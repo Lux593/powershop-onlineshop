@@ -112,9 +112,8 @@
     return '<div class="container mega__inner mega__inner--cols"><div><p class="mega__title">Kategorien</p>' +
       links(subLinks(kat).concat([['Alle ' + label, K + kat, true]])) +
       '</div><div><p class="mega__title">Entdecken</p>' +
-      links([['Neuheiten', K + 'neuheiten&bereich=' + kat], ['Sale', K + 'sale&bereich=' + kat], ['Größentabelle', '#', false, 'data-open="sizeguide"'],
-        ['Kollektion Herbst/Winter', K + kat + '&kollektion=' + encodeURIComponent('Herbst/Winter')], ['Riding Gear', K + kat + '&kollektion=' + encodeURIComponent('Riding Gear')], ['Custom Garage', K + kat + '&kollektion=' + encodeURIComponent('Custom Garage')]]) +
-      '</div><div class="mega__teasers">' + tile('mega-' + kat + '.jpg', 'Neue Kollektion', K + kat + '&kollektion=' + encodeURIComponent('Herbst/Winter')) + tile('bento-' + kat + '.jpg', 'Riding Gear', K + kat + '&kollektion=' + encodeURIComponent('Riding Gear')) + '</div></div>';
+      links([['Neuheiten', K + 'neuheiten&bereich=' + kat], ['Sale', K + 'sale&bereich=' + kat], ['Größentabelle', '#', false, 'data-open="sizeguide"']]) +
+      '</div><div class="mega__teasers">' + tile('mega-' + kat + '.jpg', 'Neue Kollektion', kat === 'herren' ? K + 'herren' : K + kat + '&kollektion=' + encodeURIComponent('Herbst/Winter')) + tile('bento-' + kat + '.jpg', 'Riding Gear', kat === 'herren' ? K + 'herren&typ=motorradbekleidung' : K + kat + '&kollektion=' + encodeURIComponent('Riding Gear')) + '</div></div>';
   }
 
   /* ---------------- Header ---------------- */

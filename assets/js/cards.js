@@ -113,10 +113,10 @@
         '<ul class="facts">' +
           '<li>' + PS.icon('calendar') + first + '</li>' +
           '<li>' + PS.icon('gauge') + PS.num(b.km) + ' km</li>' +
-          '<li>' + PS.icon('zap') + b.kw + ' kW (' + b.ps + ' PS)</li>' +
+          '<li>' + PS.icon('zap') + (b.kw ? b.kw + ' kW (' + b.ps + ' PS)' : PS.esc(b.color)) + '</li>' +
         '</ul>' +
-        '<div class="bcard__price"><strong>' + PS.moneyInt(b.price) + '</strong>' +
-          '<span class="caption muted">' + (b.zustand === 'neu' ? 'Gesamtpreis inkl. Überführung · ' : '') + PS.taxNote(b) + '</span></div>' +
+        '<div class="bcard__price"><strong>' + (b.ab ? 'ab ' : '') + PS.moneyInt(b.price) + '</strong>' +
+          '<span class="caption muted">' + (b.ab ? 'Ab-Preis · ' : (b.zustand === 'neu' ? 'Gesamtpreis inkl. Überführung · ' : '')) + PS.taxNote(b) + '</span></div>' +
         '<div class="bcard__actions">' +
           '<a class="btn btn--outline-dark btn--sm" href="' + b.url + '">Details</a>' +
           '<a class="btn btn--primary btn--sm" href="' + b.url + '#kontakt">Anfragen</a>' +

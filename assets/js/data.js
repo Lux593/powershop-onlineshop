@@ -52,8 +52,8 @@ PS.colors = {
 };
 
 PS.subcats = {
-  herren: { jacken: 'Jacken', shirts: 'Shirts & Hemden', hoodies: 'Hoodies & Sweats', hosen: 'Hosen & Jeans', motorradbekleidung: 'Motorradbekleidung', stiefel: 'Stiefel & Schuhe', handschuhe: 'Handschuhe' },
-  damen: { jacken: 'Jacken', shirts: 'Shirts & Blusen', hoodies: 'Hoodies & Sweats', hosen: 'Hosen & Jeans', motorradbekleidung: 'Motorradbekleidung', stiefel: 'Stiefel & Schuhe', handschuhe: 'Handschuhe' },
+  herren: { oberbekleidung: 'Oberbekleidung', motorradbekleidung: 'Motorradbekleidung', hosen: 'Hosen', stiefel: 'Stiefel & Schuhe' },
+  damen: { oberbekleidung: 'Oberbekleidung', motorradbekleidung: 'Motorradbekleidung', hosen: 'Hosen', stiefel: 'Stiefel & Schuhe' },
   teile: { motor: 'Motor & Performance', auspuff: 'Auspuff', fahrwerk: 'Fahrwerk & Bremsen', beleuchtung: 'Beleuchtung', lenker: 'Lenker & Bedienelemente', sitze: 'Sitze', gepaeck: 'Gepäck & Taschen', raeder: 'Räder', elektronik: 'Elektronik & Audio', wartung: 'Wartung & Pflege' },
   accessoires: { helme: 'Helme & Brillen', taschen: 'Taschen & Rucksäcke', caps: 'Caps & Mützen', leder: 'Gürtel & Geldbörsen', schmuck: 'Schmuck & Uhren', home: 'Home & Garage', gutscheine: 'Geschenkgutscheine' },
 };
@@ -63,31 +63,29 @@ function P(o) { return Object.assign({ rating: 4.6, reviews: 12, isNew: false, s
 
 PS.products = [
   // ---------------- Herren ----------------
-  P({ id: 'h1', kat: 'herren', typ: 'jacken', name: 'Herren Lederjacke „Iron Road“', price: 449.95, colors: ['schwarz', 'braun'], sizes: ['S', 'M', 'L', 'XL', 'XXL', '3XL'], soldOut: ['S'], sizeType: 'oberteile', collection: 'Herbst/Winter', img: 1, img2: 6, isNew: true, rating: 4.8, reviews: 41, material: 'Obermaterial: 100 % Rindsleder · Futter: 100 % Polyester' }),
-  P({ id: 'h2', kat: 'herren', typ: 'shirts', name: 'T-Shirt „Bar & Shield Classic“', price: 39.95, colors: ['schwarz', 'weiss', 'grau', 'oliv', 'orange', 'blau'], sizes: ['S', 'M', 'L', 'XL', 'XXL'], sizeType: 'oberteile', collection: 'Essentials', img: 2, img2: 5, isNew: true, rating: 4.7, reviews: 128 }),
-  P({ id: 'h3', kat: 'herren', typ: 'hoodies', name: 'Hoodie „Custom Garage“', price: 89.95, compareAt: 109.95, colors: ['schwarz', 'grau'], sizes: ['S', 'M', 'L', 'XL', 'XXL'], sizeType: 'oberteile', collection: 'Custom Garage', img: 3, img2: 2, sale: true, rating: 4.5, reviews: 36 }),
-  P({ id: 'h4', kat: 'herren', typ: 'hosen', name: 'Riding-Jeans „Asphalt“ mit Protektoren', price: 179.95, colors: ['blau', 'schwarz'], sizes: ['30', '32', '34', '36', '38'], sizeType: 'hosen', collection: 'Riding Gear', img: 4, img2: 1, rating: 4.4, reviews: 22 }),
-  P({ id: 'h5', kat: 'herren', typ: 'shirts', name: 'Flanellhemd „Workshop“', price: 69.95, colors: ['rot', 'oliv'], sizes: ['S', 'M', 'L', 'XL', 'XXL'], sizeType: 'oberteile', collection: 'Herbst/Winter', img: 5, img2: 3, isNew: true, rating: 4.6, reviews: 18 }),
-  P({ id: 'h6', kat: 'herren', typ: 'motorradbekleidung', name: 'Textiljacke „Long Haul“ wasserdicht', price: 329.95, colors: ['schwarz', 'grau'], sizes: ['M', 'L', 'XL', 'XXL', '3XL'], sizeType: 'oberteile', collection: 'Riding Gear', img: 6, img2: 1, isNew: true, rating: 4.7, reviews: 27 }),
-  P({ id: 'h7', kat: 'herren', typ: 'jacken', name: 'Lederweste „Rally“', price: 229.95, compareAt: 279.95, colors: ['schwarz'], sizes: ['M', 'L', 'XL', 'XXL'], sizeType: 'oberteile', collection: 'Custom Garage', img: 1, img2: 3, sale: true, rating: 4.3, reviews: 9 }),
-  P({ id: 'h8', kat: 'herren', typ: 'stiefel', name: 'Bikerstiefel „Hollister“', price: 199.95, colors: ['schwarz', 'braun'], sizes: ['40', '41', '42', '43', '44', '45', '46'], sizeType: 'stiefel', collection: 'Riding Gear', img: 4, img2: 6, rating: 4.6, reviews: 33 }),
-  P({ id: 'h9', kat: 'herren', typ: 'handschuhe', name: 'Lederhandschuhe „Classic Grip“', price: 69.95, colors: ['schwarz'], sizes: ['S', 'M', 'L', 'XL', 'XXL'], sizeType: 'handschuhe', collection: 'Riding Gear', img: 6, img2: 2, rating: 4.5, reviews: 51 }),
-  P({ id: 'h10', kat: 'herren', typ: 'hoodies', name: 'Zip-Hoodie „Heritage“', price: 99.95, colors: ['schwarz', 'oliv', 'sand'], sizes: ['S', 'M', 'L', 'XL', 'XXL'], sizeType: 'oberteile', collection: 'Herbst/Winter', img: 3, img2: 5, isNew: true, rating: 4.8, reviews: 14 }),
-  P({ id: 'h11', kat: 'herren', typ: 'shirts', name: 'Longsleeve „Milwaukee Eight“', price: 49.95, colors: ['schwarz', 'weiss'], sizes: ['S', 'M', 'L', 'XL', 'XXL'], sizeType: 'oberteile', collection: 'Essentials', img: 2, img2: 4, rating: 4.4, reviews: 20 }),
-  P({ id: 'h12', kat: 'herren', typ: 'hosen', name: 'Cargo-Hose „Garage Work“', price: 89.95, compareAt: 99.95, colors: ['oliv', 'schwarz'], sizes: ['30', '32', '34', '36', '38'], sizeType: 'hosen', collection: 'Custom Garage', img: 4, img2: 3, sale: true, rating: 4.2, reviews: 7 }),
+  // h1–h5: Neuheiten von harley-davidson.com/ch (Herren). Preise in CHF, im Mockup als € formatiert. Größen standen auf der Liste nicht.
+  P({ id: 'h1', kat: 'herren', typ: 'oberbekleidung', name: 'Vintage Plaid Short Sleeve Shirt für Herren', partNo: '96196-26VM', price: 108, colors: ['orange'], sizes: ['S', 'M', 'L', 'XL', 'XXL'], sizeType: 'oberteile', collection: 'Neuheiten', img: 'hd1', img2: 'hd1b', isNew: true, rating: 0, reviews: 0 }),
+  P({ id: 'h2', kat: 'herren', typ: 'oberbekleidung', name: 'Idyll winddichte Softshell-Jacke für Herren', partNo: '97410-26RM', price: 201, colors: ['oliv'], sizes: ['S', 'M', 'L', 'XL', 'XXL'], sizeType: 'oberteile', collection: 'Neuheiten', img: 'hd2', img2: 'hd2b', isNew: true, rating: 0, reviews: 0 }),
+  P({ id: 'h3', kat: 'herren', typ: 'oberbekleidung', name: 'Harley-Davidson x Realtree Idyll Jacke für Herren', partNo: '97417-26VM', price: 230, colors: ['oliv'], sizes: ['S', 'M', 'L', 'XL', 'XXL'], sizeType: 'oberteile', collection: 'Neuheiten', img: 'hd3', img2: 'hd3b', isNew: true, rating: 0, reviews: 0 }),
+  P({ id: 'h4', kat: 'herren', typ: 'oberbekleidung', name: 'H-D American Classic Railroad Stripe Shirt für Herren', partNo: '96537-26VM', price: 122, colors: ['schwarz'], sizes: ['S', 'M', 'L', 'XL', 'XXL'], sizeType: 'oberteile', collection: 'Neuheiten', img: 'hd4', img2: 'hd4b', isNew: true, rating: 0, reviews: 0 }),
+  P({ id: 'h5', kat: 'herren', typ: 'oberbekleidung', name: 'H-D American Classic Eagle Long Sleeve Graphic Tee für Herren', partNo: '96498-26VM', price: 65, colors: ['schwarz'], sizes: ['S', 'M', 'L', 'XL', 'XXL'], sizeType: 'oberteile', collection: 'Neuheiten', img: 'hd5', img2: 'hd5b', isNew: true, rating: 0, reviews: 0 }),
+  // h6–h8: Sommer-Motorradausrüstung von harley-davidson.com/ch. Preise in CHF.
+  P({ id: 'h6', kat: 'herren', typ: 'motorradbekleidung', name: 'Men\'s Willie G Skull Mesh Riding Jacket', partNo: '97131-26VM', price: 338, colors: ['schwarz'], sizes: ['S', 'M', 'L', 'XL', 'XXL'], sizeType: 'oberteile', collection: 'Sommer', img: 'hd6', img2: 'hd6b', isNew: true, rating: 0, reviews: 0 }),
+  P({ id: 'h7', kat: 'herren', typ: 'motorradbekleidung', name: 'Men\'s Willie G Skull Soft Shell Riding Jacket', partNo: '97122-26VM', price: 311, colors: ['grau'], sizes: ['S', 'M', 'L', 'XL', 'XXL'], sizeType: 'oberteile', collection: 'Sommer', img: 'hd7', img2: 'hd7b', isNew: true, rating: 0, reviews: 0 }),
+  P({ id: 'h8', kat: 'herren', typ: 'motorradbekleidung', name: 'Men\'s Willie G Skull Riding Chore Jacket', partNo: '97123-26VM', price: 406, colors: ['grau'], sizes: ['S', 'M', 'L', 'XL', 'XXL'], sizeType: 'oberteile', collection: 'Sommer', img: 'hd8', img2: 'hd8b', isNew: true, rating: 0, reviews: 0 }),
 
   // ---------------- Damen ----------------
-  P({ id: 'd1', kat: 'damen', typ: 'jacken', name: 'Damen Lederjacke „Midnight“', price: 399.95, colors: ['schwarz', 'rot'], sizes: ['XS', 'S', 'M', 'L', 'XL'], soldOut: ['XS'], sizeType: 'oberteile', collection: 'Herbst/Winter', img: 1, img2: 6, isNew: true, rating: 4.9, reviews: 38 }),
-  P({ id: 'd2', kat: 'damen', typ: 'shirts', name: 'T-Shirt „Wings“ Slim Fit', price: 34.95, colors: ['schwarz', 'weiss', 'orange', 'grau'], sizes: ['XS', 'S', 'M', 'L', 'XL'], sizeType: 'oberteile', collection: 'Essentials', img: 2, img2: 5, isNew: true, rating: 4.6, reviews: 74 }),
-  P({ id: 'd3', kat: 'damen', typ: 'hoodies', name: 'Cropped Hoodie „Open Road“', price: 79.95, compareAt: 94.95, colors: ['schwarz', 'sand'], sizes: ['XS', 'S', 'M', 'L', 'XL'], sizeType: 'oberteile', collection: 'Custom Garage', img: 3, img2: 2, sale: true, rating: 4.5, reviews: 19 }),
+  P({ id: 'd1', kat: 'damen', typ: 'oberbekleidung', name: 'Damen Lederjacke „Midnight“', price: 399.95, colors: ['schwarz', 'rot'], sizes: ['XS', 'S', 'M', 'L', 'XL'], soldOut: ['XS'], sizeType: 'oberteile', collection: 'Herbst/Winter', img: 1, img2: 6, isNew: true, rating: 4.9, reviews: 38 }),
+  P({ id: 'd2', kat: 'damen', typ: 'oberbekleidung', name: 'T-Shirt „Wings“ Slim Fit', price: 34.95, colors: ['schwarz', 'weiss', 'orange', 'grau'], sizes: ['XS', 'S', 'M', 'L', 'XL'], sizeType: 'oberteile', collection: 'Essentials', img: 2, img2: 5, isNew: true, rating: 4.6, reviews: 74 }),
+  P({ id: 'd3', kat: 'damen', typ: 'oberbekleidung', name: 'Cropped Hoodie „Open Road“', price: 79.95, compareAt: 94.95, colors: ['schwarz', 'sand'], sizes: ['XS', 'S', 'M', 'L', 'XL'], sizeType: 'oberteile', collection: 'Custom Garage', img: 3, img2: 2, sale: true, rating: 4.5, reviews: 19 }),
   P({ id: 'd4', kat: 'damen', typ: 'hosen', name: 'Riding-Jeans „Skyline“ mit Protektoren', price: 169.95, colors: ['blau', 'schwarz'], sizes: ['26', '28', '30', '32', '34'], sizeType: 'hosen', collection: 'Riding Gear', img: 4, img2: 1, rating: 4.5, reviews: 16 }),
-  P({ id: 'd5', kat: 'damen', typ: 'shirts', name: 'Bluse „Liberty“ Print', price: 64.95, colors: ['schwarz', 'weiss'], sizes: ['XS', 'S', 'M', 'L', 'XL'], sizeType: 'oberteile', collection: 'Herbst/Winter', img: 5, img2: 2, isNew: true, rating: 4.3, reviews: 8 }),
-  P({ id: 'd6', kat: 'damen', typ: 'jacken', name: 'Lederweste „Rebel“', price: 199.95, colors: ['schwarz'], sizes: ['XS', 'S', 'M', 'L', 'XL'], sizeType: 'oberteile', collection: 'Custom Garage', img: 6, img2: 1, rating: 4.7, reviews: 12 }),
+  P({ id: 'd5', kat: 'damen', typ: 'oberbekleidung', name: 'Bluse „Liberty“ Print', price: 64.95, colors: ['schwarz', 'weiss'], sizes: ['XS', 'S', 'M', 'L', 'XL'], sizeType: 'oberteile', collection: 'Herbst/Winter', img: 5, img2: 2, isNew: true, rating: 4.3, reviews: 8 }),
+  P({ id: 'd6', kat: 'damen', typ: 'oberbekleidung', name: 'Lederweste „Rebel“', price: 199.95, colors: ['schwarz'], sizes: ['XS', 'S', 'M', 'L', 'XL'], sizeType: 'oberteile', collection: 'Custom Garage', img: 6, img2: 1, rating: 4.7, reviews: 12 }),
   P({ id: 'd7', kat: 'damen', typ: 'motorradbekleidung', name: 'Textiljacke „Wanderlust“', price: 299.95, colors: ['schwarz', 'grau'], sizes: ['XS', 'S', 'M', 'L', 'XL'], sizeType: 'oberteile', collection: 'Riding Gear', img: 1, img2: 3, isNew: true, rating: 4.6, reviews: 21 }),
   P({ id: 'd8', kat: 'damen', typ: 'stiefel', name: 'Bikerstiefel „Lexington“', price: 189.95, compareAt: 219.95, colors: ['schwarz', 'braun'], sizes: ['36', '37', '38', '39', '40', '41'], sizeType: 'stiefel', collection: 'Riding Gear', img: 4, img2: 6, sale: true, rating: 4.4, reviews: 17 }),
-  P({ id: 'd9', kat: 'damen', typ: 'handschuhe', name: 'Handschuhe „Road Queen“', price: 59.95, colors: ['schwarz'], sizes: ['XS', 'S', 'M', 'L'], sizeType: 'handschuhe', collection: 'Riding Gear', img: 6, img2: 2, rating: 4.5, reviews: 23 }),
-  P({ id: 'd10', kat: 'damen', typ: 'hoodies', name: 'Sweatshirt „Since 1903“', price: 69.95, colors: ['grau', 'schwarz', 'rot'], sizes: ['XS', 'S', 'M', 'L', 'XL'], sizeType: 'oberteile', collection: 'Essentials', img: 3, img2: 5, rating: 4.6, reviews: 30 }),
-  P({ id: 'd11', kat: 'damen', typ: 'shirts', name: 'Tanktop „Freedom“', price: 29.95, colors: ['schwarz', 'weiss'], sizes: ['XS', 'S', 'M', 'L', 'XL'], sizeType: 'oberteile', collection: 'Essentials', img: 2, img2: 4, rating: 4.2, reviews: 11 }),
+  P({ id: 'd9', kat: 'damen', typ: 'motorradbekleidung', name: 'Handschuhe „Road Queen“', price: 59.95, colors: ['schwarz'], sizes: ['XS', 'S', 'M', 'L'], sizeType: 'handschuhe', collection: 'Riding Gear', img: 6, img2: 2, rating: 4.5, reviews: 23 }),
+  P({ id: 'd10', kat: 'damen', typ: 'oberbekleidung', name: 'Sweatshirt „Since 1903“', price: 69.95, colors: ['grau', 'schwarz', 'rot'], sizes: ['XS', 'S', 'M', 'L', 'XL'], sizeType: 'oberteile', collection: 'Essentials', img: 3, img2: 5, rating: 4.6, reviews: 30 }),
+  P({ id: 'd11', kat: 'damen', typ: 'oberbekleidung', name: 'Tanktop „Freedom“', price: 29.95, colors: ['schwarz', 'weiss'], sizes: ['XS', 'S', 'M', 'L', 'XL'], sizeType: 'oberteile', collection: 'Essentials', img: 2, img2: 4, rating: 4.2, reviews: 11 }),
   P({ id: 'd12', kat: 'damen', typ: 'hosen', name: 'Leggings „Moto“ mit Stretch', price: 59.95, colors: ['schwarz'], sizes: ['XS', 'S', 'M', 'L', 'XL'], sizeType: 'hosen', collection: 'Herbst/Winter', img: 4, img2: 3, isNew: true, rating: 4.4, reviews: 9 }),
 
   // ---------------- Teile & Zubehör ----------------
@@ -140,29 +138,25 @@ PS.products = [
 })();
 
 // ---------------- Motorräder ----------------
+// Katalog 2026 von harley-davidson.com/ch/de/motorcycles/touring.html. Preise sind CHF-Ab-Preise, im Mockup als € formatiert.
 PS.bikes = [
-  { id: 'b1', name: 'Street Glide', family: 'Grand American Touring', zustand: 'neu', year: 2026, ez: null, km: 0, kw: 80, ps: 109, ccm: 1923, color: 'Vivid Black', price: 34990, tax: 'regel', hu: null, fzgNr: 'PS-26011', img: 1 },
-  { id: 'b2', name: 'Fat Boy 114', family: 'Cruiser', zustand: 'neu', year: 2026, ez: null, km: 0, kw: 69, ps: 94, ccm: 1868, color: 'Billiard Gray', price: 27490, tax: 'regel', hu: null, fzgNr: 'PS-26014', img: 2 },
-  { id: 'b3', name: 'Road Glide', family: 'Grand American Touring', zustand: 'gebraucht', year: 2023, ez: '04/2023', km: 11850, kw: 78, ps: 106, ccm: 1923, color: 'Redline Red', price: 28900, tax: '25a', hu: '04/2027', fzgNr: 'PS-23108', img: 3, owners: 1 },
-  { id: 'b4', name: 'Low Rider ST', family: 'Cruiser', zustand: 'gebraucht', year: 2022, ez: '06/2022', km: 18400, kw: 77, ps: 105, ccm: 1923, color: 'Vivid Black', price: 21490, tax: '25a', hu: '06/2026', fzgNr: 'PS-22094', img: 4, owners: 1, status: 'reserviert', reservedUntil: '30.09.2026, 18:00 Uhr' },
-  { id: 'b5', name: 'Pan America 1250 Special', family: 'Adventure Touring', zustand: 'vorfuehrer', year: 2025, ez: '03/2025', km: 2100, kw: 112, ps: 152, ccm: 1252, color: 'Mineral Green', price: 20990, tax: 'regel', hu: '03/2028', fzgNr: 'PS-25032', img: 5, owners: 0 },
-  { id: 'b6', name: 'Nightster', family: 'Sport', zustand: 'neu', year: 2026, ez: null, km: 0, kw: 66, ps: 90, ccm: 975, color: 'Vivid Black', price: 14990, tax: 'regel', hu: null, fzgNr: 'PS-26019', img: 6 },
-  { id: 'b7', name: 'Breakout 117', family: 'Cruiser', zustand: 'gebraucht', year: 2024, ez: '05/2024', km: 5300, kw: 75, ps: 102, ccm: 1923, color: 'Iron Horse Metallic', price: 25990, tax: 'regel', hu: '05/2027', fzgNr: 'PS-24051', img: 7, owners: 1 },
-  { id: 'b8', name: 'CVO Road Glide', family: 'CVO', zustand: 'neu', year: 2026, ez: null, km: 0, kw: 94, ps: 128, ccm: 1977, color: 'Raven Metallic', price: 48990, tax: 'regel', hu: null, fzgNr: 'PS-26003', img: 8 },
-  { id: 'b9', name: 'Tri Glide Ultra', family: 'Trike', zustand: 'gebraucht', year: 2021, ez: '07/2021', km: 21700, kw: 68, ps: 92, ccm: 1868, color: 'Midnight Blue', price: 31900, tax: '25a', hu: '07/2027', fzgNr: 'PS-21077', img: 1, owners: 2 },
-  { id: 'b10', name: 'Sportster S', family: 'Sport', zustand: 'vorfuehrer', year: 2025, ez: '04/2025', km: 1450, kw: 89, ps: 121, ccm: 1252, color: 'Vivid Black', price: 16490, tax: 'regel', hu: '04/2028', fzgNr: 'PS-25041', img: 2, owners: 0 },
-  { id: 'b11', name: 'Heritage Classic 114', family: 'Cruiser', zustand: 'gebraucht', year: 2020, ez: '03/2020', km: 26300, kw: 69, ps: 94, ccm: 1868, color: 'River Rock Gray', price: 17990, tax: '25a', hu: '03/2027', fzgNr: 'PS-20012', img: 3, owners: 2 },
-  { id: 'b12', name: 'Road King Special', family: 'Grand American Touring', zustand: 'gebraucht', year: 2019, ez: '05/2019', km: 32800, kw: 68, ps: 92, ccm: 1868, color: 'Vivid Black', price: 18490, tax: '25a', hu: '05/2027', fzgNr: 'PS-19055', img: 4, owners: 2 },
+  { id: 'b1', name: 'Street Glide', family: 'Grand American Touring', zustand: 'neu', year: 2026, ez: null, km: 0, kw: null, ps: null, ccm: null, color: 'Blau', price: 31500, tax: 'regel', hu: null, fzgNr: 'M75B', img: 1, ab: true, heroPoster: 'Street Glide', heroBlurb: 'Die tiefe Scheibe für die offene Strasse.', heroLine: 'Touring', heroColor: 'Schwarz', heroAlt: 'Zwei Fahrer auf einer Street Glide, unterwegs auf der Autobahn', heroImage: 'assets/img/hero-ride-street.png' },
+  { id: 'b2', name: 'Road Glide', family: 'Grand American Touring', zustand: 'neu', year: 2026, ez: null, km: 0, kw: null, ps: null, ccm: null, color: 'Türkis', price: 31500, tax: 'regel', hu: null, fzgNr: 'M79B', img: 2, ab: true, heroPoster: 'Road Glide', heroBlurb: 'Die feste Verkleidung für lange Strecken.', heroLine: 'Touring', heroColor: 'Violett', heroAlt: 'Zwei Fahrer auf einer violetten Road Glide, unterwegs auf der Autobahn', heroImage: 'assets/img/hero-ride-road.png' },
+  { id: 'b3', name: 'Street Glide Limited', family: 'Grand American Touring', zustand: 'neu', year: 2026, ez: null, km: 0, kw: null, ps: null, ccm: null, color: 'Schwarz', price: 33900, tax: 'regel', hu: null, fzgNr: 'M04B', img: 3, ab: true },
+  { id: 'b4', name: 'Road Glide Limited', family: 'Grand American Touring', zustand: 'neu', year: 2026, ez: null, km: 0, kw: null, ps: null, ccm: null, color: 'Dunkelblau', price: 33900, tax: 'regel', hu: null, fzgNr: 'M76', img: 4, ab: true },
+  { id: 'b5', name: 'CVO Street Glide ST', family: 'CVO', zustand: 'neu', year: 2026, ez: null, km: 0, kw: null, ps: null, ccm: null, color: 'Grau', price: 48300, tax: 'regel', hu: null, fzgNr: 'M67B', img: 5, ab: true },
+  { id: 'b6', name: 'CVO Road Glide ST', family: 'CVO', zustand: 'neu', year: 2026, ez: null, km: 0, kw: null, ps: null, ccm: null, color: 'Orange', price: 48300, tax: 'regel', hu: null, fzgNr: 'M65B', img: 6, ab: true, heroPoster: 'CVO', heroBlurb: 'Die CVO-Ausstattung für die grosse Tour.', heroLine: 'CVO', heroColor: 'Grau', heroAlt: 'Fahrer auf einer grauen CVO Road Glide, unterwegs auf einer Landstrasse', heroImage: 'assets/img/hero-ride-cvo.png' },
 ];
 PS.bikes.forEach(function (b, i) {
   b.status = b.status || 'verfuegbar';
   b.image = 'assets/img/bike-' + b.img + '.jpg';
-  b.gallery = [b.image, 'assets/img/bike-detail-1.jpg', 'assets/img/bike-detail-2.jpg', 'assets/img/bike-detail-3.jpg', 'assets/img/bike-detail-4.jpg'];
+  b.gallery = [b.image];
   b.url = 'motorrad.html?id=' + b.id;
   b.date = 100 - i;
-  b.equipment = ['ABS & Kurven-ABS', 'Tempomat', 'Keyless Ride', 'LED-Scheinwerfer', 'Traktionskontrolle', 'TFT-Display mit Navigation', 'Bluetooth-Audio', 'USB-C-Anschluss'];
-  if (b.family === 'Cruiser' || b.family === 'Sport') b.equipment = b.equipment.slice(0, 5).concat(['Custom-Lackierung ab Werk', 'Wegfahrsperre']);
+  b.equipment = ['Ausstattung hängt von der Konfiguration ab. Wir beraten dich im Showroom.'];
 });
+
+PS.heroBikes = ['b2', 'b1', 'b6'];
 
 PS.zustandLabel = { neu: 'Neu', gebraucht: 'Gebraucht', vorfuehrer: 'Vorführer' };
 

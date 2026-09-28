@@ -114,39 +114,81 @@
      Homepage
      ====================================================================== */
   function initHero() {
-    var hero = $('.hero'); if (!hero) return;
-    var slides = $$('.hero__slide', hero), dots = $$('.hero__dot', hero), pauseBtn = $('.hero__pause', hero);
-    var i = 0, timer = null, playing = !reduceMotion, hovering = false;
-    function go(n) {
-      i = (n + slides.length) % slides.length;
-      slides.forEach(function (s, k) { s.classList.toggle('is-active', k === i); s.setAttribute('aria-hidden', k !== i); s.inert = k !== i; });
-      dots.forEach(function (d, k) { d.setAttribute('aria-current', k === i); });
+    var hero = $('.hero'); if (!hero || !PS.heroBikes) return;
+    var bikes = PS.heroBikes.map(PS.findBike).filter(Boolean);
+    if (!bikes.length) return;
+    var poster = $('#hero-poster', hero), panel = $('#hero-panel', hero), media = $('.hero__media', hero);
+    var chips = $$('.hero__chip', hero);
+    var current = -1;
+
+    function showPhoto(b) {
+      var frames = $$('.hero__bg', media);
+      var next = null;
+      frames.forEach(function (img) { if (img.getAttribute('src') === b.heroImage) next = img; });
+      if (!next) {
+        next = document.createElement('img');
+        next.className = 'hero__bg';
+        next.src = b.heroImage;
+        next.width = 1024;
+        next.height = 576;
+        media.appendChild(next);
+      }
+      next.alt = b.heroAlt || '';
+      frames.forEach(function (img) { if (img !== next) img.classList.remove('is-active'); });
+      if (reduceMotion) next.classList.add('is-active');
+      else requestAnimationFrame(function () { next.classList.add('is-active'); });
     }
-    function tick() { clearInterval(timer); if (playing && !hovering) timer = setInterval(function () { go(i + 1); }, 6000); }
-    function setPlaying(p) {
-      playing = p;
-      pauseBtn.innerHTML = I(p ? 'pause' : 'play');
-      pauseBtn.setAttribute('aria-label', p ? 'Automatischen Wechsel anhalten' : 'Automatischen Wechsel starten');
-      $('.hero__track', hero).setAttribute('aria-live', p ? 'off' : 'polite');
-      tick();
+
+    function select(index, fromUser) {
+      if (index === current) return;
+      current = index;
+      var b = bikes[index];
+      if (fromUser) panel.setAttribute('aria-live', 'polite');
+      poster.textContent = b.heroPoster;
+      poster.classList.toggle('is-short', b.heroPoster.length < 6);
+      if (fromUser && !reduceMotion) {
+        poster.classList.remove('is-in');
+        void poster.offsetWidth;
+        poster.classList.add('is-in');
+      }
+      $('#hero-eyebrow', hero).textContent = b.family + ' · ' + b.year;
+      $('#hero-blurb', hero).textContent = b.heroBlurb;
+      var detail = $('#hero-detail', hero);
+      detail.href = b.url;
+      detail.textContent = b.name + ' ansehen';
+      $('#hero-color', hero).textContent = b.heroColor || b.color;
+      $('#hero-year', hero).textContent = String(b.year);
+      $('#hero-line', hero).textContent = b.heroLine;
+      $('#hero-price', hero).textContent = (b.ab ? 'ab ' : '') + PS.moneyInt(b.price);
+      chips.forEach(function (tab, k) {
+        var on = k === index;
+        tab.setAttribute('aria-selected', on ? 'true' : 'false');
+        tab.tabIndex = on ? 0 : -1;
+      });
+      panel.setAttribute('aria-labelledby', 'hero-tab-' + b.id);
+      showPhoto(b);
     }
-    $('.hero__arrow--prev', hero).onclick = function () { go(i - 1); tick(); };
-    $('.hero__arrow--next', hero).onclick = function () { go(i + 1); tick(); };
-    dots.forEach(function (d, k) { d.onclick = function () { go(k); tick(); }; });
-    pauseBtn.onclick = function () { setPlaying(!playing); };
-    hero.addEventListener('mouseenter', function () { hovering = true; tick(); });
-    hero.addEventListener('mouseleave', function () { hovering = false; tick(); });
-    hero.addEventListener('focusin', function () { hovering = true; tick(); });
-    hero.addEventListener('focusout', function (e) { if (!hero.contains(e.relatedTarget)) { hovering = false; tick(); } });
-    // Swipe
-    var x0 = null;
-    hero.addEventListener('pointerdown', function (e) { if (e.pointerType !== 'mouse') x0 = e.clientX; });
-    hero.addEventListener('pointerup', function (e) {
-      if (x0 === null) return;
-      var dx = e.clientX - x0; x0 = null;
-      if (Math.abs(dx) > 40) { go(i + (dx < 0 ? 1 : -1)); tick(); }
+
+    chips.forEach(function (tab, k) {
+      tab.addEventListener('click', function () { select(k, true); });
     });
-    go(0); setPlaying(playing);
+    hero.querySelector('.hero__chips').addEventListener('keydown', function (e) {
+      var next = null;
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = (current + 1) % bikes.length;
+      else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = (current - 1 + bikes.length) % bikes.length;
+      else if (e.key === 'Home') next = 0;
+      else if (e.key === 'End') next = bikes.length - 1;
+      if (next === null) return;
+      e.preventDefault();
+      select(next, true);
+      chips[next].focus();
+    });
+
+    select(0, false);
+    var idle = window.requestIdleCallback || function (fn) { setTimeout(fn, 280); };
+    idle(function () {
+      bikes.forEach(function (b) { if (b.heroImage) { var im = new Image(); im.src = b.heroImage; } });
+    });
   }
 
   function initNews() {
@@ -475,7 +517,7 @@
     if (p.kat === 'teile') { location.replace(p.url); return; }
     PS.store.addRecent(p.id);
     var cat = PS.categories[p.kat], sub = PS.subcats[p.kat][p.typ];
-    var images = [p.image, p.image2].concat(PS.products.filter(function (x) { return x.kat === p.kat && x.image !== p.image && x.image !== p.image2; }).map(function (x) { return x.image; }).filter(function (v, i, a) { return a.indexOf(v) === i; }).slice(0, 2));
+    var images = [p.image, p.image2].filter(function (src, i, list) { return src && list.indexOf(src) === i; });
     var color = p.colors[0];
     var badges = (p.isNew ? '<span class="badge">Neu</span>' : '') + (p.compareAt ? '<span class="badge badge--sale">Sale</span>' : '');
     document.title = p.name + ' – Power Shop';
@@ -486,7 +528,7 @@
       '<div class="pdp__info">' +
         '<p class="eyebrow">' + esc(PS.catLabel(p)) + (p.collection ? ' · ' + esc(p.collection) : '') + '</p>' +
         '<h1 class="pdp__title">' + esc(p.name) + '</h1>' +
-        '<div class="pdp__meta">' + PS.stars(p.rating, p.reviews) + '<a class="text-link small" href="#bewertungen">Bewertungen lesen</a></div>' +
+        '<div class="pdp__meta">' + (p.partNo ? '<span class="partno">Art.-Nr. ' + esc(p.partNo) + '</span>' : '') + PS.stars(p.rating, p.reviews) + '<a class="text-link small" href="#bewertungen">Bewertungen lesen</a></div>' +
         '<div class="pdp__price">' + PS.priceBlock(p, { long: true }) + '</div>' +
         (p.colors.length ? '<div class="pdp__row"><div class="pdp__row-head"><span><strong>Farbe:</strong> <span data-color-name>' + color.name + '</span></span></div><div class="swatches" role="group" aria-label="Farbe wählen">' +
           p.colors.map(function (c, i) { return '<button class="swatch-btn" type="button" data-color="' + c.name + '" aria-pressed="' + (i === 0) + '" aria-label="' + c.name + '"><span class="swatch" style="background:' + c.hex + '"></span></button>'; }).join('') + '</div></div>' : '') +
@@ -615,7 +657,7 @@
     var isNew = b.zustand === 'neu', reserved = b.status === 'reserviert';
     var canReserve = !isNew && !reserved;
     var sub = isNew ? ['Neufahrzeuge', 'neu'] : b.zustand === 'vorfuehrer' ? ['Vorführfahrzeuge', 'vorfuehrer'] : ['Gebrauchtfahrzeuge', 'gebraucht'];
-    var label = b.name + ' (' + (isNew ? 'Modelljahr ' + b.year : 'EZ ' + b.ez) + ', Fzg.-Nr. ' + b.fzgNr + ')';
+    var label = b.name + ' (' + (isNew ? 'Modelljahr ' + b.year : 'EZ ' + b.ez) + (b.ab ? '' : ', Fzg.-Nr. ' + b.fzgNr) + ')';
     var topics = ['probefahrt', 'finanzierung', 'inzahlungnahme'].concat(canReserve ? ['reservierung'] : [], ['frage']);
     document.title = b.name + ' – ' + PS.zustandLabel[b.zustand] + ' – Power Shop';
     document.body.classList.add('has-sticky-contact');
@@ -629,11 +671,11 @@
       '<div class="pdp">' +
         '<div>' + gallery(b.gallery, { wide: true, alt: b.name, badges: PS.bikeBadge(b) }) + '</div>' +
         '<div class="pdp__info">' +
-          '<p class="eyebrow">' + esc(b.family) + ' · Fzg.-Nr. ' + b.fzgNr + '</p>' +
+          '<p class="eyebrow">' + esc(b.family) + (b.ab ? ' · Modell ' + b.fzgNr : ' · Fzg.-Nr. ' + b.fzgNr) + '</p>' +
           '<h1 class="pdp__title">' + esc(b.name) + '</h1>' +
-          '<div class="bike-price"><strong>' + PS.moneyInt(b.price) + '</strong><p>' + (isNew ? 'Gesamtpreis inkl. Überführung und Nebenkosten · ' : '') + PS.taxNote(b) + (isNew ? '' : ' · zzgl. Zulassung') + '</p></div>' +
+          '<div class="bike-price"><strong>' + (b.ab ? 'ab ' : '') + PS.moneyInt(b.price) + '</strong><p>' + (b.ab ? 'Ab-Preis laut Harley-Davidson CH · ' : (isNew ? 'Gesamtpreis inkl. Überführung und Nebenkosten · ' : '')) + PS.taxNote(b) + (isNew || b.ab ? '' : ' · zzgl. Zulassung') + '</p></div>' +
           '<dl class="bike-facts">' +
-            [['calendar', isNew ? 'Modelljahr' : 'Erstzulassung', isNew ? b.year : b.ez], ['gauge', 'km-Stand', PS.num(b.km) + ' km'], ['zap', 'Leistung', b.kw + ' kW (' + b.ps + ' PS)'], ['cog', 'Hubraum', PS.num(b.ccm) + ' cm³'], ['palette', 'Farbe', b.color], ['shield-check', 'HU bis', b.hu || 'neu']]
+            [['calendar', isNew ? 'Modelljahr' : 'Erstzulassung', isNew ? b.year : b.ez], ['gauge', 'km-Stand', PS.num(b.km) + ' km'], ['zap', 'Leistung', b.kw ? b.kw + ' kW (' + b.ps + ' PS)' : 'auf Anfrage'], ['cog', 'Hubraum', b.ccm ? PS.num(b.ccm) + ' cm³' : 'auf Anfrage'], ['palette', 'Farbe', b.color], ['shield-check', 'HU bis', b.hu || 'neu']]
               .map(function (f) { return '<div><dt>' + I(f[0]) + f[1] + '</dt><dd>' + f[2] + '</dd></div>'; }).join('') +
           '</dl>' +
           (reserved ? '<div class="reserved-banner">' + I('clock') + '<span><strong>Reserviert bis ' + b.reservedUntil + '.</strong> Du kannst uns trotzdem kontaktieren – wir melden uns, falls das Bike wieder frei wird.</span></div>' : '') +
@@ -642,7 +684,7 @@
       '</div>' +
       '<div class="pdp-sections">' +
         acc('Ausstattung & Extras', '<ul class="equip">' + b.equipment.map(function (e) { return '<li>' + I('check') + e + '</li>'; }).join('') + '</ul>', true) +
-        acc('Technische Daten', '<table class="spec-table"><tbody>' + [['Modellfamilie', b.family], ['Modell', b.name], ['Modelljahr', b.year], ['Hubraum', PS.num(b.ccm) + ' cm³'], ['Leistung', b.kw + ' kW (' + b.ps + ' PS)'], ['Farbe', b.color], ['Fahrzeugnummer', b.fzgNr]].map(function (r) { return '<tr><th>' + r[0] + '</th><td>' + r[1] + '</td></tr>'; }).join('') + '</tbody></table>') +
+        acc('Technische Daten', '<table class="spec-table"><tbody>' + [['Modellfamilie', b.family], ['Modell', b.name], ['Modelljahr', b.year], ['Hubraum', b.ccm ? PS.num(b.ccm) + ' cm³' : 'auf Anfrage'], ['Leistung', b.kw ? b.kw + ' kW (' + b.ps + ' PS)' : 'auf Anfrage'], ['Farbe', b.color], [b.ab ? 'Modellcode' : 'Fahrzeugnummer', b.fzgNr]].map(function (r) { return '<tr><th>' + r[0] + '</th><td>' + r[1] + '</td></tr>'; }).join('') + '</tbody></table>') +
         acc('Fahrzeughistorie', isNew ? '<p>Neufahrzeug mit voller Herstellergarantie.</p>' : '<ul><li>' + (b.owners === 0 ? 'Vorführfahrzeug aus unserem Haus' : b.owners + ' Vorbesitzer') + '</li><li>Scheckheftgepflegt bei Harley-Davidson Vertragspartnern</li><li>Unfallfrei laut Vorbesitzer</li><li>Frische Inspektion vor Übergabe</li></ul>') +
         acc('Finanzierung', '<p>Wir erstellen dir ein individuelles Finanzierungs- oder Leasingangebot – passend zu Anzahlung, Laufzeit und Schlussrate. Wähle in der Kontakt-Box „Finanzierung“ und schick uns deine Anfrage.</p><p class="small muted">Hinweis fürs Livegehen: Werden Monatsraten angezeigt, ist ein repräsentatives Beispiel nach § 17 PAngV Pflicht.</p>') +
         acc('Standort & Übergabe', '<p>Besichtigung und Probefahrt im Power Shop, ' + shop.address + '. Der Kaufvertrag wird bei uns vor Ort abgeschlossen. Zulassung und Überführung übernehmen wir auf Wunsch.</p>') +
@@ -678,7 +720,7 @@
     var bikes = $('[data-sg-bikes]');
     if (bikes) bikes.innerHTML = [PS.findBike('b1'), PS.findBike('b3'), PS.findBike('b4')].map(PS.bikeCard).join('');
     var cb = $('[data-sg-contact]');
-    if (cb) { cb.innerHTML = PS.contactBox({ title: 'Interesse an diesem Bike?', subject: 'Road Glide (EZ 04/2023, Fzg.-Nr. PS-23108)', topics: ['probefahrt', 'finanzierung', 'inzahlungnahme', 'reservierung', 'frage'] }); PS.initContactBoxes(cb); }
+    if (cb) { cb.innerHTML = PS.contactBox({ title: 'Interesse an diesem Bike?', subject: 'Street Glide (Modelljahr 2026)', topics: ['probefahrt', 'finanzierung', 'inzahlungnahme', 'frage'] }); PS.initContactBoxes(cb); }
   }
 
   /* ---------------- Start ---------------- */
