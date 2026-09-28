@@ -498,6 +498,7 @@
       PS.toast('Deine Cookie-Auswahl wurde gespeichert.');
     });
   }
-  if (!PS.store.consent && !/[?&]nocookie/.test(location.search)) cookieBanner(false);
+  // Banner erscheint kurz nach dem Laden, damit die Seite zuerst sichtbar ist
+  if (!PS.store.consent && !/[?&]nocookie/.test(location.search)) setTimeout(function () { if (!PS.store.consent) cookieBanner(false); }, 1200);
   document.addEventListener('click', function (e) { if (e.target.closest('[data-cookie-settings]')) { e.preventDefault(); cookieBanner(true); } });
 })();

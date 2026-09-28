@@ -8,7 +8,7 @@
 .announce a { text-decoration: underline; text-underline-offset: 2px; font-weight: 600; }
 
 /* ---------- Header ---------- */
-.site-header { position: sticky; top: 0; z-index: 200; background: var(--c-black); color: var(--c-white); border-bottom: 1px solid var(--c-steel); }
+.site-header { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 200; background: var(--c-black); color: var(--c-white); border-bottom: 1px solid var(--c-steel); }
 .header__bar { height: var(--header-h); display: flex; align-items: center; gap: 12px; transition: height var(--t-med) var(--ease); }
 .site-header.is-compact .header__bar { height: 60px; }
 .brand { display: inline-flex; align-items: center; gap: 12px; }

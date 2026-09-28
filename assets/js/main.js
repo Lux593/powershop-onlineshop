@@ -336,7 +336,7 @@
         var v = k === 'familie' ? state.f[k].map(function (f) { return PS.familySlug[f] || f; }) : state.f[k];
         if (['typ', 'zustand', 'kollektion', 'bereich', 'familie'].indexOf(k) > -1) u.set(k, v.join(','));
       });
-      history.replaceState(null, '', location.pathname + '?' + u.toString());
+      try { history.replaceState(null, '', location.pathname + '?' + u.toString()); } catch (e) { /* z. B. in eingebetteten Ansichten */ }
     }
 
     function render() {
