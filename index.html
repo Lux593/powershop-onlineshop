@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Power Shop – Harley-Davidson Vertragshändler | Motorräder, Bekleidung & Teile</title>
+  <meta name="description" content="Power Shop – offizieller Harley-Davidson Vertragshändler: Neufahrzeuge, geprüfte Gebrauchte, MotorClothes, Original-Teile und Werkstatt-Service.">
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="icon" href="assets/brand/power-shop-signet.svg" type="image/svg+xml">
+  <link rel="preload" href="assets/fonts/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/barlow-condensed-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/css/tokens.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/sections.css">
+  <script src="assets/js/icons.js" defer></script>
+  <script src="assets/js/data.js" defer></script>
+  <script src="assets/js/cards.js" defer></script>
+  <script src="assets/js/layout.js" defer></script>
+  <script src="assets/js/main.js" defer></script>
+</head>
+<body data-page="home">
+  <a class="skip-link" href="#main">Zum Inhalt springen</a>
+  <div id="site-header"></div>
+
+  <main id="main">
+    <h1 class="sr-only">Power Shop – offizieller Harley-Davidson Vertragshändler</h1>
+
+    <!-- 3 · Hero-Slider (Split wie Template) -->
+    <section class="hero on-dark" aria-roledescription="Karussell" aria-label="Highlights">
+      <div class="hero__track" aria-live="off">
+        <div class="hero__slide is-active" role="group" aria-roledescription="Folie" aria-label="1 von 3">
+          <div class="hero__media"><img src="assets/img/hero-1-motorraeder.jpg" alt="Neues Touring-Modell auf der Landstraße bei Sonnenuntergang" width="1600" height="1200" fetchpriority="high"></div>
+          <div class="hero__content textured"><div class="hero__text">
+            <p class="eyebrow">Jetzt im Showroom</p>
+            <h2 class="h1">Die neuen Modelle</h2>
+            <p>Mehr Druck, mehr Komfort, mehr Charakter. Erlebe die neue Generation live – bei einer Probefahrt mit persönlicher Beratung.</p>
+            <div class="hero__actions">
+              <a class="btn btn--primary" href="service.html#probefahrt">Probefahrt anfragen</a>
+              <a class="btn btn--outline-light" href="kollektion.html?kat=motorraeder&amp;zustand=neu">Modelle entdecken</a>
+            </div>
+          </div></div>
+        </div>
+        <div class="hero__slide" role="group" aria-roledescription="Folie" aria-label="2 von 3">
+          <div class="hero__media"><img src="assets/img/hero-2-kollektion.jpg" alt="Paar in Lederjacken am Motorrad im Herbstlicht" width="1600" height="1200" loading="lazy"></div>
+          <div class="hero__content textured"><div class="hero__text">
+            <p class="eyebrow">Herbst/Winter-Kollektion</p>
+            <h2 class="h1">Gemacht für kalte Kilometer</h2>
+            <p>Lederjacken, Riding Gear und Layer, die auf dem Bike und in der Stadt funktionieren.</p>
+            <div class="hero__actions">
+              <a class="btn btn--primary" href="kollektion.html?kat=herren&amp;kollektion=Herbst%2FWinter">Herren</a>
+              <a class="btn btn--outline-light" href="kollektion.html?kat=damen&amp;kollektion=Herbst%2FWinter">Damen</a>
+            </div>
+          </div></div>
+        </div>
+        <div class="hero__slide" role="group" aria-roledescription="Folie" aria-label="3 von 3">
+          <div class="hero__media"><img src="assets/img/hero-3-custom-parts.jpg" alt="Custom-Umbau in der Werkstatt, Detail eines Chrom-Auspuffs" width="1600" height="1200" loading="lazy"></div>
+          <div class="hero__content textured"><div class="hero__text">
+            <p class="eyebrow">Custom Parts</p>
+            <h2 class="h1">Mach sie zu deiner</h2>
+            <p>Screamin’ Eagle Performance, Original-Teile mit Kompatibilitäts-Check und Einbau durch unsere Werkstatt.</p>
+            <div class="hero__actions">
+              <a class="btn btn--primary" href="kollektion.html?kat=teile">Teile entdecken</a>
+              <a class="btn btn--outline-light" href="service.html#werkstatt">Werkstatt-Termin</a>
+            </div>
+          </div></div>
+        </div>
+      </div>
+      <button class="hero__arrow hero__arrow--prev" type="button" aria-label="Vorherige Folie"><svg class="icon" aria-hidden="true"><use href="#i-chevron-left"></use></svg></button>
+      <button class="hero__arrow hero__arrow--next" type="button" aria-label="Nächste Folie"><svg class="icon" aria-hidden="true"><use href="#i-chevron-right"></use></svg></button>
+      <div class="hero__controls">
+        <div class="hero__dots">
+          <button class="hero__dot" type="button" aria-label="Folie 1: Die neuen Modelle"></button>
+          <button class="hero__dot" type="button" aria-label="Folie 2: Herbst/Winter-Kollektion"></button>
+          <button class="hero__dot" type="button" aria-label="Folie 3: Custom Parts"></button>
+        </div>
+        <button class="hero__pause" type="button" aria-label="Automatischen Wechsel anhalten"></button>
+      </div>
+    </section>
+
+    <!-- 4 · Service-Leiste -->
+    <section class="section--tight" aria-label="Service">
+      <div class="container service-tiles">
+        <a class="service-tile" href="service.html#probefahrt">
+          <svg class="icon" aria-hidden="true"><use href="#i-route"></use></svg>
+          <h3>Probefahrt</h3><p>Dein Wunsch-Bike live erleben.</p>
+          <span class="more">Anfragen <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg></span>
+        </a>
+        <a class="service-tile" href="service.html#finanzierung">
+          <svg class="icon" aria-hidden="true"><use href="#i-banknote"></use></svg>
+          <h3>Finanzierung</h3><p>Individuell zu Laufzeit und Rate.</p>
+          <span class="more">Beraten lassen <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg></span>
+        </a>
+        <a class="service-tile" href="service.html#werkstatt">
+          <svg class="icon" aria-hidden="true"><use href="#i-wrench"></use></svg>
+          <h3>Werkstatt</h3><p>Service, Umbau und Eintragung.</p>
+          <span class="more">Termin anfragen <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg></span>
+        </a>
+        <a class="service-tile" href="service.html#inzahlungnahme">
+          <svg class="icon" aria-hidden="true"><use href="#i-handshake"></use></svg>
+          <h3>Inzahlungnahme</h3><p>Fairer Preis für dein altes Bike.</p>
+          <span class="more">Bewerten lassen <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg></span>
+        </a>
+      </div>
+    </section>
+
+    <!-- 5 · Neuheiten mit Tabs -->
+    <section class="section" aria-labelledby="news-title" style="padding-top:var(--s-4)">
+      <div class="container">
+        <div class="section-head section-head--center">
+          <h2 id="news-title">Neuheiten</h2>
+          <p class="muted">Frisch eingetroffen im Power Shop</p>
+        </div>
+        <div class="tabs" role="tablist" aria-label="Neuheiten nach Bereich" data-news-tabs>
+          <button class="tab" role="tab" type="button" id="news-tab-bekleidung" data-key="bekleidung" aria-selected="true" aria-controls="news-grid">Bekleidung</button>
+          <button class="tab" role="tab" type="button" id="news-tab-teile" data-key="teile" aria-selected="false" aria-controls="news-grid" tabindex="-1">Teile &amp; Zubehör</button>
+          <button class="tab" role="tab" type="button" id="news-tab-accessoires" data-key="accessoires" aria-selected="false" aria-controls="news-grid" tabindex="-1">Accessoires</button>
+        </div>
+        <div class="product-grid product-grid--rail" id="news-grid" role="tabpanel" data-news></div>
+        <div class="center-cta"><a class="btn btn--outline-dark" href="kollektion.html?kat=neuheiten" data-news-all>Alle Neuheiten</a></div>
+      </div>
+    </section>
+
+    <!-- 6 · Kategorie-Bento (Aufbau wie Template) -->
+    <section class="section on-dark textured" aria-labelledby="bento-title">
+      <div class="container">
+        <div class="section-head"><h2 id="bento-title">Shop nach Kategorie</h2></div>
+        <div class="bento">
+          <div class="bento__col bento__col--left">
+            <a class="bento-tile bento-tile--moto" href="kollektion.html?kat=motorraeder">
+              <img src="assets/img/bento-motorraeder.jpg" alt="" width="1400" height="1000" loading="lazy">
+              <span class="bento-tile__label"><strong>Motorräder</strong><span>Neu, gebraucht &amp; Vorführer <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg></span></span>
+            </a>
+            <div class="bento__pair">
+              <a class="bento-tile" href="kollektion.html?kat=herren">
+                <img src="assets/img/bento-herren.jpg" alt="" width="800" height="600" loading="lazy">
+                <span class="bento-tile__label"><strong>Herren</strong><span>Entdecken <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg></span></span>
+              </a>
+              <a class="bento-tile" href="kollektion.html?kat=damen">
+                <img src="assets/img/bento-damen.jpg" alt="" width="800" height="600" loading="lazy">
+                <span class="bento-tile__label"><strong>Damen</strong><span>Entdecken <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg></span></span>
+              </a>
+            </div>
+          </div>
+          <div class="bento__col bento__col--right">
+            <a class="bento-tile" href="kollektion.html?kat=accessoires">
+              <img src="assets/img/bento-accessoires.jpg" alt="" width="800" height="500" loading="lazy">
+              <span class="bento-tile__label"><strong>Accessoires</strong><span>Entdecken <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg></span></span>
+            </a>
+            <a class="bento-tile bento-tile--teile" href="kollektion.html?kat=teile">
+              <img src="assets/img/bento-teile.jpg" alt="" width="800" height="1000" loading="lazy">
+              <span class="bento-tile__label"><strong>Teile &amp; Zubehör</strong><span>Entdecken <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg></span></span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 · Bike-Showroom-Karussell -->
+    <section class="section showroom" aria-labelledby="showroom-title">
+      <div class="container">
+        <div class="section-head">
+          <div class="showroom__tools">
+            <h2 id="showroom-title">Bikes im Showroom</h2>
+            <div class="segmented" role="group" aria-label="Fahrzeugzustand">
+              <button type="button" data-showroom-mode="neu" aria-pressed="true">Neu</button>
+              <button type="button" data-showroom-mode="gebraucht" aria-pressed="false">Gebraucht &amp; Vorführer</button>
+            </div>
+          </div>
+          <div class="showroom__tools">
+            <a class="btn btn--text" href="kollektion.html?kat=motorraeder">Alle Motorräder <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg></a>
+            <div class="rail-nav">
+              <button type="button" data-rail-prev="showroom-rail" aria-label="Vorherige Bikes"><svg class="icon" aria-hidden="true"><use href="#i-chevron-left"></use></svg></button>
+              <button type="button" data-rail-next="showroom-rail" aria-label="Weitere Bikes"><svg class="icon" aria-hidden="true"><use href="#i-chevron-right"></use></svg></button>
+            </div>
+          </div>
+        </div>
+        <div class="rail" id="showroom-rail" data-showroom aria-live="polite"></div>
+      </div>
+    </section>
+
+    <!-- 8 · Storytelling „Über uns“ + Events -->
+    <section class="section on-dark textured" aria-labelledby="story-title">
+      <div class="container">
+        <div class="story">
+          <div class="story__media"><img src="assets/img/story-werkstatt.jpg" alt="Mechaniker bei der Arbeit in der Power-Shop-Werkstatt" width="1200" height="900" loading="lazy"></div>
+          <div class="story__text">
+            <p class="eyebrow">Seit über 25 Jahren (Platzhalter)</p>
+            <h2 id="story-title">Mehr als ein Shop</h2>
+            <p>Bei uns trifft Showroom auf Werkstatt und Community. Wir beraten dich ehrlich, schrauben mit Leidenschaft und fahren selbst – vom ersten Führerschein-Traum bis zum kompletten Custom-Umbau.</p>
+            <div class="stats">
+              <div><strong>25+</strong><span>Jahre Erfahrung</span></div>
+              <div><strong>300+</strong><span>Bikes pro Jahr</span></div>
+              <div><strong>1</strong><span>Meisterwerkstatt</span></div>
+            </div>
+            <div><a class="btn btn--outline-light" href="#" data-todo="Über uns">Über uns</a></div>
+          </div>
+        </div>
+        <div class="events">
+          <div class="section-head">
+            <h2 class="h3">Nächste Events</h2>
+            <a class="btn btn--text" href="service.html#events">Alle Events <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg></a>
+          </div>
+          <div class="event-grid" data-events></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+</body>
+</html>
