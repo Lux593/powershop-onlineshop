@@ -145,13 +145,6 @@
       var b = bikes[index];
       if (fromUser) panel.setAttribute('aria-live', 'polite');
       poster.textContent = b.heroPoster;
-      poster.classList.toggle('is-short', b.heroPoster.length < 6);
-      if (fromUser && !reduceMotion) {
-        poster.classList.remove('is-in');
-        void poster.offsetWidth;
-        poster.classList.add('is-in');
-      }
-      $('#hero-eyebrow', hero).textContent = b.family + ' · ' + b.year;
       $('#hero-blurb', hero).textContent = b.heroBlurb;
       var detail = $('#hero-detail', hero);
       detail.href = b.url;

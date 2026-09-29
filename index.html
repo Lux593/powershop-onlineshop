@@ -26,39 +26,44 @@
   <main id="main">
     <h1 class="sr-only">Power Shop – offizieller Harley-Davidson Vertragshändler</h1>
 
-    <!-- 3 · Hero, Plakat-Bühne -->
-    <section class="hero on-dark textured" aria-label="Modelle 2026">
-      <div class="hero__stage">
-        <div class="hero__chips" role="tablist" aria-label="Modell wählen">
-          <button class="hero__chip" id="hero-tab-b2" type="button" role="tab" aria-selected="true" aria-controls="hero-panel" tabindex="0">Road Glide</button>
-          <button class="hero__chip" id="hero-tab-b1" type="button" role="tab" aria-selected="false" aria-controls="hero-panel" tabindex="-1">Street Glide</button>
-          <button class="hero__chip" id="hero-tab-b6" type="button" role="tab" aria-selected="false" aria-controls="hero-panel" tabindex="-1">CVO</button>
-        </div>
-        <div class="hero__panel" id="hero-panel" role="tabpanel" aria-labelledby="hero-tab-b2">
-          <div class="hero__copy">
-            <h2 class="hero__poster" id="hero-poster">Road Glide</h2>
-            <p class="eyebrow" id="hero-eyebrow">Grand American Touring · 2026</p>
-            <p class="hero__blurb" id="hero-blurb">Die feste Verkleidung für lange Strecken.</p>
-            <div class="hero__actions">
-              <a class="btn btn--primary" id="hero-detail" href="motorrad.html?id=b2">Road Glide ansehen</a>
-              <a class="btn btn--outline-light" href="service.html#probefahrt">Probefahrt anfragen</a>
-            </div>
+    <!-- 3 · Hero -->
+    <section class="hero on-dark" aria-label="Modelle 2026">
+      <div class="hero__media">
+        <img class="hero__bg is-active" id="hero-photo" src="assets/img/hero-ride-road.png" alt="Zwei Fahrer auf einer violetten Road Glide, unterwegs auf der Autobahn" width="1024" height="576" fetchpriority="high">
+      </div>
+      <div class="hero__caption textured">
+        <div class="container hero__caption-inner">
+          <div class="hero__chips" role="tablist" aria-label="Modell wählen">
+            <button class="hero__chip" id="hero-tab-b2" type="button" role="tab" aria-selected="true" aria-controls="hero-panel" tabindex="0">Road Glide</button>
+            <button class="hero__chip" id="hero-tab-b1" type="button" role="tab" aria-selected="false" aria-controls="hero-panel" tabindex="-1">Street Glide</button>
+            <button class="hero__chip" id="hero-tab-b6" type="button" role="tab" aria-selected="false" aria-controls="hero-panel" tabindex="-1">CVO</button>
           </div>
-          <dl class="hero__specs">
-            <div><dt>Farbe</dt><dd id="hero-color">Violett</dd></div>
-            <div><dt>Jahr</dt><dd id="hero-year">2026</dd></div>
-            <div><dt>Linie</dt><dd id="hero-line">Touring</dd></div>
-            <div><dt>Ab-Preis</dt><dd id="hero-price">ab 31.500 €</dd></div>
-          </dl>
-        </div>
-        <div class="hero__media">
-          <img class="hero__bg is-active" id="hero-photo" src="assets/img/hero-ride-road.png" alt="Zwei Fahrer auf einer violetten Road Glide, unterwegs auf der Autobahn" width="1024" height="576" fetchpriority="high">
+          <div class="hero__panel" id="hero-panel" role="tabpanel" aria-labelledby="hero-tab-b2">
+            <h2 class="hero__poster" id="hero-poster">Road Glide</h2>
+            <p class="hero__blurb" id="hero-blurb">Die feste Verkleidung für lange Strecken.</p>
+            <div class="hero__offer">
+              <p class="hero__price" id="hero-price">ab 31.500 €</p>
+              <div class="hero__actions">
+                <a class="btn btn--primary" id="hero-detail" href="motorrad.html?id=b2">Road Glide ansehen</a>
+                <a class="btn btn--outline-light" href="service.html#probefahrt">Probefahrt anfragen</a>
+              </div>
+            </div>
+            <p class="hero__meta">
+              <span class="hero__fact"><span class="sr-only">Farbe: </span><span id="hero-color">Violett</span></span>
+              <span class="hero__fact"><span class="sr-only">Jahr: </span><span id="hero-year">2026</span></span>
+              <span class="hero__fact"><span class="sr-only">Linie: </span><span id="hero-line">Touring</span></span>
+            </p>
+          </div>
         </div>
       </div>
+      <a class="hero__scroll" href="#nach-hero">
+        <span>Weiter</span>
+        <svg class="icon" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+      </a>
     </section>
 
     <!-- 4 · Service-Leiste -->
-    <section class="section--tight" aria-label="Service">
+    <section class="section--tight" id="nach-hero" aria-label="Service">
       <div class="container service-tiles">
         <a class="service-tile" href="service.html#probefahrt">
           <svg class="icon" aria-hidden="true"><use href="#i-route"></use></svg>
@@ -112,22 +117,22 @@
             </a>
             <div class="bento__pair">
               <a class="bento-tile" href="kollektion.html?kat=herren">
-                <img src="assets/img/bento-herren.jpg" alt="" width="800" height="600" loading="lazy">
+                <img src="assets/img/bento-herren.jpg" alt="" width="736" height="738" loading="lazy">
                 <span class="bento-tile__label"><strong>Herren</strong><span>Entdecken <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg></span></span>
               </a>
               <a class="bento-tile" href="kollektion.html?kat=damen">
-                <img src="assets/img/bento-damen.jpg" alt="" width="800" height="600" loading="lazy">
+                <img src="assets/img/bento-damen.jpg" alt="" width="960" height="867" loading="lazy">
                 <span class="bento-tile__label"><strong>Damen</strong><span>Entdecken <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg></span></span>
               </a>
             </div>
           </div>
           <div class="bento__col bento__col--right">
-            <a class="bento-tile" href="kollektion.html?kat=accessoires">
-              <img src="assets/img/bento-accessoires.jpg" alt="" width="800" height="500" loading="lazy">
+            <a class="bento-tile bento-tile--product bento-tile--light" href="kollektion.html?kat=accessoires">
+              <img src="assets/img/bento-accessoires.jpg" alt="" width="960" height="867" loading="lazy">
               <span class="bento-tile__label"><strong>Accessoires</strong><span>Entdecken <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg></span></span>
             </a>
             <a class="bento-tile bento-tile--teile" href="kollektion.html?kat=teile">
-              <img src="assets/img/bento-teile.jpg" alt="" width="800" height="1000" loading="lazy">
+              <img src="assets/img/bento-teile.jpg" alt="" width="1400" height="787" loading="lazy">
               <span class="bento-tile__label"><strong>Teile &amp; Zubehör</strong><span>Entdecken <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg></span></span>
             </a>
           </div>
@@ -162,7 +167,7 @@
     <section class="section on-dark textured" aria-labelledby="story-title">
       <div class="container">
         <div class="story">
-          <div class="story__media"><img src="assets/img/story-werkstatt.jpg" alt="Mechaniker bei der Arbeit in der Power-Shop-Werkstatt" width="1200" height="900" loading="lazy"></div>
+          <div class="story__media"><img src="assets/img/powershop-team.png" alt="Das Team vom Power Shop" width="980" height="807" loading="lazy"></div>
           <div class="story__text">
             <p class="eyebrow">Seit über 25 Jahren (Platzhalter)</p>
             <h2 id="story-title">Mehr als ein Shop</h2>
