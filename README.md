@@ -1,73 +1,51 @@
-# Power Shop – klickbares UI-Mockup
+# Power Shop – Shopify-Theme
 
-Mockup für den Harley-Davidson-Onlineshop **Power Shop**: eine deutsche Firma, offizieller H-D-Vertragshändler, Umsetzung auf Shopify.
-Das Mockup ist statisches HTML, CSS und JavaScript. Es gibt keinen Build-Step und keine externen Abhängigkeiten.
+Shopify-Theme für den Harley-Davidson-Onlineshop **Power Shop**: eine deutsche Firma und offizieller H-D-Vertragshändler.
+
+Das Theme liegt in [`theme/`](theme) und ist in sich geschlossen – eigene Assets, Schriften und Icons, kein Build-Step.
 
 - **Briefing & Komponenten:** [`docs/briefing.md`](docs/briefing.md)
 - **Bildliste (Shotlist):** [`docs/bildliste.md`](docs/bildliste.md)
-- **Komponenten-Übersicht im Browser:** `styleguide.html`
 
-## Starten
+## Entwickeln
 
 ```bash
-python3 -m http.server 8000
-# dann im Browser öffnen: http://localhost:8000
+shopify theme dev --path theme
+# Vorschau: http://127.0.0.1:9292
 ```
 
-Alternativ geht auch `npx serve .`. Bitte immer über einen lokalen Server öffnen, damit Schriften und Icons zuverlässig laden.
+Die Vorschau lädt Änderungen an Liquid, CSS und JavaScript automatisch nach.
 
-## Seiten
-
-| Seite | Beispiel-URL |
+| Befehl | Zweck |
 |---|---|
-| Homepage | `index.html` |
-| Kategorieseite | `kollektion.html?kat=herren` (auch `damen`, `teile`, `accessoires`, `motorraeder`, `neuheiten`, `sale`) |
-| Mit Vorfilter | `kollektion.html?kat=motorraeder&familie=touring` · `kollektion.html?kat=herren&typ=jacken` |
-| Suche | `kollektion.html?kat=suche&q=auspuff` (oder Such-Icon im Header, auch Teilenummer z. B. `64900-24`) |
-| PDP Bekleidung | `produkt-bekleidung.html?id=h1` |
-| PDP Teile | `produkt-teil.html?id=t1` (ABE) · `?id=t2` (eintragungspflichtig) · `?id=t7` (ohne Straßenzulassung) |
-| PDP Motorrad | `motorrad.html?id=b3` (gebraucht, reservierbar) · `?id=b1` (neu) · `?id=b4` (reserviert) |
-| Service | `service.html` |
-| Styleguide | `styleguide.html` |
-
-Klickbar sind unter anderem:
-- Megamenüs (Maus, Tastatur, Touch) und Mobile-Menü
-- Hero-Slider mit Pause-Button und Neuheiten-Tabs
-- Filter, Sortierung und Pagination
-- Warenkorb- und Merkliste-Drawer
-- Größentabelle und Kontakt-Box (WhatsApp- und E-Mail-Text wird vorausgefüllt)
-- Suche und Cookie-Banner
-
-Links, die nicht zum Mockup gehören (Checkout, Konto, Rechtstexte …), zeigen einen Hinweis „folgt im Shopify-Shop“.
-
-Warenkorb, Merkliste und Cookie-Wahl werden nur lokal im Browser gespeichert (`localStorage`).
-Mit `?nocookie` in der URL erscheint das Cookie-Banner nicht.
+| `shopify theme dev --path theme` | Lokale Vorschau mit Live-Reload |
+| `shopify theme check --path theme` | Theme auf Liquid- und Schema-Fehler prüfen |
+| `shopify theme push --path theme` | Theme in den Store hochladen |
+| `shopify theme pull --path theme` | Änderungen aus dem Theme-Editor zurückholen |
 
 ## Struktur
 
 ```
-index.html, kollektion.html, produkt-*.html, motorrad.html, service.html, styleguide.html
-assets/css/   tokens.css (Design-Tokens) · base.css · components.css · sections.css
-assets/js/    icons.js (generiert) · data.js (Mock-Daten + Platzhalter-Firmendaten) · cards.js · layout.js · main.js
-assets/fonts/ Inter + Barlow Condensed (self-hosted, OFL)
-assets/icons/ Lucide-Icons (ISC)
-assets/img/   Platzhalter-Bilder
-assets/brand/ H-D-Logo (Platzhalter), Power-Shop-Signet (Favicon)
-scripts/      build-icons.mjs · placeholders.mjs
-docs/         briefing.md · bildliste.md
+theme/layout/     theme.liquid · password.liquid
+theme/templates/  index · collection (+ .motorrad) · product (+ .motorrad, .teil) · page (+ .service) · cart · search · blog · article · 404
+theme/sections/   24 Sections, u. a. hero · category-bento · service-tiles · showroom · story-events · header · footer
+theme/snippets/   Karten, Preis, Galerie, Megamenü, Filter, Größentabelle …
+theme/assets/     tokens.css (Design-Tokens) · base.css · components.css · sections.css · theme.css · JS-Module · Bilder · Schriften
+theme/config/     settings_schema.json · settings_data.json
+theme/locales/    de.default.json
+docs/             briefing.md · bildliste.md
+pics_to_use/      Quellbilder für Kategorien und Team
+shopify-theme/    Referenzkopie des Horizon-Basisthemes (nur zum Nachschauen)
 ```
 
-## Bilder & Logo austauschen
+## Händlerdaten pflegen
 
-- **Fotos:** Unter **demselben Dateinamen** und im gleichen Seitenverhältnis nach `assets/img/` legen. Die Liste mit Motiv und Format steht in `docs/bildliste.md`.
-- **H-D Bar & Shield:** Die offizielle Datei als `assets/brand/hd-bar-shield.png` ablegen. Seitenverhältnis ca. 1446 × 1174.
-  - Als SVG: Pfad in `assets/js/layout.js` und `styleguide.html` anpassen.
-- **Firmendaten:** Telefon, WhatsApp, E-Mail, Öffnungszeiten, Versandschwelle, Reservierungsgebühr usw. stehen oben in `assets/js/data.js` (`PS.shop`).
+Telefon, WhatsApp, E-Mail, Öffnungszeiten, Versandschwelle und Reservierungsgebühr sind Theme-Einstellungen
+(`theme/config/settings_schema.json`) und lassen sich im Shopify-Theme-Editor ändern – kein Eingriff im Code nötig.
 
-Platzhalter neu erzeugen (nutzt Playwright/Chromium):
+## Bilder austauschen
 
-```bash
-node scripts/placeholders.mjs          # erzeugt nur fehlende Bilder + docs/bildliste.md (echte Fotos/Logo bleiben)
-node scripts/placeholders.mjs --force  # alle Platzhalter neu erzeugen (überschreibt Bilder in assets/img!)
-node scripts/build-icons.mjs    # nach dem Hinzufügen von Icons in assets/icons/
-```
+Fotos unter **demselben Dateinamen** und im gleichen Seitenverhältnis nach `theme/assets/` legen.
+Motiv und Format stehen in [`docs/bildliste.md`](docs/bildliste.md).
+
+Das H-D Bar & Shield liegt als `theme/assets/hd-bar-shield.png` (Seitenverhältnis ca. 1446 × 1174).
