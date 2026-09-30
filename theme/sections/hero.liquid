@@ -1,0 +1,164 @@
+{%- if section.blocks.size > 0 -%}
+  <section class="hero on-dark" aria-label="{{ section.settings.aria_label }}" data-hero data-section-id="{{ section.id }}">
+    {%- if section.settings.heading != blank -%}
+      <h1 class="sr-only">{{ section.settings.heading | escape }}</h1>
+    {%- endif -%}
+    <div class="hero__media">
+      {%- for block in section.blocks -%}
+        <div class="hero__bg-wrap" {{ block.shopify_attributes }}>
+          {%- capture bg_class -%}hero__bg{% if forloop.first %} is-active{% endif %}{%- endcapture -%}
+          {%- if forloop.first -%}
+            {%- render 'media', image: block.settings.image, asset: block.settings.image_asset, width: 1024, height: 576, alt: block.settings.image_alt, class: bg_class, loading: 'eager' -%}
+          {%- else -%}
+            {%- render 'media', image: block.settings.image, asset: block.settings.image_asset, width: 1024, height: 576, alt: block.settings.image_alt, class: bg_class, loading: 'lazy' -%}
+          {%- endif -%}
+        </div>
+      {%- endfor -%}
+    </div>
+
+    <div class="hero__caption textured">
+      <div class="container hero__caption-inner">
+        <div class="hero__chips" role="tablist" aria-label="Modell wählen" data-hero-tabs>
+          {%- for block in section.blocks -%}
+            <button
+              class="hero__chip"
+              id="hero-tab-{{ block.id }}"
+              type="button"
+              role="tab"
+              aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+              aria-controls="hero-panel-{{ block.id }}"
+              {% unless forloop.first %}tabindex="-1"{% endunless %}
+              data-index="{{ forloop.index0 }}"
+            >{{ block.settings.label }}</button>
+          {%- endfor -%}
+        </div>
+
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign bike = block.settings.product
+            assign price_text = block.settings.price_text
+            if price_text == blank and bike != blank
+              assign price_text = bike.price | money_without_trailing_zeros
+              if bike.metafields.bike.ab_preis.value
+                assign price_text = 'ab ' | append: price_text
+              endif
+            endif
+            assign meta_color = block.settings.meta_color | default: bike.metafields.bike.farbe.value
+            assign meta_year = block.settings.meta_year | default: bike.metafields.bike.baujahr.value
+            assign cta_label = block.settings.cta_label | default: block.settings.label
+            assign detail_url = bike.url | default: block.settings.url
+          -%}
+          <div
+            class="hero__panel"
+            id="hero-panel-{{ block.id }}"
+            role="tabpanel"
+            aria-labelledby="hero-tab-{{ block.id }}"
+            {% unless forloop.first %}hidden{% endunless %}
+            {{ block.shopify_attributes }}
+          >
+            <h2 class="hero__poster">{{ block.settings.poster | default: block.settings.label }}</h2>
+            {%- if block.settings.blurb != blank -%}
+              <p class="hero__blurb">{{ block.settings.blurb }}</p>
+            {%- endif -%}
+            <div class="hero__offer">
+              {%- if price_text != blank -%}
+                <p class="hero__price">{{ price_text }}</p>
+              {%- endif -%}
+              <div class="hero__actions">
+                {%- if detail_url != blank -%}
+                  <a class="btn btn--primary" href="{{ detail_url }}">{{ cta_label }}</a>
+                {%- endif -%}
+                {%- if block.settings.secondary_label != blank -%}
+                  <a class="btn btn--outline-light" href="{{ block.settings.secondary_url | default: '#' }}">{{ block.settings.secondary_label }}</a>
+                {%- endif -%}
+              </div>
+            </div>
+            {%- if meta_color != blank or meta_year != blank or block.settings.meta_line != blank -%}
+              <p class="hero__meta">
+                {%- if meta_color != blank -%}<span class="hero__fact"><span class="sr-only">Farbe: </span>{{ meta_color }}</span>{%- endif -%}
+                {%- if meta_year != blank -%}<span class="hero__fact"><span class="sr-only">Jahr: </span>{{ meta_year }}</span>{%- endif -%}
+                {%- if block.settings.meta_line != blank -%}<span class="hero__fact"><span class="sr-only">Linie: </span>{{ block.settings.meta_line }}</span>{%- endif -%}
+              </p>
+            {%- endif -%}
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
+
+    {%- if section.settings.scroll_target != blank -%}
+      <a class="hero__scroll" href="#{{ section.settings.scroll_target }}">
+        <span>Weiter</span>
+        {% render 'icon', name: 'chevron-down' %}
+      </a>
+    {%- endif -%}
+  </section>
+{%- elsif request.design_mode -%}
+  <section class="hero on-dark">
+    <div class="container" style="padding-block:var(--s-8)"><p>Hero: Füge Slides hinzu (Modelle mit Bild, Text und Preis).</p></div>
+  </section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Hero mit Modell-Tabs",
+  "tag": "div",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Seitenüberschrift (nur für Screenreader und Suchmaschinen)", "info": "Die Startseite braucht genau eine H1. Die großen Modellnamen darunter sind H2.", "default": "Power Shop: Harley-Davidson Neufahrzeuge, Teile und Bekleidung" },
+    { "type": "text", "id": "aria_label", "label": "Beschriftung für Screenreader", "default": "Modelle 2026" },
+    { "type": "text", "id": "scroll_target", "label": "Ziel des „Weiter“-Pfeils (ID)", "default": "nach-hero", "info": "ID der nächsten Section, z. B. nach-hero." }
+  ],
+  "max_blocks": 5,
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Modell",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Tab-Text", "default": "Road Glide" },
+        { "type": "text", "id": "poster", "label": "Große Überschrift", "info": "Ohne Eingabe gilt der Tab-Text." },
+        { "type": "text", "id": "blurb", "label": "Kurztext", "default": "Die feste Verkleidung für lange Strecken." },
+        { "type": "image_picker", "id": "image", "label": "Bild", "info": "Empfohlen 16:9, mindestens 1920 Pixel breit." },
+        { "type": "text", "id": "image_asset", "label": "Standard-Bilddatei im Theme", "info": "Wird benutzt, solange kein Bild gewählt ist.", "default": "hero-ride-road.png" },
+        { "type": "text", "id": "image_alt", "label": "Bildbeschreibung" },
+        { "type": "product", "id": "product", "label": "Motorrad", "info": "Liefert Preis, Link, Farbe und Jahr." },
+        { "type": "text", "id": "price_text", "label": "Preistext (überschreibt den Produktpreis)", "info": "Zum Beispiel: ab 31.500 €" },
+        { "type": "text", "id": "cta_label", "label": "Button-Text", "info": "Ohne Eingabe gilt der Tab-Text." },
+        { "type": "url", "id": "url", "label": "Link (falls kein Motorrad gewählt)" },
+        { "type": "text", "id": "secondary_label", "label": "Zweiter Button", "default": "Probefahrt anfragen" },
+        { "type": "url", "id": "secondary_url", "label": "Zweiter Button Link" },
+        { "type": "text", "id": "meta_color", "label": "Farbe" },
+        { "type": "text", "id": "meta_year", "label": "Jahr" },
+        { "type": "text", "id": "meta_line", "label": "Linie", "default": "Touring" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero mit Modell-Tabs",
+      "blocks": [
+        { "type": "slide" },
+        {
+          "type": "slide",
+          "settings": {
+            "label": "Street Glide",
+            "blurb": "Die tiefe Scheibe für die offene Straße.",
+            "image_asset": "hero-ride-street.png",
+            "meta_color": "Schwarz",
+            "meta_year": "2026"
+          }
+        },
+        {
+          "type": "slide",
+          "settings": {
+            "label": "CVO",
+            "blurb": "Die CVO-Ausstattung für die große Tour.",
+            "image_asset": "hero-ride-cvo.png",
+            "meta_color": "Grau",
+            "meta_year": "2026",
+            "meta_line": "CVO"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

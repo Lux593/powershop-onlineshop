@@ -1,0 +1,106 @@
+{% doc %}
+  Kaufbereich der Produktseite: Farbe, Größe und weitere Optionen, Menge und Warenkorb-Button.
+  Optionen werden aus den Produktoptionen gebaut. Die Auswahl steuert assets/product.js.
+  Farb-Optionen erscheinen als Farbfelder, alle anderen als Auswahl-Chips.
+
+  @param {product} product - Produkt
+  @param {string} [size_type] - Tabelle in der Größentabelle: oberteile, hosen, handschuhe, helme, stiefel
+
+  @example
+  {% render 'pdp-buy', product: product, size_type: 'oberteile' %}
+{% enddoc %}
+
+{%- liquid
+  assign current_variant = product.selected_variant
+  if current_variant == blank and product.has_only_default_variant
+    assign current_variant = product.variants.first
+  endif
+  assign form_id = 'product-form-' | append: product.id
+-%}
+
+{%- form 'product', product, id: form_id, class: 'pdp-form', novalidate: 'novalidate', data-product-form: '' -%}
+  <input type="hidden" name="id" value="{{ current_variant.id }}" data-variant-id>
+
+  {%- unless product.has_only_default_variant -%}
+    {%- for option in product.options_with_values -%}
+      {%- liquid
+        assign option_index = option.position | minus: 1
+        assign option_key = option.name | downcase
+        assign is_color = false
+        if option_key == 'farbe' or option_key == 'color'
+          assign is_color = true
+        endif
+        assign selected_value = current_variant.options[option_index]
+        if selected_value == blank and is_color
+          assign selected_value = option.values.first.name | default: option.values.first
+        endif
+        assign is_size = false
+        if option_key == 'größe' or option_key == 'groesse' or option_key == 'size' or option_key == 'weite'
+          assign is_size = true
+        endif
+      -%}
+      <div class="pdp__row" data-option-row data-option-index="{{ option_index }}" data-option-label="{{ option.name | escape }}">
+        <div class="pdp__row-head">
+          <span><strong>{{ option.name | escape }}:</strong> <span data-option-name>{{ selected_value | default: 'bitte wählen' }}</span></span>
+          {%- if is_size and size_type != blank -%}
+            <button class="text-link small" type="button" data-open="sizeguide" data-type="{{ size_type }}">{% render 'icon', name: 'ruler', class: 'icon--sm' %} Größentabelle</button>
+          {%- endif -%}
+        </div>
+        {%- if is_color -%}
+          <div class="swatches" role="group" aria-label="{{ option.name | escape }} wählen">
+            {%- for value in option.values -%}
+              {%- assign value_name = value.name | default: value -%}
+              <button
+                class="swatch-btn"
+                type="button"
+                data-option-value="{{ value_name | escape }}"
+                aria-pressed="{% if value_name == selected_value %}true{% else %}false{% endif %}"
+                aria-label="{{ value_name | escape }}"
+              >{% render 'swatch', name: value_name, swatch: value.swatch, tag: 'span' %}</button>
+            {%- endfor -%}
+          </div>
+        {%- else -%}
+          <div class="size-grid" role="group" aria-label="{{ option.name | escape }} wählen">
+            {%- for value in option.values -%}
+              {%- assign value_name = value.name | default: value -%}
+              <button
+                class="size-chip"
+                type="button"
+                data-option-value="{{ value_name | escape }}"
+                aria-pressed="{% if value_name == selected_value %}true{% else %}false{% endif %}"
+              >{{ value_name | escape }}</button>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      </div>
+    {%- endfor -%}
+    <p class="small" data-option-error role="alert" style="color:var(--c-error)"></p>
+  {%- endunless -%}
+
+  <div class="pdp__buy">
+    <div class="qty">
+      <button type="button" data-q="-1" aria-label="Menge verringern">{% render 'icon', name: 'minus', class: 'icon--sm' %}</button>
+      <input type="number" name="quantity" value="1" min="1" max="9" aria-label="Menge" data-q-input>
+      <button type="button" data-q="1" aria-label="Menge erhöhen">{% render 'icon', name: 'plus', class: 'icon--sm' %}</button>
+    </div>
+    <button class="btn btn--primary" type="submit" name="add" data-buy{% unless product.available %} disabled{% endunless %}>
+      {% render 'icon', name: 'shopping-bag' %}<span data-buy-text>{% if product.available %}In den Warenkorb{% else %}Ausverkauft{% endif %}</span>
+    </button>
+  </div>
+{%- endform -%}
+
+<script type="application/json" data-product-json>
+  {
+    "url": {{ product.url | json }},
+    "variants": [
+      {%- for variant in product.variants -%}
+        {
+          "id": {{ variant.id }},
+          "options": {{ variant.options | json }},
+          "available": {{ variant.available | json }},
+          "image": {{ variant.featured_image.id | default: 0 | json }}
+        }{% unless forloop.last %},{% endunless %}
+      {%- endfor -%}
+    ]
+  }
+</script>

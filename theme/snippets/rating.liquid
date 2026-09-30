@@ -1,0 +1,22 @@
+{% doc %}
+  Sternebewertung. Liest die Standard-Metafelder der Bewertungs-Apps (reviews.rating, reviews.rating_count).
+  Ohne Bewertung wird nichts ausgegeben.
+
+  @param {product} product - Produkt
+{% enddoc %}
+
+{%- liquid
+  assign rating_value = product.metafields.reviews.rating.value
+  assign rating_count = product.metafields.reviews.rating_count.value
+-%}
+{%- if rating_value != blank and rating_count > 0 -%}
+  {%- assign stars = rating_value.rating | round -%}
+  <span class="rating">
+    <span class="rating__stars" aria-hidden="true">
+      {%- for i in (1..5) -%}
+        {% if i <= stars %}{% render 'icon', name: 'star', class: 'is-full' %}{% else %}{% render 'icon', name: 'star' %}{% endif %}
+      {%- endfor -%}
+    </span>
+    <span class="sr-only">{{ rating_value.rating }} von 5 Sternen, </span>({{ rating_count }})
+  </span>
+{%- endif -%}

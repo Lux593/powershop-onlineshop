@@ -1,0 +1,50 @@
+{% doc %}
+  Eine Position im Warenkorb (Markup wie im Mockup: .line-item). Für Drawer und Warenkorb-Seite.
+
+  @param {object} item - Position aus cart.items
+  @param {number} line - Position im Warenkorb, beginnend bei 1
+
+  @example
+  {% render 'cart-line', item: item, line: forloop.index %}
+{% enddoc %}
+
+<div class="line-item">
+  {%- if item.image -%}
+    {{ item.image | image_url: width: 176 | image_tag: width: 88, height: 110, alt: '', loading: 'lazy' }}
+  {%- else -%}
+    <div></div>
+  {%- endif -%}
+  <div>
+    <div class="line-item__top">
+      <div>
+        <a class="line-item__name" href="{{ item.url }}">{{ item.product.title }}</a>
+        <p class="line-item__meta">
+          {%- unless item.product.has_only_default_variant %}{{ item.variant.title }} · {% endunless -%}
+          {%- if item.sku != blank %}Art.-Nr. {{ item.sku }} · {% endif -%}
+          {{ item.original_price | money }}
+        </p>
+      </div>
+      <button
+        class="remove-btn"
+        type="button"
+        data-cart-change
+        data-line="{{ line }}"
+        data-quantity="0"
+        aria-label="{{ item.product.title | escape }} entfernen"
+      >{% render 'icon', name: 'trash-2' %}</button>
+    </div>
+    <div class="line-item__bottom">
+      <div class="qty">
+        <button type="button" data-cart-change data-line="{{ line }}" data-quantity="{{ item.quantity | minus: 1 }}" aria-label="Menge verringern">{% render 'icon', name: 'minus', class: 'icon--sm' %}</button>
+        <input type="number" value="{{ item.quantity }}" min="1" max="99" aria-label="Menge" data-cart-qty data-line="{{ line }}">
+        <button type="button" data-cart-change data-line="{{ line }}" data-quantity="{{ item.quantity | plus: 1 }}" aria-label="Menge erhöhen">{% render 'icon', name: 'plus', class: 'icon--sm' %}</button>
+      </div>
+      <strong>
+        {%- if item.original_line_price != item.final_line_price -%}
+          <s class="price__old">{{ item.original_line_price | money }}</s>
+        {%- endif -%}
+        {{ item.final_line_price | money }}
+      </strong>
+    </div>
+  </div>
+</div>

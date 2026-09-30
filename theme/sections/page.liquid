@@ -1,0 +1,26 @@
+<section class="page-banner on-dark textured">
+  <div class="container page-banner__inner">
+    <div class="page-banner__text">
+      <nav class="breadcrumb" aria-label="Brotkrumen">
+        <ol>
+          <li><a href="{{ routes.root_url }}">Home</a></li>
+          <li><span aria-current="page">{{ page.title | escape }}</span></li>
+        </ol>
+      </nav>
+      <h1>{{ page.title | escape }}</h1>
+    </div>
+  </div>
+</section>
+
+<div class="container section--tight">
+  <div class="page-content">
+    {{ page.content }}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Seite",
+  "settings": []
+}
+{% endschema %}

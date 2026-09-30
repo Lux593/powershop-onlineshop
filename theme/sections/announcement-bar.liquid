@@ -1,0 +1,58 @@
+{%- liquid
+  assign threshold_cents = settings.free_shipping_threshold | default: 0 | times: 100
+  assign threshold_text = threshold_cents | money_without_trailing_zeros
+-%}
+
+{%- if section.blocks.size > 0 -%}
+  <div class="announce" role="region" aria-label="Aktuelle Hinweise" data-section-id="{{ section.id }}">
+    <div class="container announce__inner">
+      <p>
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign message = block.settings.text | replace: '{schwelle}', threshold_text | replace: '{tage}', settings.return_days
+          -%}
+          <span {{ block.shopify_attributes }}{% if block.settings.hide_on_mobile %} class="announce__extra"{% endif %}>
+            {%- unless forloop.first %} · {% endunless -%}
+            {{- message -}}
+            {%- if block.settings.link_label != blank and block.settings.link_url != blank %} <a href="{{ block.settings.link_url }}">{{ block.settings.link_label }}</a>{% endif -%}
+          </span>
+        {%- endfor -%}
+      </p>
+    </div>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Ankündigungsleiste",
+  "max_blocks": 4,
+  "blocks": [
+    {
+      "type": "message",
+      "name": "Hinweis",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "info": "{schwelle} wird durch die Gratisversand-Grenze ersetzt, {tage} durch die Rückgabefrist.",
+          "default": "Versandkostenfrei ab {schwelle}*"
+        },
+        { "type": "text", "id": "link_label", "label": "Link-Text" },
+        { "type": "url", "id": "link_url", "label": "Link" },
+        { "type": "checkbox", "id": "hide_on_mobile", "label": "Auf dem Handy ausblenden", "default": false }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Ankündigungsleiste",
+      "blocks": [
+        { "type": "message" },
+        { "type": "message", "settings": { "text": "{tage} Tage Rückgabe", "hide_on_mobile": true } },
+        { "type": "message", "settings": { "text": "", "link_label": "Probefahrt anfragen" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,72 @@
+{%- liquid
+  assign query = predictive_search.terms
+  assign products = predictive_search.resources.products
+  assign collections = predictive_search.resources.collections
+  assign pages = predictive_search.resources.pages
+  assign articles = predictive_search.resources.articles
+  assign total = products.size
+-%}
+
+{%- if predictive_search.performed -%}
+  <div class="search__group">
+    <h2>Seiten &amp; Kategorien</h2>
+    {%- if collections.size > 0 or pages.size > 0 or articles.size > 0 -%}
+      <div class="search__list">
+        {%- for item in collections limit: 4 -%}
+          <a href="{{ item.url }}"><span class="search__name">{{ item.title }}</span></a>
+        {%- endfor -%}
+        {%- for item in pages limit: 3 -%}
+          <a href="{{ item.url }}"><span class="search__name">{{ item.title }}</span></a>
+        {%- endfor -%}
+        {%- for item in articles limit: 3 -%}
+          <a href="{{ item.url }}"><span class="search__name">{{ item.title }}</span></a>
+        {%- endfor -%}
+      </div>
+    {%- else -%}
+      <p class="search__hint">Keine Treffer.</p>
+    {%- endif -%}
+  </div>
+
+  <div class="search__group">
+    <h2>Produkte &amp; Bikes ({{ total }})</h2>
+    {%- if total > 0 -%}
+      <div class="search__list">
+        {%- for product in products -%}
+          <a href="{{ product.url }}">
+            {%- if product.featured_image -%}
+              {{ product.featured_image | image_url: width: 96 | image_tag: width: 48, height: 60, alt: '', loading: 'lazy' }}
+            {%- else -%}
+              <span style="width:48px;height:60px;flex:none;background:var(--c-stone)"></span>
+            {%- endif -%}
+            <span>
+              <span class="search__name">{{ product.title }}</span><br>
+              <span class="search__meta">
+                {%- if product.type != blank %}{{ product.type }} · {% endif -%}
+                {%- assign sku = product.selected_or_first_available_variant.sku -%}
+                {%- if sku != blank %}Art.-Nr. {{ sku }} · {% endif -%}
+                {%- if product.type == 'Motorrad' -%}
+                  ab {{ product.price | money_without_trailing_zeros }}
+                {%- else -%}
+                  {{ product.price | money }}
+                {%- endif -%}
+              </span>
+            </span>
+          </a>
+        {%- endfor -%}
+      </div>
+      <p style="margin-top:16px">
+        <a class="btn btn--secondary btn--sm" href="{{ routes.search_url }}?q={{ query | url_encode }}&options[prefix]=last">
+          {%- if total == 1 %}1 Produkt{% else %}Alle Produkte{% endif %} anzeigen {% render 'icon', name: 'arrow-right' -%}
+        </a>
+      </p>
+    {%- else -%}
+      <p class="search__hint">Keine Produkte gefunden. Versuch es mit einem anderen Begriff oder einer Teilenummer.</p>
+    {%- endif -%}
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Vorschlagssuche"
+}
+{% endschema %}

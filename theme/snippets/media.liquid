@@ -1,0 +1,47 @@
+{% doc %}
+  Rendert ein Bild: entweder das im Theme-Editor gewählte Bild (responsiv, über Shopify-CDN)
+  oder, wenn keins gewählt ist, die Standarddatei aus dem Mockup in assets/.
+
+  @param {image} [image] - Gewähltes Bild aus dem Theme-Editor oder einer Ressource
+  @param {string} [asset] - Dateiname in assets/ als Standard, z. B. "bento-herren.jpg"
+  @param {number} [width] - Breite der Standarddatei (für das Seitenverhältnis)
+  @param {number} [height] - Höhe der Standarddatei
+  @param {string} [alt] - Alternativtext, leer für dekorative Bilder
+  @param {string} [loading] - "lazy" (Standard) oder "eager"
+  @param {string} [sizes] - sizes-Attribut für das gewählte Bild
+  @param {string} [class] - Klassen am img
+  @param {string} [id] - ID am img
+
+  @example
+  {% render 'media', image: block.settings.image, asset: 'bento-herren.jpg', width: 736, height: 738, alt: '' %}
+{% enddoc %}
+
+{%- liquid
+  assign img_loading = loading | default: 'lazy'
+  assign img_alt = alt | default: ''
+  assign img_width = width | default: 1200
+  assign img_height = height | default: 900
+-%}
+{%- if image != blank -%}
+  {{
+    image
+    | image_url: width: 2000
+    | image_tag:
+      loading: img_loading,
+      alt: img_alt,
+      class: class,
+      id: id,
+      sizes: sizes,
+      widths: '400, 600, 800, 1000, 1400, 1800'
+  }}
+{%- elsif asset != blank -%}
+  <img
+    src="{{ asset | asset_url }}"
+    alt="{{ img_alt | escape }}"
+    width="{{ img_width }}"
+    height="{{ img_height }}"
+    loading="{{ img_loading }}"
+    {% if class != blank %}class="{{ class }}"{% endif %}
+    {% if id != blank %}id="{{ id }}"{% endif %}
+  >
+{%- endif -%}

@@ -1,0 +1,104 @@
+{% doc %}
+  Größentabelle als Dialog (Modal, mobil Bottom-Sheet). Öffnen mit data-open="sizeguide",
+  optional data-type="oberteile|hosen|handschuhe|helme|stiefel" für den passenden Tab.
+  Die Werte sind Platzhalter aus dem Mockup und später durch das Metaobjekt „Größentabelle“ zu ersetzen.
+{% enddoc %}
+
+<dialog class="modal" id="sizeguide" aria-labelledby="sg-title">
+  <div class="modal__inner">
+    <div class="modal__head">
+      <h2 class="h3" id="sg-title">Größentabelle</h2>
+      <button class="icon-btn" type="button" data-close aria-label="Größentabelle schließen">{% render 'icon', name: 'x' %}</button>
+    </div>
+    <div class="modal__body">
+      <div class="tabs tabs--left" role="tablist" aria-label="Produktart">
+        <button class="tab" role="tab" type="button" id="sgt-oberteile" aria-controls="sgp-oberteile" aria-selected="true">Oberteile &amp; Jacken</button>
+        <button class="tab" role="tab" type="button" id="sgt-hosen" aria-controls="sgp-hosen" aria-selected="false" tabindex="-1">Hosen &amp; Jeans</button>
+        <button class="tab" role="tab" type="button" id="sgt-handschuhe" aria-controls="sgp-handschuhe" aria-selected="false" tabindex="-1">Handschuhe</button>
+        <button class="tab" role="tab" type="button" id="sgt-helme" aria-controls="sgp-helme" aria-selected="false" tabindex="-1">Helme</button>
+        <button class="tab" role="tab" type="button" id="sgt-stiefel" aria-controls="sgp-stiefel" aria-selected="false" tabindex="-1">Stiefel</button>
+      </div>
+      <div role="tabpanel" id="sgp-oberteile" aria-labelledby="sgt-oberteile">
+        <div class="size-table-wrap">
+          <table class="size-table">
+            <thead><tr><th scope="col">Größe</th><th scope="col">Brust (cm)</th><th scope="col">Taille (cm)</th><th scope="col">Ärmel (cm)</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">S</th><td>88–96</td><td>76–84</td><td>62</td></tr>
+              <tr><th scope="row">M</th><td>96–104</td><td>84–92</td><td>63</td></tr>
+              <tr><th scope="row">L</th><td>104–112</td><td>92–100</td><td>64</td></tr>
+              <tr><th scope="row">XL</th><td>112–120</td><td>100–108</td><td>65</td></tr>
+              <tr><th scope="row">XXL</th><td>120–128</td><td>108–116</td><td>66</td></tr>
+              <tr><th scope="row">3XL</th><td>128–136</td><td>116–124</td><td>67</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div role="tabpanel" id="sgp-hosen" aria-labelledby="sgt-hosen" hidden>
+        <div class="size-table-wrap">
+          <table class="size-table">
+            <thead><tr><th scope="col">Weite</th><th scope="col">Taille (cm)</th><th scope="col">Hüfte (cm)</th><th scope="col">Innenbein (cm)</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">30</th><td>76–78</td><td>94–96</td><td>81</td></tr>
+              <tr><th scope="row">32</th><td>81–83</td><td>99–101</td><td>81</td></tr>
+              <tr><th scope="row">34</th><td>86–88</td><td>104–106</td><td>84</td></tr>
+              <tr><th scope="row">36</th><td>91–93</td><td>109–111</td><td>84</td></tr>
+              <tr><th scope="row">38</th><td>96–98</td><td>114–116</td><td>86</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div role="tabpanel" id="sgp-handschuhe" aria-labelledby="sgt-handschuhe" hidden>
+        <div class="size-table-wrap">
+          <table class="size-table">
+            <thead><tr><th scope="col">Größe</th><th scope="col">Handumfang (cm)</th><th scope="col">Handlänge (cm)</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">S</th><td>18–20</td><td>17–18</td></tr>
+              <tr><th scope="row">M</th><td>20–22</td><td>18–19</td></tr>
+              <tr><th scope="row">L</th><td>22–24</td><td>19–20</td></tr>
+              <tr><th scope="row">XL</th><td>24–26</td><td>20–21</td></tr>
+              <tr><th scope="row">XXL</th><td>26–28</td><td>21–22</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div role="tabpanel" id="sgp-helme" aria-labelledby="sgt-helme" hidden>
+        <div class="size-table-wrap">
+          <table class="size-table">
+            <thead><tr><th scope="col">Größe</th><th scope="col">Kopfumfang (cm)</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">S</th><td>55–56</td></tr>
+              <tr><th scope="row">M</th><td>57–58</td></tr>
+              <tr><th scope="row">L</th><td>59–60</td></tr>
+              <tr><th scope="row">XL</th><td>61–62</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div role="tabpanel" id="sgp-stiefel" aria-labelledby="sgt-stiefel" hidden>
+        <div class="size-table-wrap">
+          <table class="size-table">
+            <thead><tr><th scope="col">EU</th><th scope="col">UK</th><th scope="col">US</th><th scope="col">Fußlänge (cm)</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">40</th><td>6,5</td><td>7</td><td>25,5</td></tr>
+              <tr><th scope="row">41</th><td>7</td><td>8</td><td>26</td></tr>
+              <tr><th scope="row">42</th><td>8</td><td>9</td><td>27</td></tr>
+              <tr><th scope="row">43</th><td>9</td><td>10</td><td>27,5</td></tr>
+              <tr><th scope="row">44</th><td>9,5</td><td>10,5</td><td>28</td></tr>
+              <tr><th scope="row">45</th><td>10,5</td><td>11,5</td><td>29</td></tr>
+              <tr><th scope="row">46</th><td>11</td><td>12</td><td>29,5</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="howto">
+        <img src="{{ 'messanleitung.jpg' | asset_url }}" alt="Illustration der Messpunkte Brust, Taille, Hüfte und Innenbeinlänge" width="800" height="600" loading="lazy">
+        <dl>
+          <div><dt>Brust</dt><dd>Waagerecht an der breitesten Stelle unter den Achseln messen.</dd></div>
+          <div><dt>Taille</dt><dd>An der schmalsten Stelle, locker über der Unterwäsche.</dd></div>
+          <div><dt>Innenbein</dt><dd>Vom Schritt bis zum Boden, ohne Schuhe.</dd></div>
+          <div><dt>Zwischen zwei Größen?</dt><dd>Lederjacken sitzen eng und weiten sich – im Zweifel die größere Größe für Protektoren wählen.</dd></div>
+        </dl>
+      </div>
+    </div>
+  </div>
+</dialog>

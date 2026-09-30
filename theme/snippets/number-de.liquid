@@ -1,0 +1,28 @@
+{% doc %}
+  Gibt eine ganze Zahl mit Tausenderpunkt aus (18420 wird 18.420). Für Kilometerstände und Ähnliches.
+
+  @param {number} value - Zahl
+{% enddoc %}
+
+{%- liquid
+  assign n = value | plus: 0 | round
+  if n >= 1000000
+    assign millions = n | divided_by: 1000000
+    assign rest = n | modulo: 1000000
+    assign thousands = rest | divided_by: 1000
+    assign units = rest | modulo: 1000
+    echo millions
+    echo '.'
+    echo thousands | prepend: '000' | slice: -3, 3
+    echo '.'
+    echo units | prepend: '000' | slice: -3, 3
+  elsif n >= 1000
+    assign thousands = n | divided_by: 1000
+    assign units = n | modulo: 1000
+    echo thousands
+    echo '.'
+    echo units | prepend: '000' | slice: -3, 3
+  else
+    echo n
+  endif
+-%}

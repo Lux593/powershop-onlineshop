@@ -1,0 +1,41 @@
+{% doc %}
+  Preisblock mit Streichpreis (§ 11 PAngV: niedrigster Preis der letzten 30 Tage) und Grundpreis.
+
+  @param {product} product - Produkt
+  @param {variant} [variant] - Variante, sonst die erste verfügbare
+  @param {boolean} [long] - Ausführliche Variante für die Produktseite mit Steuer- und Versandhinweis
+
+  @example
+  {% render 'price', product: product %}
+  {% render 'price', product: product, variant: current_variant, long: true %}
+{% enddoc %}
+
+{%- liquid
+  assign v = variant | default: product.selected_or_first_available_variant
+  assign show_from = false
+  if variant == blank and product.price_varies
+    assign show_from = true
+  endif
+-%}
+
+<p class="price" data-price>
+  <span class="price__now">
+    {%- if show_from %}ab {% endif -%}
+    {{ v.price | money }}{% unless long %}*{% endunless -%}
+  </span>
+  {%- if v.compare_at_price > v.price -%}
+    <s class="price__old"><span class="sr-only">Vorher </span>{{ v.compare_at_price | money }}</s>
+  {%- endif -%}
+  {%- if v.unit_price_measurement -%}
+    <span class="price__unit">
+      ({{ v.unit_price | money }} / {% if v.unit_price_measurement.reference_value != 1 %}{{ v.unit_price_measurement.reference_value }} {% else %}1 {% endif %}{{ v.unit_price_measurement.reference_unit }})
+    </span>
+  {%- endif -%}
+  {%- if long -%}
+    <span class="price__note">
+      inkl. MwSt.
+      {%- if shop.shipping_policy.url != blank %}, zzgl. <a class="text-link" href="{{ shop.shipping_policy.url }}">Versandkosten</a>{% else %}, zzgl. Versandkosten{% endif -%}
+      {%- if v.compare_at_price > v.price %} · Streichpreis = niedrigster Preis der letzten 30 Tage{% endif -%}
+    </span>
+  {%- endif -%}
+</p>

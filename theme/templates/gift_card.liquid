@@ -1,0 +1,41 @@
+{% layout none %}
+
+<!doctype html>
+<html lang="{{ request.locale.iso_code }}">
+  <head>
+    {% render 'meta-tags' %}
+    <meta name="robots" content="noindex">
+    <link rel="icon" href="{{ 'power-shop-signet.svg' | asset_url }}" type="image/svg+xml">
+    {% render 'fonts' %}
+    {{ 'tokens.css' | asset_url | stylesheet_tag }}
+    {{ 'base.css' | asset_url | stylesheet_tag }}
+    {{ 'components.css' | asset_url | stylesheet_tag }}
+    {{ 'sections.css' | asset_url | stylesheet_tag }}
+    {{ 'theme.css' | asset_url | stylesheet_tag }}
+    {{ content_for_header }}
+  </head>
+
+  <body data-template="gift_card">
+    <main id="main" class="on-dark textured" style="min-height:100vh;display:grid;place-items:center;padding:var(--s-6) var(--gutter)">
+      <div class="shopify-section" style="text-align:center;display:grid;gap:16px;max-width:480px">
+        <span class="wordmark">Power<span>Shop</span></span>
+        <h1>{{ gift_card.balance | money }}</h1>
+
+        {%- if gift_card.enabled == false or gift_card.expired -%}
+          <p>Dieser Gutschein ist nicht mehr gültig.</p>
+        {%- endif -%}
+        {%- if gift_card.expires_on -%}
+          <p>Gültig bis {{ gift_card.expires_on | date: '%d.%m.%Y' }}</p>
+        {%- endif -%}
+
+        <p>Löse den Gutschein an der Kasse mit diesem Code ein:</p>
+        <p><strong style="font-size:24px;letter-spacing:.08em">{{ gift_card.code | format_code }}</strong></p>
+
+        {%- if gift_card.pass_url -%}
+          <a href="{{ gift_card.pass_url }}" class="btn btn--outline-light">Zu Apple Wallet hinzufügen</a>
+        {%- endif -%}
+        <a class="btn btn--primary" href="{{ shop.url }}">Zum Shop</a>
+      </div>
+    </main>
+  </body>
+</html>

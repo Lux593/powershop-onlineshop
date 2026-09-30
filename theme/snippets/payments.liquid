@@ -1,0 +1,18 @@
+{% doc %}
+  Liste der Zahlarten als Pillen (Texte aus den Theme-Einstellungen).
+
+  @param {string} [style] - Optionaler Inline-Style für die Liste
+  @param {boolean} [light] - Helle Variante für den Warenkorb-Drawer
+{% enddoc %}
+
+{%- assign methods = settings.payment_methods | newline_to_br | split: '<br />' -%}
+{%- if methods.size > 0 -%}
+  <ul class="payments" aria-label="Zahlarten"{% if style != blank %} style="{{ style }}"{% endif %}>
+    {%- for method in methods -%}
+      {%- assign method_clean = method | strip | strip_newlines -%}
+      {%- if method_clean != blank -%}
+        <li{% if light %} style="color:var(--c-muted);border-color:var(--c-line)"{% endif %}>{{ method_clean }}</li>
+      {%- endif -%}
+    {%- endfor -%}
+  </ul>
+{%- endif -%}

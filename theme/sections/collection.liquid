@@ -1,0 +1,130 @@
+{%- liquid
+  assign is_bikes = section.settings.bikes_layout
+  assign default_cols = '4'
+  if is_bikes
+    assign default_cols = '3'
+  endif
+
+  case collection.handle
+    when 'herren'
+      assign banner_asset = 'banner-herren.jpg'
+    when 'damen'
+      assign banner_asset = 'banner-damen.jpg'
+    when 'teile'
+      assign banner_asset = 'banner-teile.jpg'
+    when 'accessoires'
+      assign banner_asset = 'banner-accessoires.jpg'
+    when 'motorraeder'
+      assign banner_asset = 'banner-motorraeder.jpg'
+    when 'sale'
+      assign banner_asset = 'banner-sale.jpg'
+    else
+      assign banner_asset = 'banner-neuheiten.jpg'
+  endcase
+  assign banner_image = collection.image | default: section.settings.banner_image
+
+  comment
+    Zwei Leerzustände: Die Kollektion hat gar keine Artikel (Toolbar und Filter entfallen)
+    oder die Filter schließen alles aus (Filter bleiben, „Zurücksetzen“ hilft).
+  endcomment
+  assign collection_empty = false
+  if collection.all_products_count == 0
+    assign collection_empty = true
+  endif
+-%}
+
+<div data-collection data-section-id="{{ section.id }}">
+  <section class="page-banner on-dark textured">
+    <div class="container page-banner__inner">
+      <div class="page-banner__text">
+        <nav class="breadcrumb" aria-label="Brotkrumen">
+          <ol>
+            <li><a href="{{ routes.root_url }}">Home</a></li>
+            <li><span aria-current="page">{{ collection.title | escape }}</span></li>
+          </ol>
+        </nav>
+        <h1>{{ collection.title | escape }}</h1>
+        {%- if collection.description != blank -%}
+          <p>{{ collection.description | strip_html | truncate: 240 }}</p>
+        {%- endif -%}
+      </div>
+      <div class="page-banner__media">
+        {%- render 'media', image: banner_image, asset: banner_asset, width: 1200, height: 600, sizes: '50vw', loading: 'eager' -%}
+      </div>
+    </div>
+  </section>
+
+  <div class="container">
+    {%- unless collection_empty -%}
+      {%- render 'results-toolbar', results: collection, action: collection.url, bikes: is_bikes, default_cols: default_cols -%}
+    {%- endunless -%}
+
+    {%- paginate collection.products by section.settings.per_page -%}
+      <div data-results>
+        {%- unless collection_empty -%}
+          {%- if is_bikes -%}
+            {%- render 'active-filters', results: collection, reset_url: collection.url, singular: 'Motorrad', plural: 'Motorräder' -%}
+          {%- else -%}
+            {%- render 'active-filters', results: collection, reset_url: collection.url, singular: 'Artikel', plural: 'Artikel' -%}
+          {%- endif -%}
+        {%- endunless -%}
+
+        <h2 class="sr-only">{% if is_bikes %}Fahrzeuge{% else %}Produkte{% endif %}</h2>
+
+        {%- if collection.products.size > 0 -%}
+          <div class="product-grid{% if is_bikes %} product-grid--bikes{% endif %}" data-grid data-cols="{{ default_cols }}">
+            {%- for product in collection.products -%}
+              {%- if forloop.index0 < 4 -%}
+                {% render 'result-card', product: product, loading: 'eager' %}
+              {%- else -%}
+                {% render 'result-card', product: product %}
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        {%- elsif collection_empty -%}
+          <div class="empty">
+            {% render 'icon', name: 'store', class: 'icon--lg' %}
+            <h2 class="h3">Hier kommt bald etwas dazu</h2>
+            <p class="muted">Diese Kategorie füllen wir gerade. Schau bei den anderen vorbei oder frag uns nach einem bestimmten Stück.</p>
+            <div class="chip-row">
+              <a class="btn btn--secondary" href="{{ routes.collections_url }}">Alle Kategorien</a>
+              <a class="btn btn--outline-dark" href="{{ routes.root_url }}">Zur Startseite</a>
+            </div>
+          </div>
+        {%- else -%}
+          <div class="empty">
+            {% render 'icon', name: 'search', class: 'icon--lg' %}
+            <h2 class="h3">Keine Treffer</h2>
+            <p class="muted">Mit diesen Filtern passt kein Artikel. Nimm einen Filter heraus oder starte neu.</p>
+            <a class="btn btn--secondary" href="{{ collection.url }}" data-filter-link>Filter zurücksetzen</a>
+          </div>
+        {%- endif -%}
+
+        {%- render 'pagination', paginate: paginate -%}
+      </div>
+    {%- endpaginate -%}
+  </div>
+  <div class="section--tight"></div>
+</div>
+
+{% schema %}
+{
+  "name": "Kollektion",
+  "settings": [
+    { "type": "range", "id": "per_page", "label": "Produkte pro Seite", "min": 8, "max": 24, "step": 4, "default": 12 },
+    {
+      "type": "checkbox",
+      "id": "bikes_layout",
+      "label": "Motorrad-Ansicht",
+      "info": "Größere Fahrzeugkarten mit zwei bis drei Spalten. Wird von der Vorlage „collection.motorrad“ eingeschaltet.",
+      "default": false
+    },
+    {
+      "type": "image_picker",
+      "id": "banner_image",
+      "label": "Ersatz-Bannerbild",
+      "info": "Gilt, wenn die Kollektion selbst kein Bild hat."
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,222 @@
+{%- liquid
+  assign menu = linklists[section.settings.menu]
+-%}
+
+<header class="site-header" id="top" data-header>
+  <div class="container header__bar">
+    <button class="icon-btn header__burger" type="button" data-open="mobile-menu" aria-label="Menü öffnen">
+      {% render 'icon', name: 'menu' %}
+    </button>
+
+    <a class="brand" href="{{ routes.root_url }}" aria-label="{{ shop.name }} – zur Startseite">
+      <span class="wordmark">Power<span>Shop</span></span>
+    </a>
+    <span class="brand__divider" aria-hidden="true"></span>
+    <img
+      class="brand__hd"
+      src="{{ 'hd-bar-shield.png' | asset_url }}"
+      alt="Harley-Davidson – offizieller Vertragshändler"
+      width="49"
+      height="40"
+    >
+
+    <nav class="mainnav" aria-label="Hauptnavigation">
+      <ul class="mainnav__list">
+        {%- for link in menu.links -%}
+          {%- liquid
+            assign has_children = false
+            if link.links.size > 0
+              assign has_children = true
+            endif
+          -%}
+          <li class="mainnav__item"{% if has_children %} data-mega="{{ link.handle }}"{% endif %}>
+            <a
+              class="mainnav__link{% if link.handle == 'sale' %} mainnav__link--sale{% endif %}"
+              href="{{ link.url }}"
+              {% if link.active or link.child_active %}aria-current="page"{% endif %}
+            >
+              {{- link.title -}}
+            </a>
+            {%- if has_children -%}
+              <button
+                class="mainnav__toggle"
+                type="button"
+                aria-expanded="false"
+                aria-controls="mega-{{ link.handle }}"
+                aria-label="Untermenü {{ link.title }}"
+              >
+                {% render 'icon', name: 'chevron-down' %}
+              </button>
+              <div class="mega on-dark" id="mega-{{ link.handle }}">
+                {% render 'mega-menu', link: link, blocks: section.blocks %}
+              </div>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+    </nav>
+
+    <div class="header__icons">
+      <button class="icon-btn" type="button" data-open="search" aria-label="Suche öffnen">
+        {% render 'icon', name: 'search' %}
+      </button>
+      {%- if shop.customer_accounts_enabled -%}
+        <a class="icon-btn hide-mobile" href="{{ routes.account_url }}" aria-label="Kundenkonto">
+          {% render 'icon', name: 'user' %}
+        </a>
+      {%- endif -%}
+      {%- if section.settings.show_wishlist -%}
+        <button class="icon-btn hide-mobile" type="button" data-open="wish-drawer" aria-label="Merkliste">
+          {% render 'icon', name: 'heart' %}<span class="count" data-wish-count></span>
+        </button>
+      {%- endif -%}
+      <button class="icon-btn" type="button" data-open="cart-drawer" aria-label="Warenkorb, {{ cart.item_count }} Artikel" data-cart-trigger>
+        {% render 'icon', name: 'shopping-bag' %}<span class="count" data-cart-count data-count="{{ cart.item_count }}">{% if cart.item_count > 0 %}{{ cart.item_count }}{% endif %}</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<dialog class="drawer drawer--left mobile-menu" id="mobile-menu" aria-label="Menü">
+  <div class="drawer__head">
+    <span class="wordmark">Power<span>Shop</span></span>
+    <button class="icon-btn" type="button" data-close aria-label="Menü schließen">{% render 'icon', name: 'x' %}</button>
+  </div>
+  <div class="drawer__body" style="padding:0">
+    {%- for link in menu.links -%}
+      {%- if link.links.size > 0 -%}
+        <details class="acc">
+          <summary>{{ link.title }}{% render 'icon', name: 'plus' %}</summary>
+          <div class="acc__body">
+            <a href="{{ link.url }}"><strong>Alle anzeigen</strong></a>
+            {%- for child in link.links -%}
+              {%- if child.links.size > 0 -%}
+                {%- for grandchild in child.links -%}
+                  <a href="{{ grandchild.url }}">{{ grandchild.title }}</a>
+                {%- endfor -%}
+              {%- else -%}
+                <a href="{{ child.url }}">{{ child.title }}</a>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        </details>
+      {%- else -%}
+        <a class="mobile-menu__direct{% if link.handle == 'sale' %} mobile-menu__direct--sale{% endif %}" href="{{ link.url }}">
+          {{- link.title }}{% render 'icon', name: 'arrow-right' -%}
+        </a>
+      {%- endif -%}
+    {%- endfor -%}
+    <div class="mobile-menu__foot">
+      {%- if shop.customer_accounts_enabled -%}
+        <a href="{{ routes.account_url }}">{% render 'icon', name: 'user' %}Kundenkonto</a>
+      {%- endif -%}
+      {%- if settings.phone != blank -%}
+        <a href="tel:{{ settings.phone | remove: ' ' }}">{% render 'icon', name: 'phone' %}{{ settings.phone }}</a>
+      {%- endif -%}
+      <div class="mobile-menu__hd">
+        <img src="{{ 'hd-bar-shield.png' | asset_url }}" alt="" width="49" height="40">
+        <span>Offizieller Harley-Davidson Vertragshändler</span>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<dialog class="search-dialog" id="search" aria-label="Suche">
+  <div class="container">
+    <form class="search__bar" role="search" action="{{ routes.search_url }}" method="get">
+      {% render 'icon', name: 'search', class: 'icon--lg' %}
+      <input type="hidden" name="options[prefix]" value="last">
+      <label class="sr-only" for="search-input">Suche nach Produkt, Modell oder Teilenummer</label>
+      <input
+        class="search__input"
+        id="search-input"
+        name="q"
+        type="search"
+        autocomplete="off"
+        placeholder="Produkt, Modell oder Teilenummer …"
+        data-search-input
+      >
+      <button class="icon-btn" type="button" data-close aria-label="Suche schließen">{% render 'icon', name: 'x' %}</button>
+    </form>
+    <div class="search__results" id="search-results" aria-live="polite" data-search-results>
+      {%- assign terms = section.settings.search_terms | newline_to_br | split: '<br />' -%}
+      {%- if terms.size > 0 -%}
+        <div class="search__group" data-search-start>
+          <h2>Beliebte Suchen</h2>
+          <div class="chip-row">
+            {%- for term in terms -%}
+              {%- assign term_clean = term | strip | strip_newlines -%}
+              {%- if term_clean != blank -%}
+                <button class="chip" type="button" data-suggest="{{ term_clean | escape }}">{{ term_clean }}</button>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+          <p class="search__hint" style="margin-top:16px">Tipp: Du kannst direkt nach der Teilenummer suchen.</p>
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</dialog>
+
+{% schema %}
+{
+  "name": "Header",
+  "class": "site-header-wrap",
+  "settings": [
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Hauptmenü",
+      "default": "main-menu",
+      "info": "Ebene 1 = Hauptpunkt, Ebene 2 = Spaltenüberschrift, Ebene 3 = Links. Kollektionen mit Bild erscheinen als Kacheln."
+    },
+    {
+      "type": "textarea",
+      "id": "search_terms",
+      "label": "Beliebte Suchen (eine pro Zeile)",
+      "default": "Lederjacke\nStreet Glide\nAuspuff\nHelm\nGebraucht"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_wishlist",
+      "label": "Merkliste anzeigen",
+      "default": false,
+      "info": "Die Merkliste ist noch nicht umgesetzt."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "teaser",
+      "name": "Megamenü: Teaser-Kachel",
+      "settings": [
+        { "type": "text", "id": "parent", "label": "Hauptmenüpunkt (Titel)", "info": "Zum Beispiel Herren oder Teile & Zubehör." },
+        { "type": "image_picker", "id": "image", "label": "Bild", "info": "Ohne Auswahl wird die Standarddatei unten benutzt." },
+        { "type": "text", "id": "image_asset", "label": "Standard-Bilddatei im Theme", "info": "Dateiname aus den Theme-Dateien, z. B. mega-herren.jpg." },
+        { "type": "text", "id": "label", "label": "Beschriftung" },
+        { "type": "url", "id": "url", "label": "Link" }
+      ]
+    },
+    {
+      "type": "contact",
+      "name": "Megamenü: Kontaktspalte",
+      "limit": 2,
+      "settings": [
+        { "type": "text", "id": "parent", "label": "Hauptmenüpunkt (Titel)", "default": "Service" },
+        { "type": "text", "id": "title", "label": "Überschrift", "default": "Direkter Draht" }
+      ]
+    },
+    {
+      "type": "cta",
+      "name": "Megamenü: Aufruf-Zeile",
+      "settings": [
+        { "type": "text", "id": "parent", "label": "Hauptmenüpunkt (Titel)", "default": "Motorräder" },
+        { "type": "text", "id": "text", "label": "Text", "default": "Persönliche Beratung, Probefahrt und Finanzierung – direkt bei uns im Showroom." },
+        { "type": "text", "id": "primary_label", "label": "Button 1", "default": "Probefahrt anfragen" },
+        { "type": "url", "id": "primary_url", "label": "Button 1 Link" },
+        { "type": "text", "id": "secondary_label", "label": "Button 2", "default": "Finanzierung anfragen" },
+        { "type": "url", "id": "secondary_url", "label": "Button 2 Link" }
+      ]
+    }
+  ]
+}
+{% endschema %}

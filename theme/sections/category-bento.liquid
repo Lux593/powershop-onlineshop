@@ -1,0 +1,73 @@
+{%- liquid
+  assign blocks = section.blocks
+  assign moto = blocks[0]
+  assign pair_a = blocks[1]
+  assign pair_b = blocks[2]
+  assign light = blocks[3]
+  assign teile = blocks[4]
+-%}
+
+<section class="section on-dark textured" aria-labelledby="bento-title-{{ section.id }}" data-section-id="{{ section.id }}">
+  <div class="container">
+    <div class="section-head"><h2 id="bento-title-{{ section.id }}">{{ section.settings.heading }}</h2></div>
+    <div class="bento">
+      <div class="bento__col bento__col--left">
+        {%- if moto -%}
+          {%- render 'bento-tile', block: moto, modifier: 'bento-tile--moto', width: 1400, height: 1000 -%}
+        {%- endif -%}
+        <div class="bento__pair">
+          {%- if pair_a -%}
+            {%- render 'bento-tile', block: pair_a, modifier: '', width: 736, height: 738 -%}
+          {%- endif -%}
+          {%- if pair_b -%}
+            {%- render 'bento-tile', block: pair_b, modifier: '', width: 960, height: 867 -%}
+          {%- endif -%}
+        </div>
+      </div>
+      <div class="bento__col bento__col--right">
+        {%- if light -%}
+          {%- render 'bento-tile', block: light, modifier: 'bento-tile--product bento-tile--light', width: 960, height: 867 -%}
+        {%- endif -%}
+        {%- if teile -%}
+          {%- render 'bento-tile', block: teile, modifier: 'bento-tile--teile', width: 1400, height: 787 -%}
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Kategorie-Bento",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Überschrift", "default": "Shop nach Kategorie" }
+  ],
+  "max_blocks": 5,
+  "blocks": [
+    {
+      "type": "tile",
+      "name": "Kachel",
+      "settings": [
+        { "type": "paragraph", "content": "Reihenfolge: 1 groß oben links, 2 und 3 darunter, 4 hell oben rechts, 5 breit unten rechts." },
+        { "type": "text", "id": "title", "label": "Titel", "default": "Motorräder" },
+        { "type": "text", "id": "subtitle", "label": "Unterzeile", "default": "Entdecken" },
+        { "type": "url", "id": "url", "label": "Link" },
+        { "type": "image_picker", "id": "image", "label": "Bild" },
+        { "type": "text", "id": "image_asset", "label": "Standard-Bilddatei im Theme" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Kategorie-Bento",
+      "blocks": [
+        { "type": "tile", "settings": { "title": "Motorräder", "subtitle": "Neu, gebraucht & Vorführer", "image_asset": "bento-motorraeder.jpg", "url": "/collections/motorraeder" } },
+        { "type": "tile", "settings": { "title": "Herren", "subtitle": "Entdecken", "image_asset": "bento-herren.jpg", "url": "/collections/herren" } },
+        { "type": "tile", "settings": { "title": "Damen", "subtitle": "Entdecken", "image_asset": "bento-damen.jpg", "url": "/collections/damen" } },
+        { "type": "tile", "settings": { "title": "Accessoires", "subtitle": "Entdecken", "image_asset": "bento-accessoires.jpg", "url": "/collections/accessoires" } },
+        { "type": "tile", "settings": { "title": "Teile & Zubehör", "subtitle": "Entdecken", "image_asset": "bento-teile.jpg", "url": "/collections/teile" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

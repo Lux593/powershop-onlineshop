@@ -1,0 +1,63 @@
+{% doc %}
+  Bedienelemente für einen Shopify-Filter (Markup wie im Mockup: .fgroup, .check, .frange).
+  Die Filter selbst legst du im Shopify-Admin unter „Search & Discovery“ an.
+
+  @param {object} filter - Filter aus collection.filters oder search.filters
+  @param {string} id_prefix - Präfix für eindeutige IDs, z. B. "d" (Desktop) oder "m" (Mobil)
+
+  @example
+  {% render 'filter-controls', filter: filter, id_prefix: 'd' %}
+{% enddoc %}
+
+{%- case filter.type -%}
+  {%- when 'price_range' -%}
+    <div class="frange">
+      <div class="field">
+        <label for="{{ id_prefix }}-{{ filter.param_name | handleize }}-min">von (€)</label>
+        <input
+          class="input"
+          type="number"
+          inputmode="numeric"
+          min="0"
+          id="{{ id_prefix }}-{{ filter.param_name | handleize }}-min"
+          name="{{ filter.min_value.param_name }}"
+          value="{% if filter.min_value.value %}{{ filter.min_value.value | divided_by: 100.0 | round }}{% endif %}"
+          placeholder="0"
+        >
+      </div>
+      <span aria-hidden="true">–</span>
+      <div class="field">
+        <label for="{{ id_prefix }}-{{ filter.param_name | handleize }}-max">bis (€)</label>
+        <input
+          class="input"
+          type="number"
+          inputmode="numeric"
+          min="0"
+          id="{{ id_prefix }}-{{ filter.param_name | handleize }}-max"
+          name="{{ filter.max_value.param_name }}"
+          value="{% if filter.max_value.value %}{{ filter.max_value.value | divided_by: 100.0 | round }}{% endif %}"
+          placeholder="{{ filter.range_max | divided_by: 100.0 | round }}"
+        >
+      </div>
+    </div>
+  {%- else -%}
+    <div class="fgroup">
+      {%- for value in filter.values -%}
+        <label class="check">
+          <input
+            type="checkbox"
+            id="{{ id_prefix }}-{{ filter.param_name | handleize }}-{{ forloop.index }}"
+            name="{{ value.param_name }}"
+            value="{{ value.value }}"
+            {% if value.active %}checked{% endif %}
+            {% if value.count == 0 and value.active == false %}disabled{% endif %}
+          >
+          {%- if value.swatch != blank -%}
+            <span class="fgroup__swatch" style="background: {% if value.swatch.color %}{{ value.swatch.color }}{% elsif value.swatch.image %}url({{ value.swatch.image | image_url: width: 32 }}) center / cover{% endif %}"></span>
+          {%- endif -%}
+          {{ value.label | escape }}
+          <span class="fgroup__count">{{ value.count }}</span>
+        </label>
+      {%- endfor -%}
+    </div>
+{%- endcase -%}

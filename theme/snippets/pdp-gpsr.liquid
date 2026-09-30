@@ -1,0 +1,15 @@
+{% doc %}
+  Herstellerinformationen nach GPSR (EU 2023/988). Liest die Metafelder gpsr.hersteller,
+  gpsr.verantwortliche_person und gpsr.hinweise, sonst gilt der Hersteller aus dem Produkt.
+
+  @param {product} product - Produkt
+{% enddoc %}
+
+{%- capture gpsr_body -%}
+  <p><strong>Hersteller:</strong> {{ product.metafields.gpsr.hersteller.value | default: product.vendor | escape }}</p>
+  {%- if product.metafields.gpsr.verantwortliche_person.value != blank -%}
+    <p><strong>Verantwortliche Person in der EU:</strong> {{ product.metafields.gpsr.verantwortliche_person.value | escape }}</p>
+  {%- endif -%}
+  <p><strong>Sicherheitshinweise:</strong> {% if product.metafields.gpsr.hinweise.value != blank %}{{ product.metafields.gpsr.hinweise.value | escape }}. {% endif %}Bitte Pflege- und Gebrauchshinweise beachten. Produktsicherheitsangaben gemäß GPSR (EU 2023/988).</p>
+{%- endcapture -%}
+{% render 'accordion', title: 'Herstellerinformationen', body: gpsr_body %}

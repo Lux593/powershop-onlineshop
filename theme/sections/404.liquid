@@ -1,0 +1,25 @@
+<section class="page-banner on-dark textured">
+  <div class="container page-banner__inner">
+    <div class="page-banner__text">
+      <h1>Diese Seite gibt es nicht</h1>
+      <p>Fehler 404: Der Link ist veraltet oder falsch getippt. Von hier kommst du schnell wieder auf die Strecke.</p>
+    </div>
+  </div>
+</section>
+<div class="container section">
+  <div class="empty">
+    {% render 'icon', name: 'route', class: 'icon--lg' %}
+    <div class="chip-row">
+      <a class="btn btn--primary" href="{{ routes.root_url }}">Zur Startseite</a>
+      <a class="btn btn--outline-dark" href="{{ routes.all_products_collection_url }}">Alle Produkte</a>
+      <a class="btn btn--outline-dark" href="{{ routes.search_url }}">Suchen</a>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Fehlerseite 404",
+  "settings": []
+}
+{% endschema %}

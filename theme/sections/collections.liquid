@@ -1,0 +1,42 @@
+<section class="page-banner on-dark textured">
+  <div class="container page-banner__inner">
+    <div class="page-banner__text">
+      <nav class="breadcrumb" aria-label="Brotkrumen">
+        <ol>
+          <li><a href="{{ routes.root_url }}">Home</a></li>
+          <li><span aria-current="page">Kategorien</span></li>
+        </ol>
+      </nav>
+      <h1>Alle Kategorien</h1>
+    </div>
+  </div>
+</section>
+
+<div class="container section--tight">
+  {%- paginate collections by 24 -%}
+    <div class="product-grid">
+      {%- for item in collections -%}
+        <article class="pcard">
+          <div class="pcard__media">
+            <a href="{{ item.url }}" tabindex="-1" aria-hidden="true">
+              {%- if item.featured_image -%}
+                {{ item.featured_image | image_url: width: 900 | image_tag: class: 'pcard__img', alt: '', loading: 'lazy', sizes: '(min-width: 1024px) 25vw, 50vw', widths: '300, 450, 600, 900' }}
+              {%- endif -%}
+            </a>
+          </div>
+          <div class="pcard__body">
+            <h2 class="pcard__title"><a href="{{ item.url }}">{{ item.title | escape }}</a></h2>
+          </div>
+        </article>
+      {%- endfor -%}
+    </div>
+    {% render 'pagination', paginate: paginate %}
+  {%- endpaginate -%}
+</div>
+
+{% schema %}
+{
+  "name": "Kategorien-Übersicht",
+  "settings": []
+}
+{% endschema %}

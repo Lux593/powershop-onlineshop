@@ -1,0 +1,33 @@
+<section class="page-banner on-dark textured">
+  <div class="container page-banner__inner">
+    <div class="page-banner__text">
+      <nav class="breadcrumb" aria-label="Brotkrumen">
+        <ol>
+          <li><a href="{{ routes.root_url }}">Home</a></li>
+          <li><a href="{{ blog.url }}">{{ blog.title | escape }}</a></li>
+          <li><span aria-current="page">{{ article.title | escape }}</span></li>
+        </ol>
+      </nav>
+      <h1>{{ article.title | escape }}</h1>
+      <p>{{ article.published_at | date: '%d.%m.%Y' }}{% if article.author != blank %} · {{ article.author | escape }}{% endif %}</p>
+    </div>
+    {%- if article.image -%}
+      <div class="page-banner__media">
+        {{ article.image | image_url: width: 1200 | image_tag: alt: article.image.alt, loading: 'eager', sizes: '50vw' }}
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+<div class="container section--tight">
+  <div class="page-content">
+    {{ article.content }}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Beitrag",
+  "settings": []
+}
+{% endschema %}

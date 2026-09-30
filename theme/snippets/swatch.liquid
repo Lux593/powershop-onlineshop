@@ -1,0 +1,46 @@
+{% doc %}
+  Farbfeld für eine Farb-Option. Nimmt die Shopify-Swatch-Farbe, sonst eine Zuordnung nach Farbname.
+
+  @param {string} name - Farbname, z. B. "Schwarz"
+  @param {object} [swatch] - Swatch des Optionswerts (value.swatch)
+  @param {string} [tag] - "li" (Standard) oder "span"
+{% enddoc %}
+
+{%- liquid
+  assign hex = swatch.color
+  if hex == blank
+    assign key = name | downcase
+    case key
+      when 'schwarz'
+        assign hex = '#141414'
+      when 'braun'
+        assign hex = '#6b4226'
+      when 'grau'
+        assign hex = '#8a8a8a'
+      when 'oliv'
+        assign hex = '#5b5e3a'
+      when 'weiß'
+        assign hex = '#f4f4f2'
+      when 'weiss'
+        assign hex = '#f4f4f2'
+      when 'orange'
+        assign hex = '#f26722'
+      when 'bordeaux'
+        assign hex = '#7d1f24'
+      when 'rot'
+        assign hex = '#7d1f24'
+      when 'denim'
+        assign hex = '#3d5a80'
+      when 'blau'
+        assign hex = '#3d5a80'
+      when 'sand'
+        assign hex = '#c8b79a'
+      when 'chrom'
+        assign hex = '#c9ccd1'
+      else
+        assign hex = '#cccccc'
+    endcase
+  endif
+  assign element = tag | default: 'li'
+-%}
+<{{ element }} class="swatch" style="background:{{ hex }}" title="{{ name | escape }}"></{{ element }}>

@@ -1,0 +1,142 @@
+{% doc %}
+  Produktkarte für Bekleidung, Teile und Accessoires (Markup wie im Mockup: .pcard).
+  Motorräder nutzen stattdessen das Snippet bike-card.
+
+  @param {product} product - Produkt
+  @param {string} [sizes] - sizes-Attribut für die Bilder
+  @param {string} [loading] - "lazy" (Standard) oder "eager"
+
+  @example
+  {% render 'product-card', product: product %}
+{% enddoc %}
+
+{%- liquid
+  assign img_loading = loading | default: 'lazy'
+  assign img_sizes = sizes | default: '(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw'
+
+  assign is_part = false
+  if product.metafields.part.teilenummer != blank or product.template_suffix == 'teil'
+    assign is_part = true
+  endif
+
+  assign size_option = nil
+  assign color_option = nil
+  for option in product.options_with_values
+    assign option_name = option.name | downcase
+    if option_name == 'größe' or option_name == 'groesse' or option_name == 'size' or option_name == 'weite'
+      assign size_option = option
+    elsif option_name == 'farbe' or option_name == 'color'
+      assign color_option = option
+    endif
+  endfor
+
+  assign discount = 0
+  if product.compare_at_price > product.price
+    assign discount = product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price
+  endif
+  assign is_new = false
+  if product.tags contains 'neu'
+    assign is_new = true
+  endif
+-%}
+
+<article class="pcard" data-product-id="{{ product.id }}">
+  <div class="pcard__media">
+    <a href="{{ product.url }}" tabindex="-1" aria-hidden="true">
+      {%- if product.featured_image -%}
+        {{
+          product.featured_image
+          | image_url: width: 900
+          | image_tag: class: 'pcard__img', alt: '', loading: img_loading, sizes: img_sizes, widths: '300, 450, 600, 900'
+        }}
+        {%- assign second_image = product.images[1] -%}
+        {%- if second_image -%}
+          {{
+            second_image
+            | image_url: width: 900
+            | image_tag: class: 'pcard__img pcard__img--alt', alt: '', loading: 'lazy', sizes: img_sizes, widths: '300, 450, 600, 900'
+          }}
+        {%- endif -%}
+      {%- endif -%}
+    </a>
+
+    {%- if is_new or discount > 0 or product.available == false -%}
+      <div class="pcard__badges">
+        {%- if product.available == false -%}<span class="badge badge--used">Ausverkauft</span>{%- endif -%}
+        {%- if is_new and product.available %}<span class="badge">Neu</span>{% endif -%}
+        {%- if discount > 0 and product.available %}<span class="badge badge--sale">-{{ discount }} %</span>{% endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- if product.available -%}
+      <div class="pcard__quick">
+        {%- if size_option -%}
+          {%- assign size_idx = size_option.position | minus: 1 -%}
+          {%- if color_option -%}
+            {%- assign color_idx = color_option.position | minus: 1 -%}
+            {%- assign first_color = color_option.values.first.name | default: color_option.values.first -%}
+          {%- endif -%}
+          <p class="pcard__quick-label">Größe wählen &amp; in den Warenkorb</p>
+          <div class="size-grid">
+            {%- for variant in product.variants -%}
+              {%- assign show_variant = true -%}
+              {%- if color_option -%}
+                {%- assign variant_color = variant.options[color_idx] -%}
+                {%- if variant_color != first_color %}{% assign show_variant = false %}{% endif -%}
+              {%- endif -%}
+              {%- if show_variant -%}
+                {%- assign variant_size = variant.options[size_idx] -%}
+                <button
+                  class="size-chip{% unless variant.available %} is-soldout{% endunless %}"
+                  type="button"
+                  data-add-variant="{{ variant.id }}"
+                  {% unless variant.available %}disabled aria-label="Größe {{ variant_size | escape }} ausverkauft"{% else %}aria-label="Größe {{ variant_size | escape }} in den Warenkorb"{% endunless %}
+                >{{ variant_size }}</button>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        {%- elsif product.variants.size == 1 -%}
+          <button class="btn btn--secondary btn--block btn--sm" type="button" data-add-variant="{{ product.selected_or_first_available_variant.id }}">
+            {% render 'icon', name: 'shopping-bag' %}In den Warenkorb
+          </button>
+        {%- else -%}
+          <a class="btn btn--secondary btn--block btn--sm" href="{{ product.url }}">Optionen wählen</a>
+        {%- endif -%}
+      </div>
+      <button class="pcard__plus" type="button" data-quick-toggle aria-expanded="false" aria-label="Schnell hinzufügen: {{ product.title | escape }}">
+        {% render 'icon', name: 'plus' %}
+      </button>
+    {%- endif -%}
+  </div>
+
+  <div class="pcard__body">
+    <p class="caption muted">
+      {%- if is_part and product.vendor != blank -%}{{ product.vendor }}{%- else -%}{{ product.type }}{%- endif -%}
+    </p>
+    <h3 class="pcard__title"><a href="{{ product.url }}">{{ product.title }}</a></h3>
+    {% render 'rating', product: product %}
+    {% render 'price', product: product %}
+
+    {%- if is_part -%}
+      {%- assign families = product.metafields.part.modellfamilien.value -%}
+      {%- assign years = product.metafields.part.baujahre.value | sort -%}
+      {%- if families != blank -%}
+        <p class="pcard__fits">
+          {% render 'icon', name: 'check' %}Passt für:
+          {% if families.size > 2 %}{{ families.size }} Modellfamilien{% else %}{{ families | join: ', ' }}{% endif %}
+          {%- if years.size > 0 %} {{ years.first }}–{{ years.last }}{% endif -%}
+        </p>
+      {%- endif -%}
+    {%- elsif color_option and color_option.values.size > 1 -%}
+      <ul class="swatches" aria-label="{{ color_option.values.size }} Farben">
+        {%- for value in color_option.values limit: 4 -%}
+          {%- assign swatch_name = value.name | default: value -%}
+          {% render 'swatch', name: swatch_name, swatch: value.swatch %}
+        {%- endfor -%}
+        {%- if color_option.values.size > 4 -%}
+          <li class="swatches__more">+{{ color_option.values.size | minus: 4 }}</li>
+        {%- endif -%}
+      </ul>
+    {%- endif -%}
+  </div>
+</article>

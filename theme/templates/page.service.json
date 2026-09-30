@@ -1,0 +1,118 @@
+{
+  "sections": {
+    "main": {
+      "type": "service-page",
+      "blocks": {
+        "probefahrt": {
+          "type": "service",
+          "settings": {
+            "chip": "Probefahrt",
+            "anchor": "probefahrt",
+            "image_asset": "service-probefahrt.jpg",
+            "image_alt": "Frontansicht einer Harley vor dem Power Shop",
+            "title": "Erst fahren, dann entscheiden",
+            "text": "<p>Wähle dein Wunsch-Modell – vom Einsteiger-Bike bis zur CVO. Wir nehmen uns Zeit, erklären dir alles in Ruhe und passen Sitzposition und Lenker für dich an.</p>",
+            "bullets": "Gültiger Führerschein der passenden Klasse (A / A2) mitbringen\nHelm und Schutzkleidung leihen wir dir auf Wunsch\nAuch für Wiedereinsteiger und Neulinge – ohne Druck",
+            "contact_title": "Probefahrt anfragen",
+            "topic": "probefahrt"
+          }
+        },
+        "finanzierung": {
+          "type": "service",
+          "settings": {
+            "chip": "Finanzierung & Leasing",
+            "anchor": "finanzierung",
+            "image_asset": "service-finanzierung.jpg",
+            "image_alt": "Beratungsgespräch am Tisch, Motorrad im Hintergrund",
+            "title": "Dein Bike, deine Rate",
+            "text": "<p>Klassische Finanzierung, Ballonfinanzierung oder Leasing: Wir rechnen dir ein Angebot passend zu Anzahlung, Laufzeit und Schlussrate – auch mit Inzahlungnahme deines aktuellen Bikes.</p>",
+            "bullets": "",
+            "contact_title": "Finanzierung anfragen",
+            "topic": "finanzierung"
+          }
+        },
+        "werkstatt": {
+          "type": "service",
+          "settings": {
+            "chip": "Werkstatt",
+            "anchor": "werkstatt",
+            "image_asset": "service-werkstatt.jpg",
+            "image_alt": "Motorrad auf der Hebebühne in der Werkstatt",
+            "title": "Service, Umbau & Eintragung",
+            "text": "<p>Inspektion nach Herstellervorgabe, Reifen, Winter-Check oder kompletter Custom-Umbau: Unsere Meisterwerkstatt kennt jede Harley. Teile aus dem Shop bauen wir dir direkt ein und kümmern uns um Abnahme und Eintragung.</p>",
+            "bullets": "Inspektion & Wartung mit Original-Teilen\nEinbau von Zubehör inkl. TÜV/DEKRA-Abnahme\nWinterlager und Hol- & Bringservice (Platzhalter)",
+            "contact_title": "Werkstatt-Termin anfragen",
+            "topic": "werkstatt"
+          }
+        },
+        "inzahlungnahme": {
+          "type": "service",
+          "settings": {
+            "chip": "Inzahlungnahme",
+            "anchor": "inzahlungnahme",
+            "image_asset": "service-inzahlungnahme.jpg",
+            "image_alt": "Handschlag vor einem Gebrauchtmotorrad",
+            "title": "Dein altes Bike zählt",
+            "text": "<p>Schick uns Modell, Baujahr, km-Stand und ein paar Fotos – wir machen dir ein faires Angebot und rechnen es direkt beim Kauf deines neuen Bikes an.</p>",
+            "bullets": "",
+            "contact_title": "Bike bewerten lassen",
+            "topic": "inzahlungnahme"
+          }
+        },
+        "event_1": {
+          "type": "event",
+          "settings": {
+            "date": "2026-10-11",
+            "title": "Saisonabschluss-Ausfahrt",
+            "place": "Start: Power Shop, 10:00 Uhr",
+            "image_asset": "event-1.jpg"
+          }
+        },
+        "event_2": {
+          "type": "event",
+          "settings": {
+            "date": "2026-10-24",
+            "title": "Bike Night & Custom Show",
+            "place": "Power Shop Hof, ab 18:00 Uhr",
+            "image_asset": "event-2.jpg"
+          }
+        },
+        "event_3": {
+          "type": "event",
+          "settings": {
+            "date": "2026-11-14",
+            "title": "Winter-Check-Tag",
+            "place": "Werkstatt, 09:00–14:00 Uhr",
+            "image_asset": "event-3.jpg"
+          }
+        },
+        "standort": {
+          "type": "location",
+          "settings": {
+            "chip": "Standort & Kontakt",
+            "anchor": "standort",
+            "title": "Besuch uns im Power Shop",
+            "contact_title": "Schreib uns"
+          }
+        }
+      },
+      "block_order": [
+        "probefahrt",
+        "finanzierung",
+        "werkstatt",
+        "inzahlungnahme",
+        "event_1",
+        "event_2",
+        "event_3",
+        "standort"
+      ],
+      "settings": {
+        "heading": "Service",
+        "intro": "Probefahrt, Finanzierung, Werkstatt und Inzahlungnahme – schreib uns per WhatsApp, E-Mail oder ruf einfach an."
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

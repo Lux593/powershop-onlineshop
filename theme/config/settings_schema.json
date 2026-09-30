@@ -1,0 +1,67 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "Power Shop",
+    "theme_version": "0.1.0",
+    "theme_author": "Power Shop",
+    "theme_documentation_url": "https://help.shopify.com/manual/online-store/themes",
+    "theme_support_url": "https://help.shopify.com/"
+  },
+  {
+    "name": "Händlerdaten",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Diese Angaben erscheinen in Kontaktbox, Footer, Megamenü und Service-Seite. Im Moment sind es Platzhalter."
+      },
+      { "type": "text", "id": "company", "label": "Firmenname (Rechtsform)", "default": "Power Shop GmbH (Platzhalter)" },
+      { "type": "textarea", "id": "address", "label": "Adresse", "default": "Musterstraße 1\n12345 Musterstadt" },
+      { "type": "text", "id": "phone", "label": "Telefon (Anzeige)", "default": "+49 000 1234567" },
+      { "type": "text", "id": "whatsapp", "label": "WhatsApp-Nummer (nur Ziffern, mit Ländervorwahl)", "default": "490001234567" },
+      { "type": "text", "id": "email", "label": "E-Mail für Anfragen", "default": "verkauf@power-shop.example" }
+    ]
+  },
+  {
+    "name": "Öffnungszeiten",
+    "settings": [
+      { "type": "paragraph", "content": "Volle Stunden, 24-Stunden-Format. Bei 0 bis 0 gilt der Tag als geschlossen." },
+      { "type": "header", "content": "Montag bis Freitag" },
+      { "type": "range", "id": "hours_week_from", "label": "Von", "min": 0, "max": 23, "step": 1, "unit": "Uhr", "default": 9 },
+      { "type": "range", "id": "hours_week_to", "label": "Bis", "min": 0, "max": 24, "step": 1, "unit": "Uhr", "default": 18 },
+      { "type": "header", "content": "Samstag" },
+      { "type": "range", "id": "hours_sat_from", "label": "Von", "min": 0, "max": 23, "step": 1, "unit": "Uhr", "default": 9 },
+      { "type": "range", "id": "hours_sat_to", "label": "Bis", "min": 0, "max": 24, "step": 1, "unit": "Uhr", "default": 14 }
+    ]
+  },
+  {
+    "name": "Kontaktperson",
+    "settings": [
+      { "type": "text", "id": "contact_person_name", "label": "Name", "default": "Max Mustermann" },
+      { "type": "text", "id": "contact_person_role", "label": "Funktion", "default": "Verkaufsberater Motorräder" },
+      { "type": "image_picker", "id": "contact_person_image", "label": "Foto" }
+    ]
+  },
+  {
+    "name": "Versand, Rückgabe, Reservierung",
+    "settings": [
+      { "type": "paragraph", "content": "Die tatsächlichen Versandraten stellst du unter Einstellungen > Versand und Lieferung ein. Diese Werte steuern nur die Hinweise im Shop." },
+      { "type": "number", "id": "free_shipping_threshold", "label": "Versandkostenfrei ab (Euro)", "default": 100 },
+      { "type": "text", "id": "shipping_cost_text", "label": "Versandkosten darunter (Anzeige)", "default": "4,95 €" },
+      { "type": "text", "id": "delivery_time", "label": "Lieferzeit", "default": "2–4 Werktage" },
+      { "type": "number", "id": "return_days", "label": "Freiwillige Rückgabefrist (Tage)", "default": 30, "info": "Das gesetzliche Widerrufsrecht beträgt 14 Tage." },
+      { "type": "number", "id": "reservation_fee", "label": "Reservierungsgebühr Gebrauchtfahrzeug (Euro)", "default": 250 },
+      { "type": "number", "id": "reservation_hours", "label": "Reservierung gilt (Stunden)", "default": 48 },
+      { "type": "number", "id": "newsletter_discount", "label": "Newsletter-Rabatt (Prozent)", "default": 10 }
+    ]
+  },
+  {
+    "name": "Footer und Soziale Netze",
+    "settings": [
+      { "type": "textarea", "id": "payment_methods", "label": "Zahlarten (eine pro Zeile)", "default": "PayPal\nKlarna\nVisa\nMastercard\nApple Pay\nGoogle Pay\nDHL", "info": "Nur Zahlarten eintragen, die im Checkout aktiv sind." },
+      { "type": "url", "id": "social_instagram", "label": "Instagram" },
+      { "type": "url", "id": "social_facebook", "label": "Facebook" },
+      { "type": "url", "id": "social_youtube", "label": "YouTube" },
+      { "type": "url", "id": "social_tiktok", "label": "TikTok" }
+    ]
+  }
+]

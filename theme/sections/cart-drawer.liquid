@@ -1,0 +1,69 @@
+{%- liquid
+  assign threshold = settings.free_shipping_threshold | default: 0 | times: 100
+  assign total = cart.total_price
+  assign missing = threshold | minus: total
+  assign pct = 100
+  if threshold > 0 and missing > 0
+    assign pct = total | times: 100 | divided_by: threshold
+  endif
+  assign pct = pct | at_most: 100
+-%}
+
+<dialog class="drawer" id="cart-drawer" aria-labelledby="cart-title" data-cart-drawer>
+  <div class="drawer__head">
+    <h2 class="h4" id="cart-title">Warenkorb ({{ cart.item_count }})</h2>
+    <button class="icon-btn" type="button" data-close aria-label="Warenkorb schließen">{% render 'icon', name: 'x' %}</button>
+  </div>
+
+  {%- if cart.item_count == 0 -%}
+    <div class="drawer__body">
+      <div class="drawer__empty">
+        {% render 'icon', name: 'shopping-bag' %}
+        <p>Dein Warenkorb ist noch leer.</p>
+        <a class="btn btn--secondary" href="{{ routes.all_products_collection_url }}">Produkte entdecken</a>
+      </div>
+    </div>
+  {%- else -%}
+    <div class="drawer__body">
+      {%- if threshold > 0 -%}
+        <div class="progress">
+          <span>
+            {%- if missing > 0 -%}
+              Noch <strong>{{ missing | money }}</strong> bis zum kostenlosen Versand
+            {%- else -%}
+              <strong>Glückwunsch!</strong> Dein Versand ist kostenlos.
+            {%- endif -%}
+          </span>
+          <div class="progress__bar" role="progressbar" aria-label="Fortschritt bis zum kostenlosen Versand" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ pct }}">
+            <span style="width:{{ pct }}%"></span>
+          </div>
+        </div>
+      {%- endif -%}
+
+      {%- for item in cart.items -%}
+        {% render 'cart-line', item: item, line: forloop.index %}
+      {%- endfor -%}
+    </div>
+
+    <div class="drawer__foot">
+      <div class="subtotal"><span>Zwischensumme</span><strong>{{ cart.total_price | money }}</strong></div>
+      <p class="caption muted">
+        inkl. MwSt., zzgl.
+        {% if missing > 0 and settings.shipping_cost_text != blank %}{{ settings.shipping_cost_text }} {% endif -%}
+        Versand{% if threshold > 0 and missing <= 0 %} (kostenlos){% endif %}
+        {%- if settings.delivery_time != blank %} · Lieferzeit {{ settings.delivery_time }}{% endif -%}
+      </p>
+      <form action="{{ routes.cart_url }}" method="post">
+        <button class="btn btn--primary btn--block" type="submit" name="checkout">Zur Kasse {% render 'icon', name: 'arrow-right' %}</button>
+      </form>
+      <button class="btn btn--text" type="button" data-close style="justify-self:center">Weiter einkaufen</button>
+      {% render 'payments', style: 'justify-content:center', light: true %}
+    </div>
+  {%- endif -%}
+</dialog>
+
+{% schema %}
+{
+  "name": "Warenkorb-Drawer"
+}
+{% endschema %}

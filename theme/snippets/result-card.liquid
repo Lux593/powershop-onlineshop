@@ -1,0 +1,23 @@
+{% doc %}
+  Wählt die passende Karte: Motorräder als Fahrzeugkarte, alles andere als Produktkarte.
+  Motorrad ist, wer die Produktart „Motorrad“ hat oder die Vorlage „motorrad“ nutzt.
+
+  @param {product} product - Produkt
+  @param {string} [sizes] - sizes-Attribut für das Bild
+  @param {string} [loading] - "lazy" (Standard) oder "eager"
+
+  @example
+  {% render 'result-card', product: product %}
+{% enddoc %}
+
+{%- liquid
+  assign is_bike = false
+  if product.type == 'Motorrad' or product.template_suffix == 'motorrad'
+    assign is_bike = true
+  endif
+-%}
+{%- if is_bike -%}
+  {% render 'bike-card', product: product, sizes: sizes %}
+{%- else -%}
+  {% render 'product-card', product: product, sizes: sizes, loading: loading %}
+{%- endif -%}

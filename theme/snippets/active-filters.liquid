@@ -1,0 +1,44 @@
+{% doc %}
+  Trefferzahl, aktive Filter als Chips und „Alle zurücksetzen“ (Markup wie im Mockup).
+  Jeder Chip ist ein Link, funktioniert also auch ohne JavaScript.
+
+  @param {object} results - collection oder search
+  @param {string} reset_url - URL ohne Filter
+  @param {string} singular - Einzahl, z. B. "Artikel"
+  @param {string} plural - Mehrzahl, z. B. "Artikel" oder "Motorräder"
+
+  @example
+  {% render 'active-filters', results: collection, reset_url: collection.url, singular: 'Artikel', plural: 'Artikel' %}
+{% enddoc %}
+
+{%- liquid
+  assign result_count = results.products_count | default: results.results_count
+  assign any_active = false
+-%}
+<div class="active-filters" data-active aria-live="polite">
+  <span class="active-filters__count"><strong>{{ result_count }}</strong> {% if result_count == 1 %}{{ singular }}{% else %}{{ plural }}{% endif %}</span>
+  {%- for filter in results.filters -%}
+    {%- for value in filter.active_values -%}
+      {%- assign any_active = true -%}
+      <a class="chip" href="{{ value.url_to_remove }}" data-filter-link>
+        {{ filter.label | escape }}: {{ value.label | escape }}
+        {% render 'icon', name: 'x' %}<span class="sr-only"> entfernen</span>
+      </a>
+    {%- endfor -%}
+    {%- if filter.type == 'price_range' -%}
+      {%- if filter.min_value.value != nil or filter.max_value.value != nil -%}
+        {%- assign any_active = true -%}
+        <a class="chip" href="{{ filter.url_to_remove }}" data-filter-link>
+          {{ filter.label | escape }}:
+          {% if filter.min_value.value != nil %}{{ filter.min_value.value | money_without_trailing_zeros }}{% else %}…{% endif %}
+          –
+          {% if filter.max_value.value != nil %}{{ filter.max_value.value | money_without_trailing_zeros }}{% else %}…{% endif %}
+          {% render 'icon', name: 'x' %}<span class="sr-only"> entfernen</span>
+        </a>
+      {%- endif -%}
+    {%- endif -%}
+  {%- endfor -%}
+  {%- if any_active -%}
+    <a class="reset" href="{{ reset_url }}" data-filter-link>Alle zurücksetzen</a>
+  {%- endif -%}
+</div>

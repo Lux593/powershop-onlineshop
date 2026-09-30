@@ -1,0 +1,67 @@
+{%- liquid
+  assign rail_id = 'showroom-rail-' | append: section.id
+  assign bikes = section.settings.collection.products
+-%}
+
+<section class="section showroom" aria-labelledby="showroom-title-{{ section.id }}" data-section-id="{{ section.id }}" data-showroom data-showroom-state="neu">
+  <div class="container">
+    <div class="section-head">
+      <div class="showroom__tools">
+        <h2 id="showroom-title-{{ section.id }}">{{ section.settings.heading }}</h2>
+        {%- if bikes.size > 0 or request.design_mode -%}
+          <div class="segmented" role="group" aria-label="Fahrzeugzustand">
+            <button type="button" data-showroom-mode="neu" aria-pressed="true">Neu</button>
+            <button type="button" data-showroom-mode="gebraucht" aria-pressed="false">Gebraucht &amp; Vorführer</button>
+          </div>
+        {%- endif -%}
+      </div>
+      <div class="showroom__tools">
+        {%- if section.settings.collection != blank -%}
+          <a class="btn btn--text" href="{{ section.settings.collection.url }}">Alle Motorräder {% render 'icon', name: 'arrow-right' %}</a>
+        {%- endif -%}
+        {%- if bikes.size > 0 or request.design_mode -%}
+          <div class="rail-nav">
+            <button type="button" data-rail-prev="{{ rail_id }}" aria-label="Vorherige Bikes">{% render 'icon', name: 'chevron-left' %}</button>
+            <button type="button" data-rail-next="{{ rail_id }}" aria-label="Weitere Bikes">{% render 'icon', name: 'chevron-right' %}</button>
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+
+    {%- if bikes.size > 0 -%}
+      <div class="rail" id="{{ rail_id }}" aria-live="polite">
+        {%- for bike in bikes limit: 12 -%}
+          {% render 'bike-card', product: bike, sizes: '(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 86vw' %}
+        {%- endfor -%}
+      </div>
+    {%- else -%}
+      <div class="empty">
+        <p class="muted">
+          {%- if request.design_mode -%}
+            Wähle eine Kollektion mit Motorrädern.
+          {%- else -%}
+            Aktuelle Fahrzeuge zeigen wir dir gern im Showroom.
+          {%- endif -%}
+        </p>
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Bike-Showroom",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Überschrift", "default": "Bikes im Showroom" },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Kollektion mit Motorrädern",
+      "info": "Der Umschalter Neu / Gebraucht nutzt das Metafeld bike.zustand."
+    }
+  ],
+  "presets": [
+    { "name": "Bike-Showroom" }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,23 @@
+{
+  "name": "Footer",
+  "type": "footer",
+  "sections": {
+    "footer": {
+      "type": "footer",
+      "blocks": {
+        "company": { "type": "links", "settings": { "title": "Power Shop", "menu": "footer" } },
+        "service": { "type": "links", "settings": { "title": "Kundenservice", "menu": "customer-service", "show_size_guide": true } },
+        "legal": { "type": "links", "settings": { "title": "Rechtliches", "menu": "legal", "show_cookie_settings": true } },
+        "social": { "type": "social", "settings": { "title": "Folge uns" } }
+      },
+      "block_order": ["company", "service", "legal", "social"],
+      "settings": {
+        "show_newsletter": true,
+        "news_heading": "{rabatt} % auf deine erste Bestellung",
+        "news_text": "News zu neuen Modellen, Events und Kollektionen. Der Gutschein gilt für Bekleidung, Teile und Accessoires – nicht für Motorräder.",
+        "dealer_text": "Harley-Davidson Neufahrzeuge, Original-Teile, MotorClothes und Werkstatt-Service."
+      }
+    }
+  },
+  "order": ["footer"]
+}

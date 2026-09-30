@@ -1,0 +1,70 @@
+{% doc %}
+  Bildergalerie mit Vorschaubildern und Vergrößerung (Markup wie im Mockup: .gallery).
+
+  @param {product} product - Produkt
+  @param {boolean} [wide] - Breites Format (Motorräder)
+  @param {string} [badges] - HTML der Abzeichen oben links
+
+  @example
+  {% render 'pdp-gallery', product: product, wide: true, badges: badges_html %}
+{% enddoc %}
+
+{%- liquid
+  assign main_width = 1200
+  if wide
+    assign main_width = 1600
+  endif
+  assign first_image = product.featured_image
+-%}
+
+<div class="gallery{% if wide %} gallery--wide{% endif %}" data-gallery>
+  <div class="gallery__main">
+    {%- if first_image -%}
+      <img
+        src="{{ first_image | image_url: width: main_width }}"
+        srcset="{{ first_image | image_url: width: 600 }} 600w, {{ first_image | image_url: width: 900 }} 900w, {{ first_image | image_url: width: main_width }} {{ main_width }}w"
+        sizes="(min-width: 1024px) 58vw, 100vw"
+        alt="{{ first_image.alt | default: product.title | escape }}"
+        width="{{ first_image.width }}"
+        height="{{ first_image.height }}"
+        data-gallery-main
+      >
+    {%- else -%}
+      {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+    {%- endif -%}
+    {%- if badges != blank -%}<div class="gallery__badges">{{ badges }}</div>{%- endif -%}
+    {%- if first_image -%}
+      <button class="gallery__zoom" type="button" data-zoom aria-label="Bild vergrößern">{% render 'icon', name: 'maximize-2' %}</button>
+    {%- endif -%}
+  </div>
+
+  {%- if product.images.size > 1 -%}
+    <div class="gallery__thumbs" role="group" aria-label="Weitere Bilder">
+      {%- for image in product.images -%}
+        <button
+          type="button"
+          data-thumb="{{ image | image_url: width: main_width }}"
+          data-thumb-srcset="{{ image | image_url: width: 600 }} 600w, {{ image | image_url: width: 900 }} 900w, {{ image | image_url: width: main_width }} {{ main_width }}w"
+          data-thumb-alt="{{ image.alt | default: product.title | escape }}"
+          data-media-id="{{ image.id }}"
+          aria-current="{% if forloop.first %}true{% else %}false{% endif %}"
+          aria-label="Bild {{ forloop.index }} von {{ product.images.size }}"
+        >
+          <img src="{{ image | image_url: width: 240 }}" alt="" width="160" height="200" loading="lazy">
+        </button>
+      {%- endfor -%}
+    </div>
+  {%- endif -%}
+</div>
+
+<dialog class="modal lightbox" id="lightbox" aria-label="Bildansicht">
+  <div class="modal__inner">
+    <div class="modal__head">
+      <span class="small">{{ product.title | escape }}</span>
+      <button class="icon-btn" type="button" data-close aria-label="Schließen">{% render 'icon', name: 'x' %}</button>
+    </div>
+    {%- if first_image -%}
+      <img src="{{ first_image | image_url: width: 1600 }}" alt="{{ product.title | escape }}" width="{{ first_image.width }}" height="{{ first_image.height }}" loading="lazy" data-lightbox-img>
+    {%- endif -%}
+  </div>
+</dialog>

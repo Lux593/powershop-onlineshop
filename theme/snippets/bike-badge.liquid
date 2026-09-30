@@ -1,0 +1,16 @@
+{% doc %}
+  Zustands-Badge eines Motorrads.
+
+  @param {string} zustand - "neu", "gebraucht" oder "vorfuehrer"
+  @param {string} [status] - "reserviert" überschreibt das Badge
+{% enddoc %}
+
+{%- if status == 'reserviert' -%}
+  <span class="badge badge--reserved">{% render 'icon', name: 'clock' %}Reserviert</span>
+{%- elsif zustand == 'neu' -%}
+  <span class="badge">Neu</span>
+{%- elsif zustand == 'vorfuehrer' -%}
+  <span class="badge badge--demo">Vorführer</span>
+{%- else -%}
+  <span class="badge badge--used">Gebraucht</span>
+{%- endif -%}

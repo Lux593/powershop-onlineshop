@@ -1,0 +1,16 @@
+{% doc %}
+  Aufklappbarer Abschnitt (Markup wie im Mockup: details.acc).
+
+  @param {string} title - Titel
+  @param {string} body - Inhalt als HTML
+  @param {boolean} [open] - Beim Laden geöffnet
+
+  @example
+  {% capture body %}<p>Text</p>{% endcapture %}
+  {% render 'accordion', title: 'Beschreibung', body: body, open: true %}
+{% enddoc %}
+
+<details class="acc"{% if open %} open{% endif %}>
+  <summary>{{ title }}{% render 'icon', name: 'plus' %}</summary>
+  <div class="acc__body">{{ body }}</div>
+</details>

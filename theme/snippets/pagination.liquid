@@ -1,0 +1,34 @@
+{% doc %}
+  Seitenzahlen (Markup wie im Mockup: .pagination). Links statt Buttons, damit es ohne JavaScript geht.
+
+  @param {object} paginate - paginate-Objekt aus dem paginate-Tag
+
+  @example
+  {% render 'pagination', paginate: paginate %}
+{% enddoc %}
+
+{%- if paginate.pages > 1 -%}
+  <nav class="pagination" data-pagination aria-label="Seiten">
+    {%- if paginate.previous -%}
+      <a href="{{ paginate.previous.url }}" aria-label="Vorherige Seite" data-filter-link>{% render 'icon', name: 'chevron-left' %}</a>
+    {%- else -%}
+      <span class="is-disabled" aria-hidden="true">{% render 'icon', name: 'chevron-left' %}</span>
+    {%- endif -%}
+
+    {%- for part in paginate.parts -%}
+      {%- if part.is_link -%}
+        <a href="{{ part.url }}" aria-label="Seite {{ part.title }}" data-filter-link>{{ part.title }}</a>
+      {%- elsif part.title == paginate.current_page -%}
+        <a aria-current="page" aria-label="Seite {{ part.title }}">{{ part.title }}</a>
+      {%- else -%}
+        <span aria-hidden="true">{{ part.title }}</span>
+      {%- endif -%}
+    {%- endfor -%}
+
+    {%- if paginate.next -%}
+      <a href="{{ paginate.next.url }}" aria-label="Nächste Seite" data-filter-link>{% render 'icon', name: 'chevron-right' %}</a>
+    {%- else -%}
+      <span class="is-disabled" aria-hidden="true">{% render 'icon', name: 'chevron-right' %}</span>
+    {%- endif -%}
+  </nav>
+{%- endif -%}

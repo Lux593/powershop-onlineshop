@@ -1,0 +1,42 @@
+<section class="page-banner on-dark textured">
+  <div class="container page-banner__inner">
+    <div class="page-banner__text">
+      <nav class="breadcrumb" aria-label="Brotkrumen">
+        <ol>
+          <li><a href="{{ routes.root_url }}">Home</a></li>
+          <li><span aria-current="page">{{ blog.title | escape }}</span></li>
+        </ol>
+      </nav>
+      <h1>{{ blog.title | escape }}</h1>
+    </div>
+  </div>
+</section>
+
+<div class="container section--tight">
+  {%- paginate blog.articles by 9 -%}
+    <div class="event-grid">
+      {%- for article in blog.articles -%}
+        <a class="event-card" href="{{ article.url }}" style="color:inherit">
+          <div class="event-card__media">
+            {%- if article.image -%}
+              {{ article.image | image_url: width: 800 | image_tag: alt: article.image.alt, loading: 'lazy', sizes: '(min-width: 640px) 33vw, 100vw', widths: '400, 600, 800' }}
+            {%- endif -%}
+            <span class="date-badge"><strong>{{ article.published_at | date: '%-d' }}</strong><span>{{ article.published_at | date: '%m/%y' }}</span></span>
+          </div>
+          <div class="event-card__body">
+            <h2 class="h4">{{ article.title | escape }}</h2>
+            {%- if article.excerpt_or_content != blank -%}<p>{{ article.excerpt_or_content | strip_html | truncate: 120 }}</p>{%- endif -%}
+          </div>
+        </a>
+      {%- endfor -%}
+    </div>
+    {% render 'pagination', paginate: paginate %}
+  {%- endpaginate -%}
+</div>
+
+{% schema %}
+{
+  "name": "Blog",
+  "settings": []
+}
+{% endschema %}

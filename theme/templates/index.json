@@ -1,0 +1,135 @@
+{
+  "sections": {
+    "hero": {
+      "type": "hero",
+      "blocks": {
+        "road": {
+          "type": "slide",
+          "settings": {
+            "label": "Road Glide",
+            "blurb": "Die feste Verkleidung für lange Strecken.",
+            "image_asset": "hero-ride-road.png",
+            "image_alt": "Zwei Fahrer auf einer violetten Road Glide, unterwegs auf der Autobahn",
+            "price_text": "ab 31.500 €",
+            "cta_label": "Road Glide ansehen",
+            "url": "/collections/motorraeder",
+            "secondary_label": "Probefahrt anfragen",
+            "secondary_url": "/pages/service#probefahrt",
+            "meta_color": "Violett",
+            "meta_year": "2026",
+            "meta_line": "Touring"
+          }
+        },
+        "street": {
+          "type": "slide",
+          "settings": {
+            "label": "Street Glide",
+            "blurb": "Die tiefe Scheibe für die offene Straße.",
+            "image_asset": "hero-ride-street.png",
+            "image_alt": "Zwei Fahrer auf einer Street Glide, unterwegs auf der Autobahn",
+            "price_text": "ab 31.500 €",
+            "cta_label": "Street Glide ansehen",
+            "url": "/collections/motorraeder",
+            "secondary_label": "Probefahrt anfragen",
+            "secondary_url": "/pages/service#probefahrt",
+            "meta_color": "Schwarz",
+            "meta_year": "2026",
+            "meta_line": "Touring"
+          }
+        },
+        "cvo": {
+          "type": "slide",
+          "settings": {
+            "label": "CVO",
+            "blurb": "Die CVO-Ausstattung für die große Tour.",
+            "image_asset": "hero-ride-cvo.png",
+            "image_alt": "Fahrer auf einer grauen CVO Road Glide, unterwegs auf einer Landstraße",
+            "price_text": "ab 48.300 €",
+            "cta_label": "CVO Road Glide ST ansehen",
+            "url": "/collections/motorraeder",
+            "secondary_label": "Probefahrt anfragen",
+            "secondary_url": "/pages/service#probefahrt",
+            "meta_color": "Grau",
+            "meta_year": "2026",
+            "meta_line": "CVO"
+          }
+        }
+      },
+      "block_order": ["road", "street", "cvo"],
+      "settings": {
+        "aria_label": "Modelle 2026",
+        "scroll_target": "nach-hero"
+      }
+    },
+    "service": {
+      "type": "service-tiles",
+      "blocks": {
+        "testdrive": { "type": "tile", "settings": { "icon": "route", "title": "Probefahrt", "text": "Dein Wunsch-Bike live erleben.", "more_label": "Anfragen", "url": "/pages/service#probefahrt" } },
+        "finance": { "type": "tile", "settings": { "icon": "banknote", "title": "Finanzierung", "text": "Individuell zu Laufzeit und Rate.", "more_label": "Beraten lassen", "url": "/pages/service#finanzierung" } },
+        "workshop": { "type": "tile", "settings": { "icon": "wrench", "title": "Werkstatt", "text": "Service, Umbau und Eintragung.", "more_label": "Termin anfragen", "url": "/pages/service#werkstatt" } },
+        "tradein": { "type": "tile", "settings": { "icon": "handshake", "title": "Inzahlungnahme", "text": "Fairer Preis für dein altes Bike.", "more_label": "Bewerten lassen", "url": "/pages/service#inzahlungnahme" } }
+      },
+      "block_order": ["testdrive", "finance", "workshop", "tradein"],
+      "settings": {
+        "anchor_id": "nach-hero"
+      }
+    },
+    "news": {
+      "type": "product-tabs",
+      "blocks": {
+        "apparel": { "type": "tab", "settings": { "label": "Bekleidung" } },
+        "parts": { "type": "tab", "settings": { "label": "Teile & Zubehör" } },
+        "accessories": { "type": "tab", "settings": { "label": "Accessoires" } }
+      },
+      "block_order": ["apparel", "parts", "accessories"],
+      "settings": {
+        "heading": "Neuheiten",
+        "subheading": "Frisch eingetroffen im Power Shop",
+        "products_count": 4,
+        "button_label": "Alle ansehen"
+      }
+    },
+    "bento": {
+      "type": "category-bento",
+      "blocks": {
+        "moto": { "type": "tile", "settings": { "title": "Motorräder", "subtitle": "Neu, gebraucht & Vorführer", "image_asset": "bento-motorraeder.jpg", "url": "/collections/motorraeder" } },
+        "men": { "type": "tile", "settings": { "title": "Herren", "subtitle": "Entdecken", "image_asset": "bento-herren.jpg", "url": "/collections/herren" } },
+        "women": { "type": "tile", "settings": { "title": "Damen", "subtitle": "Entdecken", "image_asset": "bento-damen.jpg", "url": "/collections/damen" } },
+        "acc": { "type": "tile", "settings": { "title": "Accessoires", "subtitle": "Entdecken", "image_asset": "bento-accessoires.jpg", "url": "/collections/accessoires" } },
+        "parts": { "type": "tile", "settings": { "title": "Teile & Zubehör", "subtitle": "Entdecken", "image_asset": "bento-teile.jpg", "url": "/collections/teile" } }
+      },
+      "block_order": ["moto", "men", "women", "acc", "parts"],
+      "settings": {
+        "heading": "Shop nach Kategorie"
+      }
+    },
+    "showroom": {
+      "type": "showroom",
+      "settings": {
+        "heading": "Bikes im Showroom"
+      }
+    },
+    "story": {
+      "type": "story-events",
+      "blocks": {
+        "years": { "type": "stat", "settings": { "value": "25+", "label": "Jahre Erfahrung" } },
+        "bikes": { "type": "stat", "settings": { "value": "300+", "label": "Bikes pro Jahr" } },
+        "shop": { "type": "stat", "settings": { "value": "1", "label": "Meisterwerkstatt" } },
+        "event_1": { "type": "event", "settings": { "date": "2026-10-11", "title": "Saisonabschluss-Ausfahrt", "place": "Start: Power Shop, 10:00 Uhr", "image_asset": "event-1.jpg", "url": "/pages/service#events" } },
+        "event_2": { "type": "event", "settings": { "date": "2026-10-24", "title": "Bike Night & Custom Show", "place": "Power Shop Hof, ab 18:00 Uhr", "image_asset": "event-2.jpg", "url": "/pages/service#events" } },
+        "event_3": { "type": "event", "settings": { "date": "2026-11-14", "title": "Winter-Check-Tag", "place": "Werkstatt, 09:00–14:00 Uhr", "image_asset": "event-3.jpg", "url": "/pages/service#events" } }
+      },
+      "block_order": ["years", "bikes", "shop", "event_1", "event_2", "event_3"],
+      "settings": {
+        "image_asset": "powershop-team.png",
+        "image_alt": "Das Team vom Power Shop",
+        "heading": "Mehr als ein Shop",
+        "text": "<p>Bei uns trifft Showroom auf Werkstatt und Community. Wir beraten dich ehrlich, schrauben mit Leidenschaft und fahren selbst – vom ersten Führerschein-Traum bis zum kompletten Custom-Umbau.</p>",
+        "button_label": "Über uns",
+        "events_heading": "Nächste Events",
+        "events_url": "/pages/service#events"
+      }
+    }
+  },
+  "order": ["hero", "service", "news", "bento", "showroom", "story"]
+}

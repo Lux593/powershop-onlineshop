@@ -1,0 +1,10 @@
+{% doc %}
+  Rendert ein Icon aus dem Sprite (snippets/icons-sprite.liquid).
+
+  @param {string} name - Icon-Name ohne Präfix, z. B. "arrow-right"
+  @param {string} [class] - Zusätzliche Klassen, z. B. "icon--sm"
+
+  @example
+  {% render 'icon', name: 'phone', class: 'icon--sm' %}
+{% enddoc %}
+<svg class="icon{% if class != blank %} {{ class }}{% endif %}" aria-hidden="true" focusable="false"><use href="#i-{{ name }}"></use></svg>

@@ -1,0 +1,145 @@
+{%- liquid
+  assign discount = settings.newsletter_discount | default: 0
+  assign news_heading = section.settings.news_heading | replace: '{rabatt}', discount
+
+  comment
+    Die Spalte „Soziale Netze“ erscheint erst, wenn mindestens ein Profil hinterlegt ist.
+    Das Raster passt sich an die Zahl der sichtbaren Spalten an.
+  endcomment
+  assign has_social = false
+  if settings.social_instagram != blank or settings.social_facebook != blank or settings.social_youtube != blank or settings.social_tiktok != blank
+    assign has_social = true
+  endif
+  assign footer_cols = 0
+  for block in section.blocks
+    if block.type == 'social' and has_social == false and request.design_mode == false
+      continue
+    endif
+    assign footer_cols = footer_cols | plus: 1
+  endfor
+  if footer_cols < 1
+    assign footer_cols = 1
+  endif
+-%}
+
+<footer class="site-footer on-dark">
+  {%- if section.settings.show_newsletter -%}
+    <div class="container footer__news">
+      <div>
+        <h2 class="h2">{{ news_heading }}</h2>
+        <p>{{ section.settings.news_text }}</p>
+      </div>
+      {%- form 'customer', class: 'news-form', id: 'footer-newsletter' -%}
+        <input type="hidden" name="contact[tags]" value="newsletter">
+        <label class="sr-only" for="news-mail">E-Mail-Adresse</label>
+        <div class="news-form__row">
+          <input
+            class="input"
+            id="news-mail"
+            type="email"
+            name="contact[email]"
+            required
+            placeholder="Deine E-Mail-Adresse"
+            autocomplete="email"
+            {% if form.errors %}aria-invalid="true"{% endif %}
+          >
+          <button class="btn btn--primary" type="submit">Anmelden</button>
+        </div>
+        {%- if form.posted_successfully? -%}
+          <p role="status"><strong>Fast geschafft:</strong> Bitte bestätige deine Anmeldung in der E-Mail (Double-Opt-in).</p>
+        {%- elsif form.errors -%}
+          <p role="alert">Bitte gib eine gültige E-Mail-Adresse ein.</p>
+        {%- endif -%}
+        <small>
+          Du erhältst eine E-Mail zur Bestätigung (Double-Opt-in). Abmeldung jederzeit möglich.
+          {%- if shop.privacy_policy.url != blank %} Mehr in der <a href="{{ shop.privacy_policy.url }}">Datenschutzerklärung</a>.{% endif -%}
+        </small>
+      {%- endform -%}
+    </div>
+  {%- endif -%}
+
+  <div class="container footer__cols" style="--footer-cols: {{ footer_cols }}">
+    {%- for block in section.blocks -%}
+      {%- case block.type -%}
+        {%- when 'links' -%}
+          <div {{ block.shopify_attributes }}>
+            <h2>{{ block.settings.title }}</h2>
+            <ul>
+              {%- for link in linklists[block.settings.menu].links -%}
+                <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+              {%- endfor -%}
+              {%- if block.settings.show_size_guide -%}
+                <li><a href="#" data-open="sizeguide">Größentabelle</a></li>
+              {%- endif -%}
+              {%- if block.settings.show_cookie_settings -%}
+                <li><a href="#" data-cookie-settings>Cookie-Einstellungen</a></li>
+              {%- endif -%}
+            </ul>
+          </div>
+        {%- when 'social' -%}
+          {%- if has_social or request.design_mode -%}
+          <div {{ block.shopify_attributes }}>
+            <h2>{{ block.settings.title }}</h2>
+            <ul>
+              {%- if settings.social_instagram != blank -%}<li><a href="{{ settings.social_instagram }}" rel="noopener" target="_blank">Instagram</a></li>{%- endif -%}
+              {%- if settings.social_facebook != blank -%}<li><a href="{{ settings.social_facebook }}" rel="noopener" target="_blank">Facebook</a></li>{%- endif -%}
+              {%- if settings.social_youtube != blank -%}<li><a href="{{ settings.social_youtube }}" rel="noopener" target="_blank">YouTube</a></li>{%- endif -%}
+              {%- if settings.social_tiktok != blank -%}<li><a href="{{ settings.social_tiktok }}" rel="noopener" target="_blank">TikTok</a></li>{%- endif -%}
+            </ul>
+          </div>
+          {%- endif -%}
+      {%- endcase -%}
+    {%- endfor -%}
+
+    <div class="footer__dealer">
+      <img src="{{ 'hd-bar-shield.png' | asset_url }}" alt="Harley-Davidson Bar &amp; Shield" width="69" height="56" loading="lazy">
+      <p>
+        <strong>Offizieller Vertragshändler</strong>
+        {{ section.settings.dealer_text }}
+      </p>
+    </div>
+  </div>
+
+  <div class="footer__bottom">
+    <div class="container">
+      {% render 'payments' %}
+      <p>
+        © {{ 'now' | date: '%Y' }} {{ settings.company }} · * Alle Preise inkl. MwSt.
+        {%- if shop.shipping_policy.url != blank %}, zzgl. <a href="{{ shop.shipping_policy.url }}">Versandkosten</a>{% endif -%}
+      </p>
+    </div>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Footer",
+  "settings": [
+    { "type": "checkbox", "id": "show_newsletter", "label": "Newsletter-Band anzeigen", "default": true },
+    { "type": "text", "id": "news_heading", "label": "Newsletter-Überschrift", "info": "{rabatt} wird durch den Newsletter-Rabatt aus den Theme-Einstellungen ersetzt.", "default": "{rabatt} % auf deine erste Bestellung" },
+    { "type": "textarea", "id": "news_text", "label": "Newsletter-Text", "default": "News zu neuen Modellen, Events und Kollektionen. Der Gutschein gilt für Bekleidung, Teile und Accessoires – nicht für Motorräder." },
+    { "type": "textarea", "id": "dealer_text", "label": "Text der Händlerkarte", "default": "Harley-Davidson Neufahrzeuge, Original-Teile, MotorClothes und Werkstatt-Service." }
+  ],
+  "max_blocks": 4,
+  "blocks": [
+    {
+      "type": "links",
+      "name": "Link-Spalte",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Überschrift", "default": "Kundenservice" },
+        { "type": "link_list", "id": "menu", "label": "Menü" },
+        { "type": "checkbox", "id": "show_size_guide", "label": "Link zur Größentabelle anhängen", "default": false },
+        { "type": "checkbox", "id": "show_cookie_settings", "label": "Link zu den Cookie-Einstellungen anhängen", "default": false }
+      ]
+    },
+    {
+      "type": "social",
+      "name": "Soziale Netze",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "title", "label": "Überschrift", "default": "Folge uns" }
+      ]
+    }
+  ]
+}
+{% endschema %}

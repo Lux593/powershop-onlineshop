@@ -1,0 +1,52 @@
+{%- liquid
+  assign threshold = settings.free_shipping_threshold | default: 0 | times: 100
+  assign missing = threshold | minus: cart.total_price
+-%}
+
+<div class="container cart-page" data-cart-page data-section-id="{{ section.id }}">
+  <nav class="breadcrumb" aria-label="Brotkrumen" style="padding-top:20px">
+    <ol>
+      <li><a href="{{ routes.root_url }}">Home</a></li>
+      <li><span aria-current="page">Warenkorb</span></li>
+    </ol>
+  </nav>
+  <h1 class="cart-page__title">Warenkorb{% if cart.item_count > 0 %} ({{ cart.item_count }}){% endif %}</h1>
+
+  {%- if cart.item_count == 0 -%}
+    <div class="empty">
+      {% render 'icon', name: 'shopping-bag', class: 'icon--lg' %}
+      <h2 class="h3">Dein Warenkorb ist noch leer.</h2>
+      <a class="btn btn--secondary" href="{{ routes.all_products_collection_url }}">Produkte entdecken</a>
+    </div>
+  {%- else -%}
+    <div class="cart-page__grid">
+      <div class="cart-page__lines">
+        {%- for item in cart.items -%}
+          {% render 'cart-line', item: item, line: forloop.index %}
+        {%- endfor -%}
+      </div>
+
+      <aside class="cart-page__summary" aria-label="Zusammenfassung">
+        <div class="subtotal"><span>Zwischensumme</span><strong>{{ cart.total_price | money }}</strong></div>
+        <p class="caption muted">
+          inkl. MwSt., zzgl.
+          {% if missing > 0 and settings.shipping_cost_text != blank %}{{ settings.shipping_cost_text }} {% endif -%}
+          Versand{% if threshold > 0 and missing <= 0 %} (kostenlos){% endif %}
+          {%- if settings.delivery_time != blank %} · Lieferzeit {{ settings.delivery_time }}{% endif -%}
+        </p>
+        <form action="{{ routes.cart_url }}" method="post">
+          <button class="btn btn--primary btn--block" type="submit" name="checkout">Zur Kasse {% render 'icon', name: 'arrow-right' %}</button>
+        </form>
+        <a class="btn btn--text" href="{{ routes.all_products_collection_url }}" style="justify-self:center">Weiter einkaufen</a>
+        {% render 'payments', style: 'justify-content:center' %}
+      </aside>
+    </div>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Warenkorb",
+  "settings": []
+}
+{% endschema %}

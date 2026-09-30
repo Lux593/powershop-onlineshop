@@ -1,0 +1,64 @@
+<section class="section--tight" id="{{ section.settings.anchor_id | default: 'nach-hero' }}" aria-labelledby="service-title-{{ section.id }}" data-section-id="{{ section.id }}">
+  <h2 class="sr-only" id="service-title-{{ section.id }}">Unser Service</h2>
+  <div class="container service-tiles">
+    {%- for block in section.blocks -%}
+      <a class="service-tile" href="{{ block.settings.url | default: '#' }}" {{ block.shopify_attributes }}>
+        {% render 'icon', name: block.settings.icon %}
+        <h3>{{ block.settings.title }}</h3>
+        <p>{{ block.settings.text }}</p>
+        {%- if block.settings.more_label != blank -%}
+          <span class="more">{{ block.settings.more_label }} {% render 'icon', name: 'arrow-right' %}</span>
+        {%- endif -%}
+      </a>
+    {%- endfor -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Service-Leiste",
+  "settings": [
+    { "type": "text", "id": "anchor_id", "label": "Anker-ID", "default": "nach-hero", "info": "Ziel des Hero-Pfeils." }
+  ],
+  "max_blocks": 4,
+  "blocks": [
+    {
+      "type": "tile",
+      "name": "Kachel",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "route", "label": "Route (Probefahrt)" },
+            { "value": "banknote", "label": "Geldschein (Finanzierung)" },
+            { "value": "wrench", "label": "Schraubenschlüssel (Werkstatt)" },
+            { "value": "handshake", "label": "Handschlag (Inzahlungnahme)" },
+            { "value": "calendar-check", "label": "Kalender" },
+            { "value": "map-pin", "label": "Standort" },
+            { "value": "phone", "label": "Telefon" },
+            { "value": "shield-check", "label": "Schild" }
+          ],
+          "default": "route"
+        },
+        { "type": "text", "id": "title", "label": "Titel", "default": "Probefahrt" },
+        { "type": "text", "id": "text", "label": "Text", "default": "Dein Wunsch-Bike live erleben." },
+        { "type": "text", "id": "more_label", "label": "Link-Text", "default": "Anfragen" },
+        { "type": "url", "id": "url", "label": "Link" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Service-Leiste",
+      "blocks": [
+        { "type": "tile", "settings": { "icon": "route", "title": "Probefahrt", "text": "Dein Wunsch-Bike live erleben.", "more_label": "Anfragen", "url": "/pages/service#probefahrt" } },
+        { "type": "tile", "settings": { "icon": "banknote", "title": "Finanzierung", "text": "Individuell zu Laufzeit und Rate.", "more_label": "Beraten lassen", "url": "/pages/service#finanzierung" } },
+        { "type": "tile", "settings": { "icon": "wrench", "title": "Werkstatt", "text": "Service, Umbau und Eintragung.", "more_label": "Termin anfragen", "url": "/pages/service#werkstatt" } },
+        { "type": "tile", "settings": { "icon": "handshake", "title": "Inzahlungnahme", "text": "Fairer Preis für dein altes Bike.", "more_label": "Bewerten lassen", "url": "/pages/service#inzahlungnahme" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

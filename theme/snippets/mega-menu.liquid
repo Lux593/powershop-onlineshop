@@ -1,0 +1,143 @@
+{% doc %}
+  Megamenü-Inhalt für einen Hauptmenüpunkt.
+  Aufbau aus der Shopify-Navigation:
+  - Ebene 2 mit Unterpunkten = Spalte mit Überschrift, Ebene 3 = Links
+  - Sind alle Links einer Spalte Kollektionen mit Bild, erscheinen sie als Bild-Kacheln
+  - Ebene 2 ohne Unterpunkte = eine gemeinsame Link-Spalte
+  Teaser, Kontaktspalte und Aufruf-Zeile kommen als Blöcke aus dem Header.
+
+  @param {object} link - Hauptmenüpunkt
+  @param {object} blocks - Blöcke der Header-Section
+{% enddoc %}
+
+{%- liquid
+  assign key = link.handle
+  assign has_groups = false
+  assign tile_group_index = -1
+  for group in link.links
+    if group.links.size > 0
+      assign has_groups = true
+      assign first_child = group.links.first
+      if first_child.object.image != blank and tile_group_index == -1
+        assign tile_group_index = forloop.index0
+      endif
+    endif
+  endfor
+
+  assign teaser_count = 0
+  assign contact_block = nil
+  assign cta_block = nil
+  for block in blocks
+    assign parent_key = block.settings.parent | handleize
+    if parent_key == key
+      case block.type
+        when 'teaser'
+          assign teaser_count = teaser_count | plus: 1
+        when 'contact'
+          assign contact_block = block
+        when 'cta'
+          assign cta_block = block
+      endcase
+    endif
+  endfor
+
+  assign grid = ''
+  if has_groups
+    for group in link.links
+      if forloop.index0 == tile_group_index
+        assign grid = grid | append: ' 1fr'
+      elsif tile_group_index > -1
+        assign grid = grid | append: ' 220px'
+      else
+        assign grid = grid | append: ' 1fr'
+      endif
+    endfor
+  else
+    assign grid = ' 1fr'
+  endif
+  if contact_block
+    assign grid = grid | append: ' 1fr'
+  endif
+  if teaser_count > 0
+    assign grid = grid | append: ' 1.2fr'
+  endif
+-%}
+
+<div class="container mega__inner" style="grid-template-columns:{{ grid }}">
+  {%- if has_groups -%}
+    {%- for group in link.links -%}
+      <div>
+        <p class="mega__title">{{ group.title }}</p>
+        {%- if forloop.index0 == tile_group_index -%}
+          <div class="mega__families">
+            {%- for child in group.links -%}
+              <a class="mega-tile" href="{{ child.url }}">
+                {%- render 'media', image: child.object.image, width: 600, height: 400, sizes: '(min-width: 1024px) 200px, 50vw' -%}
+                <span>{{ child.title }}</span>
+              </a>
+            {%- endfor -%}
+          </div>
+        {%- else -%}
+          <ul class="mega__links{% if group.links.size > 7 %} mega__links--2col{% endif %}">
+            {%- for child in group.links -%}
+              <li><a href="{{ child.url }}">{{ child.title }}</a></li>
+            {%- endfor -%}
+            {%- if forloop.first -%}
+              <li><a class="is-strong" href="{{ link.url }}">Alle {{ link.title }}</a></li>
+            {%- endif -%}
+          </ul>
+        {%- endif -%}
+      </div>
+    {%- endfor -%}
+  {%- else -%}
+    <div>
+      <p class="mega__title">{{ link.title }}</p>
+      <ul class="mega__links">
+        {%- for child in link.links -%}
+          <li><a href="{{ child.url }}">{{ child.title }}</a></li>
+        {%- endfor -%}
+      </ul>
+    </div>
+  {%- endif -%}
+
+  {%- if contact_block -%}
+    <div {{ contact_block.shopify_attributes }}>
+      <p class="mega__title">{{ contact_block.settings.title }}</p>
+      <ul class="mega__links">
+        {%- if settings.phone != blank -%}
+          <li><a href="tel:{{ settings.phone | remove: ' ' }}">{% render 'icon', name: 'phone', class: 'icon--sm' %}&nbsp;{{ settings.phone }}</a></li>
+        {%- endif -%}
+        {%- if settings.email != blank -%}
+          <li><a href="mailto:{{ settings.email }}">{% render 'icon', name: 'mail', class: 'icon--sm' %}&nbsp;{{ settings.email }}</a></li>
+        {%- endif -%}
+        {%- render 'opening-hours', as: 'mega-links' -%}
+      </ul>
+    </div>
+  {%- endif -%}
+
+  {%- if teaser_count > 0 -%}
+    <div class="mega__teasers">
+      {%- for block in blocks -%}
+        {%- assign parent_key = block.settings.parent | handleize -%}
+        {%- if block.type == 'teaser' and parent_key == key -%}
+          <a class="mega-tile" href="{{ block.settings.url | default: link.url }}" {{ block.shopify_attributes }}>
+            {%- render 'media', image: block.settings.image, asset: block.settings.image_asset, width: 600, height: 400, sizes: '(min-width: 1024px) 250px, 50vw' -%}
+            <span>{{ block.settings.label }}</span>
+          </a>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  {%- endif -%}
+
+  {%- if cta_block -%}
+    <div class="mega__cta" {{ cta_block.shopify_attributes }}>
+      <p>{{ cta_block.settings.text }}</p>
+      {%- if cta_block.settings.primary_label != blank -%}
+        <a class="btn btn--primary btn--sm" href="{{ cta_block.settings.primary_url | default: '#' }}">{{ cta_block.settings.primary_label }}</a>
+      {%- endif -%}
+      {%- if cta_block.settings.secondary_label != blank -%}
+        <a class="btn btn--outline-light btn--sm" href="{{ cta_block.settings.secondary_url | default: '#' }}">{{ cta_block.settings.secondary_label }}</a>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+</div>

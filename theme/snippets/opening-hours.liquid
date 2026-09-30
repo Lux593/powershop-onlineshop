@@ -1,0 +1,51 @@
+{% doc %}
+  Öffnungszeiten aus den Theme-Einstellungen.
+
+  @param {string} [as] - "plain" (Standard): Listenpunkte mit Text, "mega-links": Listenpunkte mit Link zum Standort, "inline": ein Text mit Trennpunkt
+  @example
+  <ul>{% render 'opening-hours' %}</ul>
+{% enddoc %}
+
+{%- liquid
+  assign mode = as | default: 'plain'
+  assign service_page = pages['service']
+  assign target = service_page.url | default: routes.root_url
+  assign target = target | append: '#standort'
+
+  assign week_from = settings.hours_week_from | plus: 0
+  assign week_to = settings.hours_week_to | plus: 0
+  assign sat_from = settings.hours_sat_from | plus: 0
+  assign sat_to = settings.hours_sat_to | plus: 0
+
+  capture week_text
+    if week_from != week_to
+      echo week_from | prepend: '0' | slice: -2, 2
+      echo ':00–'
+      echo week_to | prepend: '0' | slice: -2, 2
+      echo ':00 Uhr'
+    else
+      echo 'geschlossen'
+    endif
+  endcapture
+  capture sat_text
+    if sat_from != sat_to
+      echo sat_from | prepend: '0' | slice: -2, 2
+      echo ':00–'
+      echo sat_to | prepend: '0' | slice: -2, 2
+      echo ':00 Uhr'
+    else
+      echo 'geschlossen'
+    endif
+  endcapture
+-%}
+
+{%- case mode -%}
+  {%- when 'mega-links' -%}
+    <li><a href="{{ target }}">Mo–Fr: {{ week_text }}</a></li>
+    <li><a href="{{ target }}">Sa: {{ sat_text }}</a></li>
+  {%- when 'inline' -%}
+    Mo–Fr {{ week_text }} · Sa {{ sat_text }}
+  {%- else -%}
+    <li>Mo–Fr: {{ week_text }}</li>
+    <li>Sa: {{ sat_text }}</li>
+{%- endcase -%}

@@ -1,0 +1,94 @@
+<section class="section" aria-labelledby="news-title-{{ section.id }}" style="padding-top:var(--s-4)" data-section-id="{{ section.id }}">
+  <div class="container">
+    <div class="section-head section-head--center">
+      <h2 id="news-title-{{ section.id }}">{{ section.settings.heading }}</h2>
+      {%- if section.settings.subheading != blank -%}
+        <p class="muted">{{ section.settings.subheading }}</p>
+      {%- endif -%}
+    </div>
+
+    {%- if section.blocks.size > 0 -%}
+      {%- if section.blocks.size > 1 -%}
+        <div class="tabs" role="tablist" aria-label="{{ section.settings.heading | escape }} nach Bereich">
+          {%- for block in section.blocks -%}
+            <button
+              class="tab"
+              role="tab"
+              type="button"
+              id="tab-{{ block.id }}"
+              aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+              aria-controls="panel-{{ block.id }}"
+              {% unless forloop.first %}tabindex="-1"{% endunless %}
+              {{ block.shopify_attributes }}
+            >{{ block.settings.label | default: block.settings.collection.title }}</button>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+
+      {%- for block in section.blocks -%}
+        {%- assign collection = block.settings.collection -%}
+        <div
+          id="panel-{{ block.id }}"
+          role="tabpanel"
+          aria-labelledby="tab-{{ block.id }}"
+          {% unless forloop.first %}hidden{% endunless %}
+          {% if section.blocks.size == 1 %}{{ block.shopify_attributes }}{% endif %}
+        >
+          {%- if collection != blank and collection.products_count > 0 -%}
+            <div class="product-grid product-grid--rail">
+              {%- for product in collection.products limit: section.settings.products_count -%}
+                {% render 'product-card', product: product %}
+              {%- endfor -%}
+            </div>
+            <div class="center-cta">
+              <a class="btn btn--outline-dark" href="{{ collection.url }}">{{ section.settings.button_label }}</a>
+            </div>
+          {%- else -%}
+            <div class="empty">
+              <p class="muted">
+                {%- if request.design_mode -%}
+                  Wähle in diesem Tab eine Kollektion mit Produkten.
+                {%- else -%}
+                  Hier erscheinen bald neue Produkte.
+                {%- endif -%}
+              </p>
+            </div>
+          {%- endif -%}
+        </div>
+      {%- endfor -%}
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Produkt-Tabs",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Überschrift", "default": "Neuheiten" },
+    { "type": "text", "id": "subheading", "label": "Unterzeile", "default": "Frisch eingetroffen im Power Shop" },
+    { "type": "range", "id": "products_count", "label": "Produkte pro Tab", "min": 2, "max": 12, "step": 1, "default": 4 },
+    { "type": "text", "id": "button_label", "label": "Button-Text", "default": "Alle ansehen" }
+  ],
+  "max_blocks": 4,
+  "blocks": [
+    {
+      "type": "tab",
+      "name": "Tab",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Tab-Text", "default": "Bekleidung" },
+        { "type": "collection", "id": "collection", "label": "Kollektion" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Produkt-Tabs",
+      "blocks": [
+        { "type": "tab", "settings": { "label": "Bekleidung" } },
+        { "type": "tab", "settings": { "label": "Teile & Zubehör" } },
+        { "type": "tab", "settings": { "label": "Accessoires" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

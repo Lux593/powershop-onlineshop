@@ -1,0 +1,12 @@
+{
+  "sections": {
+    "main": {
+      "type": "collection",
+      "settings": {
+        "per_page": 12,
+        "bikes_layout": false
+      }
+    }
+  },
+  "order": ["main"]
+}

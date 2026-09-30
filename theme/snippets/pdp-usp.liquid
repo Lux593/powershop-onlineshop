@@ -1,0 +1,9 @@
+{% doc %}
+  Liste mit Lieferzeit, Rückgabe und Abholung auf der Produktseite. Werte kommen aus den Theme-Einstellungen.
+{% enddoc %}
+
+<ul class="usp">
+  <li>{% render 'icon', name: 'truck' %}Lieferzeit {{ settings.delivery_time }} · versandkostenfrei ab {{ settings.free_shipping_threshold | times: 100 | money_without_trailing_zeros }}</li>
+  <li>{% render 'icon', name: 'rotate-ccw' %}{{ settings.return_days }} Tage Rückgabe (gesetzliches Widerrufsrecht: 14 Tage)</li>
+  <li>{% render 'icon', name: 'store' %}Abholung im Power Shop möglich</li>
+</ul>

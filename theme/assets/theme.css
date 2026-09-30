@@ -1,0 +1,59 @@
+/* ==========================================================================
+   Power Shop – Ergänzungen fürs Shopify-Theme.
+   tokens/base/components/sections.css sind 1:1 das Mockup. Hier steht nur, was
+   es im Mockup nicht gab (Shopify-Wrapper, serverseitig gerenderte Zustände).
+   ========================================================================== */
+
+/* Showroom: Umschalter Neu / Gebraucht blendet Karten über ein Zustand-Attribut aus */
+[data-showroom-state="neu"] .bcard:not([data-zustand="neu"]),
+[data-showroom-state="gebraucht"] .bcard[data-zustand="neu"] { display: none; }
+
+/* Section-Wrapper von Shopify dürfen das Layout nicht beeinflussen */
+.shopify-section { display: block; }
+
+/* Bewegungs-Haken: Sections dürfen später über data-motion animiert werden.
+   Ohne Bewegungswunsch (prefers-reduced-motion) bleibt alles statisch. */
+@media (prefers-reduced-motion: reduce) {
+  [data-motion], [data-parallax] { transition: none !important; animation: none !important; transform: none !important; }
+}
+
+/* Filterleiste: das Formular darf das Flex-Layout der Leiste nicht brechen */
+.filterbar__form { display: contents; }
+
+/* Seitenzahlen als Links (Mockup nutzte Buttons) */
+.pagination a, .pagination span {
+  min-width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%;
+  font-weight: 600; font-size: var(--fs-small);
+}
+.pagination a:hover { background: var(--c-stone); }
+.pagination a[aria-current="page"] { background: var(--c-black); color: var(--c-white); pointer-events: none; }
+.pagination .is-disabled { opacity: 0.35; }
+.pagination .icon { width: 20px; height: 20px; }
+
+/* Kollektions-Ergebnisse: beim Nachladen leicht abdunkeln */
+[data-results].is-loading { opacity: 0.5; pointer-events: none; transition: opacity var(--t-fast); }
+
+/* Suche: Eingabefeld im Banner und weitere Treffer */
+.search-inline { display: flex; gap: 8px; max-width: 520px; }
+.search-inline .input { flex: 1; min-width: 0; }
+.search-other { display: grid; gap: 8px; padding-block: var(--s-3); }
+.search-other a { text-decoration: underline; }
+
+/* Freie Inhaltsseiten (Impressum, Datenschutz, Über uns …) */
+.page-content { max-width: 760px; display: grid; gap: 16px; padding-block: var(--s-6); }
+.page-content h2, .page-content h3 { margin-top: var(--s-4); }
+.page-content ul, .page-content ol { padding-left: 20px; display: grid; gap: 6px; }
+.page-content ul { list-style: disc; }
+.page-content ol { list-style: decimal; }
+.page-content a { text-decoration: underline; }
+.page-content table { width: 100%; border-collapse: collapse; }
+.page-content th, .page-content td { padding: 8px 6px; border-bottom: 1px solid var(--c-line); text-align: left; }
+
+/* Warenkorb-Seite */
+.cart-page__title { margin-block: var(--s-3) var(--s-5); }
+.cart-page__grid { display: grid; gap: 32px; padding-bottom: var(--s-8); }
+@media (min-width: 1024px) { .cart-page__grid { grid-template-columns: 7fr 4fr; gap: 56px; align-items: start; } }
+.cart-page__lines { display: grid; gap: 0; }
+.cart-page__lines .line-item { padding-block: 20px; border-bottom: 1px solid var(--c-line); }
+.cart-page__summary { display: grid; gap: 16px; padding: 24px; background: var(--c-white); border: 1px solid var(--c-line); }
+@media (min-width: 1024px) { .cart-page__summary { position: sticky; top: calc(var(--header-h) + 24px); } }

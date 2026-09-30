@@ -1,0 +1,88 @@
+<div data-collection data-section-id="{{ section.id }}">
+  <section class="page-banner on-dark textured">
+    <div class="container page-banner__inner">
+      <div class="page-banner__text">
+        <nav class="breadcrumb" aria-label="Brotkrumen">
+          <ol>
+            <li><a href="{{ routes.root_url }}">Home</a></li>
+            <li><span aria-current="page">Suche</span></li>
+          </ol>
+        </nav>
+        <h1>{% if search.performed %}Suche: „{{ search.terms | escape }}“{% else %}Suche{% endif %}</h1>
+        <form action="{{ routes.search_url }}" method="get" role="search" class="search-inline">
+          <label class="sr-only" for="search-page-input">Suche nach Produkt, Modell oder Teilenummer</label>
+          <input class="input" id="search-page-input" type="search" name="q" value="{{ search.terms | escape }}" placeholder="Produkt, Modell oder Teilenummer" autocomplete="off">
+          <button class="btn btn--primary" type="submit">{% render 'icon', name: 'search' %}Suchen</button>
+        </form>
+      </div>
+      <div class="page-banner__media">
+        {%- render 'media', image: section.settings.banner_image, asset: 'banner-neuheiten.jpg', width: 1200, height: 600, sizes: '50vw', loading: 'eager' -%}
+      </div>
+    </div>
+  </section>
+
+  <div class="container">
+    {%- if search.performed -%}
+      {%- render 'results-toolbar', results: search, action: routes.search_url, terms: search.terms, default_cols: '4' -%}
+
+      {%- paginate search.results by section.settings.per_page -%}
+        <div data-results>
+          {%- capture reset_link -%}{{ routes.search_url }}?q={{ search.terms | url_encode }}{%- endcapture -%}
+          {%- render 'active-filters', results: search, reset_url: reset_link, singular: 'Treffer', plural: 'Treffer' -%}
+
+          {%- if search.results_count > 0 -%}
+            <h2 class="sr-only">Suchergebnisse</h2>
+            <div class="product-grid" data-grid data-cols="4">
+              {%- for item in search.results -%}
+                {%- if item.object_type == 'product' -%}
+                  {% render 'result-card', product: item %}
+                {%- endif -%}
+              {%- endfor -%}
+            </div>
+
+            {%- assign other_count = 0 -%}
+            {%- for item in search.results -%}
+              {%- unless item.object_type == 'product' -%}{%- assign other_count = other_count | plus: 1 -%}{%- endunless -%}
+            {%- endfor -%}
+            {%- if other_count > 0 -%}
+              <h2 class="h3" style="margin-top:var(--s-6)">Weitere Treffer</h2>
+              <ul class="search-other">
+                {%- for item in search.results -%}
+                  {%- unless item.object_type == 'product' -%}
+                    <li><a href="{{ item.url }}">{{ item.title | escape }}</a></li>
+                  {%- endunless -%}
+                {%- endfor -%}
+              </ul>
+            {%- endif -%}
+          {%- else -%}
+            <div class="empty">
+              {% render 'icon', name: 'search', class: 'icon--lg' %}
+              <h2 class="h3">Keine Treffer</h2>
+              <p class="muted">Prüfe die Schreibweise, suche nach der Teilenummer oder frag uns direkt.</p>
+              <a class="btn btn--secondary" href="{{ routes.root_url }}">Zur Startseite</a>
+            </div>
+          {%- endif -%}
+
+          {%- render 'pagination', paginate: paginate -%}
+        </div>
+      {%- endpaginate -%}
+    {%- else -%}
+      <div class="empty">
+        {% render 'icon', name: 'search', class: 'icon--lg' %}
+        <h2 class="h3">Wonach suchst du?</h2>
+        <p class="muted">Suche nach Produkt, Modell oder Teilenummer.</p>
+      </div>
+    {%- endif -%}
+  </div>
+  <div class="section--tight"></div>
+</div>
+
+{% schema %}
+{
+  "name": "Suche",
+  "settings": [
+    { "type": "range", "id": "per_page", "label": "Treffer pro Seite", "min": 8, "max": 24, "step": 4, "default": 12 },
+    { "type": "image_picker", "id": "banner_image", "label": "Bannerbild" }
+  ]
+}
+{% endschema %}

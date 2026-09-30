@@ -1,0 +1,15 @@
+{% doc %}
+  Schriften Inter und Barlow Condensed, self-hosted (kein Google-CDN, DSGVO).
+  Lädt nur die zwei wichtigsten Schnitte vor, der Rest kommt bei Bedarf.
+{% enddoc %}
+
+{{ 'inter-latin-400-normal.woff2' | asset_url | preload_tag: as: 'font', type: 'font/woff2', crossorigin: 'anonymous' }}
+{{ 'barlow-condensed-latin-700-normal.woff2' | asset_url | preload_tag: as: 'font', type: 'font/woff2', crossorigin: 'anonymous' }}
+<style>
+  @font-face { font-family: "Inter"; font-style: normal; font-weight: 400; font-display: swap; src: url("{{ 'inter-latin-400-normal.woff2' | asset_url }}") format("woff2"); }
+  @font-face { font-family: "Inter"; font-style: normal; font-weight: 500; font-display: swap; src: url("{{ 'inter-latin-500-normal.woff2' | asset_url }}") format("woff2"); }
+  @font-face { font-family: "Inter"; font-style: normal; font-weight: 600; font-display: swap; src: url("{{ 'inter-latin-600-normal.woff2' | asset_url }}") format("woff2"); }
+  @font-face { font-family: "Barlow Condensed"; font-style: normal; font-weight: 600; font-display: swap; src: url("{{ 'barlow-condensed-latin-600-normal.woff2' | asset_url }}") format("woff2"); }
+  @font-face { font-family: "Barlow Condensed"; font-style: normal; font-weight: 700; font-display: swap; src: url("{{ 'barlow-condensed-latin-700-normal.woff2' | asset_url }}") format("woff2"); }
+  @font-face { font-family: "Barlow Condensed"; font-style: normal; font-weight: 800; font-display: swap; src: url("{{ 'barlow-condensed-latin-800-normal.woff2' | asset_url }}") format("woff2"); }
+</style>

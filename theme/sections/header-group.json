@@ -1,0 +1,59 @@
+{
+  "name": "Header",
+  "type": "header",
+  "sections": {
+    "announcement": {
+      "type": "announcement-bar",
+      "blocks": {
+        "shipping": { "type": "message", "settings": { "text": "Versandkostenfrei ab {schwelle}*", "hide_on_mobile": false } },
+        "returns": { "type": "message", "settings": { "text": "{tage} Tage Rückgabe", "hide_on_mobile": true } },
+        "testdrive": { "type": "message", "settings": { "text": "", "link_label": "Probefahrt anfragen", "link_url": "/pages/service#probefahrt", "hide_on_mobile": false } }
+      },
+      "block_order": ["shipping", "returns", "testdrive"],
+      "settings": {}
+    },
+    "header": {
+      "type": "header",
+      "blocks": {
+        "cta_motorraeder": {
+          "type": "cta",
+          "settings": {
+            "parent": "Motorräder",
+            "text": "Persönliche Beratung, Probefahrt und Finanzierung – direkt bei uns im Showroom.",
+            "primary_label": "Probefahrt anfragen",
+            "primary_url": "/pages/service#probefahrt",
+            "secondary_label": "Finanzierung anfragen",
+            "secondary_url": "/pages/service#finanzierung"
+          }
+        },
+        "teaser_herren_1": { "type": "teaser", "settings": { "parent": "Herren", "image_asset": "mega-herren.jpg", "label": "Neue Kollektion", "url": "" } },
+        "teaser_herren_2": { "type": "teaser", "settings": { "parent": "Herren", "image_asset": "bento-herren.jpg", "label": "Riding Gear", "url": "" } },
+        "teaser_damen_1": { "type": "teaser", "settings": { "parent": "Damen", "image_asset": "mega-damen.jpg", "label": "Neue Kollektion", "url": "" } },
+        "teaser_damen_2": { "type": "teaser", "settings": { "parent": "Damen", "image_asset": "bento-damen.jpg", "label": "Riding Gear", "url": "" } },
+        "teaser_teile_1": { "type": "teaser", "settings": { "parent": "Teile & Zubehör", "image_asset": "mega-teile.jpg", "label": "Custom-Umbauten", "url": "/pages/service#werkstatt" } },
+        "teaser_teile_2": { "type": "teaser", "settings": { "parent": "Teile & Zubehör", "image_asset": "bento-teile.jpg", "label": "Performance-Teile", "url": "" } },
+        "teaser_acc_1": { "type": "teaser", "settings": { "parent": "Accessoires", "image_asset": "mega-accessoires.jpg", "label": "Geschenkideen", "url": "" } },
+        "teaser_acc_2": { "type": "teaser", "settings": { "parent": "Accessoires", "image_asset": "bento-accessoires.jpg", "label": "Helme & Brillen", "url": "" } },
+        "contact_service": { "type": "contact", "settings": { "parent": "Service", "title": "Direkter Draht" } }
+      },
+      "block_order": [
+        "cta_motorraeder",
+        "teaser_herren_1",
+        "teaser_herren_2",
+        "teaser_damen_1",
+        "teaser_damen_2",
+        "teaser_teile_1",
+        "teaser_teile_2",
+        "teaser_acc_1",
+        "teaser_acc_2",
+        "contact_service"
+      ],
+      "settings": {
+        "menu": "main-menu",
+        "search_terms": "Lederjacke\nStreet Glide\nAuspuff\nHelm\nGebraucht",
+        "show_wishlist": false
+      }
+    }
+  },
+  "order": ["announcement", "header"]
+}

@@ -1,0 +1,128 @@
+<section class="section on-dark textured" aria-labelledby="story-title-{{ section.id }}" data-section-id="{{ section.id }}">
+  <div class="container">
+    <div class="story">
+      <div class="story__media">
+        {%- render 'media', image: section.settings.image, asset: section.settings.image_asset, width: 980, height: 807, alt: section.settings.image_alt, sizes: '(min-width: 1024px) 50vw, 100vw' -%}
+      </div>
+      <div class="story__text">
+        <h2 id="story-title-{{ section.id }}">{{ section.settings.heading }}</h2>
+        {{ section.settings.text }}
+        {%- assign has_stats = false -%}
+        {%- for block in section.blocks -%}{%- if block.type == 'stat' %}{% assign has_stats = true %}{% endif -%}{%- endfor -%}
+        {%- if has_stats -%}
+          <div class="stats">
+            {%- for block in section.blocks -%}
+              {%- if block.type == 'stat' -%}
+                <div {{ block.shopify_attributes }}><strong>{{ block.settings.value }}</strong><span>{{ block.settings.label }}</span></div>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+        {%- if section.settings.button_label != blank and section.settings.button_url != blank -%}
+          <div><a class="btn btn--outline-light" href="{{ section.settings.button_url }}">{{ section.settings.button_label }}</a></div>
+        {%- endif -%}
+      </div>
+    </div>
+
+    {%- assign has_events = false -%}
+    {%- for block in section.blocks -%}{%- if block.type == 'event' %}{% assign has_events = true %}{% endif -%}{%- endfor -%}
+    {%- if has_events -%}
+      <div class="events">
+        <div class="section-head">
+          <h2 class="h3">{{ section.settings.events_heading }}</h2>
+          {%- if section.settings.events_url != blank -%}
+            <a class="btn btn--text" href="{{ section.settings.events_url }}">Alle Events {% render 'icon', name: 'arrow-right' %}</a>
+          {%- endif -%}
+        </div>
+        <div class="event-grid">
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'event' -%}
+              {%- liquid
+                assign event_day = block.settings.date | date: '%-d'
+                assign event_month_number = block.settings.date | date: '%-m' | plus: 0
+                assign months = 'Jan,Feb,Mär,Apr,Mai,Jun,Jul,Aug,Sep,Okt,Nov,Dez' | split: ','
+                assign month_index = event_month_number | minus: 1
+                assign event_month = months[month_index]
+              -%}
+              <a class="event-card" href="{{ block.settings.url | default: section.settings.events_url | default: '#' }}" {{ block.shopify_attributes }}>
+                <div class="event-card__media">
+                  {%- render 'media', image: block.settings.image, asset: block.settings.image_asset, width: 800, height: 500, sizes: '(min-width: 640px) 33vw, 100vw' -%}
+                  {%- if block.settings.date != blank -%}
+                    <span class="date-badge"><strong>{{ event_day }}</strong><span>{{ event_month }}</span></span>
+                  {%- endif -%}
+                </div>
+                <div class="event-card__body">
+                  <h3>{{ block.settings.title }}</h3>
+                  {%- if block.settings.place != blank -%}
+                    <p>{% render 'icon', name: 'map-pin' %}{{ block.settings.place }}</p>
+                  {%- endif -%}
+                </div>
+              </a>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Story und Events",
+  "settings": [
+    { "type": "header", "content": "Story" },
+    { "type": "image_picker", "id": "image", "label": "Bild" },
+    { "type": "text", "id": "image_asset", "label": "Standard-Bilddatei im Theme", "default": "powershop-team.png" },
+    { "type": "text", "id": "image_alt", "label": "Bildbeschreibung", "default": "Das Team vom Power Shop" },
+    { "type": "text", "id": "heading", "label": "Überschrift", "default": "Mehr als ein Shop" },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Bei uns trifft Showroom auf Werkstatt und Community. Wir beraten dich ehrlich, schrauben mit Leidenschaft und fahren selbst – vom ersten Führerschein-Traum bis zum kompletten Custom-Umbau.</p>"
+    },
+    { "type": "text", "id": "button_label", "label": "Button-Text", "default": "Über uns" },
+    { "type": "url", "id": "button_url", "label": "Button-Link" },
+    { "type": "header", "content": "Events" },
+    { "type": "text", "id": "events_heading", "label": "Überschrift", "default": "Nächste Events" },
+    { "type": "url", "id": "events_url", "label": "Link zu allen Events" }
+  ],
+  "blocks": [
+    {
+      "type": "stat",
+      "name": "Kennzahl",
+      "limit": 3,
+      "settings": [
+        { "type": "text", "id": "value", "label": "Zahl", "default": "25+" },
+        { "type": "text", "id": "label", "label": "Beschriftung", "default": "Jahre Erfahrung" }
+      ]
+    },
+    {
+      "type": "event",
+      "name": "Event",
+      "limit": 3,
+      "settings": [
+        { "type": "text", "id": "date", "label": "Datum (JJJJ-MM-TT)", "default": "2026-10-11" },
+        { "type": "text", "id": "title", "label": "Titel", "default": "Saisonabschluss-Ausfahrt" },
+        { "type": "text", "id": "place", "label": "Ort und Uhrzeit", "default": "Start: Power Shop, 10:00 Uhr" },
+        { "type": "image_picker", "id": "image", "label": "Bild" },
+        { "type": "text", "id": "image_asset", "label": "Standard-Bilddatei im Theme", "default": "event-1.jpg" },
+        { "type": "url", "id": "url", "label": "Link" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Story und Events",
+      "blocks": [
+        { "type": "stat", "settings": { "value": "25+", "label": "Jahre Erfahrung" } },
+        { "type": "stat", "settings": { "value": "300+", "label": "Bikes pro Jahr" } },
+        { "type": "stat", "settings": { "value": "1", "label": "Meisterwerkstatt" } },
+        { "type": "event", "settings": { "date": "2026-10-11", "title": "Saisonabschluss-Ausfahrt", "place": "Start: Power Shop, 10:00 Uhr", "image_asset": "event-1.jpg" } },
+        { "type": "event", "settings": { "date": "2026-10-24", "title": "Bike Night & Custom Show", "place": "Power Shop Hof, ab 18:00 Uhr", "image_asset": "event-2.jpg" } },
+        { "type": "event", "settings": { "date": "2026-11-14", "title": "Winter-Check-Tag", "place": "Werkstatt, 09:00–14:00 Uhr", "image_asset": "event-3.jpg" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

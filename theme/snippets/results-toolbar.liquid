@@ -1,0 +1,128 @@
+{% doc %}
+  Filterleiste, Sortierung, Spaltenwahl und mobiler Filter-Dialog (Markup wie im Mockup).
+  Funktioniert für Kollektionen und Suchergebnisse. Die Verarbeitung übernimmt assets/collection.js.
+
+  @param {object} results - collection oder search
+  @param {string} action - URL, an die der Filter sendet
+  @param {string} [terms] - Suchbegriff (nur Suche), wird als versteckte Eingabe mitgeschickt
+  @param {boolean} [bikes] - Motorrad-Ansicht (zwei oder drei Spalten statt vier)
+  @param {string} [default_cols] - Voreingestellte Spaltenzahl
+
+  @example
+  {% render 'results-toolbar', results: collection, action: collection.url %}
+{% enddoc %}
+
+{%- liquid
+  assign visible_filters = 0
+  for filter in results.filters
+    if filter.type == 'price_range' or filter.values.size > 0
+      assign visible_filters = visible_filters | plus: 1
+    endif
+  endfor
+
+  assign active_total = 0
+  for filter in results.filters
+    if filter.type == 'price_range'
+      if filter.min_value.value != nil or filter.max_value.value != nil
+        assign active_total = active_total | plus: 1
+      endif
+    else
+      assign active_total = active_total | plus: filter.active_values.size
+    endif
+  endfor
+
+  assign current_sort = results.sort_by | default: results.default_sort_by
+  assign result_count = results.products_count | default: results.results_count
+-%}
+
+<div class="filterbar" data-filterbar>
+  {%- if visible_filters > 0 -%}
+    <span class="filterbar__label">Filtern nach</span>
+    <form class="filterbar__form" action="{{ action }}" method="get" data-filter-form>
+      {%- if terms != blank -%}<input type="hidden" name="q" value="{{ terms | escape }}">{%- endif -%}
+      {%- for filter in results.filters -%}
+        {%- if filter.type == 'price_range' or filter.values.size > 0 -%}
+          {%- liquid
+            assign filter_count = filter.active_values.size
+            if filter.type == 'price_range'
+              assign filter_count = 0
+              if filter.min_value.value != nil or filter.max_value.value != nil
+                assign filter_count = 1
+              endif
+            endif
+          -%}
+          <div class="fdrop" data-fdrop="{{ filter.param_name }}">
+            <button class="fdrop__btn" type="button" aria-expanded="false" aria-controls="fp-{{ forloop.index }}">
+              {{ filter.label | escape }}
+              <span class="dot" data-dot{% if filter_count == 0 %} hidden{% endif %}>{{ filter_count }}</span>
+              {% render 'icon', name: 'chevron-down' %}
+            </button>
+            <div class="fdrop__panel" id="fp-{{ forloop.index }}" hidden>
+              {% render 'filter-controls', filter: filter, id_prefix: 'd' %}
+              <noscript><button class="btn btn--primary btn--sm" type="submit">Anwenden</button></noscript>
+            </div>
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+    </form>
+  {%- endif -%}
+
+  {%- if visible_filters > 0 -%}
+    <button class="btn btn--outline-dark btn--sm filterbar__mobile" type="button" data-open="filter-sheet">
+      {% render 'icon', name: 'sliders-horizontal' %}Filter
+      <span class="dot" data-dot-all{% if active_total == 0 %} hidden{% endif %}>{{ active_total }}</span>
+    </button>
+  {%- endif -%}
+
+  <div class="filterbar__right">
+    {%- if results.sort_options.size > 0 -%}
+      <label class="sort">
+        <span class="hide-mobile">Sortieren:</span>
+        <select class="select" data-sort aria-label="Sortieren">
+          {%- for option in results.sort_options -%}
+            <option value="{{ option.value }}"{% if option.value == current_sort %} selected{% endif %}>{{ option.name | escape }}</option>
+          {%- endfor -%}
+        </select>
+      </label>
+    {%- endif -%}
+    <div class="grid-toggle" role="group" aria-label="Spalten">
+      <button type="button" data-cols="2" aria-pressed="{% if default_cols == '2' %}true{% else %}false{% endif %}" aria-label="2 Spalten">
+        <svg viewBox="0 0 20 16" aria-hidden="true" focusable="false"><rect x="0" y="0" width="9" height="16" rx="1"/><rect x="11" y="0" width="9" height="16" rx="1"/></svg>
+      </button>
+      <button type="button" data-cols="3" aria-pressed="{% if default_cols == '3' %}true{% else %}false{% endif %}" aria-label="3 Spalten">
+        <svg viewBox="0 0 20 16" aria-hidden="true" focusable="false"><rect x="0" y="0" width="5.33" height="16" rx="1"/><rect x="7.33" y="0" width="5.33" height="16" rx="1"/><rect x="14.67" y="0" width="5.33" height="16" rx="1"/></svg>
+      </button>
+      {%- unless bikes -%}
+        <button type="button" data-cols="4" aria-pressed="{% if default_cols == '4' %}true{% else %}false{% endif %}" aria-label="4 Spalten">
+          <svg viewBox="0 0 20 16" aria-hidden="true" focusable="false"><rect x="0" y="0" width="3.5" height="16" rx="1"/><rect x="5.5" y="0" width="3.5" height="16" rx="1"/><rect x="11" y="0" width="3.5" height="16" rx="1"/><rect x="16.5" y="0" width="3.5" height="16" rx="1"/></svg>
+        </button>
+      {%- endunless -%}
+    </div>
+  </div>
+</div>
+
+{%- if visible_filters > 0 -%}
+  <dialog class="modal filter-sheet" id="filter-sheet" aria-labelledby="fs-title">
+    <form class="modal__inner" action="{{ action }}" method="get" data-filter-form>
+      {%- if terms != blank -%}<input type="hidden" name="q" value="{{ terms | escape }}">{%- endif -%}
+      <div class="modal__head">
+        <h2 class="h3" id="fs-title">Filter</h2>
+        <button class="icon-btn" type="button" data-close aria-label="Filter schließen">{% render 'icon', name: 'x' %}</button>
+      </div>
+      <div class="modal__body">
+        {%- for filter in results.filters -%}
+          {%- if filter.type == 'price_range' or filter.values.size > 0 -%}
+            <details class="acc" data-fdrop="{{ filter.param_name }}"{% if filter.active_values.size > 0 %} open{% endif %}>
+              <summary>{{ filter.label | escape }}{% render 'icon', name: 'plus' %}</summary>
+              <div class="acc__body">{% render 'filter-controls', filter: filter, id_prefix: 'm' %}</div>
+            </details>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+      <div class="modal__foot">
+        <a class="btn btn--text" href="{{ action }}{% if terms != blank %}?q={{ terms | url_encode }}{% endif %}" data-filter-link>Zurücksetzen</a>
+        <button class="btn btn--primary" type="submit" data-close data-show-count>{{ result_count }} Ergebnisse anzeigen</button>
+      </div>
+    </form>
+  </dialog>
+{%- endif -%}

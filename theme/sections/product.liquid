@@ -1,0 +1,504 @@
+{%- liquid
+  # Art der Produktseite: Motorrad, Teil oder Bekleidung/Accessoire
+  assign kind = 'apparel'
+  if product.type == 'Motorrad' or product.template_suffix == 'motorrad'
+    assign kind = 'bike'
+  elsif product.metafields.part.teilenummer.value != blank or product.template_suffix == 'teil'
+    assign kind = 'part'
+  endif
+
+  assign current_variant = product.selected_variant
+  if current_variant == blank
+    assign current_variant = product.selected_or_first_available_variant
+  endif
+
+  assign parent_collection = collection
+  if parent_collection == blank
+    assign parent_collection = product.collections.first
+  endif
+
+  assign is_new = false
+  if product.tags contains 'neu'
+    assign is_new = true
+  endif
+  assign is_sale = false
+  if product.compare_at_price > product.price
+    assign is_sale = true
+  endif
+-%}
+
+{%- capture badges_html -%}
+  {%- if is_new -%}<span class="badge">Neu</span>{%- endif -%}
+  {%- if is_sale -%}<span class="badge badge--sale">Sale</span>{%- endif -%}
+{%- endcapture -%}
+
+{%- capture breadcrumb_html -%}
+  <nav class="breadcrumb" aria-label="Brotkrumen">
+    <ol>
+      <li><a href="{{ routes.root_url }}">Home</a></li>
+      {%- if parent_collection != blank -%}
+        <li><a href="{{ parent_collection.url }}">{{ parent_collection.title | escape }}</a></li>
+      {%- endif -%}
+      <li><span aria-current="page">{{ product.title | escape }}</span></li>
+    </ol>
+  </nav>
+{%- endcapture -%}
+
+{%- comment -%} ===================== MOTORRAD ===================== {%- endcomment -%}
+{%- if kind == 'bike' -%}
+  {%- liquid
+    assign zustand = product.metafields.bike.zustand.value | default: 'neu'
+    assign status = product.metafields.bike.status.value
+    assign year = product.metafields.bike.baujahr.value
+    assign ez = product.metafields.bike.erstzulassung.value
+    assign km = product.metafields.bike.km.value | default: 0
+    assign kw = product.metafields.bike.leistung_kw.value
+    assign ps = product.metafields.bike.leistung_ps.value
+    assign ccm = product.metafields.bike.hubraum_ccm.value
+    assign color = product.metafields.bike.farbe.value
+    assign family = product.metafields.bike.modellfamilie.value
+    assign tax = product.metafields.bike.besteuerung.value
+    assign from_price = product.metafields.bike.ab_preis.value
+    assign fzg_nr = product.metafields.bike.fahrzeugnummer.value
+    assign hu = product.metafields.bike.hu_bis.value
+    assign owners = product.metafields.bike.vorbesitzer.value
+    assign equipment = product.metafields.bike.ausstattung.value
+    assign reserved_until = product.metafields.bike.reserviert_bis.value
+
+    assign is_new_bike = false
+    if zustand == 'neu'
+      assign is_new_bike = true
+    endif
+    assign is_reserved = false
+    if status == 'reserviert'
+      assign is_reserved = true
+    endif
+    assign can_reserve = false
+    if is_new_bike == false and is_reserved == false
+      assign can_reserve = true
+    endif
+
+    assign bike_label = product.title
+    if is_new_bike
+      assign bike_label = bike_label | append: ' (Modelljahr ' | append: year
+    else
+      assign bike_label = bike_label | append: ' (EZ ' | append: ez
+    endif
+    if from_price != true and fzg_nr != blank
+      assign bike_label = bike_label | append: ', Fzg.-Nr. ' | append: fzg_nr
+    endif
+    assign bike_label = bike_label | append: ')'
+
+    assign bike_topics = 'probefahrt,finanzierung,inzahlungnahme'
+    if can_reserve
+      assign bike_topics = bike_topics | append: ',reservierung'
+    endif
+    assign bike_topics = bike_topics | append: ',frage'
+    assign similar = parent_collection.products
+  -%}
+
+  <div data-pdp="bike" data-section-id="{{ section.id }}">
+    <div class="container">
+      <div class="pdp__crumbs">{{ breadcrumb_html }}</div>
+      <div class="pdp">
+        <div>
+          {%- capture bike_badges -%}{% render 'bike-badge', zustand: zustand, status: status %}{%- endcapture -%}
+          {% render 'pdp-gallery', product: product, wide: true, badges: bike_badges %}
+        </div>
+        <div class="pdp__info">
+          <h1 class="pdp__title">{{ product.title | escape }}</h1>
+          {%- if family != blank or fzg_nr != blank -%}
+            <p class="pdp__meta">
+              {%- if family != blank -%}<span>{{ family | escape }}</span>{%- endif -%}
+              {%- if fzg_nr != blank -%}<span>{% if from_price %}Modell {{ fzg_nr | escape }}{% else %}Fzg.-Nr. {{ fzg_nr | escape }}{% endif %}</span>{%- endif -%}
+            </p>
+          {%- endif -%}
+          <div class="bike-price">
+            <strong>{% if from_price %}ab {% endif %}{{ product.price | money_without_trailing_zeros }}</strong>
+            <p>
+              {%- if from_price %}Ab-Preis laut Harley-Davidson · {% elsif is_new_bike %}Gesamtpreis inkl. Überführung und Nebenkosten · {% endif -%}
+              {%- if tax == '25a' %}MwSt. nicht ausweisbar (Differenzbesteuerung § 25a UStG){% else %}inkl. 19 % MwSt.{% endif -%}
+              {%- if is_new_bike == false and from_price != true %} · zzgl. Zulassung{% endif -%}
+            </p>
+          </div>
+
+          <dl class="bike-facts">
+            <div><dt>{% render 'icon', name: 'calendar' %}{% if is_new_bike %}Modelljahr{% else %}Erstzulassung{% endif %}</dt><dd>{% if is_new_bike %}{{ year }}{% else %}{{ ez }}{% endif %}</dd></div>
+            <div><dt>{% render 'icon', name: 'gauge' %}km-Stand</dt><dd>{% render 'number-de', value: km %} km</dd></div>
+            <div><dt>{% render 'icon', name: 'zap' %}Leistung</dt><dd>{% if kw != blank %}{{ kw }} kW ({{ ps }} PS){% else %}auf Anfrage{% endif %}</dd></div>
+            <div><dt>{% render 'icon', name: 'cog' %}Hubraum</dt><dd>{% if ccm != blank %}{% render 'number-de', value: ccm %} cm³{% else %}auf Anfrage{% endif %}</dd></div>
+            <div><dt>{% render 'icon', name: 'palette' %}Farbe</dt><dd>{{ color | default: '–' | escape }}</dd></div>
+            <div><dt>{% render 'icon', name: 'shield-check' %}HU bis</dt><dd>{% if is_new_bike %}neu{% else %}{{ hu | default: '–' | escape }}{% endif %}</dd></div>
+          </dl>
+
+          {%- if is_reserved -%}
+            <div class="reserved-banner">
+              {% render 'icon', name: 'clock' %}
+              <span><strong>Reserviert{% if reserved_until != blank %} bis {{ reserved_until | escape }}{% endif %}.</strong> Du kannst uns trotzdem kontaktieren – wir melden uns, falls das Bike wieder frei wird.</span>
+            </div>
+          {%- endif -%}
+
+          {%- capture reserve_note -%}
+            {%- if can_reserve -%}
+              <div class="reserve-note">
+                <strong>{% render 'icon', name: 'clock' %}Reservierung möglich</strong>
+                <p>{{ settings.reservation_hours }} h Reservierung gegen {{ settings.reservation_fee | times: 100 | money_without_trailing_zeros }} Gebühr – wird beim Kauf angerechnet, sonst erstattet.</p>
+                <ol>
+                  <li>Wähle oben „Reservierung“ und schreib uns per WhatsApp oder E-Mail.</li>
+                  <li>Wir prüfen die Verfügbarkeit und senden dir einen Zahlungslink.</li>
+                  <li>Nach Zahlung ist das Bike für dich reserviert.</li>
+                </ol>
+              </div>
+            {%- endif -%}
+          {%- endcapture -%}
+          {% render 'contact-box', anchor: 'kontakt', title: 'Interesse an diesem Bike?', topics: bike_topics, subject: bike_label, primary: true, extra: reserve_note %}
+        </div>
+      </div>
+
+      <div class="pdp-sections">
+        {%- if equipment.size > 0 -%}
+          {%- capture equip_body -%}
+            <ul class="equip">{%- for item in equipment -%}<li>{% render 'icon', name: 'check' %}{{ item | escape }}</li>{%- endfor -%}</ul>
+          {%- endcapture -%}
+          {% render 'accordion', title: 'Ausstattung & Extras', body: equip_body, open: true %}
+        {%- endif -%}
+
+        {%- capture spec_body -%}
+          <table class="spec-table"><tbody>
+            <tr><th>Modellfamilie</th><td>{{ family | default: '–' | escape }}</td></tr>
+            <tr><th>Modell</th><td>{{ product.title | escape }}</td></tr>
+            <tr><th>Modelljahr</th><td>{{ year | default: '–' }}</td></tr>
+            <tr><th>Hubraum</th><td>{% if ccm != blank %}{% render 'number-de', value: ccm %} cm³{% else %}auf Anfrage{% endif %}</td></tr>
+            <tr><th>Leistung</th><td>{% if kw != blank %}{{ kw }} kW ({{ ps }} PS){% else %}auf Anfrage{% endif %}</td></tr>
+            <tr><th>Farbe</th><td>{{ color | default: '–' | escape }}</td></tr>
+            <tr><th>{% if from_price %}Modellcode{% else %}Fahrzeugnummer{% endif %}</th><td>{{ fzg_nr | default: '–' | escape }}</td></tr>
+          </tbody></table>
+        {%- endcapture -%}
+        {% render 'accordion', title: 'Technische Daten', body: spec_body %}
+
+        {%- capture history_body -%}
+          {%- if is_new_bike -%}
+            <p>Neufahrzeug mit voller Herstellergarantie.</p>
+          {%- else -%}
+            <ul>
+              <li>{% if owners == 0 %}Vorführfahrzeug aus unserem Haus{% elsif owners != blank %}{{ owners }} Vorbesitzer{% else %}Vorbesitzer auf Anfrage{% endif %}</li>
+              <li>Scheckheftgepflegt bei Harley-Davidson Vertragspartnern</li>
+              <li>Unfallfrei laut Vorbesitzer</li>
+              <li>Frische Inspektion vor Übergabe</li>
+            </ul>
+          {%- endif -%}
+        {%- endcapture -%}
+        {% render 'accordion', title: 'Fahrzeughistorie', body: history_body %}
+
+        {%- capture finance_body -%}
+          <p>Wir erstellen dir ein individuelles Finanzierungs- oder Leasingangebot – passend zu Anzahlung, Laufzeit und Schlussrate. Wähle in der Kontakt-Box „Finanzierung“ und schick uns deine Anfrage.</p>        {%- endcapture -%}
+        {% render 'accordion', title: 'Finanzierung', body: finance_body %}
+
+        {%- capture place_body -%}
+          <p>Besichtigung und Probefahrt im Power Shop, {{ settings.address | newline_to_br }}. Der Kaufvertrag wird bei uns vor Ort abgeschlossen. Zulassung und Überführung übernehmen wir auf Wunsch.</p>
+        {%- endcapture -%}
+        {% render 'accordion', title: 'Standort & Übergabe', body: place_body %}
+      </div>
+
+      {%- if similar.size > 1 -%}
+        <section class="section--tight">
+          <div class="section-head">
+            <h2>Ähnliche Bikes</h2>
+            <div class="rail-nav">
+              <button type="button" data-rail-prev="rail-bikes-{{ section.id }}" aria-label="Zurück">{% render 'icon', name: 'chevron-left' %}</button>
+              <button type="button" data-rail-next="rail-bikes-{{ section.id }}" aria-label="Weiter">{% render 'icon', name: 'chevron-right' %}</button>
+            </div>
+          </div>
+          <div class="rail showroom-rail" id="rail-bikes-{{ section.id }}" style="grid-auto-columns:minmax(280px, calc((100% - 48px) / 3))">
+            {%- assign shown = 0 -%}
+            {%- for item in similar -%}
+              {%- if item.id != product.id and shown < 6 -%}
+                {%- assign shown = shown | plus: 1 -%}
+                {% render 'bike-card', product: item %}
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        </section>
+      {%- endif -%}
+    </div>
+
+    <div class="sticky-contact" data-sticky-contact aria-label="Schnellkontakt">
+      <a class="btn btn--primary" href="tel:{{ settings.phone | remove: ' ' | remove: '-' | remove: '(' | remove: ')' | remove: '/' }}">{% render 'icon', name: 'phone' %}Anrufen</a>
+      <a class="btn btn--outline-light" data-sticky="wa" href="https://wa.me/{{ settings.whatsapp }}" target="_blank" rel="noopener">{% render 'icon', name: 'message-circle' %}WhatsApp</a>
+      <a class="btn btn--outline-light" data-sticky="mail" href="mailto:{{ settings.email }}">{% render 'icon', name: 'mail' %}E-Mail</a>
+    </div>
+  </div>
+
+{%- comment -%} ===================== TEIL ===================== {%- endcomment -%}
+{%- elsif kind == 'part' -%}
+  {%- liquid
+    assign part_no = product.metafields.part.teilenummer.value | default: current_variant.sku
+    assign families = product.metafields.part.modellfamilien.value
+    assign years = product.metafields.part.baujahre.value
+    assign approval = product.metafields.part.zulassung.value
+    assign compat = product.metafields.part.kompatibilitaet.value
+
+    case approval
+      when 'abe'
+        assign approval_class = 'badge--abe'
+        assign approval_icon = 'shield-check'
+        assign approval_label = 'Mit ABE / EG-Genehmigung'
+        assign approval_tip = 'Darf ohne Eintragung verbaut werden. Die ABE bzw. EG-Genehmigung liegt bei und muss mitgeführt werden.'
+      when 'eintragung'
+        assign approval_class = 'badge--eintragung'
+        assign approval_icon = 'circle-alert'
+        assign approval_label = 'Eintragungspflichtig'
+        assign approval_tip = 'Nach dem Einbau ist eine Abnahme (z. B. TÜV/DEKRA) und Eintragung in die Fahrzeugpapiere nötig. Wir erledigen das auf Wunsch für dich.'
+      when 'keine'
+        assign approval_class = 'badge--keine'
+        assign approval_icon = 'circle-alert'
+        assign approval_label = 'Ohne Straßenzulassung'
+        assign approval_tip = 'Nur für den Einsatz auf abgesperrten Strecken (Rennsport). Im öffentlichen Straßenverkehr nicht zulässig.'
+      else
+        assign approval_class = ''
+    endcase
+    assign similar = parent_collection.products
+  -%}
+
+  <div data-pdp="part" data-section-id="{{ section.id }}">
+    <div class="container">
+      <div class="pdp__crumbs">{{ breadcrumb_html }}</div>
+      <div class="pdp">
+        {% render 'pdp-gallery', product: product, badges: badges_html %}
+        <div class="pdp__info">
+          <h1 class="pdp__title">{{ product.title | escape }}</h1>
+          <div class="pdp__meta">
+            {%- if product.vendor != blank -%}
+              <span>{{ product.vendor | escape }}{% if product.type != blank %} · {{ product.type | escape }}{% endif %}</span>
+            {%- endif -%}
+            {%- if part_no != blank -%}
+              <span class="partno">Art.-Nr. <code data-partno>{{ part_no | escape }}</code>
+                <button type="button" data-copy="{{ part_no | escape }}" aria-label="Teilenummer kopieren">{% render 'icon', name: 'copy', class: 'icon--sm' %}</button>
+              </span>
+            {%- endif -%}
+            {% render 'rating', product: product %}
+          </div>
+          <div class="pdp__price">
+            <div data-pdp-dynamic="price">{% render 'price', product: product, variant: product.selected_variant, long: true %}</div>
+            <div data-pdp-dynamic="stock">
+              {%- if current_variant.available -%}
+                {%- if current_variant.inventory_management != blank and current_variant.inventory_quantity <= 0 -%}
+                  <p class="stock stock--order">Lieferbar in 5–7 Werktagen</p>
+                {%- else -%}
+                  <p class="stock">Auf Lager – Lieferzeit {{ settings.delivery_time }}</p>
+                {%- endif -%}
+              {%- else -%}
+                <p class="stock stock--order">Aktuell nicht lieferbar – frag uns nach dem Liefertermin.</p>
+              {%- endif -%}
+            </div>
+          </div>
+
+          {%- if families.size > 0 or compat.size > 0 -%}
+            <div class="compat">
+              <div class="compat__head">
+                {% render 'icon', name: 'circle-check' %}
+                <div>
+                  <strong>Passt für: {{ families | join: ', ' | escape }}{% if years != blank %} {{ years | escape }}{% endif %}</strong>
+                  <p>{% if compat.size > 0 %}{{ compat.size }} kompatible Modelle · {% endif %}Angaben laut Hersteller</p>
+                </div>
+              </div>
+              {%- if compat.size > 0 -%}
+                <details>
+                  <summary>Alle kompatiblen Modelle anzeigen{% render 'icon', name: 'chevron-down', class: 'icon--sm' %}</summary>
+                  <div class="compat__table">
+                    <label class="sr-only" for="compat-q">Modell suchen</label>
+                    <input class="input" id="compat-q" type="search" placeholder="Modell suchen, z. B. Street Glide" data-compat-q>
+                    <div class="compat__scroll">
+                      <table>
+                        <thead><tr><th scope="col">Modellfamilie</th><th scope="col">Modell</th><th scope="col">Baujahre</th></tr></thead>
+                        <tbody data-compat-rows>
+                          {%- for row in compat -%}
+                            <tr><td>{{ row.family | escape }}</td><td>{{ row.model | escape }}</td><td>{{ row.from }}–{{ row.to }}</td></tr>
+                          {%- endfor -%}
+                        </tbody>
+                      </table>
+                    </div>
+                    <p class="small muted" data-compat-empty hidden>Kein passendes Modell gefunden – frag uns kurz, wir prüfen das für dich.</p>
+                  </div>
+                </details>
+              {%- endif -%}
+              <div class="compat__foot">
+                <span>Unsicher? Frag unsere Werkstatt:</span>
+                <a class="btn btn--text" href="tel:{{ settings.phone | remove: ' ' | remove: '-' | remove: '(' | remove: ')' | remove: '/' }}">{% render 'icon', name: 'phone', class: 'icon--sm' %}Anrufen</a>
+                <a class="btn btn--text" href="#werkstatt-kontakt">{% render 'icon', name: 'message-circle', class: 'icon--sm' %}WhatsApp / E-Mail</a>
+              </div>
+            </div>
+          {%- endif -%}
+
+          {%- if approval_class != blank -%}
+            <div class="approval">
+              <span class="badge {{ approval_class }}">{% render 'icon', name: approval_icon %}{{ approval_label }}</span>
+              <span class="tip">
+                <button class="tip__btn" type="button" aria-describedby="tip-approval" aria-label="Was bedeutet das?">{% render 'icon', name: 'info' %}</button>
+                <span class="tip__bubble" role="tooltip" id="tip-approval">{{ approval_tip }}</span>
+              </span>
+            </div>
+          {%- endif -%}
+
+          <div class="note">
+            {% render 'icon', name: 'wrench' %}
+            <div>Einbau durch Fachwerkstatt empfohlen. <a class="text-link" href="{{ pages['service'].url | default: '/pages/service' }}#werkstatt">Werkstatt-Termin anfragen</a></div>
+          </div>
+
+          {% render 'pdp-buy', product: product %}
+          {% render 'pdp-usp' %}
+
+          <div>
+            {%- if product.description != blank -%}
+              {% render 'accordion', title: 'Beschreibung', body: product.description, open: true %}
+            {%- endif -%}
+            {%- capture spec_body -%}
+              <table class="spec-table"><tbody>
+                {%- if part_no != blank -%}<tr><th>Art.-Nr.</th><td>{{ part_no | escape }}</td></tr>{%- endif -%}
+                <tr><th>Marke</th><td>{{ product.vendor | escape }}</td></tr>
+                {%- if product.metafields.part.material.value != blank -%}<tr><th>Material</th><td>{{ product.metafields.part.material.value | escape }}</td></tr>{%- endif -%}
+                <tr><th>Zulassung</th><td>{{ approval_label | default: 'Keine Zulassung nötig' }}</td></tr>
+              </tbody></table>
+            {%- endcapture -%}
+            {% render 'accordion', title: 'Technische Daten', body: spec_body %}
+
+            {%- capture scope_body -%}
+              <ul><li>1 × {{ product.title | escape }}</li><li>Montagematerial</li>{% if approval == 'abe' %}<li>ABE / EG-Genehmigung</li>{% endif %}</ul>
+            {%- endcapture -%}
+            {% render 'accordion', title: 'Lieferumfang', body: scope_body %}
+            {% render 'pdp-gpsr', product: product %}
+            {%- capture ship_body -%}
+              <p>Lieferzeit {{ settings.delivery_time }}. Versandkostenfrei ab {{ settings.free_shipping_threshold | times: 100 | money_without_trailing_zeros }}. Sperrgut kann gesondert berechnet werden.</p>
+            {%- endcapture -%}
+            {% render 'accordion', title: 'Versand', body: ship_body %}
+          </div>
+        </div>
+      </div>
+
+      {%- if similar.size > 1 -%}
+        <section class="section--tight">
+          <div class="section-head">
+            <h2>Wird oft zusammen gekauft</h2>
+            <div class="rail-nav">
+              <button type="button" data-rail-prev="rail-similar-{{ section.id }}" aria-label="Zurück">{% render 'icon', name: 'chevron-left' %}</button>
+              <button type="button" data-rail-next="rail-similar-{{ section.id }}" aria-label="Weiter">{% render 'icon', name: 'chevron-right' %}</button>
+            </div>
+          </div>
+          <div class="rail" id="rail-similar-{{ section.id }}" style="grid-auto-columns:minmax(220px, calc((100% - 72px) / 4))">
+            {%- assign shown = 0 -%}
+            {%- for item in similar -%}
+              {%- if item.id != product.id and shown < 8 -%}
+                {%- assign shown = shown | plus: 1 -%}
+                {% render 'product-card', product: item %}
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        </section>
+      {%- endif -%}
+
+      <section class="section--tight">
+        <div style="max-width:560px">
+          {% render 'contact-box', anchor: 'werkstatt-kontakt', title: 'Fragen zum Einbau?', intro: 'Unsere Werkstatt hilft dir bei Kompatibilität, Einbau und Eintragung.', topics: 'kompatibilitaet,einbau,frage', subject: product.title, ref: '' %}
+        </div>
+      </section>
+    </div>
+  </div>
+
+{%- comment -%} ===================== BEKLEIDUNG / ACCESSOIRES ===================== {%- endcomment -%}
+{%- else -%}
+  {%- liquid
+    assign size_type = product.metafields.apparel.groessentabelle.value
+    assign sku = current_variant.sku
+    assign similar = parent_collection.products
+  -%}
+
+  <div data-pdp="apparel" data-section-id="{{ section.id }}">
+    <div class="container">
+      <div class="pdp__crumbs">{{ breadcrumb_html }}</div>
+      <div class="pdp">
+        {% render 'pdp-gallery', product: product, badges: badges_html %}
+        <div class="pdp__info">
+          <h1 class="pdp__title">{{ product.title | escape }}</h1>
+          <div class="pdp__meta">
+            {%- if product.vendor != blank or product.type != blank -%}
+              <span>{{ product.vendor | escape }}{% if product.vendor != blank and product.type != blank %} · {% endif %}{{ product.type | escape }}</span>
+            {%- endif -%}
+            <span data-pdp-dynamic="sku">{%- if sku != blank -%}<span class="partno">Art.-Nr. {{ sku | escape }}</span>{%- endif -%}</span>
+            {% render 'rating', product: product %}
+            <a class="text-link small" href="#bewertungen">Bewertungen lesen</a>
+          </div>
+          <div class="pdp__price" data-pdp-dynamic="price">{% render 'price', product: product, variant: product.selected_variant, long: true %}</div>
+
+          {% render 'pdp-buy', product: product, size_type: size_type %}
+          {% render 'pdp-usp' %}
+
+          <div>
+            {%- if product.description != blank -%}
+              {% render 'accordion', title: 'Beschreibung', body: product.description, open: true %}
+            {%- endif -%}
+            {%- if product.metafields.apparel.material.value != blank -%}
+              {%- capture material_body -%}
+                <p>{{ product.metafields.apparel.material.value | escape }}</p>
+                <p>Pflege: Siehe Etikett. Leder mit geeigneter Lederpflege behandeln, nicht in den Trockner.</p>
+              {%- endcapture -%}
+              {% render 'accordion', title: 'Material & Pflege', body: material_body %}
+            {%- endif -%}
+            {%- if size_type != blank -%}
+              {%- capture fit_body -%}
+                {%- if product.metafields.apparel.passform.value != blank -%}<p>{{ product.metafields.apparel.passform.value | escape }}</p>{%- endif -%}
+                <p>Unsicher? Wirf einen Blick in die <button class="text-link" type="button" data-open="sizeguide" data-type="{{ size_type }}">Größentabelle</button>.</p>
+              {%- endcapture -%}
+              {% render 'accordion', title: 'Passform', body: fit_body %}
+            {%- endif -%}
+            {%- capture ship_body -%}
+              <p>Lieferzeit {{ settings.delivery_time }}. Versandkostenfrei ab {{ settings.free_shipping_threshold | times: 100 | money_without_trailing_zeros }}, darunter {{ settings.shipping_cost_text }}. {{ settings.return_days }} Tage kostenlose Rückgabe; dein gesetzliches Widerrufsrecht (14 Tage) bleibt unberührt.</p>
+            {%- endcapture -%}
+            {% render 'accordion', title: 'Versand & Rückgabe', body: ship_body %}
+            {% render 'pdp-gpsr', product: product %}
+          </div>
+        </div>
+      </div>
+
+      <section class="section--tight" id="bewertungen">
+        <div class="section-head"><h2>Bewertungen</h2>{% render 'rating', product: product %}</div>
+        {%- for block in section.blocks -%}
+          {%- if block.type == '@app' -%}{% render block %}{%- endif -%}
+        {%- endfor -%}
+        <div class="note">
+          {% render 'icon', name: 'badge-check' %}
+          <div><strong>Geprüfte Bewertungen</strong><br>Bewertungen stammen nur von Kund:innen, die das Produkt bei uns gekauft haben (Pflichthinweis nach UWG).</div>
+        </div>
+      </section>
+
+      {%- if similar.size > 1 -%}
+        <section class="section--tight">
+          <div class="section-head">
+            <h2>Das könnte dir auch gefallen</h2>
+            <div class="rail-nav">
+              <button type="button" data-rail-prev="rail-similar-{{ section.id }}" aria-label="Zurück">{% render 'icon', name: 'chevron-left' %}</button>
+              <button type="button" data-rail-next="rail-similar-{{ section.id }}" aria-label="Weiter">{% render 'icon', name: 'chevron-right' %}</button>
+            </div>
+          </div>
+          <div class="rail" id="rail-similar-{{ section.id }}" style="grid-auto-columns:minmax(220px, calc((100% - 72px) / 4))">
+            {%- assign shown = 0 -%}
+            {%- for item in similar -%}
+              {%- if item.id != product.id and shown < 8 -%}
+                {%- assign shown = shown | plus: 1 -%}
+                {% render 'product-card', product: item %}
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        </section>
+      {%- endif -%}
+    </div>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Produktseite",
+  "blocks": [
+    { "type": "@app" }
+  ]
+}
+{% endschema %}

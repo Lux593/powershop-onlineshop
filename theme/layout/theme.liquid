@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="{{ request.locale.iso_code }}">
+  <head>
+    {% render 'meta-tags' %}
+    <meta name="theme-color" content="#0a0a0a">
+    <link rel="icon" href="{{ 'power-shop-signet.svg' | asset_url }}" type="image/svg+xml">
+
+    {% render 'fonts' %}
+    {{ 'tokens.css' | asset_url | stylesheet_tag }}
+    {{ 'base.css' | asset_url | stylesheet_tag }}
+    {{ 'components.css' | asset_url | stylesheet_tag }}
+    {{ 'sections.css' | asset_url | stylesheet_tag }}
+    {{ 'theme.css' | asset_url | stylesheet_tag }}
+
+    {{ content_for_header }}
+  </head>
+
+  <body data-template="{{ template.name }}">
+    <a class="skip-link" href="#main">Zum Inhalt springen</a>
+
+    {% sections 'header-group' %}
+
+    <main id="main">
+      {{ content_for_layout }}
+    </main>
+
+    {% sections 'footer-group' %}
+
+    {% render 'icons-sprite' %}
+    {% section 'cart-drawer' %}
+    {% render 'size-guide' %}
+    <div class="toast-wrap" data-toast-wrap role="status" aria-live="polite"></div>
+
+    <script>
+      window.PS = window.PS || {};
+      PS.routes = {
+        root: {{ routes.root_url | json }},
+        cart: {{ routes.cart_url | json }},
+        cartAdd: {{ routes.cart_add_url | json }},
+        cartChange: {{ routes.cart_change_url | json }},
+        search: {{ routes.search_url | json }},
+        predictiveSearch: {{ routes.predictive_search_url | json }}
+      };
+      PS.shop = {
+        freeShipping: {{ settings.free_shipping_threshold | default: 0 | json }},
+        whatsapp: {{ settings.whatsapp | json }},
+        phone: {{ settings.phone | json }},
+        email: {{ settings.email | json }},
+        hours: [
+          { days: [1, 2, 3, 4, 5], from: {{ settings.hours_week_from | default: 0 | json }}, to: {{ settings.hours_week_to | default: 0 | json }} },
+          { days: [6], from: {{ settings.hours_sat_from | default: 0 | json }}, to: {{ settings.hours_sat_to | default: 0 | json }} }
+        ]
+      };
+    </script>
+    <script src="{{ 'theme.js' | asset_url }}" defer></script>
+    <script src="{{ 'header.js' | asset_url }}" defer></script>
+    <script src="{{ 'cart.js' | asset_url }}" defer></script>
+    <script src="{{ 'search.js' | asset_url }}" defer></script>
+    <script src="{{ 'sections.js' | asset_url }}" defer></script>
+    <script src="{{ 'contact.js' | asset_url }}" defer></script>
+    {%- if template.name == 'collection' or template.name == 'search' -%}
+      <script src="{{ 'collection.js' | asset_url }}" defer></script>
+    {%- endif -%}
+    {%- if template.name == 'product' -%}
+      <script src="{{ 'product.js' | asset_url }}" defer></script>
+    {%- endif -%}
+  </body>
+</html>
