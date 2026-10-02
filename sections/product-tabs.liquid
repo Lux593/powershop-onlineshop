@@ -9,7 +9,7 @@
 
 {%- comment -%} Ohne Produkte im Shop erscheint der Abschnitt nicht (im Theme-Editor immer). {%- endcomment -%}
 {%- if has_products or request.design_mode -%}
-<section class="section" aria-labelledby="news-title-{{ section.id }}" style="padding-top:var(--s-4)" data-section-id="{{ section.id }}">
+<section class="section product-tabs" aria-labelledby="news-title-{{ section.id }}" style="padding-top:var(--s-4)" data-section-id="{{ section.id }}">
   <div class="container">
     <div class="section-head section-head--center">
       <h2 id="news-title-{{ section.id }}">{{ section.settings.heading }}</h2>
@@ -20,7 +20,7 @@
 
     {%- if section.blocks.size > 0 -%}
       {%- if section.blocks.size > 1 -%}
-        <div class="tabs" role="tablist" aria-label="{{ section.settings.heading | escape }} nach Bereich">
+        <div class="tabs tabs--slide" role="tablist" aria-label="{{ section.settings.heading | escape }} nach Bereich">
           {%- for block in section.blocks -%}
             <button
               class="tab"
@@ -46,7 +46,7 @@
           {% if section.blocks.size == 1 %}{{ block.shopify_attributes }}{% endif %}
         >
           {%- if collection != blank and collection.products_count > 0 -%}
-            <div class="product-grid product-grid--rail">
+            <div class="product-grid product-grid--rail" data-stagger="70">
               {%- for product in collection.products limit: section.settings.products_count -%}
                 {% render 'product-card', product: product %}
               {%- endfor -%}

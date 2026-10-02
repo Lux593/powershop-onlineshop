@@ -61,6 +61,23 @@
         "scroll_target": "nach-hero"
       }
     },
+    "marquee": {
+      "type": "marquee",
+      "blocks": {
+        "motorcycles": { "type": "item", "settings": { "text": "Motorräder" } },
+        "apparel": { "type": "item", "settings": { "text": "Bekleidung" } },
+        "parts": { "type": "item", "settings": { "text": "Teile & Zubehör" } },
+        "accessories": { "type": "item", "settings": { "text": "Accessoires" } },
+        "service": { "type": "item", "settings": { "text": "Service" } },
+        "testdrive": { "type": "item", "settings": { "text": "Probefahrt" } }
+      },
+      "block_order": ["motorcycles", "apparel", "parts", "accessories", "service", "testdrive"],
+      "settings": {
+        "aria_label": "Sortiment und Service",
+        "anchor_id": "nach-hero",
+        "speed": 60
+      }
+    },
     "service": {
       "type": "service-tiles",
       "blocks": {
@@ -71,7 +88,7 @@
       },
       "block_order": ["testdrive", "finance", "workshop", "tradein"],
       "settings": {
-        "anchor_id": "nach-hero"
+        "anchor_id": "service"
       }
     },
     "news": {
@@ -87,6 +104,12 @@
         "subheading": "Frisch eingetroffen im Power Shop",
         "products_count": 4,
         "button_label": "Alle ansehen"
+      }
+    },
+    "statement": {
+      "type": "statement",
+      "settings": {
+        "text": "Von der Probefahrt bis zum Umbau: Motorrad, Ausrüstung und Werkstatt aus einer Hand."
       }
     },
     "bento": {
@@ -131,5 +154,5 @@
       }
     }
   },
-  "order": ["hero", "service", "news", "bento", "showroom", "story"]
+  "order": ["hero", "marquee", "service", "news", "statement", "bento", "showroom", "story"]
 }

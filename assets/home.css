@@ -1,8 +1,58 @@
 /* ==========================================================================
-   Power Shop – Startseiten-Sections: Service-Leiste, Produkt-Grids, Kategorie-Bento, Showroom, Story.
-   Aus sections.css verschoben (M1b), Regeln unverändert. Bereich: Startseite und Footer.
+   Power Shop – Startseiten-Sections: Lauftext-Band, Statement, Service-Leiste, Produkt-Grids, Kategorie-Bento,
+   Showroom, Story. Legacy-Regeln aus sections.css (M1b) stehen hier und sind für die Bewegung (M4) erweitert.
+   Bewegungszustände gelten nur unter html.has-motion (Vertrag: docs/motion-api.md); ohne sie ist alles statisch.
    .product-grid wird auch von Kollektion und Suche genutzt (collection.liquid, search.liquid).
    ========================================================================== */
+
+/* ---------- Lauftext-Band (Section marquee) ---------- */
+/* Orange Fläche, schwarze Schrift (6,4 : 1). Ohne Bewegung: einmal zentriert, umbrechend. Mit Bewegung (has-motion,
+   Spur läuft per motion.css) steht die Spur von Anfang an einzeilig, damit beim Start nichts springt. */
+.marquee { display: flex; align-items: center; background: var(--c-orange); color: var(--c-black); }
+.marquee__viewport { flex: 1; min-width: 0; overflow: hidden; padding-block: 12px; }
+.marquee__track { display: flex; justify-content: center; }
+.marquee__set { display: flex; flex-wrap: wrap; justify-content: center; }
+.marquee__item {
+  display: inline-flex; align-items: center; padding-block: 4px;
+  font-family: var(--f-head); font-weight: 800; font-size: clamp(22px, 2.6vw, 34px); line-height: 1;
+  letter-spacing: 0.02em; text-transform: uppercase; white-space: nowrap;
+}
+/* Trenner zwischen den Begriffen: ein gedrehtes Quadrat, kein Text (nichts für Screenreader) */
+.marquee__item::after { content: ""; width: 0.26em; height: 0.26em; margin-inline: 0.8em; background: currentColor; transform: rotate(45deg); }
+html:not(.has-motion) .marquee__item--last::after { display: none; }
+/* Wiederholungen füllen die Spur nur in Bewegung (siehe sections/marquee.liquid) */
+.marquee__item--rep { display: none; }
+.has-motion .marquee__item--rep { display: inline-flex; }
+.has-motion .marquee__track { justify-content: flex-start; }
+.has-motion .marquee__set { flex: none; flex-wrap: nowrap; justify-content: flex-start; }
+.has-motion .marquee__viewport { -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent); mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent); }
+.marquee__toggle {
+  display: grid; place-items: center; flex: none; width: 44px; height: 44px; margin-inline: var(--s-1) var(--gutter);
+  color: inherit; border: 2px solid currentColor; border-radius: var(--radius);
+  transition: background-color var(--t-fast), color var(--t-fast);
+}
+.marquee__toggle:hover { background: var(--c-black); color: var(--c-orange); }
+.marquee__icon { grid-area: 1 / 1; width: 18px; height: 18px; fill: currentColor; stroke-width: 2; }
+.marquee__toggle[aria-pressed="false"] .marquee__icon--play,
+.marquee__toggle[aria-pressed="true"] .marquee__icon--pause { display: none; }
+.marquee--empty { padding: 16px var(--gutter); }
+.marquee__hint { font-size: var(--fs-small); }
+
+/* ---------- Statement ---------- */
+/* Fließt in das Bento darunter (ebenfalls dunkel): unten wenig Abstand */
+.statement { padding-block: var(--section-y) var(--s-4); }
+.statement .container::before { content: ""; display: block; width: 96px; height: 6px; margin-bottom: var(--s-4); background: var(--c-orange); }
+.statement__text {
+  --split-pad: 0.2em; /* Luft für Umlaute in den Wortmasken */
+  font-family: var(--f-head); font-weight: 800; font-size: calc(var(--fs-display) * 0.6); line-height: 0.96;
+  letter-spacing: 0.005em; text-transform: uppercase; text-wrap: balance; hyphens: auto; overflow-wrap: anywhere;
+}
+/* Scrub (home.js setzt .is-scrub, solange ScrollTrigger läuft): gedimmt bleibt --c-muted-dark (8 : 1 auf Schwarz),
+   erleuchtet wird Weiß. Dann entfällt das Hochgleiten der Wörter, nur die Farbe wechselt. */
+.statement .ps-wi { transition: color 420ms var(--ease); overflow-wrap: anywhere; }
+.has-motion .statement.is-scrub .statement__text .ps-wi { color: var(--c-muted-dark); translate: none; animation: none; }
+.has-motion .statement.is-scrub .statement__text .ps-wi.is-lit { color: var(--c-white); }
+@media print { .statement .statement__text .ps-wi { color: inherit !important; } }
 
 /* ---------- Service-Leiste ---------- */
 /* Eine Leiste statt vier Karten: Die Felder teilen sich eine Fläche, die Haarlinien sind der Zwischenraum */
@@ -12,14 +62,24 @@
   position: relative; display: grid; gap: 8px; align-content: start; padding: 24px 20px;
   background: var(--c-white);
 }
-.service-tile::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--c-orange); transform: scaleX(0); transform-origin: left; transition: transform var(--t-med) var(--ease); }
-.service-tile:hover::after { transform: scaleX(1); }
-.service-tile > .icon { color: var(--c-orange); width: 32px; height: 32px; }
+/* Wipe-Linie: läuft beim Überfahren von links ein und beim Verlassen nach rechts aus; auch bei Tastaturfokus */
+.service-tile::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--c-orange); transform: scaleX(0); transform-origin: right; transition: transform var(--t-med) var(--ease); }
+.service-tile:hover::after, .service-tile:focus-visible::after { transform: scaleX(1); transform-origin: left; }
+.service-tile > .icon { color: var(--c-orange); width: 32px; height: 32px; transition: transform var(--t-med) var(--ease); }
+.service-tile:hover > .icon, .service-tile:focus-visible > .icon { transform: translateY(-4px); }
+/* Stagger: der Inhalt jeder Kachel blendet nacheinander ein (data-stagger), die Kacheln selbst versetzt per --rd.
+   Die weiße Fläche bleibt stehen, sonst schimmerte die Haarlinienfarbe des Rasters als Block durch. */
+.service-tile:nth-child(2) { --rd: 90ms; }
+.service-tile:nth-child(4) { --rd: 90ms; }
+@media (min-width: 1024px) {
+  .service-tile:nth-child(3) { --rd: 180ms; }
+  .service-tile:nth-child(4) { --rd: 270ms; }
+}
 .service-tile h3 { font-size: 22px; margin-top: 8px; }
 .service-tile p { font-size: var(--fs-small); color: var(--c-muted); }
 .service-tile .more { display: inline-flex; align-items: center; gap: 6px; font-size: var(--fs-small); font-weight: 600; margin-top: 4px; }
 .service-tile .more .icon { width: 16px; height: 16px; transition: transform var(--t-fast); }
-.service-tile:hover .more .icon { transform: translateX(4px); }
+.service-tile:hover .more .icon, .service-tile:focus-visible .more .icon { transform: translateX(4px); }
 
 /* ---------- Produkt-Grids ---------- */
 .product-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 16px; }
@@ -44,10 +104,32 @@
 @media (min-width: 640px) and (max-width: 1023px) { .product-grid--rail { grid-auto-columns: 40%; } }
 .center-cta { display: flex; justify-content: center; margin-top: var(--s-6); }
 
+/* ---------- Produkt-Tabs (News): gleitender Indikator und Panel-Wechsel, nur mit Bewegung ---------- */
+/* Modifier .tabs--slide: .tabs/.tab teilt sich die Größentabelle (size-guide.liquid), dort bleibt alles beim Alten.
+   home.js setzt --ind-x und --ind-w (px, ohne Einheit) und .has-ind; bis dahin gilt der Unterstrich am aktiven Tab. */
+.tabs--slide { position: relative; }
+.tabs--slide .tab { transition: color var(--t-fast); }
+.has-motion .tabs--slide.has-ind::after {
+  content: ""; position: absolute; left: 0; bottom: 0; width: 1px; height: 2px; background: var(--c-orange); pointer-events: none;
+  transform-origin: 0 50%; transform: translateX(calc(var(--ind-x) * 1px)) scaleX(var(--ind-w));
+}
+.has-motion .tabs--slide.has-ind.is-ready::after { transition: transform var(--t-slow) var(--ease-out); }
+.has-motion .tabs--slide.has-ind .tab[aria-selected="true"] { border-bottom-color: transparent; }
+@keyframes ps-tab-fwd { from { opacity: 0; translate: 28px 0; } }
+@keyframes ps-tab-back { from { opacity: 0; translate: -28px 0; } }
+.has-motion .tabs--slide.is-fwd ~ [role="tabpanel"]:not([hidden]) { animation: ps-tab-fwd var(--t-slow) var(--ease-out) backwards; }
+.has-motion .tabs--slide.is-back ~ [role="tabpanel"]:not([hidden]) { animation: ps-tab-back var(--t-slow) var(--ease-out) backwards; }
+/* Karten: auf dem Desktop (Grid, keine Schiene) mit Versatz, mobil nur opacity (motion.css) */
+@media (min-width: 1024px) { .has-motion .product-tabs .product-grid--rail { --rv-d: 24px; } }
+
 /* ---------- Kategorie-Bento ---------- */
 .bento { display: grid; gap: 12px; grid-template-columns: 1fr 1fr; }
 .bento-tile { position: relative; display: block; overflow: hidden; background: var(--c-anthracite); aspect-ratio: 1; }
 .bento-tile--moto { grid-column: 1 / -1; aspect-ratio: 4 / 3; }
+/* Bildträger: bei Fotokacheln (data-parallax) höher als die Kachel, damit das Bild beim Scrollen driften kann.
+   Der Zoom-Scale beim Einblenden nutzt die Eigenschaft scale, der Hover-Zoom transform: beides wirkt zusammen. */
+.bento-tile__media { position: absolute; inset: 0; }
+.has-motion .bento-tile__media[data-parallax] { inset: -8% 0; }
 .bento-tile img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 700ms var(--ease); }
 .bento-tile--product { background: #111; }
 .bento-tile--product.bento-tile--light { background: #fff; }
@@ -80,16 +162,38 @@
 }
 @media (max-width: 1023px) { .bento__col, .bento__pair { display: contents; } }
 
+/* Einblenden (Clip-Reveal an der Kachel selbst, nicht an .bento__col/-pair: mobil display:contents). Das Bild zoomt
+   von 1,15 auf 1; --rd versetzt die Kacheln und gilt für Kachel und Bild. Der Clip endet in none (motion.css). */
+@keyframes ps-bento-img { from { scale: 1.15; } }
+.has-motion .bento-tile:not(.is-in) img { scale: 1.15; }
+.has-motion .bento-tile.is-in img { animation: ps-bento-img 1200ms var(--ease-out) backwards; animation-delay: var(--rd, 0ms); }
+.bento__pair > :nth-child(2), .bento-tile--teile { --rd: 100ms; }
+@media (min-width: 1024px) { .bento-tile--light { --rd: 120ms; } }
+
 /* ---------- Showroom ---------- */
 .showroom .rail { grid-auto-columns: 86%; }
 @media (min-width: 640px) { .showroom .rail { grid-auto-columns: calc((100% - 24px) / 2); } }
 @media (min-width: 1024px) { .showroom .rail { grid-auto-columns: calc((100% - 48px) / 3); } }
 .showroom__tools { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; }
+/* Schiene bis an den Bildschirmrand: Karten sitzen per Padding/scroll-padding wie bisher, die nächste Karte schaut in den
+   Randstreifen und läuft dort aus (Maske, home.js setzt .has-edge/.is-start/.is-end). Das vertikale Padding gibt
+   Fokusringen Luft (die Schiene schneidet sonst ab), der negative Rand gleicht es aus. */
+.showroom .rail { margin: -6px calc(var(--gutter) * -1); padding: 6px var(--gutter); scroll-padding-inline: var(--gutter); }
+.showroom .rail.has-edge {
+  --edge-l: var(--gutter); --edge-r: var(--gutter);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 var(--edge-l), #000 calc(100% - var(--edge-r)), transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 var(--edge-l), #000 calc(100% - var(--edge-r)), transparent);
+}
+.showroom .rail.has-edge.is-start { --edge-l: 0px; }
+.showroom .rail.has-edge.is-end { --edge-r: 0px; }
+/* Fortschritt (aria-hidden): wie viel der Schiene schon im Bild war, --rail-progress 0..1 */
+.rail-progress { position: relative; height: 2px; margin-top: var(--s-3); overflow: hidden; background: var(--c-line); }
+.rail-progress span { position: absolute; inset: 0; background: var(--c-orange); transform-origin: left; transform: scaleX(var(--rail-progress, 0)); }
 
 /* ---------- Story & Events ---------- */
 /* Teil Story; die Event-Regeln stehen weiter in sections.css (geteilt mit Service-Seite und Blog) */
 .story { display: grid; gap: 32px; align-items: center; }
-@media (min-width: 1024px) { .story { grid-template-columns: 1fr 1fr; gap: 64px; } }
+@media (min-width: 1024px) { .story { grid-template-columns: 1fr 1fr; gap: 64px; } .story--text { grid-template-columns: minmax(0, 1fr); max-width: 760px; } }
 .story__media { position: relative; aspect-ratio: 980 / 807; overflow: hidden; background: #000; }
 .story__media img { width: 100%; height: calc(100% - 16px); object-fit: contain; object-position: top center; }
 .story__media::after { content: ""; position: absolute; left: 0; bottom: 0; width: 96px; height: 6px; background: var(--c-orange); }
@@ -98,4 +202,5 @@
 .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding-block: 8px; border-top: 1px solid var(--c-steel); border-bottom: 1px solid var(--c-steel); }
 .stats div { padding-block: 16px; }
 .stats strong { display: block; font-family: var(--f-head); font-weight: 800; font-size: 40px; line-height: 1; color: var(--c-white); }
-.stats span { font-size: var(--fs-small); color: var(--c-muted-dark); }
+/* Nur die Beschriftung: die Spans im Count-up (strong > span, assets/motion.js) erben Größe und Farbe der Zahl */
+.stats div > span { font-size: var(--fs-small); color: var(--c-muted-dark); }

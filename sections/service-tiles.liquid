@@ -6,7 +6,7 @@
         {%- comment -%} Ohne Link bleibt das Feld eine reine Infofläche (kein toter Link auf „#“). {%- endcomment -%}
         {%- assign tile_tag = 'div' -%}
         {%- if block.settings.url != blank -%}{%- assign tile_tag = 'a' -%}{%- endif -%}
-        <{{ tile_tag }} class="service-tile"{% if block.settings.url != blank %} href="{{ block.settings.url }}"{% endif %} {{ block.shopify_attributes }}>
+        <{{ tile_tag }} class="service-tile" data-stagger="55"{% if block.settings.url != blank %} href="{{ block.settings.url }}"{% endif %} {{ block.shopify_attributes }}>
           {% render 'icon', name: block.settings.icon %}
           <h3>{{ block.settings.title }}</h3>
           <p>{{ block.settings.text }}</p>
@@ -23,7 +23,7 @@
 {
   "name": "Service-Leiste",
   "settings": [
-    { "type": "text", "id": "anchor_id", "label": "Anker-ID", "default": "nach-hero", "info": "Ziel des Hero-Pfeils." }
+    { "type": "text", "id": "anchor_id", "label": "Anker-ID", "default": "nach-hero", "info": "Ziel des Hero-Pfeils, solange kein Lauftext-Band darüber steht (dort trägt man „nach-hero“ ein)." }
   ],
   "max_blocks": 4,
   "blocks": [
