@@ -424,3 +424,13 @@ html:not(.has-motion) .bcard:hover .bcard__media img { transform: none; }
 @media (min-width: 1024px) and (hover: hover) {
   .has-motion .search-dialog::backdrop { backdrop-filter: blur(6px); }
 }
+
+/* ---------- Seitenübergänge (Cross-Document, Opt-in in layout/theme.liquid) ----------
+   Kurzer Überblend-Fade der Seite, der Header (view-transition-name: site-header) bleibt stehen. Alle Gruppen
+   kürzer als die Standard-Dauer von 250 ms; die Ergebnisse der Kollektion (oben) behalten ihre längere Fahrt. */
+::view-transition-group(*) { animation-duration: 200ms; animation-timing-function: ease-out; }
+/* Das globale Reduced-Motion aus base.css greift auf ::view-transition-* nicht; der Opt-in steht ohnehin nur
+   in no-preference, dies sichert die Same-Document-Übergänge zusätzlich ab */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+}

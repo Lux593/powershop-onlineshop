@@ -42,6 +42,23 @@
     {{ 'footer.css' | asset_url | stylesheet_tag }}
     {{ 'shop.css' | asset_url | stylesheet_tag }}
 
+    {%- comment -%}
+      Seitenübergänge: Cross-Document View Transition mit kurzem Fade (Chrome, Safari; andere Browser ignorieren die Regel).
+      Beide Seiten müssen zustimmen, daher ist der Warenkorb ausgenommen. Nicht im Theme-Editor, nicht ohne Animationen
+      (Notaus) und nicht bei reduzierter Bewegung. Der Header behält einen Namen und bleibt beim Überblenden stehen. Die
+      ::view-transition-Regeln stehen in shop.css.
+    {%- endcomment -%}
+    {%- unless template.name == 'cart' or request.design_mode -%}
+      {%- if settings.motion_enabled -%}
+        <style>
+          @media (prefers-reduced-motion: no-preference) {
+            @view-transition { navigation: auto; }
+            [data-header] { view-transition-name: site-header; }
+          }
+        </style>
+      {%- endif -%}
+    {%- endunless -%}
+
     {{ content_for_header }}
   </head>
 
