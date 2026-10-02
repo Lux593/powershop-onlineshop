@@ -24,15 +24,16 @@
 html:not(:has(.announce)) { --announce-h: 0px; }
 
 /* Ausblenden beim Scrollen (header.js, nur mit html.has-motion): Wrapper rutscht nach oben, --header-shown (1/0) lenkt die
-   Sticky-Offsets. Als Zahl registriert, damit die Offsets mit dem Header gleiten statt zu springen. Ausnahme von „nur transform,
-   opacity, clip-path“: nur die Sticky-Offsets von PDP-Infospalte, Service-Navigation und Warenkorb-Summe. */
-@property --header-shown { syntax: "<number>"; inherits: true; initial-value: 1; }
-html { transition: --header-shown var(--t-med) var(--ease); }
+   Sticky-Offsets (PDP-Infospalte, Service-Navigation, Warenkorb-Summe). Die Variable springt, nur die Offsets gleiten per top
+   (Ausnahme von „nur transform, opacity, clip-path“): eine Transition auf der Variable würde in jedem Frame den ganzen Baum neu berechnen. */
 .site-header-wrap { transition: transform var(--t-med) var(--ease); }
 .site-header-wrap.is-away { transform: translateY(calc(-100% - env(safe-area-inset-top, 0px))); }
+.pdp__info, .service-nav, .cart-page__summary { transition: top var(--t-med) var(--ease); }
 
-/* Überlagerung über dem Hero (body[data-header-overlay], nur Startseite; Klassen setzt header.js): oben transparent mit weichem
-   Verlauf für die Lesbarkeit, nach etwa 40 px Scroll schwarz mit Blur. Ohne JavaScript bleibt die Fläche schwarz (is-over fehlt).
+/* Überlagerung über dem Hero (body[data-header-overlay], nur Startseite): oben transparent mit weichem Verlauf für die Lesbarkeit,
+   nach etwa 40 px Scroll schwarz mit Blur (header.js setzt is-solid). Der transparente Zustand steht im CSS: kein schwarzer Blitz
+   vor dem Skriptstart, und er gilt nur, solange der Hero die erste Section ist (wie in hero.css), auch nach einem Umsortieren im Editor.
+   Ohne JavaScript bleibt die Fläche schwarz, sonst läge die Navigation beim Scrollen transparent über hellem Inhalt.
    Beide Ebenen blenden per opacity um, kein Farbwechsel. */
 [data-header-overlay] .site-header { background: transparent; transition: border-color var(--t-med) var(--ease); }
 [data-header-overlay] .site-header::before,
@@ -44,18 +45,23 @@ html { transition: --header-shown var(--t-med) var(--ease); }
   bottom: 0;
   background: rgb(10 10 10 / 0.92);
   -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  opacity: var(--hdr-solid, 1);
 }
 [data-header-overlay] .site-header::after {
   height: 200%;
   background: linear-gradient(180deg, rgb(10 10 10 / 0.78) 0%, rgb(10 10 10 / 0.62) 50%, rgb(10 10 10 / 0));
-  opacity: 0;
+  opacity: var(--hdr-veil, 0);
 }
-[data-header-overlay] .site-header.is-over { border-bottom-color: transparent; }
-[data-header-overlay] .site-header.is-over::before { opacity: 0; }
-[data-header-overlay] .site-header.is-over::after { opacity: 1; }
-/* Orange Schrift hielte über hellem Bild keine 4,5:1: oben weiß, die orange Linie bleibt als Akzent */
-[data-header-overlay] .site-header.is-over .mainnav__link--sale { color: var(--c-white); }
-[data-header-overlay] .site-header.is-over .mainnav__link--sale::after { transform: scaleX(1); }
+@media (scripting: enabled) {
+  [data-header-overlay]:has(#main > .shopify-section:first-child > .hero) .site-header:not(.is-solid) {
+    --hdr-solid: 0; --hdr-veil: 1;
+    --focus-ring: var(--c-white); /* der orange Ring hielte über Film und Foto keine 3:1 */
+    border-bottom-color: transparent;
+  }
+  /* Orange Schrift hielte über hellem Bild keine 4,5:1: oben weiß, die orange Linie bleibt als Akzent */
+  [data-header-overlay]:has(#main > .shopify-section:first-child > .hero) .site-header:not(.is-solid) .mainnav__link--sale { color: var(--c-white); }
+  [data-header-overlay]:has(#main > .shopify-section:first-child > .hero) .site-header:not(.is-solid) .mainnav__link--sale::after { transform: scaleX(1); }
+}
 
 @media (max-width: 1023px) {
   .header__bar { display: grid; grid-template-columns: 1fr auto 1fr; }

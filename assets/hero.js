@@ -26,7 +26,7 @@
       hero.classList.toggle('is-held', !going());
       hero.classList.toggle('is-rotating', rotate);
       if (btn) {
-        btn.hidden = !video && !rotate;
+        btn.hidden = !video && !motion; // Ken-Burns und Scroll-Linie laufen auch ohne Film (2.2.2)
         btn.setAttribute('aria-pressed', paused);
       }
       if (!video) return;
@@ -70,8 +70,11 @@
           if (on) s.classList.remove('is-leaving');
           s.classList.toggle('is-active', on);
           s.setAttribute('aria-hidden', !on);
-          if (on && img) img.loading = 'eager';
+          if (on && img) img.loading = 'eager'; // Sicherheitsnetz: lazy hält gestapelte Bilder nicht zurück
         });
+        // Reveals aller Slides liefen schon beim Laden: Text der neuen Slide spielt sie neu ab
+        var p = document.getElementById(e.detail.getAttribute('aria-controls'));
+        if (p) [].forEach.call(p.querySelectorAll('.is-in'), function (n) { n.classList.remove('is-in'); void n.offsetWidth; n.classList.add('is-in'); });
         cur = i;
         t0 = performance.now();
         apply();
@@ -134,13 +137,9 @@
       if (n && n.id) link.setAttribute('href', '#' + n.id);
     }
 
-    /* ---------------- Start nach Load plus Idle, restliche Fotos im Leerlauf vorladen ---------------- */
+    /* ---------------- Start nach Load plus Idle ---------------- */
     var idle = window.requestIdleCallback || function (f) { setTimeout(f, 300); };
-    function begin() {
-      awake = true;
-      apply();
-      if (!slow) idle(function () { slides.forEach(function (s) { var i = s.querySelector('img'); if (i) i.loading = 'eager'; }); });
-    }
+    function begin() { awake = true; apply(); }
     hero.classList.add('is-ready');
     apply();
     if (document.readyState === 'complete') idle(begin, { timeout: 2000 });

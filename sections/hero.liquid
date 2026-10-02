@@ -10,7 +10,7 @@
     aria-label="{{ section.settings.aria_label | escape }}"
     data-hero
     data-section-id="{{ section.id }}"
-    style="--ov: {{ section.settings.overlay_opacity | default: 50 | divided_by: 100.0 }}; --hero-dur: {{ dur }}s"
+    style="--ov: {{ section.settings.overlay_opacity | default: 50 | at_least: 50 | divided_by: 100.0 }}; --hero-dur: {{ dur }}s"
   >
     {%- if section.settings.heading != blank -%}
       <h1 class="sr-only">{{ section.settings.heading | escape }}</h1>
@@ -224,7 +224,7 @@
   "settings": [
     { "type": "text", "id": "heading", "label": "Seitenüberschrift (nur für Screenreader und Suchmaschinen)", "info": "Die Startseite braucht genau eine H1. Die großen Modellnamen darunter sind H2.", "default": "Power Shop: Harley-Davidson Neufahrzeuge, Teile und Bekleidung" },
     { "type": "text", "id": "aria_label", "label": "Beschriftung für Screenreader", "default": "Modelle 2026" },
-    { "type": "range", "id": "overlay_opacity", "label": "Abdunklung über dem Bild", "info": "Stärke des Verlaufs, damit der Text lesbar bleibt.", "min": 0, "max": 90, "step": 5, "unit": "%", "default": 50 },
+    { "type": "range", "id": "overlay_opacity", "label": "Abdunklung über dem Bild", "info": "Stärke des Verlaufs, damit der Text lesbar bleibt. Der kleinste Wert ist 50 %, darunter geht die Schrift auf hellen Bildern unter.", "min": 50, "max": 90, "step": 5, "unit": "%", "default": 50 },
     {
       "type": "select",
       "id": "overlay_direction",
@@ -254,7 +254,7 @@
         { "type": "text", "id": "image_alt", "label": "Bildbeschreibung" },
         { "type": "header", "content": "Film (nur erster Slide)" },
         { "type": "video", "id": "video", "label": "Film", "info": "Ohne Auswahl läuft die Standarddatei. Kurzer Loop, 16:9, ohne Ton. Gilt nur für den ersten Slide." },
-        { "type": "text", "id": "video_asset", "label": "Standard-Filmdatei im Theme", "info": "Dateiname ohne Endung. Das Theme sucht hero-loop.mp4, hero-loop-720.mp4 (mobil) und hero-loop.webm. Leer lassen für ein reines Foto.", "default": "hero-loop" },
+        { "type": "text", "id": "video_asset", "label": "Standard-Filmdatei im Theme", "info": "Dateiname ohne Endung. Das Theme sucht hero-loop.mp4, hero-loop-720.mp4 (mobil) und hero-loop.webm. Leer lassen für ein reines Foto. Die Standardwerte stehen bei jedem Modell, wirken aber nur im ersten Slide: Steht ein anderes Modell vorn, hier und beim Standbild den Eintrag leeren, sonst läuft der Road-Glide-Film mit dem Text dieses Modells.", "default": "hero-loop" },
         { "type": "image_picker", "id": "poster", "label": "Standbild zum Film", "info": "Erstes Bild des Films, erscheint sofort und wenn der Film nicht läuft." },
         { "type": "text", "id": "poster_asset", "label": "Standard-Standbild im Theme", "info": "Wird benutzt, solange kein Standbild gewählt ist.", "default": "hero-poster.webp" },
         { "type": "header", "content": "Angebot" },

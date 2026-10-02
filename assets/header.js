@@ -56,11 +56,12 @@
     }, sig);
 
     /* ---------------- Überlagerung (Startseite) und Ausblenden beim Scrollen ----------------
-       is-over: oben transparent (Startseite mit Hero), ab 40 px solid. is-away: ab 400 px Tiefe beim Runterscrollen
-       weggeschoben, --header-shown (1/0) lenkt die Sticky-Offsets. Nie bei Menü, Dialog oder Fokus im Header (WCAG 2.4.11),
-       nicht während Tab-Sprung oder Anker scrollen (der einfahrende Header verdeckte das Ziel). Nur mit html.has-motion. */
+       is-solid: Header schwarz statt transparent über dem Hero (ab 40 px Scroll, bei offenem Menü); ob der Hero darunter liegt,
+       entscheidet header.css. is-away: ab 400 px Tiefe beim Runterscrollen weggeschoben, --header-shown (1/0) lenkt die
+       Sticky-Offsets. Nie bei Menü, Dialog oder Fokus im Header (WCAG 2.4.11), nicht während Tab-Sprung oder Anker scrollen
+       (der einfahrende Header verdeckte das Ziel). Ausblenden nur mit html.has-motion. */
     var wrap = header.closest('.site-header-wrap') || header;
-    var over = document.body.hasAttribute('data-header-overlay') && !!document.querySelector('[data-hero]');
+    var over = document.body.hasAttribute('data-header-overlay');
     var shown = true, lastY = window.scrollY, quiet = 0, queued = false;
 
     function show(on) {
@@ -73,7 +74,7 @@
       queued = false;
       var y = window.scrollY, d = y - lastY;
       var menu = !!header.querySelector('.mainnav__item.is-open');
-      header.classList.toggle('is-over', over && y < 40 && !menu);
+      header.classList.toggle('is-solid', over && (y >= 40 || menu));
       if (!html.classList.contains('has-motion') || y < 400 || menu || document.body.classList.contains('is-locked') ||
           header.contains(document.activeElement)) {
         lastY = y;

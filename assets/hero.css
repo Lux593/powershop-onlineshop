@@ -16,6 +16,7 @@
   overflow: clip;
   background: var(--c-black);
   color: var(--c-white);
+  --focus-ring: var(--c-white); /* der orange Ring hielte über Film und Foto keine 3:1 (base.css setzt ihn für .on-dark) */
 }
 /* Header über dem Hero (body[data-header-overlay], nur Startseite): der Hero zieht unter den Header. header.js macht ihn oben transparent. */
 [data-header-overlay] #main > .shopify-section:first-child > .hero {
@@ -45,15 +46,16 @@
 .hero__video { opacity: 0; transition: opacity 700ms var(--ease); }
 .hero.is-video .hero__video { opacity: 1; }
 
-/* Abdunklung: Stärke aus --ov (Schema), Richtung per Modifier. Der Text steht im unteren Teil, dort muss der Verlauf tragen:
+/* Abdunklung: Stärke aus --ov (Schema, mindestens 50 %: darunter fehlt auf hellen Bildern der Kontrast), Richtung per Modifier. Der Text steht im unteren Teil, dort muss der Verlauf tragen:
    Kontrast gemessen gegen Bilder des Loops (Weiß/Offwhite auf dem hellsten Zehntel der Fläche), Normaltext 4,5:1, großer Text 3:1.
-   Mobil reicht der Text höher hinauf, dort läuft der Verlauf länger. */
+   Mobil und in niedrigen Fenstern (Querformat) füllt der Text die ganze Höhe, auch die Tab-Beschriftungen oben: dort läuft der
+   Verlauf bis zum oberen Rand und lässt nur wenig nach. */
 .hero {
   --g-bottom: linear-gradient(0deg, rgb(10 10 10 / calc(var(--ov) * 1.6)) 0%, rgb(10 10 10 / calc(var(--ov) * 1.15)) 36%, rgb(10 10 10 / calc(var(--ov) * 0.8)) 56%, rgb(10 10 10 / calc(var(--ov) * 0.35)) 74%, transparent 90%);
   --g-left: linear-gradient(90deg, rgb(10 10 10 / var(--ov)) 0%, rgb(10 10 10 / calc(var(--ov) * 0.5)) 36%, transparent 68%);
 }
-@media (max-width: 767px) {
-  .hero { --g-bottom: linear-gradient(0deg, rgb(10 10 10 / calc(var(--ov) * 1.6)) 0%, rgb(10 10 10 / calc(var(--ov) * 1.3)) 50%, rgb(10 10 10 / calc(var(--ov) * 1)) 68%, rgb(10 10 10 / calc(var(--ov) * 0.5)) 82%, transparent 100%); }
+@media (max-width: 767px), (max-height: 540px) {
+  .hero { --g-bottom: linear-gradient(0deg, rgb(10 10 10 / calc(var(--ov) * 1.6)) 0%, rgb(10 10 10 / calc(var(--ov) * 1.3)) 50%, rgb(10 10 10 / var(--ov)) 68%, rgb(10 10 10 / calc(var(--ov) * 0.84)) 100%); }
 }
 .hero__veil { position: absolute; z-index: 3; inset: 0; background: var(--g-bottom); }
 @media (min-width: 768px) {
@@ -73,7 +75,8 @@
 @keyframes hero-kb { to { transform: scale(1.08); } }
 
 /* Angehalten (Pause-Taste, außerhalb des Bildes, Tab im Hintergrund, vor dem Start) oder Hover/Fokus im Text */
-.hero.is-held,
+.hero.is-held { --hero-play: paused; }
+/* eigene Regel: ohne :has() verwürfe der Browser sonst auch is-held */
 .hero:has(.hero__content:is(:hover, :focus-within)) { --hero-play: paused; }
 
 /* ---------- Text ---------- */
@@ -116,6 +119,12 @@
 @media (scripting: none) { .hero__chips { display: none; } }
 
 .hero__panel { display: grid; gap: 14px; }
+/* Alle Slides teilen eine Gitterzelle, die Zelle ist so hoch wie der höchste Text: beim Bildwechsel springt nichts (CLS). Inaktive
+   Slides bleiben im Layout und sind per visibility unsichtbar und nicht erreichbar. !important: base.css erzwingt display:none für [hidden]. */
+@media (scripting: enabled) {
+  .hero__panel { grid-area: 2 / 1; }
+  .hero__panel[hidden] { display: grid !important; visibility: hidden; }
+}
 .hero__panel > *, .hero__sub > * { min-width: 0; max-width: 100%; }
 /* Lange deutsche Wörter (Texte sind im Editor änderbar) brechen um statt aus dem Bild zu laufen (WCAG 1.4.10) */
 .hero__blurb, .hero__price, .hero__fact { -webkit-hyphens: auto; hyphens: auto; overflow-wrap: anywhere; }
@@ -136,7 +145,7 @@
   letter-spacing: 0.02em;
 }
 .hero__actions { display: flex; flex-wrap: wrap; gap: 12px; }
-.hero__actions .btn { min-height: 56px; padding: 10px 24px; font-size: 18px; white-space: normal; text-align: center; line-height: 1.1; }
+.hero__actions .btn { min-height: 56px; padding: 10px 24px; font-size: 18px; white-space: normal; text-align: center; line-height: 1.1; -webkit-hyphens: auto; hyphens: auto; overflow-wrap: anywhere; }
 /* Datenblatt statt Punktkette: Farbe, Modelljahr und Baureihe als beschriftete Werte mit feinen Trennlinien */
 .hero__meta { display: flex; flex-wrap: wrap; row-gap: 12px; margin: 0; }
 .hero__fact { display: grid; gap: 2px; min-width: 0; max-width: 100%; margin: 0 20px 0 0; padding-right: 20px; border-right: 1px solid rgb(255 255 255 / 0.28); }
