@@ -3,18 +3,28 @@
   oder, wenn keins gewählt ist, die Standarddatei aus assets/.
   Steht die Standarddatei in der Platzhalterliste (Theme-Einstellungen), erscheint sie im Shop nicht.
 
+  Die Parameter fetchpriority, decoding und srcset sind optional. Ohne sie bleibt die Ausgabe wie bisher.
+  Dateien in assets/ liefert Shopify unverändert aus, das CDN skaliert sie nicht (kein ?width=).
+  Ein srcset für die Standarddatei braucht deshalb echte, bereits skalierte Dateien in assets/.
+
   @param {image} [image] - Gewähltes Bild aus dem Theme-Editor oder einer Ressource
   @param {string} [asset] - Dateiname in assets/ als Standard, z. B. "bento-herren.jpg"
   @param {number} [width] - Breite der Standarddatei (für das Seitenverhältnis)
   @param {number} [height] - Höhe der Standarddatei
   @param {string} [alt] - Alternativtext, leer für dekorative Bilder
-  @param {string} [loading] - "lazy" (Standard) oder "eager"
-  @param {string} [sizes] - sizes-Attribut für das gewählte Bild
+  @param {string} [loading] - "lazy" (Standard) oder "eager". Mit fetchpriority "high" und ohne Angabe wird es "eager".
+  @param {string} [fetchpriority] - "high", "low" oder "auto". "high" nur für das Bild, das im ersten Bildschirm am größten erscheint.
+  @param {string} [decoding] - "async", "sync" oder "auto"
+  @param {string} [sizes] - sizes-Attribut für das gewählte Bild, bei der Standarddatei nur zusammen mit srcset
+  @param {string} [srcset] - Nur Standarddatei: Dateinamen aus assets/ mit Breite, durch Komma getrennt, z. B. "bento-herren-640.jpg 640w, bento-herren.jpg 1472w". Das src bleibt die Originaldatei (asset).
   @param {string} [class] - Klassen am img
   @param {string} [id] - ID am img
 
   @example
   {% render 'media', image: block.settings.image, asset: 'bento-herren.jpg', width: 736, height: 738, alt: '' %}
+
+  @example
+  {% render 'media', image: block.settings.image, asset: 'banner-herren.jpg', width: 1600, height: 800, alt: '', fetchpriority: 'high', sizes: '100vw', srcset: 'banner-herren-800.jpg 800w, banner-herren.jpg 1600w' %}
 {% enddoc %}
 
 {%- liquid
@@ -22,6 +32,18 @@
   assign img_alt = alt | default: ''
   assign img_width = width | default: 1200
   assign img_height = height | default: 900
+
+  if fetchpriority == 'high' and loading == blank
+    assign img_loading = 'eager'
+  endif
+
+  if fetchpriority != blank
+    assign img_fetchpriority = fetchpriority
+  endif
+
+  if decoding != blank
+    assign img_decoding = decoding
+  endif
 
   assign hidden_asset = ''
   if image == blank and asset != blank
@@ -36,6 +58,8 @@
     | image_url: width: 2000
     | image_tag:
       loading: img_loading,
+      fetchpriority: img_fetchpriority,
+      decoding: img_decoding,
       alt: img_alt,
       class: class,
       id: id,
@@ -43,12 +67,33 @@
       widths: '400, 600, 800, 1000, 1400, 1800'
   }}
 {%- elsif asset != blank and hidden_asset == blank -%}
+  {%- liquid
+    assign asset_srcset = ''
+    if srcset != blank
+      assign srcset_items = srcset | split: ','
+      for srcset_item in srcset_items
+        assign srcset_parts = srcset_item | strip | split: ' '
+        if srcset_parts[0] != blank
+          assign srcset_file = srcset_parts[0] | asset_url
+          assign srcset_entry = srcset_file | append: ' ' | append: srcset_parts[1] | strip
+          if asset_srcset != blank
+            assign asset_srcset = asset_srcset | append: ', '
+          endif
+          assign asset_srcset = asset_srcset | append: srcset_entry
+        endif
+      endfor
+    endif
+  -%}
   <img
     src="{{ asset | asset_url }}"
+    {% if asset_srcset != blank %}srcset="{{ asset_srcset | strip }}"{% endif %}
+    {% if asset_srcset != blank and sizes != blank %}sizes="{{ sizes | escape }}"{% endif %}
     alt="{{ img_alt | escape }}"
     width="{{ img_width }}"
     height="{{ img_height }}"
     loading="{{ img_loading }}"
+    {% if img_fetchpriority != blank %}fetchpriority="{{ img_fetchpriority | escape }}"{% endif %}
+    {% if img_decoding != blank %}decoding="{{ img_decoding | escape }}"{% endif %}
     {% if class != blank %}class="{{ class }}"{% endif %}
     {% if id != blank %}id="{{ id }}"{% endif %}
   >

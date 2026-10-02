@@ -7,7 +7,7 @@ gebaut wurde und was vor dem Livegang noch geklärt werden muss.
 
 | | |
 |---|---|
-| Startbild | `assets/hero-ride-road.png` (Road Glide, Fahrer und Beifahrerin auf Bergstraße), 1024 × 576 |
+| Startbild | `assets/hero-ride-road.png` (Road Glide, Fahrer und Beifahrerin auf einer Landstraße), 1024 × 576 |
 | Datum | 2. Oktober 2026 |
 | Werkzeug | Higgsfield |
 | Schritt 1 | Hochskalieren des Startbilds auf 3840 × 2160 (`bytedance_image_upscale`) |

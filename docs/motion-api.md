@@ -77,7 +77,7 @@ parallel an verschiedenen Dateien arbeiten. Inhalt und Reihenfolge der Regeln si
 | `assets/footer.css` | Footer, Cookie-Banner | Startseite + Footer (M4) |
 | `assets/shop.css` | Kategorieseite (Banner, Film-Intro, Filter), Produktseite, Warenkorb und Drawer | Kategorie, PDP, Warenkorb, Suche (M5) |
 | `snippets/search-dialog.liquid` | Markup des Such-Dialogs, aus `sections/header.liquid` per `{% render %}` | Suche (M5), eingebunden im Header |
-| `assets/sections.css` | geteilte Reste: Events, Service-Seite, eine mehrseitige `min-width`-Regel | Rest, Aufräumen in M6 |
+| `assets/sections.css` | geteilte Reste: Events, Service-Seite, eine `min-width`-Regel für Grid-Kinder mehrerer Bereiche | Rest, Aufräumen in M6 |
 | `assets/sections.js` | globale Section-Module: Showroom, Quick-Toggle der Produktkarte | Rest (Quick-Toggle: M5) |
 
 CSS-Ladereihenfolge (`layout/theme.liquid`, entspricht der Kaskade): tokens, base, components, sections, theme, motion, header, hero, home,
