@@ -68,17 +68,17 @@
                 {%- if detail_url != blank -%}
                   <a class="btn btn--primary" href="{{ detail_url }}">{{ cta_label }}</a>
                 {%- endif -%}
-                {%- if block.settings.secondary_label != blank -%}
-                  <a class="btn btn--outline-light" href="{{ block.settings.secondary_url | default: '#' }}">{{ block.settings.secondary_label }}</a>
+                {%- if block.settings.secondary_label != blank and block.settings.secondary_url != blank -%}
+                  <a class="btn btn--outline-light" href="{{ block.settings.secondary_url }}">{{ block.settings.secondary_label }}</a>
                 {%- endif -%}
               </div>
             </div>
             {%- if meta_color != blank or meta_year != blank or block.settings.meta_line != blank -%}
-              <p class="hero__meta">
-                {%- if meta_color != blank -%}<span class="hero__fact"><span class="sr-only">Farbe: </span>{{ meta_color }}</span>{%- endif -%}
-                {%- if meta_year != blank -%}<span class="hero__fact"><span class="sr-only">Jahr: </span>{{ meta_year }}</span>{%- endif -%}
-                {%- if block.settings.meta_line != blank -%}<span class="hero__fact"><span class="sr-only">Linie: </span>{{ block.settings.meta_line }}</span>{%- endif -%}
-              </p>
+              <dl class="hero__meta">
+                {%- if meta_color != blank -%}<div class="hero__fact"><dt>Farbe</dt><dd>{{ meta_color }}</dd></div>{%- endif -%}
+                {%- if meta_year != blank -%}<div class="hero__fact"><dt>Modelljahr</dt><dd>{{ meta_year }}</dd></div>{%- endif -%}
+                {%- if block.settings.meta_line != blank -%}<div class="hero__fact"><dt>Baureihe</dt><dd>{{ block.settings.meta_line }}</dd></div>{%- endif -%}
+              </dl>
             {%- endif -%}
           </div>
         {%- endfor -%}

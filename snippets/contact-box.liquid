@@ -1,6 +1,8 @@
 {% doc %}
   Kontakt-Box: Thema wählen, dann Anrufen, WhatsApp oder E-Mail mit vorausgefüllter Nachricht
   (Markup wie im Mockup: .contact-box). Links und Text setzt assets/contact.js.
+  Gezeigt werden nur Kanäle, die in den Theme-Einstellungen (Händlerdaten) gepflegt sind.
+  Ohne jeden Kanal erscheint die Box im Shop nicht, im Theme-Editor steht stattdessen ein Hinweis.
 
   @param {string} [anchor] - ID der Box, Standard "kontakt"
   @param {string} [title] - Überschrift
@@ -21,65 +23,94 @@
   assign topic_list = topics | default: 'probefahrt,finanzierung,inzahlungnahme,frage' | split: ','
   assign active_topic = topic | default: topic_list.first
   assign phone_href = settings.phone | remove: ' ' | remove: '-' | remove: '(' | remove: ')' | remove: '/'
+
+  assign has_message_channel = false
+  if settings.whatsapp != blank or settings.email != blank
+    assign has_message_channel = true
+  endif
+  assign has_channel = has_message_channel
+  if settings.phone != blank
+    assign has_channel = true
+  endif
 -%}
 
-<section
-  class="contact-box"
-  id="{{ box_id }}"
-  data-contact
-  data-subject="{{ subject | escape }}"
-  data-ref="{{ ref | escape }}"
-  {% if primary %}data-primary{% endif %}
-  aria-labelledby="{{ box_id }}-title"
->
-  <h2 class="h3" id="{{ box_id }}-title">{{ title | default: 'Interesse? Sprich mit uns' }}</h2>
-  {%- if intro != blank -%}<p class="small muted">{{ intro }}</p>{%- endif -%}
+{%- if has_channel or request.design_mode -%}
+  <section
+    class="contact-box"
+    id="{{ box_id }}"
+    data-contact
+    data-subject="{{ subject | escape }}"
+    data-ref="{{ ref | escape }}"
+    {% if primary %}data-primary{% endif %}
+    aria-labelledby="{{ box_id }}-title"
+  >
+    <h2 class="h3" id="{{ box_id }}-title">{{ title | default: 'Interesse? Sprich mit uns' }}</h2>
+    {%- if intro != blank -%}<p class="small muted">{{ intro }}</p>{%- endif -%}
 
-  <fieldset class="contact-box__topics">
-    <legend>Worum geht’s?</legend>
-    <div class="chip-row">
-      {%- for key in topic_list -%}
-        {%- liquid
-          case key
-            when 'probefahrt'
-              assign topic_label = 'Probefahrt'
-            when 'finanzierung'
-              assign topic_label = 'Finanzierung'
-            when 'inzahlungnahme'
-              assign topic_label = 'Inzahlungnahme'
-            when 'reservierung'
-              assign topic_label = 'Reservierung'
-            when 'werkstatt'
-              assign topic_label = 'Werkstatt'
-            when 'kompatibilitaet'
-              assign topic_label = 'Passt es?'
-            when 'einbau'
-              assign topic_label = 'Einbau'
-            else
-              assign topic_label = 'Frage'
-          endcase
-        -%}
-        <button class="chip" type="button" data-topic="{{ key }}" aria-pressed="{% if key == active_topic %}true{% else %}false{% endif %}">{{ topic_label }}</button>
-      {%- endfor -%}
+    {%- unless has_channel -%}
+      <p class="small" role="note"><strong>Händlerdaten fehlen.</strong> Trage Telefon, WhatsApp oder E-Mail unter „Theme-Einstellungen &gt; Händlerdaten“ ein. Besucher sehen diese Box erst dann.</p>
+    {%- endunless -%}
+
+    {%- if has_message_channel -%}
+      <fieldset class="contact-box__topics">
+        <legend>Worum geht’s?</legend>
+        <div class="chip-row">
+          {%- for key in topic_list -%}
+            {%- liquid
+              case key
+                when 'probefahrt'
+                  assign topic_label = 'Probefahrt'
+                when 'finanzierung'
+                  assign topic_label = 'Finanzierung'
+                when 'inzahlungnahme'
+                  assign topic_label = 'Inzahlungnahme'
+                when 'reservierung'
+                  assign topic_label = 'Reservierung'
+                when 'werkstatt'
+                  assign topic_label = 'Werkstatt'
+                when 'kompatibilitaet'
+                  assign topic_label = 'Passt es?'
+                when 'einbau'
+                  assign topic_label = 'Einbau'
+                else
+                  assign topic_label = 'Frage'
+              endcase
+            -%}
+            <button class="chip" type="button" data-topic="{{ key }}" aria-pressed="{% if key == active_topic %}true{% else %}false{% endif %}">{{ topic_label }}</button>
+          {%- endfor -%}
+        </div>
+      </fieldset>
+    {%- endif -%}
+
+    <div class="contact-box__buttons">
+      {%- if settings.phone != blank -%}
+        <a class="btn btn--primary" data-cb="tel" href="tel:{{ phone_href }}">
+          {% render 'icon', name: 'phone' %}<span>Anrufen</span><span class="contact-box__phone hide-mobile">· {{ settings.phone }}</span>
+        </a>
+      {%- endif -%}
+      {%- if settings.whatsapp != blank -%}
+        <a class="btn btn--outline-dark" data-cb="wa" href="https://wa.me/{{ settings.whatsapp }}" target="_blank" rel="noopener">{% render 'icon', name: 'message-circle' %}WhatsApp</a>
+      {%- endif -%}
+      {%- if settings.email != blank -%}
+        <a class="btn btn--outline-dark" data-cb="mail" href="mailto:{{ settings.email }}">{% render 'icon', name: 'mail' %}E-Mail</a>
+      {%- endif -%}
     </div>
-  </fieldset>
+    {%- if has_message_channel -%}
+      <p class="caption muted">Nachricht wird mit deinem Anliegen{% if subject != blank %} und dem Fahrzeug/Artikel{% endif %} vorausgefüllt – du kannst sie vor dem Senden anpassen.</p>
+    {%- endif -%}
 
-  <div class="contact-box__buttons">
-    <a class="btn btn--primary" data-cb="tel" href="tel:{{ phone_href }}">
-      {% render 'icon', name: 'phone' %}<span>Anrufen</span><span class="contact-box__phone hide-mobile">· {{ settings.phone }}</span>
-    </a>
-    <a class="btn btn--outline-dark" data-cb="wa" href="https://wa.me/{{ settings.whatsapp }}" target="_blank" rel="noopener">{% render 'icon', name: 'message-circle' %}WhatsApp</a>
-    <a class="btn btn--outline-dark" data-cb="mail" href="mailto:{{ settings.email }}">{% render 'icon', name: 'mail' %}E-Mail</a>
-  </div>
-  <p class="caption muted">Nachricht wird mit deinem Anliegen{% if subject != blank %} und dem Fahrzeug/Artikel{% endif %} vorausgefüllt – du kannst sie vor dem Senden anpassen.</p>
+    {{ extra }}
 
-  {{ extra }}
+    {%- if settings.contact_person_name != blank -%}
+      <div class="contact-box__person">
+        {%- render 'media', image: settings.contact_person_image, asset: 'team-verkauf.jpg', width: 56, height: 56, alt: '' -%}
+        <div><strong>{{ settings.contact_person_name }}</strong>{% if settings.contact_person_role != blank %}<span>{{ settings.contact_person_role }}</span>{% endif %}</div>
+      </div>
+    {%- endif -%}
 
-  <div class="contact-box__person">
-    {%- render 'media', image: settings.contact_person_image, asset: 'team-verkauf.jpg', width: 56, height: 56, alt: '' -%}
-    <div><strong>{{ settings.contact_person_name }}</strong><span>{{ settings.contact_person_role }}</span></div>
-  </div>
-
-  <p class="open-state" data-open-state>Öffnungszeiten siehe unten.</p>
-  <p class="hours">{% render 'opening-hours', as: 'inline' %}</p>
-</section>
+    {%- if settings.hours_enabled -%}
+      <p class="open-state" data-open-state>Öffnungszeiten siehe unten.</p>
+      <p class="hours">{% render 'opening-hours', as: 'inline' %}</p>
+    {%- endif -%}
+  </section>
+{%- endif -%}

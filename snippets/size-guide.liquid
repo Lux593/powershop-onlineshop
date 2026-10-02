@@ -91,7 +91,7 @@
         </div>
       </div>
       <div class="howto">
-        <img src="{{ 'messanleitung.jpg' | asset_url }}" alt="Illustration der Messpunkte Brust, Taille, Hüfte und Innenbeinlänge" width="800" height="600" loading="lazy">
+        {%- render 'media', asset: 'messanleitung.jpg', width: 800, height: 600, alt: 'Illustration der Messpunkte Brust, Taille, Hüfte und Innenbeinlänge' -%}
         <dl>
           <div><dt>Brust</dt><dd>Waagerecht an der breitesten Stelle unter den Achseln messen.</dd></div>
           <div><dt>Taille</dt><dd>An der schmalsten Stelle, locker über der Unterwäsche.</dd></div>

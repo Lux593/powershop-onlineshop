@@ -12,18 +12,19 @@
     "settings": [
       {
         "type": "paragraph",
-        "content": "Diese Angaben erscheinen in Kontaktbox, Footer, Megamenü und Service-Seite. Im Moment sind es Platzhalter."
+        "content": "Diese Angaben erscheinen in Kontaktbox, Footer, Megamenü und Service-Seite. Ein leeres Feld bleibt im Shop unsichtbar. Im Theme-Editor weist die Kontaktbox darauf hin, was fehlt."
       },
-      { "type": "text", "id": "company", "label": "Firmenname (Rechtsform)", "default": "Power Shop GmbH (Platzhalter)" },
-      { "type": "textarea", "id": "address", "label": "Adresse", "default": "Musterstraße 1\n12345 Musterstadt" },
-      { "type": "text", "id": "phone", "label": "Telefon (Anzeige)", "default": "+49 000 1234567" },
-      { "type": "text", "id": "whatsapp", "label": "WhatsApp-Nummer (nur Ziffern, mit Ländervorwahl)", "default": "490001234567" },
-      { "type": "text", "id": "email", "label": "E-Mail für Anfragen", "default": "verkauf@power-shop.example" }
+      { "type": "text", "id": "company", "label": "Firmenname (Rechtsform)", "info": "Leer = Shop-Name aus den Shopify-Einstellungen." },
+      { "type": "textarea", "id": "address", "label": "Adresse" },
+      { "type": "text", "id": "phone", "label": "Telefon (Anzeige)" },
+      { "type": "text", "id": "whatsapp", "label": "WhatsApp-Nummer (nur Ziffern, mit Ländervorwahl)" },
+      { "type": "text", "id": "email", "label": "E-Mail für Anfragen" }
     ]
   },
   {
     "name": "Öffnungszeiten",
     "settings": [
+      { "type": "checkbox", "id": "hours_enabled", "label": "Öffnungszeiten anzeigen", "default": false, "info": "Erst einschalten, wenn die Zeiten unten stimmen. Sonst bleiben sie samt „Jetzt geöffnet“ unsichtbar." },
       { "type": "paragraph", "content": "Volle Stunden, 24-Stunden-Format. Bei 0 bis 0 gilt der Tag als geschlossen." },
       { "type": "header", "content": "Montag bis Freitag" },
       { "type": "range", "id": "hours_week_from", "label": "Von", "min": 0, "max": 23, "step": 1, "unit": "Uhr", "default": 9 },
@@ -36,8 +37,8 @@
   {
     "name": "Kontaktperson",
     "settings": [
-      { "type": "text", "id": "contact_person_name", "label": "Name", "default": "Max Mustermann" },
-      { "type": "text", "id": "contact_person_role", "label": "Funktion", "default": "Verkaufsberater Motorräder" },
+      { "type": "text", "id": "contact_person_name", "label": "Name", "info": "Leer = die Ansprechperson wird in der Kontaktbox nicht gezeigt." },
+      { "type": "text", "id": "contact_person_role", "label": "Funktion" },
       { "type": "image_picker", "id": "contact_person_image", "label": "Foto" }
     ]
   },
@@ -57,11 +58,26 @@
   {
     "name": "Footer und Soziale Netze",
     "settings": [
-      { "type": "textarea", "id": "payment_methods", "label": "Zahlarten (eine pro Zeile)", "default": "PayPal\nKlarna\nVisa\nMastercard\nApple Pay\nGoogle Pay\nDHL", "info": "Nur Zahlarten eintragen, die im Checkout aktiv sind." },
+      { "type": "textarea", "id": "payment_methods", "label": "Zahlarten (eine pro Zeile)", "default": "PayPal\nKlarna\nVisa\nMastercard\nApple Pay\nGoogle Pay", "info": "Nur Zahlarten eintragen, die im Checkout aktiv sind." },
       { "type": "url", "id": "social_instagram", "label": "Instagram" },
       { "type": "url", "id": "social_facebook", "label": "Facebook" },
       { "type": "url", "id": "social_youtube", "label": "YouTube" },
       { "type": "url", "id": "social_tiktok", "label": "TikTok" }
+    ]
+  },
+  {
+    "name": "Platzhalterbilder",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Diese Dateien in assets/ sind noch Platzhalter. Im Shop bleiben sie unsichtbar, im Theme-Editor siehst du sie. Hast du eine Datei unter demselben Namen durch ein echtes Foto ersetzt, streiche ihren Namen aus der Liste."
+      },
+      {
+        "type": "textarea",
+        "id": "placeholder_assets",
+        "label": "Noch nicht ersetzte Platzhalter (eine Datei pro Zeile)",
+        "default": "banner-accessoires.jpg\nbanner-damen.jpg\nbanner-herren.jpg\nbanner-motorraeder.jpg\nbanner-neuheiten.jpg\nbanner-sale.jpg\nbanner-teile.jpg\nevent-1.jpg\nevent-2.jpg\nevent-3.jpg\nmega-accessoires.jpg\nmega-damen.jpg\nmega-teile.jpg\nmessanleitung.jpg\nservice-finanzierung.jpg\nservice-inzahlungnahme.jpg\nservice-standort.jpg\nstory-werkstatt.jpg\nteam-verkauf.jpg"
+      }
     ]
   }
 ]

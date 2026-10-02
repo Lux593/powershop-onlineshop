@@ -33,8 +33,8 @@
 
     // Mobile Kontaktleiste spiegelt die Links der Haupt-Box
     if (box.hasAttribute('data-primary')) {
-      document.querySelectorAll('[data-sticky="wa"]').forEach(function (a) { a.href = wa.href; });
-      document.querySelectorAll('[data-sticky="mail"]').forEach(function (a) { a.href = mail.href; });
+      document.querySelectorAll('[data-sticky="wa"]').forEach(function (a) { if (wa) a.href = wa.href; });
+      document.querySelectorAll('[data-sticky="mail"]').forEach(function (a) { if (mail) a.href = mail.href; });
     }
   }
 

@@ -203,13 +203,12 @@
 }
 .hero__actions { display: flex; flex-wrap: wrap; gap: 14px; }
 .hero__actions .btn { min-height: 58px; padding: 0 28px; font-size: 18px; }
-.hero__meta {
-  display: flex; flex-wrap: wrap; align-items: baseline;
-  margin: 2px 0 0; color: var(--c-offwhite); font-size: 18px; letter-spacing: 0.04em;
-}
-.hero__fact + .hero__fact::before {
-  content: "·"; margin-inline: 0.7em; color: var(--c-orange);
-}
+/* Datenblatt statt Punktkette: Farbe, Modelljahr und Baureihe als beschriftete Werte mit feinen Trennlinien */
+.hero__meta { display: flex; flex-wrap: wrap; row-gap: 12px; margin: 6px 0 0; }
+.hero__fact { display: grid; gap: 2px; margin: 0 28px 0 0; padding-right: 28px; border-right: 1px solid rgb(255 255 255 / 0.24); }
+.hero__fact:last-child { margin-right: 0; padding-right: 0; border-right: 0; }
+.hero__fact dt { font-size: var(--fs-small); color: var(--c-muted-dark); }
+.hero__fact dd { margin: 0; font-family: var(--f-head); font-weight: 700; font-size: 24px; line-height: 1.1; letter-spacing: 0.04em; text-transform: uppercase; color: var(--c-white); }
 @media (min-width: 1024px) {
   .hero__caption-inner { padding-top: 72px; gap: 36px; }
   .hero__chip { font-size: 26px; }
@@ -218,18 +217,18 @@
   .hero__offer, .hero__actions { flex-wrap: nowrap; }
   .hero__price { font-size: 56px; }
   .hero__actions .btn { min-height: 64px; padding: 0 32px; font-size: 20px; }
-  .hero__meta { font-size: 22px; }
+  .hero__fact dd { font-size: 28px; }
 }
 
 /* ---------- Service-Leiste ---------- */
-.service-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-@media (min-width: 1024px) { .service-tiles { grid-template-columns: repeat(4, 1fr); gap: var(--s-3); } }
+/* Eine Leiste statt vier Karten: Die Felder teilen sich eine Fläche, die Haarlinien sind der Zwischenraum */
+.service-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--c-line); border: 1px solid var(--c-line); }
+@media (min-width: 1024px) { .service-tiles { grid-template-columns: repeat(4, 1fr); } }
 .service-tile {
   position: relative; display: grid; gap: 8px; align-content: start; padding: 24px 20px;
-  background: var(--c-white); border: 1px solid var(--c-line);
-  transition: box-shadow var(--t-fast), border-color var(--t-fast);
+  background: var(--c-white);
 }
-.service-tile::after { content: ""; position: absolute; left: -1px; right: -1px; bottom: -1px; height: 3px; background: var(--c-orange); transform: scaleX(0); transform-origin: left; transition: transform var(--t-med) var(--ease); }
+.service-tile::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--c-orange); transform: scaleX(0); transform-origin: left; transition: transform var(--t-med) var(--ease); }
 .service-tile:hover::after { transform: scaleX(1); }
 .service-tile > .icon { color: var(--c-orange); width: 32px; height: 32px; }
 .service-tile h3 { font-size: 22px; margin-top: 8px; }
@@ -422,6 +421,13 @@
 .empty { padding: 64px 16px; text-align: center; display: grid; gap: 16px; justify-items: center; }
 .empty p { max-width: 44ch; }
 .empty .chip-row { justify-content: center; }
+/* Leere Kategorie: hohe Fläche, Inhalt bleibt mittig */
+.empty--strip { text-align: left; justify-items: start; align-items: center; min-height: 320px; padding: 72px 0; gap: 16px; }
+.empty--strip p { max-width: 60ch; }
+.empty--strip .chip-row { justify-content: flex-start; }
+@media (min-width: 768px) {
+  .empty--strip { grid-template-columns: auto minmax(0, 1fr) auto; gap: 24px 28px; min-height: 480px; padding-block: 120px; }
+}
 .filter-sheet .acc summary { padding-inline: 0; }
 
 /* ---------- Produktdetailseite ---------- */

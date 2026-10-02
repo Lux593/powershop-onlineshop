@@ -1,6 +1,7 @@
 {% doc %}
   Rendert ein Bild: entweder das im Theme-Editor gewählte Bild (responsiv, über Shopify-CDN)
-  oder, wenn keins gewählt ist, die Standarddatei aus dem Mockup in assets/.
+  oder, wenn keins gewählt ist, die Standarddatei aus assets/.
+  Steht die Standarddatei in der Platzhalterliste (Theme-Einstellungen), erscheint sie im Shop nicht.
 
   @param {image} [image] - Gewähltes Bild aus dem Theme-Editor oder einer Ressource
   @param {string} [asset] - Dateiname in assets/ als Standard, z. B. "bento-herren.jpg"
@@ -21,6 +22,13 @@
   assign img_alt = alt | default: ''
   assign img_width = width | default: 1200
   assign img_height = height | default: 900
+
+  assign hidden_asset = ''
+  if image == blank and asset != blank
+    capture hidden_asset
+      render 'is-placeholder', asset: asset
+    endcapture
+  endif
 -%}
 {%- if image != blank -%}
   {{
@@ -34,7 +42,7 @@
       sizes: sizes,
       widths: '400, 600, 800, 1000, 1400, 1800'
   }}
-{%- elsif asset != blank -%}
+{%- elsif asset != blank and hidden_asset == blank -%}
   <img
     src="{{ asset | asset_url }}"
     alt="{{ img_alt | escape }}"

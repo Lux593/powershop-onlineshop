@@ -1,0 +1,19 @@
+{% doc %}
+  Gibt „true“ aus, wenn die Standarddatei noch ein Platzhalter ist und im Shop nicht erscheinen soll.
+  Die Liste pflegst du in den Theme-Einstellungen unter „Platzhalterbilder“. Im Theme-Editor
+  (request.design_mode) bleiben Platzhalter sichtbar, damit klar ist, wo ein Foto hinkommt.
+
+  @param {string} asset - Dateiname in assets/, z. B. "event-1.jpg"
+
+  @example
+  {%- capture hidden_asset -%}{% render 'is-placeholder', asset: 'event-1.jpg' %}{%- endcapture -%}
+  {%- if hidden_asset == blank -%}… Bild zeigen …{%- endif -%}
+{% enddoc %}
+
+{%- unless request.design_mode -%}
+  {%- assign placeholder_files = settings.placeholder_assets | newline_to_br | split: '<br />' -%}
+  {%- for entry in placeholder_files -%}
+    {%- assign entry_name = entry | strip | strip_newlines -%}
+    {%- if entry_name == asset -%}true{%- break -%}{%- endif -%}
+  {%- endfor -%}
+{%- endunless -%}

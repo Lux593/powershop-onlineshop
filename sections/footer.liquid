@@ -4,6 +4,8 @@
 
   comment
     Die Spalte „Soziale Netze“ erscheint erst, wenn mindestens ein Profil hinterlegt ist.
+    Eine Link-Spalte erscheint erst ab zwei Menüpunkten. Die angehängten Links (Größentabelle,
+    Cookie-Einstellungen) einer ausgeblendeten Spalte wandern in die Fußzeile und bleiben erreichbar.
     Das Raster passt sich an die Zahl der sichtbaren Spalten an.
   endcomment
   assign has_social = false
@@ -11,18 +13,34 @@
     assign has_social = true
   endif
   assign footer_cols = 0
+  assign footer_size_guide = false
+  assign footer_cookie_settings = false
   for block in section.blocks
-    if block.type == 'social' and has_social == false and request.design_mode == false
-      continue
+    if block.type == 'social'
+      if has_social or request.design_mode
+        assign footer_cols = footer_cols | plus: 1
+      endif
+    elsif block.type == 'links'
+      if linklists[block.settings.menu].links.size > 1 or request.design_mode
+        assign footer_cols = footer_cols | plus: 1
+      else
+        if block.settings.show_size_guide
+          assign footer_size_guide = true
+        endif
+        if block.settings.show_cookie_settings
+          assign footer_cookie_settings = true
+        endif
+      endif
     endif
-    assign footer_cols = footer_cols | plus: 1
   endfor
+  assign footer_no_cols = false
   if footer_cols < 1
+    assign footer_no_cols = true
     assign footer_cols = 1
   endif
 -%}
 
-<footer class="site-footer on-dark">
+<footer class="site-footer on-dark textured">
   {%- if section.settings.show_newsletter -%}
     <div class="container footer__news">
       <div>
@@ -62,20 +80,22 @@
     {%- for block in section.blocks -%}
       {%- case block.type -%}
         {%- when 'links' -%}
-          <div {{ block.shopify_attributes }}>
-            <h2>{{ block.settings.title }}</h2>
-            <ul>
-              {%- for link in linklists[block.settings.menu].links -%}
-                <li><a href="{{ link.url }}">{{ link.title }}</a></li>
-              {%- endfor -%}
-              {%- if block.settings.show_size_guide -%}
-                <li><a href="#" data-open="sizeguide">Größentabelle</a></li>
-              {%- endif -%}
-              {%- if block.settings.show_cookie_settings -%}
-                <li><a href="#" data-cookie-settings>Cookie-Einstellungen</a></li>
-              {%- endif -%}
-            </ul>
-          </div>
+          {%- if linklists[block.settings.menu].links.size > 1 or request.design_mode -%}
+            <div {{ block.shopify_attributes }}>
+              <h2>{{ block.settings.title }}</h2>
+              <ul>
+                {%- for link in linklists[block.settings.menu].links -%}
+                  <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+                {%- endfor -%}
+                {%- if block.settings.show_size_guide -%}
+                  <li><a href="#" data-open="sizeguide">Größentabelle</a></li>
+                {%- endif -%}
+                {%- if block.settings.show_cookie_settings -%}
+                  <li><a href="#" data-cookie-settings>Cookie-Einstellungen</a></li>
+                {%- endif -%}
+              </ul>
+            </div>
+          {%- endif -%}
         {%- when 'social' -%}
           {%- if has_social or request.design_mode -%}
           <div {{ block.shopify_attributes }}>
@@ -91,7 +111,8 @@
       {%- endcase -%}
     {%- endfor -%}
 
-    <div class="footer__dealer">
+    {%- comment -%} Ohne Link-Spalten wird die Händlerkarte zur durchgehenden Zeile, statt links allein zu stehen. {%- endcomment -%}
+    <div class="footer__dealer"{% if footer_no_cols %} style="grid-column:1 / -1;flex-direction:row;align-items:center;justify-content:center"{% endif %}>
       <img src="{{ 'hd-bar-shield.png' | asset_url }}" alt="Harley-Davidson Bar &amp; Shield" width="69" height="56" loading="lazy">
       <p>
         <strong>Offizieller Vertragshändler</strong>
@@ -104,8 +125,10 @@
     <div class="container">
       {% render 'payments' %}
       <p>
-        © {{ 'now' | date: '%Y' }} {{ settings.company }} · * Alle Preise inkl. MwSt.
+        © {{ 'now' | date: '%Y' }} {{ settings.company | default: shop.name }} · * Alle Preise inkl. MwSt.
         {%- if shop.shipping_policy.url != blank %}, zzgl. <a href="{{ shop.shipping_policy.url }}">Versandkosten</a>{% endif -%}
+        {%- if footer_cookie_settings %} · <a href="#" data-cookie-settings>Cookie-Einstellungen</a>{% endif -%}
+        {%- if footer_size_guide %} · <a href="#" data-open="sizeguide">Größentabelle</a>{% endif -%}
       </p>
     </div>
   </div>

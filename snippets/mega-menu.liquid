@@ -32,7 +32,15 @@
     if parent_key == key
       case block.type
         when 'teaser'
-          assign teaser_count = teaser_count | plus: 1
+          assign teaser_hidden = ''
+          if block.settings.image == blank
+            capture teaser_hidden
+              render 'is-placeholder', asset: block.settings.image_asset
+            endcapture
+          endif
+          if teaser_hidden == blank
+            assign teaser_count = teaser_count | plus: 1
+          endif
         when 'contact'
           assign contact_block = block
         when 'cta'
@@ -40,6 +48,13 @@
       endcase
     endif
   endfor
+
+  comment
+    Kontaktspalte nur, wenn sie etwas zeigt: Telefon, E-Mail oder gepflegte Öffnungszeiten.
+  endcomment
+  if contact_block and settings.phone == blank and settings.email == blank and settings.hours_enabled != true
+    assign contact_block = nil
+  endif
 
   assign grid = ''
   if has_groups
@@ -120,10 +135,16 @@
       {%- for block in blocks -%}
         {%- assign parent_key = block.settings.parent | handleize -%}
         {%- if block.type == 'teaser' and parent_key == key -%}
-          <a class="mega-tile" href="{{ block.settings.url | default: link.url }}" {{ block.shopify_attributes }}>
-            {%- render 'media', image: block.settings.image, asset: block.settings.image_asset, width: 600, height: 400, sizes: '(min-width: 1024px) 250px, 50vw' -%}
-            <span>{{ block.settings.label }}</span>
-          </a>
+          {%- assign teaser_hidden = '' -%}
+          {%- if block.settings.image == blank -%}
+            {%- capture teaser_hidden -%}{% render 'is-placeholder', asset: block.settings.image_asset %}{%- endcapture -%}
+          {%- endif -%}
+          {%- if teaser_hidden == blank -%}
+            <a class="mega-tile" href="{{ block.settings.url | default: link.url }}" {{ block.shopify_attributes }}>
+              {%- render 'media', image: block.settings.image, asset: block.settings.image_asset, width: 600, height: 400, sizes: '(min-width: 1024px) 250px, 50vw' -%}
+              <span>{{ block.settings.label }}</span>
+            </a>
+          {%- endif -%}
         {%- endif -%}
       {%- endfor -%}
     </div>
@@ -132,11 +153,11 @@
   {%- if cta_block -%}
     <div class="mega__cta" {{ cta_block.shopify_attributes }}>
       <p>{{ cta_block.settings.text }}</p>
-      {%- if cta_block.settings.primary_label != blank -%}
-        <a class="btn btn--primary btn--sm" href="{{ cta_block.settings.primary_url | default: '#' }}">{{ cta_block.settings.primary_label }}</a>
+      {%- if cta_block.settings.primary_label != blank and cta_block.settings.primary_url != blank -%}
+        <a class="btn btn--primary btn--sm" href="{{ cta_block.settings.primary_url }}">{{ cta_block.settings.primary_label }}</a>
       {%- endif -%}
-      {%- if cta_block.settings.secondary_label != blank -%}
-        <a class="btn btn--outline-light btn--sm" href="{{ cta_block.settings.secondary_url | default: '#' }}">{{ cta_block.settings.secondary_label }}</a>
+      {%- if cta_block.settings.secondary_label != blank and cta_block.settings.secondary_url != blank -%}
+        <a class="btn btn--outline-light btn--sm" href="{{ cta_block.settings.secondary_url }}">{{ cta_block.settings.secondary_label }}</a>
       {%- endif -%}
     </div>
   {%- endif -%}

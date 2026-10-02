@@ -6,6 +6,7 @@
   <ul>{% render 'opening-hours' %}</ul>
 {% enddoc %}
 
+{%- if settings.hours_enabled -%}
 {%- liquid
   assign mode = as | default: 'plain'
   assign service_page = pages['service']
@@ -49,3 +50,4 @@
     <li>Mo–Fr: {{ week_text }}</li>
     <li>Sa: {{ sat_text }}</li>
 {%- endcase -%}
+{%- endif -%}

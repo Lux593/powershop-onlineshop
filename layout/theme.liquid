@@ -46,10 +46,10 @@
         whatsapp: {{ settings.whatsapp | json }},
         phone: {{ settings.phone | json }},
         email: {{ settings.email | json }},
-        hours: [
+        hours: {% if settings.hours_enabled %}[
           { days: [1, 2, 3, 4, 5], from: {{ settings.hours_week_from | default: 0 | json }}, to: {{ settings.hours_week_to | default: 0 | json }} },
           { days: [6], from: {{ settings.hours_sat_from | default: 0 | json }}, to: {{ settings.hours_sat_to | default: 0 | json }} }
-        ]
+        ]{% else %}null{% endif %}
       };
     </script>
     <script src="{{ 'theme.js' | asset_url }}" defer></script>

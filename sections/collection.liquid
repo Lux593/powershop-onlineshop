@@ -82,10 +82,12 @@
             {%- endfor -%}
           </div>
         {%- elsif collection_empty -%}
-          <div class="empty">
+          <div class="empty empty--strip">
             {% render 'icon', name: 'store', class: 'icon--lg' %}
-            <h2 class="h3">Hier kommt bald etwas dazu</h2>
-            <p class="muted">Diese Kategorie füllen wir gerade. Schau bei den anderen vorbei oder frag uns nach einem bestimmten Stück.</p>
+            <div>
+              <h2 class="h3">Hier kommt bald etwas dazu</h2>
+              <p class="muted">Diese Kategorie füllen wir gerade. Schau bei den anderen vorbei oder frag uns nach einem bestimmten Stück.</p>
+            </div>
             <div class="chip-row">
               <a class="btn btn--secondary" href="{{ routes.collections_url }}">Alle Kategorien</a>
               <a class="btn btn--outline-dark" href="{{ routes.root_url }}">Zur Startseite</a>
@@ -104,7 +106,7 @@
       </div>
     {%- endpaginate -%}
   </div>
-  <div class="section--tight"></div>
+  {%- unless collection_empty -%}<div class="section--tight"></div>{%- endunless -%}
 </div>
 
 {% schema %}

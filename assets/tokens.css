@@ -63,8 +63,10 @@
   --t-fast: 160ms;
   --t-med: 320ms;
 
-  /* Raue Akzente: feine Körnung als Overlay für dunkle Sektionen */
-  --texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+  /* Raue Akzente: Körnung als Overlay für dunkle Sektionen.
+     Der Alphakanal lässt nur die hellen Spitzen des Rauschens stehen (Schwelle 0,6). So liest sie sich
+     als Korn und hellt das Schwarz nicht bloß auf. Die Stärke steht in base.css (.textured::before). */
+  --texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 9 0 0 0 -5.4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 @media (min-width: 1024px) {

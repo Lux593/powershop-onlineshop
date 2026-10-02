@@ -1,3 +1,14 @@
+{%- liquid
+  assign has_products = false
+  for block in section.blocks
+    if block.settings.collection != blank and block.settings.collection.products_count > 0
+      assign has_products = true
+    endif
+  endfor
+-%}
+
+{%- comment -%} Ohne Produkte im Shop erscheint der Abschnitt nicht (im Theme-Editor immer). {%- endcomment -%}
+{%- if has_products or request.design_mode -%}
 <section class="section" aria-labelledby="news-title-{{ section.id }}" style="padding-top:var(--s-4)" data-section-id="{{ section.id }}">
   <div class="container">
     <div class="section-head section-head--center">
@@ -59,6 +70,7 @@
     {%- endif -%}
   </div>
 </section>
+{%- endif -%}
 
 {% schema %}
 {

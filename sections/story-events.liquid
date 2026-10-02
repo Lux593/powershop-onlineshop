@@ -37,27 +37,8 @@
         <div class="event-grid">
           {%- for block in section.blocks -%}
             {%- if block.type == 'event' -%}
-              {%- liquid
-                assign event_day = block.settings.date | date: '%-d'
-                assign event_month_number = block.settings.date | date: '%-m' | plus: 0
-                assign months = 'Jan,Feb,Mär,Apr,Mai,Jun,Jul,Aug,Sep,Okt,Nov,Dez' | split: ','
-                assign month_index = event_month_number | minus: 1
-                assign event_month = months[month_index]
-              -%}
-              <a class="event-card" href="{{ block.settings.url | default: section.settings.events_url | default: '#' }}" {{ block.shopify_attributes }}>
-                <div class="event-card__media">
-                  {%- render 'media', image: block.settings.image, asset: block.settings.image_asset, width: 800, height: 500, sizes: '(min-width: 640px) 33vw, 100vw' -%}
-                  {%- if block.settings.date != blank -%}
-                    <span class="date-badge"><strong>{{ event_day }}</strong><span>{{ event_month }}</span></span>
-                  {%- endif -%}
-                </div>
-                <div class="event-card__body">
-                  <h3>{{ block.settings.title }}</h3>
-                  {%- if block.settings.place != blank -%}
-                    <p>{% render 'icon', name: 'map-pin' %}{{ block.settings.place }}</p>
-                  {%- endif -%}
-                </div>
-              </a>
+              {%- assign event_url = block.settings.url | default: section.settings.events_url -%}
+              {% render 'event-card', item: block, url: event_url %}
             {%- endif -%}
           {%- endfor -%}
         </div>

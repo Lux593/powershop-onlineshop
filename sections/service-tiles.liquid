@@ -1,16 +1,21 @@
 <section class="section--tight" id="{{ section.settings.anchor_id | default: 'nach-hero' }}" aria-labelledby="service-title-{{ section.id }}" data-section-id="{{ section.id }}">
   <h2 class="sr-only" id="service-title-{{ section.id }}">Unser Service</h2>
-  <div class="container service-tiles">
-    {%- for block in section.blocks -%}
-      <a class="service-tile" href="{{ block.settings.url | default: '#' }}" {{ block.shopify_attributes }}>
-        {% render 'icon', name: block.settings.icon %}
-        <h3>{{ block.settings.title }}</h3>
-        <p>{{ block.settings.text }}</p>
-        {%- if block.settings.more_label != blank -%}
-          <span class="more">{{ block.settings.more_label }} {% render 'icon', name: 'arrow-right' %}</span>
-        {%- endif -%}
-      </a>
-    {%- endfor -%}
+  <div class="container">
+    <div class="service-tiles">
+      {%- for block in section.blocks -%}
+        {%- comment -%} Ohne Link bleibt das Feld eine reine Infofläche (kein toter Link auf „#“). {%- endcomment -%}
+        {%- assign tile_tag = 'div' -%}
+        {%- if block.settings.url != blank -%}{%- assign tile_tag = 'a' -%}{%- endif -%}
+        <{{ tile_tag }} class="service-tile"{% if block.settings.url != blank %} href="{{ block.settings.url }}"{% endif %} {{ block.shopify_attributes }}>
+          {% render 'icon', name: block.settings.icon %}
+          <h3>{{ block.settings.title }}</h3>
+          <p>{{ block.settings.text }}</p>
+          {%- if block.settings.more_label != blank and block.settings.url != blank -%}
+            <span class="more">{{ block.settings.more_label }} {% render 'icon', name: 'arrow-right' %}</span>
+          {%- endif -%}
+        </{{ tile_tag }}>
+      {%- endfor -%}
+    </div>
   </div>
 </section>
 

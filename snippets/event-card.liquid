@@ -1,0 +1,55 @@
+{% doc %}
+  Event-Karte mit Datum, Titel, Ort und Bild. Ohne Bild oder bei ausgeblendetem Platzhalterbild
+  wird eine kompakte Textkarte mit dem Datum links gezeigt statt einer leeren Bildfläche.
+
+  @param {object} item - Block vom Typ "event" (date, title, place, image, image_asset)
+  @param {string} [url] - Link der Karte. Leer = reine Infokarte, kein toter Link auf „#“
+  @param {string} [sizes] - sizes-Attribut für das Bild
+{% enddoc %}
+
+{%- liquid
+  assign event_day = item.settings.date | date: '%-d'
+  assign event_month_number = item.settings.date | date: '%-m' | plus: 0
+  assign months = 'Jan,Feb,Mär,Apr,Mai,Jun,Jul,Aug,Sep,Okt,Nov,Dez' | split: ','
+  assign month_index = event_month_number | minus: 1
+  assign event_month = months[month_index]
+
+  assign event_tag = 'div'
+  if url != blank
+    assign event_tag = 'a'
+  endif
+  assign event_sizes = sizes | default: '(min-width: 640px) 33vw, 100vw'
+
+  assign no_image = false
+  if item.settings.image == blank
+    assign no_image = true
+    if item.settings.image_asset != blank
+      capture visible_asset
+        render 'is-placeholder', asset: item.settings.image_asset
+      endcapture
+      if visible_asset == blank
+        assign no_image = false
+      endif
+    endif
+  endif
+-%}
+<{{ event_tag }} class="event-card{% if no_image %} event-card--text{% endif %}"{% if url != blank %} href="{{ url }}"{% endif %} {{ item.shopify_attributes }}>
+  {%- if no_image -%}
+    {%- if item.settings.date != blank -%}
+      <span class="date-badge"><strong>{{ event_day }}</strong><span>{{ event_month }}</span></span>
+    {%- endif -%}
+  {%- else -%}
+    <div class="event-card__media">
+      {%- render 'media', image: item.settings.image, asset: item.settings.image_asset, width: 800, height: 500, sizes: event_sizes -%}
+      {%- if item.settings.date != blank -%}
+        <span class="date-badge"><strong>{{ event_day }}</strong><span>{{ event_month }}</span></span>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+  <div class="event-card__body">
+    <h3>{{ item.settings.title | escape }}</h3>
+    {%- if item.settings.place != blank -%}
+      <p>{% render 'icon', name: 'map-pin' %}{{ item.settings.place | escape }}</p>
+    {%- endif -%}
+  </div>
+</{{ event_tag }}>

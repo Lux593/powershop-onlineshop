@@ -195,7 +195,7 @@
         {% render 'accordion', title: 'Finanzierung', body: finance_body %}
 
         {%- capture place_body -%}
-          <p>Besichtigung und Probefahrt im Power Shop, {{ settings.address | newline_to_br }}. Der Kaufvertrag wird bei uns vor Ort abgeschlossen. Zulassung und Überführung übernehmen wir auf Wunsch.</p>
+          <p>Besichtigung und Probefahrt im Power Shop{% if settings.address != blank %}, {{ settings.address | escape | newline_to_br }}{% endif %}. Der Kaufvertrag wird bei uns vor Ort abgeschlossen. Zulassung und Überführung übernehmen wir auf Wunsch.</p>
         {%- endcapture -%}
         {% render 'accordion', title: 'Standort & Übergabe', body: place_body %}
       </div>
@@ -222,11 +222,31 @@
       {%- endif -%}
     </div>
 
-    <div class="sticky-contact" data-sticky-contact aria-label="Schnellkontakt">
-      <a class="btn btn--primary" href="tel:{{ settings.phone | remove: ' ' | remove: '-' | remove: '(' | remove: ')' | remove: '/' }}">{% render 'icon', name: 'phone' %}Anrufen</a>
-      <a class="btn btn--outline-light" data-sticky="wa" href="https://wa.me/{{ settings.whatsapp }}" target="_blank" rel="noopener">{% render 'icon', name: 'message-circle' %}WhatsApp</a>
-      <a class="btn btn--outline-light" data-sticky="mail" href="mailto:{{ settings.email }}">{% render 'icon', name: 'mail' %}E-Mail</a>
-    </div>
+    {%- liquid
+      assign sticky_count = 0
+      if settings.phone != blank
+        assign sticky_count = sticky_count | plus: 1
+      endif
+      if settings.whatsapp != blank
+        assign sticky_count = sticky_count | plus: 1
+      endif
+      if settings.email != blank
+        assign sticky_count = sticky_count | plus: 1
+      endif
+    -%}
+    {%- if sticky_count > 0 -%}
+      <div class="sticky-contact" data-sticky-contact aria-label="Schnellkontakt" style="grid-template-columns:repeat({{ sticky_count }}, 1fr)">
+        {%- if settings.phone != blank -%}
+          <a class="btn btn--primary" href="tel:{{ settings.phone | remove: ' ' | remove: '-' | remove: '(' | remove: ')' | remove: '/' }}">{% render 'icon', name: 'phone' %}Anrufen</a>
+        {%- endif -%}
+        {%- if settings.whatsapp != blank -%}
+          <a class="btn btn--outline-light" data-sticky="wa" href="https://wa.me/{{ settings.whatsapp }}" target="_blank" rel="noopener">{% render 'icon', name: 'message-circle' %}WhatsApp</a>
+        {%- endif -%}
+        {%- if settings.email != blank -%}
+          <a class="btn btn--outline-light" data-sticky="mail" href="mailto:{{ settings.email }}">{% render 'icon', name: 'mail' %}E-Mail</a>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
   </div>
 
 {%- comment -%} ===================== TEIL ===================== {%- endcomment -%}
@@ -322,11 +342,17 @@
                   </div>
                 </details>
               {%- endif -%}
-              <div class="compat__foot">
-                <span>Unsicher? Frag unsere Werkstatt:</span>
-                <a class="btn btn--text" href="tel:{{ settings.phone | remove: ' ' | remove: '-' | remove: '(' | remove: ')' | remove: '/' }}">{% render 'icon', name: 'phone', class: 'icon--sm' %}Anrufen</a>
-                <a class="btn btn--text" href="#werkstatt-kontakt">{% render 'icon', name: 'message-circle', class: 'icon--sm' %}WhatsApp / E-Mail</a>
-              </div>
+              {%- if settings.phone != blank or settings.whatsapp != blank or settings.email != blank -%}
+                <div class="compat__foot">
+                  <span>Unsicher? Frag unsere Werkstatt:</span>
+                  {%- if settings.phone != blank -%}
+                    <a class="btn btn--text" href="tel:{{ settings.phone | remove: ' ' | remove: '-' | remove: '(' | remove: ')' | remove: '/' }}">{% render 'icon', name: 'phone', class: 'icon--sm' %}Anrufen</a>
+                  {%- endif -%}
+                  {%- if settings.whatsapp != blank or settings.email != blank -%}
+                    <a class="btn btn--text" href="#werkstatt-kontakt">{% render 'icon', name: 'message-circle', class: 'icon--sm' %}WhatsApp / E-Mail</a>
+                  {%- endif -%}
+                </div>
+              {%- endif -%}
             </div>
           {%- endif -%}
 

@@ -23,7 +23,21 @@
 
   <div class="container">
     {%- if search.performed -%}
-      {%- render 'results-toolbar', results: search, action: routes.search_url, terms: search.terms, default_cols: '4' -%}
+      {%- comment -%} Sortierung und Spalten ergeben ohne Treffer keinen Sinn. Aktive Filter lassen die Leiste stehen, damit man sie lösen kann. {%- endcomment -%}
+      {%- liquid
+        assign show_toolbar = false
+        if search.results_count > 0
+          assign show_toolbar = true
+        endif
+        for filter in search.filters
+          if filter.active_values.size > 0
+            assign show_toolbar = true
+          endif
+        endfor
+      -%}
+      {%- if show_toolbar -%}
+        {%- render 'results-toolbar', results: search, action: routes.search_url, terms: search.terms, default_cols: '4' -%}
+      {%- endif -%}
 
       {%- paginate search.results by section.settings.per_page -%}
         <div data-results>
@@ -55,11 +69,39 @@
               </ul>
             {%- endif -%}
           {%- else -%}
+            {%- liquid
+              assign has_channel = false
+              if settings.phone != blank or settings.whatsapp != blank or settings.email != blank
+                assign has_channel = true
+              endif
+              capture wa_text
+                echo 'Hallo Power-Shop-Team, ich suche: ' | append: search.terms
+              endcapture
+              capture mail_subject
+                echo 'Suche: ' | append: search.terms
+              endcapture
+            -%}
             <div class="empty">
               {% render 'icon', name: 'search', class: 'icon--lg' %}
               <h2 class="h3">Keine Treffer</h2>
-              <p class="muted">Prüfe die Schreibweise, suche nach der Teilenummer oder frag uns direkt.</p>
-              <a class="btn btn--secondary" href="{{ routes.root_url }}">Zur Startseite</a>
+              <p class="muted">Prüfe die Schreibweise, suche nach der Teilenummer{% if has_channel %} oder frag uns direkt{% else %} oder stöbere in den Kategorien{% endif %}.</p>
+              <div class="chip-row">
+                {%- for top_link in linklists['main-menu'].links limit: 5 -%}
+                  <a class="chip" href="{{ top_link.url }}">{{ top_link.title }}</a>
+                {%- endfor -%}
+              </div>
+              <div class="chip-row">
+                {%- if settings.phone != blank -%}
+                  <a class="btn btn--primary" href="tel:{{ settings.phone | remove: ' ' | remove: '-' | remove: '(' | remove: ')' | remove: '/' }}">{% render 'icon', name: 'phone' %}Anrufen</a>
+                {%- endif -%}
+                {%- if settings.whatsapp != blank -%}
+                  <a class="btn btn--outline-dark" href="https://wa.me/{{ settings.whatsapp }}?text={{ wa_text | url_encode }}" target="_blank" rel="noopener">{% render 'icon', name: 'message-circle' %}WhatsApp</a>
+                {%- endif -%}
+                {%- if settings.email != blank -%}
+                  <a class="btn btn--outline-dark" href="mailto:{{ settings.email }}?subject={{ mail_subject | url_encode }}">{% render 'icon', name: 'mail' %}E-Mail</a>
+                {%- endif -%}
+                <a class="btn btn--secondary" href="{{ routes.root_url }}">Zur Startseite</a>
+              </div>
             </div>
           {%- endif -%}
 

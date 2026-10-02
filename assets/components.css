@@ -292,3 +292,12 @@ dialog::backdrop { background: rgba(10, 10, 10, 0.6); }
   opacity: 0; visibility: hidden; transition: opacity var(--t-fast);
 }
 .tip:hover .tip__bubble, .tip:focus-within .tip__bubble { opacity: 1; visibility: visible; }
+
+/* ---------- Zustände ohne Bild ----------
+   Platzhalterbilder bleiben im Shop unsichtbar (snippets/is-placeholder.liquid). Karten und Banner
+   fallen dann auf eine reine Textfläche zurück, statt eine leere Bildfläche stehen zu lassen.
+   Die zugehörigen Basisregeln stehen in sections.css (Story & Events, Kategorieseite). */
+.event-card--text { grid-template-columns: auto 1fr; align-items: center; }
+.event-card--text .date-badge { position: static; margin: 20px 0 20px 20px; }
+.event-card--text .event-card__body { padding-left: 16px; }
+.page-banner__media:not(:has(img, video)) { display: none; }

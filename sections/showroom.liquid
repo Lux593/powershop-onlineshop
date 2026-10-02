@@ -34,15 +34,21 @@
           {% render 'bike-card', product: bike, sizes: '(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 86vw' %}
         {%- endfor -%}
       </div>
-    {%- else -%}
+    {%- elsif request.design_mode -%}
       <div class="empty">
-        <p class="muted">
-          {%- if request.design_mode -%}
-            Wähle eine Kollektion mit Motorrädern.
-          {%- else -%}
-            Aktuelle Fahrzeuge zeigen wir dir gern im Showroom.
+        <p class="muted">Wähle eine Kollektion mit Motorrädern.</p>
+      </div>
+    {%- else -%}
+      {%- comment -%} Ohne Fahrzeuge bleibt der Abschnitt eine Einladung mit einer Handlung statt einer leeren Fläche. {%- endcomment -%}
+      {%- assign service_url = pages['service'].url | default: routes.root_url -%}
+      <div class="showroom__empty">
+        <p class="lead">Aktuelle Fahrzeuge zeigen wir dir gern im Showroom.</p>
+        <div class="chip-row" style="margin-top:var(--s-2)">
+          <a class="btn btn--primary" href="{{ service_url }}#probefahrt">Probefahrt anfragen</a>
+          {%- if settings.phone != blank -%}
+            <a class="btn btn--outline-dark" href="tel:{{ settings.phone | remove: ' ' | remove: '-' | remove: '(' | remove: ')' | remove: '/' }}">{% render 'icon', name: 'phone' %}Anrufen</a>
           {%- endif -%}
-        </p>
+        </div>
       </div>
     {%- endif -%}
   </div>

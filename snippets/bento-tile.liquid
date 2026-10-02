@@ -1,5 +1,6 @@
 {% doc %}
   Kachel des Kategorie-Bento (Markup wie im Mockup: .bento-tile).
+  Ohne Link bleibt die Kachel eine reine Bildfläche (kein toter Link auf „#“).
 
   @param {object} block - Block mit title, subtitle, url, image, image_asset
   @param {string} modifier - Zusätzliche Klassen, z. B. "bento-tile--moto"
@@ -7,10 +8,12 @@
   @param {number} height - Höhe der Standarddatei
 {% enddoc %}
 
-<a class="bento-tile{% if modifier != blank %} {{ modifier }}{% endif %}" href="{{ block.settings.url | default: '#' }}" {{ block.shopify_attributes }}>
+{%- assign tile_tag = 'div' -%}
+{%- if block.settings.url != blank -%}{%- assign tile_tag = 'a' -%}{%- endif -%}
+<{{ tile_tag }} class="bento-tile{% if modifier != blank %} {{ modifier }}{% endif %}"{% if block.settings.url != blank %} href="{{ block.settings.url }}"{% endif %} {{ block.shopify_attributes }}>
   {%- render 'media', image: block.settings.image, asset: block.settings.image_asset, width: width, height: height, sizes: '(min-width: 1024px) 50vw, 100vw' -%}
   <span class="bento-tile__label">
     <strong>{{ block.settings.title }}</strong>
     <span>{{ block.settings.subtitle }} {% render 'icon', name: 'arrow-right' %}</span>
   </span>
-</a>
+</{{ tile_tag }}>

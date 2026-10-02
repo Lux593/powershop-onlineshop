@@ -68,7 +68,7 @@ h4, .h4 { font-size: var(--fs-h4); letter-spacing: 0.03em; }
 .textured { position: relative; isolation: isolate; }
 .textured::before {
   content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
-  background-image: var(--texture); opacity: 0.12; mix-blend-mode: screen;
+  background-image: var(--texture); opacity: 0.14; mix-blend-mode: screen;
 }
 
 /* Barrierefreiheit */

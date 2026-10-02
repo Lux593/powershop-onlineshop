@@ -6,6 +6,14 @@
     endif
   endfor
   assign events_rendered = false
+
+  comment
+    Der Standort-Block erscheint erst, wenn Händlerdaten gepflegt sind (im Theme-Editor immer).
+  endcomment
+  assign location_has_data = request.design_mode
+  if settings.address != blank or settings.phone != blank or settings.whatsapp != blank or settings.email != blank or settings.hours_enabled
+    assign location_has_data = true
+  endif
 -%}
 
 <div data-section-id="{{ section.id }}">
@@ -36,7 +44,9 @@
             <a class="chip" href="#events">Events</a>
           {%- endunless -%}
         {%- elsif block.settings.chip != blank -%}
-          <a class="chip" href="#{{ block.settings.anchor | default: block.id }}" {{ block.shopify_attributes }}>{{ block.settings.chip | escape }}</a>
+          {%- if block.type != 'location' or location_has_data -%}
+            <a class="chip" href="#{{ block.settings.anchor | default: block.id }}" {{ block.shopify_attributes }}>{{ block.settings.chip | escape }}</a>
+          {%- endif -%}
         {%- endif -%}
       {%- endfor -%}
     </div>
@@ -88,25 +98,7 @@
                 <div class="event-grid">
                   {%- for item in section.blocks -%}
                     {%- if item.type == 'event' -%}
-                      {%- liquid
-                        assign event_day = item.settings.date | date: '%-d'
-                        assign event_month_number = item.settings.date | date: '%-m' | plus: 0
-                        assign months = 'Jan,Feb,Mär,Apr,Mai,Jun,Jul,Aug,Sep,Okt,Nov,Dez' | split: ','
-                        assign month_index = event_month_number | minus: 1
-                        assign event_month = months[month_index]
-                      -%}
-                      <div class="event-card" {{ item.shopify_attributes }}>
-                        <div class="event-card__media">
-                          {%- render 'media', image: item.settings.image, asset: item.settings.image_asset, width: 800, height: 500, sizes: '(min-width: 640px) 33vw, 100vw' -%}
-                          {%- if item.settings.date != blank -%}
-                            <span class="date-badge"><strong>{{ event_day }}</strong><span>{{ event_month }}</span></span>
-                          {%- endif -%}
-                        </div>
-                        <div class="event-card__body">
-                          <h3>{{ item.settings.title | escape }}</h3>
-                          {%- if item.settings.place != blank -%}<p>{% render 'icon', name: 'map-pin' %}{{ item.settings.place | escape }}</p>{%- endif -%}
-                        </div>
-                      </div>
+                      {% render 'event-card', item: item %}
                     {%- endif -%}
                   {%- endfor -%}
                 </div>
@@ -120,20 +112,28 @@
             assign contact_anchor = anchor | append: '-kontakt'
             assign map_query = settings.address | newline_to_br | replace: '<br />', ', ' | strip_html | url_encode
           -%}
+          {%- if location_has_data -%}
           <section class="service-block" id="{{ anchor }}" aria-labelledby="sv-{{ block.id }}" {{ block.shopify_attributes }}>
             <div class="service-block__text">
               <h2 id="sv-{{ block.id }}">{{ block.settings.title | escape }}</h2>
-              <div class="map-ph">
-                {% render 'icon', name: 'map-pin', class: 'icon--lg' %}
-                <span>
-                  <a class="text-link" href="https://www.google.com/maps/search/?api=1&query={{ map_query }}" target="_blank" rel="noopener">Route in Google Maps öffnen<span class="sr-only"> (neues Fenster)</span></a>
-                </span>
-              </div>
-              <p><strong>{{ settings.company | escape }}</strong><br>{{ settings.address | escape | newline_to_br }}</p>
-              <p>{% render 'opening-hours', as: 'inline' %}</p>
+              {%- if settings.address != blank -%}
+                <div class="map-ph">
+                  {% render 'icon', name: 'map-pin', class: 'icon--lg' %}
+                  <span>
+                    <a class="text-link" href="https://www.google.com/maps/search/?api=1&query={{ map_query }}" target="_blank" rel="noopener">Route in Google Maps öffnen<span class="sr-only"> (neues Fenster)</span></a>
+                  </span>
+                </div>
+              {%- endif -%}
+              {%- if settings.company != blank or settings.address != blank -%}
+                <p><strong>{{ settings.company | default: shop.name | escape }}</strong>{% if settings.address != blank %}<br>{{ settings.address | escape | newline_to_br }}{% endif %}</p>
+              {%- endif -%}
+              {%- if settings.hours_enabled -%}
+                <p>{% render 'opening-hours', as: 'inline' %}</p>
+              {%- endif -%}
             </div>
             {% render 'contact-box', anchor: contact_anchor, title: block.settings.contact_title, topics: 'probefahrt,finanzierung,werkstatt,inzahlungnahme,frage', topic: 'frage' %}
           </section>
+          {%- endif -%}
 
       {%- endcase -%}
     {%- endfor -%}

@@ -55,9 +55,20 @@ pics_to_use/ Quellbilder für Kategorien und Team
 Telefon, WhatsApp, E-Mail, Öffnungszeiten, Versandschwelle und Reservierungsgebühr sind Theme-Einstellungen
 (`config/settings_schema.json`) und lassen sich im Shopify-Theme-Editor ändern – kein Eingriff im Code nötig.
 
+Firmenname, Adresse, Telefon, WhatsApp, E-Mail und Ansprechperson haben **keine Beispielwerte**. Ein leeres Feld bleibt im Shop
+unsichtbar: Die Kontaktbox zeigt nur Kanäle, die eingetragen sind, und erscheint ohne jeden Kanal gar nicht (im Theme-Editor steht dann
+ein Hinweis). Die Öffnungszeiten erscheinen erst, wenn **„Öffnungszeiten anzeigen“** eingeschaltet ist. Ohne Firmenname steht im Footer der Shop-Name.
+
+Versandschwelle, Rückgabefrist, Newsletter-Rabatt und Reservierungsgebühr haben noch **Beispielwerte** und erscheinen so im Shop
+(Ankündigungsleiste, Warenkorb, Newsletter, Bike-Seite). Vor dem Livegang prüfen und anpassen.
+
 ## Bilder austauschen
 
 Fotos unter **demselben Dateinamen** und im gleichen Seitenverhältnis nach `assets/` legen.
 Motiv und Format stehen in [`docs/bildliste.md`](docs/bildliste.md).
+
+Dateien, die noch Platzhalter sind, stehen in den Theme-Einstellungen unter **Platzhalterbilder**. Im Shop bleiben sie unsichtbar
+(im Theme-Editor sind sie zu sehen). **Nach dem Austausch den Dateinamen aus dieser Liste streichen**, sonst bleibt das neue Foto ausgeblendet.
+Ein im Theme-Editor gewähltes Bild hat immer Vorrang und braucht keinen Eintrag.
 
 Das H-D Bar & Shield liegt als `assets/hd-bar-shield.png` (Seitenverhältnis ca. 1446 × 1174).
