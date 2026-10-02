@@ -63,3 +63,25 @@ Hilfs-API (Aufräumen pro Section bei shopify:section:unload, beim Entfernen des
   PS.motion.track(el, cleanup)   Dasselbe für eigene Observer/Listener, auch ohne GSAP.
   PS.motion.refresh()            ScrollTrigger neu messen (nach Layoutänderungen).
 ```
+
+## Dateiaufteilung
+
+Seit M1b liegen die Regeln und Module aus `sections.css`/`sections.js` nach Bereich getrennt, damit Hero/Header, Startseite und Shop
+parallel an verschiedenen Dateien arbeiten. Inhalt und Reihenfolge der Regeln sind unverändert.
+
+| Datei | Inhalt | Bereich |
+|---|---|---|
+| `assets/header.css` | Announcement-Bar, Header, Megamenü, Mobile-Menü, Such-Dialog | Hero + Header (M2) |
+| `assets/hero.css`, `assets/hero.js` | Hero und Modell-Tabs (`hero.js` lädt nur auf index) | Hero + Header (M2) |
+| `assets/home.css`, `assets/home.js` | Service-Leiste, Produkt-Grids, Kategorie-Bento, Showroom, Story | Startseite + Footer (M4) |
+| `assets/footer.css` | Footer, Cookie-Banner | Startseite + Footer (M4) |
+| `assets/shop.css` | Kategorieseite (Banner, Film-Intro, Filter), Produktseite, Warenkorb und Drawer | Kategorie, PDP, Warenkorb, Suche (M5) |
+| `snippets/search-dialog.liquid` | Markup des Such-Dialogs, aus `sections/header.liquid` per `{% render %}` | Suche (M5), eingebunden im Header |
+| `assets/sections.css` | geteilte Reste: Events, Service-Seite, eine mehrseitige `min-width`-Regel | Rest, Aufräumen in M6 |
+| `assets/sections.js` | globale Section-Module: Showroom, Quick-Toggle der Produktkarte | Rest (Quick-Toggle: M5) |
+
+CSS-Ladereihenfolge (`layout/theme.liquid`, entspricht der Kaskade): tokens, base, components, sections, theme, motion, header, hero, home,
+footer, shop. Alle Dateien laden auf jeder Seite; die Bereichsdateien stehen hinter den Legacy-Dateien und können sie bei gleicher Spezifität
+überschreiben. Klassen, die mehrere Bereiche nutzen, liegen in der Datei ihres ursprünglichen Blocks (z. B. `.product-grid` in `home.css`,
+`.page-banner`, `.empty` und `.contact-box` in `shop.css`, `.payments` in `footer.css`, `.hide-mobile` in `header.css`): dort nur mit
+Blick auf die anderen Seiten ändern.

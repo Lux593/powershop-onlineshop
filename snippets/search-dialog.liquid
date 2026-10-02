@@ -1,0 +1,45 @@
+{% doc %}
+  Such-Dialog der Kopfzeile (<dialog id="search">, geöffnet über data-open="search"; Logik in search.js).
+  Der Bereich „Beliebte Suchen" besteht aus Chips, die aus dem Header-Setting „search_terms" kommen.
+
+  @param {string} [search_terms] - Suchbegriffe, ein Begriff pro Zeile (section.settings.search_terms der Header-Section)
+
+  @example
+  {% render 'search-dialog', search_terms: section.settings.search_terms %}
+{% enddoc -%}
+<dialog class="search-dialog" id="search" aria-label="Suche" data-lenis-prevent>
+  <div class="container">
+    <form class="search__bar" role="search" action="{{ routes.search_url }}" method="get">
+      {% render 'icon', name: 'search', class: 'icon--lg' %}
+      <input type="hidden" name="options[prefix]" value="last">
+      <label class="sr-only" for="search-input">Suche nach Produkt, Modell oder Teilenummer</label>
+      <input
+        class="search__input"
+        id="search-input"
+        name="q"
+        type="search"
+        autocomplete="off"
+        placeholder="Produkt, Modell oder Teilenummer …"
+        data-search-input
+      >
+      <button class="icon-btn" type="button" data-close aria-label="Suche schließen">{% render 'icon', name: 'x' %}</button>
+    </form>
+    <div class="search__results" id="search-results" aria-live="polite" data-search-results data-lenis-prevent>
+      {%- assign terms = search_terms | newline_to_br | split: '<br />' -%}
+      {%- if terms.size > 0 -%}
+        <div class="search__group" data-search-start>
+          <h2>Beliebte Suchen</h2>
+          <div class="chip-row">
+            {%- for term in terms -%}
+              {%- assign term_clean = term | strip | strip_newlines -%}
+              {%- if term_clean != blank -%}
+                <button class="chip" type="button" data-suggest="{{ term_clean | escape }}">{{ term_clean }}</button>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+          <p class="search__hint" style="margin-top:16px">Tipp: Du kannst direkt nach der Teilenummer suchen.</p>
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</dialog>

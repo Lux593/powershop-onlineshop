@@ -43,7 +43,7 @@ layout/     theme.liquid · password.liquid
 templates/  index · collection (+ .motorrad) · product (+ .motorrad, .teil) · page (+ .service) · cart · search · blog · article · 404
 sections/   24 Sections, u. a. hero · category-bento · service-tiles · showroom · story-events · header · footer
 snippets/   Karten, Preis, Galerie, Megamenü, Filter, Größentabelle …
-assets/     tokens.css (Design-Tokens) · base.css · components.css · sections.css · theme.css · JS-Module · Bilder · Schriften
+assets/     tokens.css (Design-Tokens) · base.css · components.css · sections.css (geteilte Reste) · theme.css · motion.css · Bereichs-CSS (header · hero · home · footer · shop) · JS-Module · Bilder · Schriften
 config/     settings_schema.json · settings_data.json
 locales/    de.default.json
 docs/       briefing.md · bildliste.md

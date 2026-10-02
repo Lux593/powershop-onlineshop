@@ -1,1 +1,43 @@
-/* Power Shop – Footer. Stub: wird in einem späteren Meilenstein befüllt. */
+/* ==========================================================================
+   Power Shop – Footer und Cookie-Banner.
+   Aus sections.css verschoben (M1b), Regeln unverändert. Bereich: Startseite und Footer.
+   ========================================================================== */
+
+/* ---------- Footer ---------- */
+.site-footer { border-top: 2px solid var(--c-orange); }
+.footer__news { display: grid; gap: 24px; padding-block: 48px; border-bottom: 1px solid var(--c-steel); }
+@media (min-width: 1024px) { .footer__news { grid-template-columns: 1fr 1fr; align-items: center; gap: 64px; } }
+.footer__news p { color: var(--c-muted-dark); margin-top: 8px; }
+.news-form { display: grid; gap: 10px; }
+.news-form__row { display: flex; gap: 8px; }
+.news-form__row .input { flex: 1; }
+.news-form small { color: var(--c-muted-dark); font-size: var(--fs-caption); }
+.news-form small a { text-decoration: underline; }
+.footer__cols { display: grid; gap: 32px; padding-block: 48px; grid-template-columns: 1fr 1fr; }
+@media (min-width: 1024px) { .footer__cols { grid-template-columns: repeat(var(--footer-cols, 4), 1fr) 1.3fr; } }
+@media (pointer: coarse) { .footer__cols a { min-height: 44px; } }
+.footer__cols h2 { font-size: 16px; letter-spacing: 0.12em; color: var(--c-white); margin-bottom: 14px; }
+.footer__cols ul { display: grid; gap: 2px; }
+.footer__cols a { display: inline-flex; align-items: center; min-height: 36px; font-size: var(--fs-small); color: var(--c-muted-dark); }
+.footer__cols a:hover { color: var(--c-white); text-decoration: underline; text-underline-offset: 3px; }
+.footer__dealer { grid-column: 1 / -1; display: flex; gap: 16px; align-items: center; padding: 20px; border: 1px solid var(--c-steel); background: var(--c-anthracite); align-self: start; }
+@media (min-width: 1024px) { .footer__dealer { grid-column: auto; flex-direction: column; align-items: flex-start; } }
+.footer__dealer img { height: 56px; width: auto; }
+.footer__dealer p { font-size: var(--fs-small); color: var(--c-muted-dark); }
+.footer__dealer strong { color: var(--c-white); display: block; font-family: var(--f-head); font-size: 18px; text-transform: uppercase; letter-spacing: 0.03em; }
+.footer__bottom { border-top: 1px solid var(--c-steel); padding-block: 20px; font-size: var(--fs-caption); color: var(--c-muted-dark); }
+.footer__bottom .container { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; }
+.payments { display: flex; flex-wrap: wrap; gap: 6px; }
+.payments li { padding: 5px 8px; border: 1px solid var(--c-steel); border-radius: var(--radius); font-size: 11px; font-weight: 600; letter-spacing: 0.04em; color: #d6d2cb; }
+.footer__bottom a { text-decoration: underline; }
+
+/* Cookie-Banner (gleichwertige Buttons) */
+.cookie {
+  position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 350; max-width: 560px;
+  padding: 24px; background: var(--c-black); color: var(--c-white); border: 1px solid var(--c-steel); box-shadow: var(--shadow-lg);
+  display: grid; gap: 14px;
+}
+.cookie p { font-size: var(--fs-small); color: #d6d2cb; }
+.cookie p a { text-decoration: underline; }
+.cookie__actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.cookie__more { justify-self: start; font-size: var(--fs-small); text-decoration: underline; min-height: 32px; }

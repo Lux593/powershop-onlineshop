@@ -1,1 +1,101 @@
-/* Power Shop – Startseiten-Sections. Stub: wird in einem späteren Meilenstein befüllt. */
+/* ==========================================================================
+   Power Shop – Startseiten-Sections: Service-Leiste, Produkt-Grids, Kategorie-Bento, Showroom, Story.
+   Aus sections.css verschoben (M1b), Regeln unverändert. Bereich: Startseite und Footer.
+   .product-grid wird auch von Kollektion und Suche genutzt (collection.liquid, search.liquid).
+   ========================================================================== */
+
+/* ---------- Service-Leiste ---------- */
+/* Eine Leiste statt vier Karten: Die Felder teilen sich eine Fläche, die Haarlinien sind der Zwischenraum */
+.service-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--c-line); border: 1px solid var(--c-line); }
+@media (min-width: 1024px) { .service-tiles { grid-template-columns: repeat(4, 1fr); } }
+.service-tile {
+  position: relative; display: grid; gap: 8px; align-content: start; padding: 24px 20px;
+  background: var(--c-white);
+}
+.service-tile::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--c-orange); transform: scaleX(0); transform-origin: left; transition: transform var(--t-med) var(--ease); }
+.service-tile:hover::after { transform: scaleX(1); }
+.service-tile > .icon { color: var(--c-orange); width: 32px; height: 32px; }
+.service-tile h3 { font-size: 22px; margin-top: 8px; }
+.service-tile p { font-size: var(--fs-small); color: var(--c-muted); }
+.service-tile .more { display: inline-flex; align-items: center; gap: 6px; font-size: var(--fs-small); font-weight: 600; margin-top: 4px; }
+.service-tile .more .icon { width: 16px; height: 16px; transition: transform var(--t-fast); }
+.service-tile:hover .more .icon { transform: translateX(4px); }
+
+/* ---------- Produkt-Grids ---------- */
+.product-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 16px; }
+@media (min-width: 640px) { .product-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px 20px; } }
+@media (min-width: 1024px) {
+  .product-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 48px 24px; }
+  .product-grid[data-cols="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .product-grid[data-cols="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+.product-grid--bikes { grid-template-columns: 1fr; gap: 24px; }
+@media (min-width: 640px) { .product-grid--bikes { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1024px) {
+  .product-grid--bikes, .product-grid--bikes[data-cols="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .product-grid--bikes[data-cols="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+/* Mobil als horizontale Schiene (1,5 Karten sichtbar) */
+@media (max-width: 1023px) {
+  .product-grid--rail { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 64%; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; margin-inline: calc(var(--gutter) * -1); padding-inline: var(--gutter); scroll-padding-inline: var(--gutter); }
+  .product-grid--rail::-webkit-scrollbar { display: none; }
+  .product-grid--rail > * { scroll-snap-align: start; }
+}
+@media (min-width: 640px) and (max-width: 1023px) { .product-grid--rail { grid-auto-columns: 40%; } }
+.center-cta { display: flex; justify-content: center; margin-top: var(--s-6); }
+
+/* ---------- Kategorie-Bento ---------- */
+.bento { display: grid; gap: 12px; grid-template-columns: 1fr 1fr; }
+.bento-tile { position: relative; display: block; overflow: hidden; background: var(--c-anthracite); aspect-ratio: 1; }
+.bento-tile--moto { grid-column: 1 / -1; aspect-ratio: 4 / 3; }
+.bento-tile img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 700ms var(--ease); }
+.bento-tile--product { background: #111; }
+.bento-tile--product.bento-tile--light { background: #fff; }
+.bento-tile--product img { object-fit: contain; }
+.bento-tile--light img { height: calc(100% - 78px); object-position: center top; }
+.bento-tile--teile img { object-fit: cover; object-position: center; }
+.bento-tile::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgb(10 10 10 / 0.88) 0%, rgb(10 10 10 / 0.55) 36%, transparent 64%); }
+.bento-tile__label { position: absolute; left: 20px; right: 20px; bottom: 18px; z-index: 1; display: grid; gap: 4px; }
+.bento-tile__label strong { font-family: var(--f-head); font-weight: 800; font-size: 26px; text-transform: uppercase; line-height: 1; letter-spacing: 0.01em; }
+/* Untertitel weiß (Kontrast auf Foto), der Pfeil trägt den orangen Akzent */
+.bento-tile__label span { display: inline-flex; align-items: center; gap: 6px; color: var(--c-offwhite); font-weight: 600; font-size: var(--fs-small); }
+.bento-tile__label span .icon { width: 16px; height: 16px; color: var(--c-orange); transition: transform var(--t-fast); }
+/* Helle Produktkachel: dunkle Schrift auf Weiß, kein Schleier */
+.bento-tile--light::after { display: none; }
+.bento-tile--light .bento-tile__label { color: var(--c-black); }
+.bento-tile--light .bento-tile__label span { color: var(--c-black); }
+.bento-tile:hover img { transform: scale(1.05); }
+.bento-tile:hover .bento-tile__label span .icon { transform: translateX(4px); }
+@media (min-width: 1024px) {
+  .bento { grid-template-columns: 7fr 5fr; gap: 16px; }
+  .bento__col { display: grid; gap: 16px; }
+  .bento__col--left { grid-template-rows: 440px 260px; }
+  .bento__col--right { grid-template-rows: 260px 440px; }
+  .bento__pair { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .bento-tile, .bento-tile--moto { aspect-ratio: auto; height: 100%; }
+  .bento-tile__label { left: 28px; bottom: 24px; }
+  .bento-tile__label strong { font-size: 32px; }
+  .bento-tile--moto .bento-tile__label strong, .bento-tile--teile .bento-tile__label strong { font-size: 40px; }
+  .bento-tile--light img { height: 100%; object-position: right center; }
+}
+@media (max-width: 1023px) { .bento__col, .bento__pair { display: contents; } }
+
+/* ---------- Showroom ---------- */
+.showroom .rail { grid-auto-columns: 86%; }
+@media (min-width: 640px) { .showroom .rail { grid-auto-columns: calc((100% - 24px) / 2); } }
+@media (min-width: 1024px) { .showroom .rail { grid-auto-columns: calc((100% - 48px) / 3); } }
+.showroom__tools { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; }
+
+/* ---------- Story & Events ---------- */
+/* Teil Story; die Event-Regeln stehen weiter in sections.css (geteilt mit Service-Seite und Blog) */
+.story { display: grid; gap: 32px; align-items: center; }
+@media (min-width: 1024px) { .story { grid-template-columns: 1fr 1fr; gap: 64px; } }
+.story__media { position: relative; aspect-ratio: 980 / 807; overflow: hidden; background: #000; }
+.story__media img { width: 100%; height: calc(100% - 16px); object-fit: contain; object-position: top center; }
+.story__media::after { content: ""; position: absolute; left: 0; bottom: 0; width: 96px; height: 6px; background: var(--c-orange); }
+.story__text { display: grid; gap: 20px; }
+.story__text p { color: #d6d2cb; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding-block: 8px; border-top: 1px solid var(--c-steel); border-bottom: 1px solid var(--c-steel); }
+.stats div { padding-block: 16px; }
+.stats strong { display: block; font-family: var(--f-head); font-weight: 800; font-size: 40px; line-height: 1; color: var(--c-white); }
+.stats span { font-size: var(--fs-small); color: var(--c-muted-dark); }

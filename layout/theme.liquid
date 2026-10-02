@@ -29,18 +29,18 @@
     {%- endunless -%}
 
     {% render 'fonts' %}
-    {%- comment -%} Stile: die Reihenfolge ist die Kaskade (Basis, Bereiche, Theme-Ergänzungen, Bewegung, Header/Footer). {%- endcomment -%}
+    {%- comment -%} Stile: die Reihenfolge ist die Kaskade (Basis, geteilte Reste, Theme-Ergänzungen, Bewegung, dann die Bereiche: Header, Hero, Startseite, Footer, Shop). {%- endcomment -%}
     {{ 'tokens.css' | asset_url | stylesheet_tag }}
     {{ 'base.css' | asset_url | stylesheet_tag }}
     {{ 'components.css' | asset_url | stylesheet_tag }}
     {{ 'sections.css' | asset_url | stylesheet_tag }}
-    {{ 'hero.css' | asset_url | stylesheet_tag }}
-    {{ 'home.css' | asset_url | stylesheet_tag }}
-    {{ 'shop.css' | asset_url | stylesheet_tag }}
     {{ 'theme.css' | asset_url | stylesheet_tag }}
     {{ 'motion.css' | asset_url | stylesheet_tag }}
     {{ 'header.css' | asset_url | stylesheet_tag }}
+    {{ 'hero.css' | asset_url | stylesheet_tag }}
+    {{ 'home.css' | asset_url | stylesheet_tag }}
     {{ 'footer.css' | asset_url | stylesheet_tag }}
+    {{ 'shop.css' | asset_url | stylesheet_tag }}
 
     {{ content_for_header }}
   </head>
@@ -90,9 +90,9 @@
       laden die Libs trotzdem (ca. 53 KB br), und auf Touch-Geräten lädt Lenis (ca. 5 KB br), ohne je gestartet zu
       werden. Sie per Head-Skript nachzuladen würde den Normalfall verlangsamen (kein Preload-Scan, keine feste
       defer-Reihenfolge vor motion.js), daher bewusst nicht gemacht.
-      hero.js/home.js laden nur auf index. Hero-/Home-Sections, die im Theme-Editor auf andere Templates gesetzt
-      werden, laufen dort ohne ihre Skripte (hero.css/home.css laden überall). Vor dem Verschieben von Logik aus
-      sections.js nach hero.js/home.js entscheiden: global laden oder dieses Risiko bewusst tragen.
+      hero.js/home.js laden nur auf index. Der Hero ist für die Startseite gedacht: wird er im Theme-Editor auf ein
+      anderes Template gesetzt, läuft dort der Bildwechsel per Tab nicht (hero.css/home.css laden überall).
+      Showroom und Quick-Toggle bleiben bewusst in sections.js und laufen auf allen Seiten.
     {%- endcomment -%}
     <script src="{{ 'theme.js' | asset_url }}" defer></script>
     {%- unless request.design_mode -%}
