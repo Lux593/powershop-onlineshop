@@ -6,6 +6,8 @@
     Die Spalte „Soziale Netze“ erscheint erst, wenn mindestens ein Profil hinterlegt ist.
     Eine Link-Spalte erscheint erst ab zwei Menüpunkten. Die angehängten Links (Größentabelle,
     Cookie-Einstellungen) einer ausgeblendeten Spalte wandern in die Fußzeile und bleiben erreichbar.
+    Auch der einzelne Menüpunkt einer ausgeblendeten Spalte (z. B. nur „Impressum“) steht dann in der Fußzeile:
+    Pflichtlinks (Impressum, Datenschutz, AGB, Widerruf) verschwinden so nie, egal wie das Menü gepflegt ist.
     Das Raster passt sich an die Zahl der sichtbaren Spalten an.
   endcomment
   assign has_social = false
@@ -42,7 +44,7 @@
 
 <footer class="site-footer on-dark textured">
   {%- if section.settings.show_newsletter -%}
-    <div class="container footer__news">
+    <div class="container footer__news" data-stagger="110">
       <div>
         <h2 class="h2">{{ news_heading }}</h2>
         <p>{{ section.settings.news_text }}</p>
@@ -127,6 +129,14 @@
       <p>
         © {{ 'now' | date: '%Y' }} {{ settings.company | default: shop.name }} · * Alle Preise inkl. MwSt.
         {%- if shop.shipping_policy.url != blank %}, zzgl. <a href="{{ shop.shipping_policy.url }}">Versandkosten</a>{% endif -%}
+        {%- unless request.design_mode -%}
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'links' -%}
+              {%- assign solo_links = linklists[block.settings.menu].links -%}
+              {%- if solo_links.size == 1 %} · <a href="{{ solo_links.first.url }}">{{ solo_links.first.title }}</a>{% endif -%}
+            {%- endif -%}
+          {%- endfor -%}
+        {%- endunless -%}
         {%- if footer_cookie_settings %} · <a href="#" data-cookie-settings>Cookie-Einstellungen</a>{% endif -%}
         {%- if footer_size_guide %} · <a href="#" data-open="sizeguide">Größentabelle</a>{% endif -%}
       </p>

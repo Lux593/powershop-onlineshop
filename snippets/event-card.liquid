@@ -5,9 +5,24 @@
   @param {object} item - Block vom Typ "event" (date, title, place, image, image_asset)
   @param {string} [url] - Link der Karte. Leer = reine Infokarte, kein toter Link auf „#“
   @param {string} [sizes] - sizes-Attribut für das Bild
+
+  Vergangene Events erscheinen nicht (Ausgabe leer), außer im Theme-Editor. Das Datum ist Freitext (JJJJ-MM-TT) und wird
+  als Zahl mit dem heutigen Tag verglichen. Der Eventtag selbst bleibt sichtbar. Lässt sich das Datum nicht lesen,
+  bleibt die Karte stehen. Wer wissen will, ob überhaupt eine Karte erscheint, rendert das Snippet in ein capture
+  und prüft das Ergebnis auf blank (so tun es story-events und service-page, damit Überschrift und Link entfallen).
+  Grenze: „heute“ gilt zum Renderzeitpunkt auf dem Shopify-Server (nicht im Browser des Besuchers). Fertige Seiten
+  werden gecacht, ein Event kann daher kurz nach Mitternacht noch erscheinen oder eine Weile früher fehlen.
 {% enddoc %}
 
 {%- liquid
+  assign show_event = true
+  unless request.design_mode
+    assign event_number = item.settings.date | date: '%Y%m%d' | plus: 0
+    assign today_number = 'now' | date: '%Y%m%d' | plus: 0
+    if event_number > 20000101 and event_number < today_number
+      assign show_event = false
+    endif
+  endunless
   assign event_day = item.settings.date | date: '%-d'
   assign event_month_number = item.settings.date | date: '%-m' | plus: 0
   assign months = 'Jan,Feb,Mär,Apr,Mai,Jun,Jul,Aug,Sep,Okt,Nov,Dez' | split: ','
@@ -33,6 +48,7 @@
     endif
   endif
 -%}
+{%- if show_event -%}
 <{{ event_tag }} class="event-card{% if no_image %} event-card--text{% endif %}"{% if url != blank %} href="{{ url }}"{% endif %} {{ item.shopify_attributes }}>
   {%- if no_image -%}
     {%- if item.settings.date != blank -%}
@@ -53,3 +69,4 @@
     {%- endif -%}
   </div>
 </{{ event_tag }}>
+{%- endif -%}
