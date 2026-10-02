@@ -79,5 +79,35 @@
         "default": "banner-accessoires.jpg\nbanner-damen.jpg\nbanner-herren.jpg\nbanner-motorraeder.jpg\nbanner-neuheiten.jpg\nbanner-sale.jpg\nbanner-teile.jpg\nevent-1.jpg\nevent-2.jpg\nevent-3.jpg\nmega-accessoires.jpg\nmega-damen.jpg\nmega-teile.jpg\nmessanleitung.jpg\nservice-finanzierung.jpg\nservice-inzahlungnahme.jpg\nservice-standort.jpg\nstory-werkstatt.jpg\nteam-verkauf.jpg"
       }
     ]
+  },
+  {
+    "name": "Animationen",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Bewegungen im Shop: Einblenden beim Scrollen, Parallax, Zahlen-Zählen und weiches Scrollen. Wer in seinem Betriebssystem „Bewegung reduzieren“ eingestellt hat, sieht den Shop immer ohne Bewegung."
+      },
+      {
+        "type": "checkbox",
+        "id": "motion_enabled",
+        "label": "Animationen aktivieren",
+        "default": true,
+        "info": "Notaus: Ausgeschaltet erscheinen alle Inhalte sofort und ohne Bewegung. Im Theme-Editor sind Animationen immer aus."
+      },
+      {
+        "type": "checkbox",
+        "id": "motion_smooth_scroll",
+        "label": "Weiches Scrollen",
+        "default": true,
+        "info": "Das Mausrad scrollt gleitend. Wirkt nur am Computer, nur auf Startseite, Kollektions- und Produktseiten und nur mit aktivierten Animationen. Auf Smartphone und Tablet sowie auf allen anderen Seiten bleibt das normale Scrollen."
+      },
+      {
+        "type": "checkbox",
+        "id": "header_overlay_home",
+        "label": "Header auf der Startseite über dem Hero",
+        "default": true,
+        "info": "Schaltet den transparenten Header über dem Hero der Startseite ein. Wirkt erst mit dem überarbeiteten Header, bis dahin ohne sichtbare Änderung."
+      }
+    ]
   }
 ]

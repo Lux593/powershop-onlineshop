@@ -9,14 +9,14 @@
   assign pct = pct | at_most: 100
 -%}
 
-<dialog class="drawer" id="cart-drawer" aria-labelledby="cart-title" data-cart-drawer>
+<dialog class="drawer" id="cart-drawer" aria-labelledby="cart-title" data-cart-drawer data-lenis-prevent>
   <div class="drawer__head">
     <h2 class="h4" id="cart-title">Warenkorb ({{ cart.item_count }})</h2>
     <button class="icon-btn" type="button" data-close aria-label="Warenkorb schließen">{% render 'icon', name: 'x' %}</button>
   </div>
 
   {%- if cart.item_count == 0 -%}
-    <div class="drawer__body">
+    <div class="drawer__body" data-lenis-prevent>
       <div class="drawer__empty">
         {% render 'icon', name: 'shopping-bag' %}
         <p>Dein Warenkorb ist noch leer.</p>
@@ -24,7 +24,7 @@
       </div>
     </div>
   {%- else -%}
-    <div class="drawer__body">
+    <div class="drawer__body" data-lenis-prevent>
       {%- if threshold > 0 -%}
         <div class="progress">
           <span>

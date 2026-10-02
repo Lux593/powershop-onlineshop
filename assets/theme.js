@@ -9,7 +9,7 @@
      PS.on('[data-foo]', function (el) { ... }) läuft für jedes passende Element
      beim Laden, nach jedem Section-Reload im Theme-Editor und für nachgeladenes HTML
      (PS.scan(root)). Jedes Element wird pro Modul nur einmal gestartet.
-     Hier hängen später auch Motion- und Parallax-Module ein. */
+     Bewegung (Reveals, Parallax, Smooth-Scroll) hängt sich aus motion.js ein. */
   var modules = [];
   PS.on = function (selector, init) {
     var mod = { selector: selector, init: init, done: new WeakSet() };
@@ -40,6 +40,12 @@
     return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   };
 
+  // Bewegung: No-op-Stub, motion.js ersetzt ihn (Vertrag dort). Fehlt es, bleiben Aufrufe harmlos.
+  function noop() {}
+  PS.motion = PS.motion || { enabled: false, scroll: false, add: noop, track: noop, refresh: noop };
+  // Lenis lädt nach theme.js und darf den Dialog nie blockieren
+  function lenis(act) { try { PS.lenis && PS.lenis[act](); } catch (e) { /* Dialog geht vor */ } }
+
   /* ---------------- Toast ---------------- */
   PS.toast = function (msg, icon) {
     var wrap = document.querySelector('[data-toast-wrap]');
@@ -62,6 +68,7 @@
     lastTrigger = trigger || document.activeElement;
     if (!d.open) d.showModal();
     document.body.classList.add('is-locked');
+    lenis('stop');
     d.dispatchEvent(new CustomEvent('ps:open'));
   };
   PS.closeDialog = function (id) {
@@ -100,8 +107,12 @@
   // „close“ blubbert nicht – daher Capture auf document (gilt auch für später eingefügte Dialoge)
   document.addEventListener('close', function (e) {
     if (e.target.tagName !== 'DIALOG') return;
-    if (!document.querySelector('dialog[open]')) document.body.classList.remove('is-locked');
-    if (lastTrigger && document.contains(lastTrigger) && lastTrigger.focus) lastTrigger.focus();
+    if (!document.querySelector('dialog[open]')) {
+      document.body.classList.remove('is-locked');
+      lenis('start');
+    }
+    // preventScroll: sonst scrollt focus() die Seite wegen scroll-padding-top nach oben, wenn der Auslöser im sticky Header liegt
+    if (lastTrigger && document.contains(lastTrigger) && lastTrigger.focus) lastTrigger.focus({ preventScroll: true });
   }, true);
 
   /* ---------------- Tabs (ARIA) ---------------- */
@@ -125,9 +136,16 @@
   });
   document.addEventListener('keydown', function (e) {
     var tab = e.target.closest && e.target.closest('[role="tab"]');
-    if (!tab || (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft')) return;
+    var keys = ['ArrowRight', 'ArrowLeft', 'Home', 'End'];
+    if (!tab || keys.indexOf(e.key) < 0 || e.altKey || e.ctrlKey || e.metaKey) return;
     var tabs = Array.prototype.slice.call(tab.closest('[role="tablist"]').querySelectorAll('[role="tab"]'));
-    var next = tabs[(tabs.indexOf(tab) + (e.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length];
+    var next;
+    if (e.key === 'Home' || e.key === 'End') {
+      e.preventDefault(); // sonst scrollt die Seite nach oben/unten
+      next = tabs[e.key === 'Home' ? 0 : tabs.length - 1];
+    } else {
+      next = tabs[(tabs.indexOf(tab) + (e.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length];
+    }
     next.focus();
     PS.selectTab(next);
   });

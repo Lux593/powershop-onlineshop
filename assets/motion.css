@@ -1,0 +1,111 @@
+/* ==========================================================================
+   Power Shop – Bewegung: Reveals, Wort-Splitter, Marquee, Lenis. Verhalten und Attribute: assets/motion.js.
+   Start- und Bewegungszustände gelten NUR unter html.has-motion. Die Klasse setzt der Head-Skript in
+   theme.liquid nicht bei prefers-reduced-motion, saveData, Theme-Editor oder ausgeschaltetem Setting;
+   ohne JS gibt es sie nie. Dann bleibt alles sichtbar und statisch.
+   Eingeblendet wird per Animation (nicht per Transition): nach dem Ende gilt wieder der normale Stil des
+   Elements, eigene Hover-Transitions und clip-path:none bleiben unberührt.
+   ========================================================================== */
+
+/* ---------- Lenis ---------- */
+/* html{scroll-behavior:smooth} (base.css) würde gegen Lenis arbeiten. Bewusst KEIN overflow:clip für
+   .lenis-stopped aus lenis.css: es bricht body{overflow-x:hidden} und alle sticky-Elemente. Die Sperre
+   bleibt body.is-locked. */
+html.lenis { scroll-behavior: auto; }
+/* contain nur in Dialogen: dort darf das Scrollen nie an die Seite dahinter kippen. In Seiten-Containern
+   (Kompatibilitätstabelle, Filter-Dropdown) soll es am Ende normal an die Seite weitergehen. */
+.lenis dialog[data-lenis-prevent],
+.lenis dialog [data-lenis-prevent] { overscroll-behavior: contain; }
+
+/* Zielelement eines Anker-Sprungs (Fokus nur für die Tab-Reihenfolge, kein Bedienelement) */
+[data-ps-anchor]:focus { outline: none; }
+
+/* ---------- Reveals ---------- */
+.has-motion {
+  --rv-d: 32px;   /* Weg von up / left */
+  --rv-clip: 8%;  /* Anfangsbeschnitt von clip */
+}
+/* Schienen scrollen horizontal: ein Versatz würde dort Scroll-/Clipping-Bereiche erzeugen, daher nur opacity */
+.rail, .product-grid--rail { --rv-d: 0px; --rv-clip: 0%; }
+
+@keyframes ps-up { from { opacity: 0; translate: 0 var(--rv-d); } }
+@keyframes ps-left { from { opacity: 0; translate: calc(var(--rv-d) * -1) 0; } }
+@keyframes ps-fade { from { opacity: 0; } }
+/* Endzustand ist clip-path:none (aus dem Basisstil), nie inset(0): sonst schneidet es Fokusringe ab */
+@keyframes ps-clip { from { opacity: 0; clip-path: inset(var(--rv-clip)); } to { opacity: 1; clip-path: inset(0); } }
+
+/* Startzustand, bis das Element im Bild ist (JS setzt .is-in) */
+.has-motion [data-reveal]:not(.is-in),
+.has-motion [data-stagger]:not(.is-in) > * { opacity: 0; }
+.has-motion [data-reveal=""]:not(.is-in),
+.has-motion [data-reveal="up"]:not(.is-in),
+.has-motion [data-stagger]:not(.is-in) > :not([data-reveal]) { translate: 0 var(--rv-d); }
+.has-motion [data-reveal="left"]:not(.is-in) { translate: calc(var(--rv-d) * -1) 0; }
+.has-motion [data-reveal="clip"]:not(.is-in) { clip-path: inset(var(--rv-clip)); }
+
+/* Einblenden: --rd = data-reveal-delay, --i = Position im Stagger (max. 7), --step = Schrittweite */
+.has-motion [data-reveal].is-in,
+.has-motion [data-stagger].is-in > * {
+  animation: ps-up var(--t-slow) var(--ease-out) backwards;
+  animation-delay: calc(var(--rd, 0ms) + var(--i, 0) * var(--step, 70ms));
+}
+.has-motion [data-reveal="left"].is-in { animation-name: ps-left; }
+.has-motion [data-reveal="fade"].is-in { animation-name: ps-fade; }
+.has-motion [data-reveal="clip"].is-in { animation-name: ps-clip; }
+
+/* ---------- Wort-Splitter ---------- */
+/* Bis zum Split (nach document.fonts.ready) unsichtbar, sonst springt der Text beim Umbau */
+.has-motion [data-split]:not(.is-split) { opacity: 0; }
+/* Die .sr-only-Kopie liest nur der Screenreader: Markieren/Kopieren liefert sonst den Text doppelt */
+[data-split] > .sr-only { -webkit-user-select: none; user-select: none; }
+/* Maske pro Wort. Padding/Margin geben Umlaut-Punkten und Unterlängen Luft, ohne den Zeilenfall zu ändern */
+.ps-w { display: inline-block; vertical-align: top; overflow: hidden; padding: var(--split-pad, 0.14em) 0.06em; margin: calc(var(--split-pad, 0.14em) * -1) -0.06em; }
+.ps-wi { display: inline-block; }
+@keyframes ps-word { from { translate: 0 110%; } }
+.has-motion [data-split]:not(.is-in) .ps-wi { translate: 0 110%; }
+.has-motion [data-split].is-in .ps-wi {
+  animation: ps-word 900ms var(--ease-out) backwards;
+  animation-delay: calc(var(--rd, 0ms) + var(--i, 0) * 45ms);
+}
+
+/* ---------- Count-up ---------- */
+[data-countup] { font-variant-numeric: tabular-nums; }
+
+/* ---------- Marquee ---------- */
+/* Spur = Element mit data-marquee, JS hängt einen Klon an; -50% = ein Satz Inhalt. Ohne has-motion: kein Klon.
+   Läuft nur mit Pause-Button [data-marquee-toggle] (WCAG 2.2.2): JS nimmt den im Markup oder ergänzt .marquee-toggle
+   und setzt .is-running. Der Button ist nur sinnvoll, solange die Spur läuft. */
+html:not(.has-motion) [data-marquee] > [data-clone],
+html:not(.has-motion) [data-marquee-toggle] { display: none; }
+[data-marquee-toggle] { min-width: 44px; min-height: 44px; }
+/* Ergänzter Button: Symbol aus CSS (Name steht im aria-label), Farbe und Rahmen folgen der Fläche */
+.marquee-toggle {
+  display: flex; align-items: center; justify-content: center; width: 44px; margin: 0 var(--gutter) 0 auto; padding: 0;
+  color: inherit; background: transparent; border: 1px solid currentColor; border-radius: var(--radius); cursor: pointer;
+}
+.marquee-toggle::before { content: ""; width: 12px; height: 14px; border-inline: 4px solid currentColor; }
+.marquee-toggle[aria-pressed="true"]::before { width: 0; height: 0; border-style: solid; border-width: 7px 0 7px 12px; border-color: transparent transparent transparent currentColor; }
+@keyframes ps-marquee { to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: no-preference) {
+  .has-motion [data-marquee].is-running {
+    width: max-content;
+    animation: ps-marquee var(--marquee-dur, 40s) linear infinite;
+  }
+}
+.has-motion [data-marquee].is-paused,
+.has-motion [data-marquee].is-off,
+.has-motion [data-marquee].is-running:hover,
+.has-motion [data-marquee].is-running:focus-within { animation-play-state: paused; }
+
+/* ---------- Reduced-Motion und Druck ---------- */
+/* Falls zur Laufzeit umgeschaltet wird, bevor motion.js abgebaut hat */
+@media (prefers-reduced-motion: reduce) {
+  [data-motion], [data-parallax] { transition: none !important; animation: none !important; transform: none !important; translate: none !important; }
+}
+@media print {
+  .has-motion [data-reveal], .has-motion [data-stagger] > *, .has-motion [data-split] { opacity: 1 !important; translate: none !important; clip-path: none !important; animation: none !important; }
+  .ps-wi { translate: none !important; animation: none !important; }
+  /* Marquee: Satz einmal drucken, ohne Klon und ohne Verschiebung */
+  [data-marquee] > [data-clone], [data-marquee-toggle] { display: none !important; }
+  .has-motion [data-marquee] { animation: none !important; transform: none !important; width: auto !important; }
+}

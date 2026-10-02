@@ -11,11 +11,8 @@
 /* Section-Wrapper von Shopify dürfen das Layout nicht beeinflussen */
 .shopify-section { display: block; }
 
-/* Bewegungs-Haken: Sections dürfen später über data-motion animiert werden.
-   Ohne Bewegungswunsch (prefers-reduced-motion) bleibt alles statisch. */
-@media (prefers-reduced-motion: reduce) {
-  [data-motion], [data-parallax] { transition: none !important; animation: none !important; transform: none !important; }
-}
+/* Bewegung (Reveals, Parallax, Smooth-Scroll): motion.css + motion.js. Unter prefers-reduced-motion
+   wird html.has-motion gar nicht erst gesetzt, die Start- und Bewegungszustände greifen dann nicht. */
 
 /* Filterleiste: das Formular darf das Flex-Layout der Leiste nicht brechen */
 .filterbar__form { display: contents; }
@@ -56,4 +53,4 @@
 .cart-page__lines { display: grid; gap: 0; }
 .cart-page__lines .line-item { padding-block: 20px; border-bottom: 1px solid var(--c-line); }
 .cart-page__summary { display: grid; gap: 16px; padding: 24px; background: var(--c-white); border: 1px solid var(--c-line); }
-@media (min-width: 1024px) { .cart-page__summary { position: sticky; top: calc(var(--header-h) + 24px); } }
+@media (min-width: 1024px) { .cart-page__summary { position: sticky; top: calc(var(--header-offset) + 24px); } }

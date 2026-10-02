@@ -40,6 +40,9 @@
   --fs-body: 16px;
   --fs-small: 14px;
   --fs-caption: 12px;
+  /* Hero- und Statement-Headlines. Dort hyphens:auto und overflow-wrap:anywhere setzen (lang=de), sonst läuft
+     „Geschwindigkeitsbegrenzung“ bei 320/390 px aus dem Bild (WCAG 1.4.10). */
+  --fs-display: clamp(64px, 11vw, 200px);
 
   /* Abstände (8er-System) */
   --s-1: 8px;
@@ -49,6 +52,7 @@
   --s-6: 48px;
   --s-8: 64px;
   --s-12: 96px;
+  --section-y: var(--s-8); /* vertikaler Rhythmus der Sektionen, ab 1024 px --s-12 */
 
   /* Layout */
   --container: 1320px;
@@ -56,12 +60,18 @@
   --radius: 2px;
   --header-h: 64px;
   --announce-h: 36px;
+  /* Sticky-Offsets und Anker-Abstand hängen an --header-offset. --header-shown: 1 = Header sichtbar,
+     0 = per Skript weggeschoben (Hide-on-scroll). Mit 1 ist --header-offset genau --header-h. */
+  --header-shown: 1;
+  --header-offset: calc(var(--header-h) * var(--header-shown));
 
   /* Effekte */
   --shadow-lg: 0 24px 64px rgba(0, 0, 0, 0.28);
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --t-fast: 160ms;
   --t-med: 320ms;
+  --t-slow: 700ms;
 
   /* Raue Akzente: Körnung als Overlay für dunkle Sektionen.
      Der Alphakanal lässt nur die hellen Spitzen des Rauschens stehen (Schwelle 0,6). So liest sie sich
@@ -77,5 +87,6 @@
     --fs-h4: 20px;
     --gutter: 24px;
     --header-h: 76px;
+    --section-y: var(--s-12);
   }
 }

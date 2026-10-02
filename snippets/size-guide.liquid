@@ -4,13 +4,13 @@
   Die Werte sind Platzhalter aus dem Mockup und später durch das Metaobjekt „Größentabelle“ zu ersetzen.
 {% enddoc %}
 
-<dialog class="modal" id="sizeguide" aria-labelledby="sg-title">
+<dialog class="modal" id="sizeguide" aria-labelledby="sg-title" data-lenis-prevent>
   <div class="modal__inner">
     <div class="modal__head">
       <h2 class="h3" id="sg-title">Größentabelle</h2>
       <button class="icon-btn" type="button" data-close aria-label="Größentabelle schließen">{% render 'icon', name: 'x' %}</button>
     </div>
-    <div class="modal__body">
+    <div class="modal__body" data-lenis-prevent>
       <div class="tabs tabs--left" role="tablist" aria-label="Produktart">
         <button class="tab" role="tab" type="button" id="sgt-oberteile" aria-controls="sgp-oberteile" aria-selected="true">Oberteile &amp; Jacken</button>
         <button class="tab" role="tab" type="button" id="sgt-hosen" aria-controls="sgp-hosen" aria-selected="false" tabindex="-1">Hosen &amp; Jeans</button>

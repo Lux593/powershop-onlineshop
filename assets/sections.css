@@ -484,7 +484,7 @@
 .pdp { display: grid; gap: 32px; padding-block: 24px 64px; }
 @media (min-width: 1024px) { .pdp { grid-template-columns: 7fr 5fr; gap: 56px; align-items: start; } }
 .pdp__info { display: grid; gap: 20px; }
-@media (min-width: 1024px) { .pdp__info { position: sticky; top: calc(var(--header-h) + 24px); } }
+@media (min-width: 1024px) { .pdp__info { position: sticky; top: calc(var(--header-offset) + 24px); } }
 .pdp__crumbs { padding-top: 20px; }
 .pdp__title { font-size: 34px; }
 @media (min-width: 1024px) { .pdp__title { font-size: 40px; } }
@@ -623,7 +623,7 @@ body.has-sticky-contact { padding-bottom: 72px; }
 .upsell__item img { width: 56px; aspect-ratio: 4/5; object-fit: cover; background: var(--c-stone); }
 
 /* ---------- Service-Seite ---------- */
-.service-nav { position: sticky; top: var(--header-h); z-index: 20; background: var(--c-offwhite); border-bottom: 1px solid var(--c-line); }
+.service-nav { position: sticky; top: var(--header-offset); z-index: 20; background: var(--c-offwhite); border-bottom: 1px solid var(--c-line); }
 .service-nav .chip-row { flex-wrap: nowrap; overflow-x: auto; padding-block: 12px; scrollbar-width: none; }
 .service-block { display: grid; gap: 32px; padding-block: var(--s-8); border-bottom: 1px solid var(--c-line); }
 @media (min-width: 1024px) { .service-block { grid-template-columns: 7fr 5fr; gap: 56px; align-items: start; } }

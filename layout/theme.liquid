@@ -5,17 +5,47 @@
     <meta name="theme-color" content="#0a0a0a">
     <link rel="icon" href="{{ 'power-shop-signet.svg' | asset_url }}" type="image/svg+xml">
 
+    {%- comment -%}
+      Bewegung: has-motion nur mit Setting, ohne prefers-reduced-motion/saveData und nicht im Theme-Editor
+      (Shopify.designMode gibt es im Head noch nicht, daher request.design_mode). Failsafe: meldet motion.js
+      nicht binnen 3,5 s PS.motionReady, fällt die Seite auf statisch zurück. Details: assets/motion.js.
+    {%- endcomment -%}
+    {%- unless request.design_mode -%}
+      {%- if settings.motion_enabled -%}
+        <script>
+          (function (d) {
+            var c = navigator.connection;
+            if (matchMedia('(prefers-reduced-motion: reduce)').matches || (c && c.saveData)) return;
+            d.classList.add('has-motion');
+            {%- if settings.motion_smooth_scroll %}
+            d.classList.add('has-smooth');
+            {%- endif %}
+            setTimeout(function () {
+              if (!(window.PS && PS.motionReady)) d.classList.remove('has-motion', 'has-smooth');
+            }, 3500);
+          })(document.documentElement);
+        </script>
+      {%- endif -%}
+    {%- endunless -%}
+
     {% render 'fonts' %}
+    {%- comment -%} Stile: die Reihenfolge ist die Kaskade (Basis, Bereiche, Theme-Ergänzungen, Bewegung, Header/Footer). {%- endcomment -%}
     {{ 'tokens.css' | asset_url | stylesheet_tag }}
     {{ 'base.css' | asset_url | stylesheet_tag }}
     {{ 'components.css' | asset_url | stylesheet_tag }}
     {{ 'sections.css' | asset_url | stylesheet_tag }}
+    {{ 'hero.css' | asset_url | stylesheet_tag }}
+    {{ 'home.css' | asset_url | stylesheet_tag }}
+    {{ 'shop.css' | asset_url | stylesheet_tag }}
     {{ 'theme.css' | asset_url | stylesheet_tag }}
+    {{ 'motion.css' | asset_url | stylesheet_tag }}
+    {{ 'header.css' | asset_url | stylesheet_tag }}
+    {{ 'footer.css' | asset_url | stylesheet_tag }}
 
     {{ content_for_header }}
   </head>
 
-  <body data-template="{{ template.name }}">
+  <body data-template="{{ template.name }}"{% if template.name == 'index' and settings.header_overlay_home %} data-header-overlay{% endif %}>
     <a class="skip-link" href="#main">Zum Inhalt springen</a>
 
     {% sections 'header-group' %}
@@ -52,7 +82,31 @@
         ]{% else %}null{% endif %}
       };
     </script>
+    {%- comment -%}
+      Skripte: Reihenfolge ist Ausführungsreihenfolge. motion.js steht vor header.js (PS.on startet sofort).
+      GSAP und ScrollTrigger laden nur mit Setting „Animationen aktivieren“, nicht im Theme-Editor und nur auf
+      index/collection/product, Lenis zusätzlich nur mit „Weiches Scrollen“. Ohne sie läuft motion.js im Fallback.
+      Restkosten (clientseitig erkennbar, serverseitig nicht): Nutzer mit prefers-reduced-motion oder saveData
+      laden die Libs trotzdem (ca. 53 KB br), und auf Touch-Geräten lädt Lenis (ca. 5 KB br), ohne je gestartet zu
+      werden. Sie per Head-Skript nachzuladen würde den Normalfall verlangsamen (kein Preload-Scan, keine feste
+      defer-Reihenfolge vor motion.js), daher bewusst nicht gemacht.
+      hero.js/home.js laden nur auf index. Hero-/Home-Sections, die im Theme-Editor auf andere Templates gesetzt
+      werden, laufen dort ohne ihre Skripte (hero.css/home.css laden überall). Vor dem Verschieben von Logik aus
+      sections.js nach hero.js/home.js entscheiden: global laden oder dieses Risiko bewusst tragen.
+    {%- endcomment -%}
     <script src="{{ 'theme.js' | asset_url }}" defer></script>
+    {%- unless request.design_mode -%}
+      {%- if settings.motion_enabled -%}
+        {%- if template.name == 'index' or template.name == 'collection' or template.name == 'product' -%}
+          <script src="{{ 'gsap.min.js' | asset_url }}" defer></script>
+          <script src="{{ 'ScrollTrigger.min.js' | asset_url }}" defer></script>
+          {%- if settings.motion_smooth_scroll -%}
+            <script src="{{ 'lenis.min.js' | asset_url }}" defer></script>
+          {%- endif -%}
+        {%- endif -%}
+      {%- endif -%}
+    {%- endunless -%}
+    <script src="{{ 'motion.js' | asset_url }}" defer onerror="document.documentElement.classList.remove('has-motion', 'has-smooth')"></script>
     <script src="{{ 'header.js' | asset_url }}" defer></script>
     <script src="{{ 'cart.js' | asset_url }}" defer></script>
     <script src="{{ 'search.js' | asset_url }}" defer></script>
@@ -63,6 +117,10 @@
     {%- endif -%}
     {%- if template.name == 'product' -%}
       <script src="{{ 'product.js' | asset_url }}" defer></script>
+    {%- endif -%}
+    {%- if template.name == 'index' -%}
+      <script src="{{ 'hero.js' | asset_url }}" defer></script>
+      <script src="{{ 'home.js' | asset_url }}" defer></script>
     {%- endif -%}
   </body>
 </html>

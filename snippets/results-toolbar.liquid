@@ -57,7 +57,7 @@
               <span class="dot" data-dot{% if filter_count == 0 %} hidden{% endif %}>{{ filter_count }}</span>
               {% render 'icon', name: 'chevron-down' %}
             </button>
-            <div class="fdrop__panel" id="fp-{{ forloop.index }}" hidden>
+            <div class="fdrop__panel" id="fp-{{ forloop.index }}" hidden data-lenis-prevent>
               {% render 'filter-controls', filter: filter, id_prefix: 'd' %}
               <noscript><button class="btn btn--primary btn--sm" type="submit">Anwenden</button></noscript>
             </div>
@@ -102,14 +102,14 @@
 </div>
 
 {%- if visible_filters > 0 -%}
-  <dialog class="modal filter-sheet" id="filter-sheet" aria-labelledby="fs-title">
+  <dialog class="modal filter-sheet" id="filter-sheet" aria-labelledby="fs-title" data-lenis-prevent>
     <form class="modal__inner" action="{{ action }}" method="get" data-filter-form>
       {%- if terms != blank -%}<input type="hidden" name="q" value="{{ terms | escape }}">{%- endif -%}
       <div class="modal__head">
         <h2 class="h3" id="fs-title">Filter</h2>
         <button class="icon-btn" type="button" data-close aria-label="Filter schließen">{% render 'icon', name: 'x' %}</button>
       </div>
-      <div class="modal__body">
+      <div class="modal__body" data-lenis-prevent>
         {%- for filter in results.filters -%}
           {%- if filter.type == 'price_range' or filter.values.size > 0 -%}
             <details class="acc" data-fdrop="{{ filter.param_name }}"{% if filter.active_values.size > 0 %} open{% endif %}>

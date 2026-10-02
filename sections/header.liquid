@@ -77,12 +77,12 @@
   </div>
 </header>
 
-<dialog class="drawer drawer--left mobile-menu" id="mobile-menu" aria-label="Menü">
+<dialog class="drawer drawer--left mobile-menu" id="mobile-menu" aria-label="Menü" data-lenis-prevent>
   <div class="drawer__head">
     <span class="wordmark">Power<span>Shop</span></span>
     <button class="icon-btn" type="button" data-close aria-label="Menü schließen">{% render 'icon', name: 'x' %}</button>
   </div>
-  <div class="drawer__body" style="padding:0">
+  <div class="drawer__body" style="padding:0" data-lenis-prevent>
     {%- for link in menu.links -%}
       {%- if link.links.size > 0 -%}
         <details class="acc">
@@ -121,7 +121,7 @@
   </div>
 </dialog>
 
-<dialog class="search-dialog" id="search" aria-label="Suche">
+<dialog class="search-dialog" id="search" aria-label="Suche" data-lenis-prevent>
   <div class="container">
     <form class="search__bar" role="search" action="{{ routes.search_url }}" method="get">
       {% render 'icon', name: 'search', class: 'icon--lg' %}
@@ -138,7 +138,7 @@
       >
       <button class="icon-btn" type="button" data-close aria-label="Suche schließen">{% render 'icon', name: 'x' %}</button>
     </form>
-    <div class="search__results" id="search-results" aria-live="polite" data-search-results>
+    <div class="search__results" id="search-results" aria-live="polite" data-search-results data-lenis-prevent>
       {%- assign terms = section.settings.search_terms | newline_to_br | split: '<br />' -%}
       {%- if terms.size > 0 -%}
         <div class="search__group" data-search-start>
