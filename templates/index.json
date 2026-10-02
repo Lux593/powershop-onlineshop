@@ -14,10 +14,7 @@
             "cta_label": "Road Glide ansehen",
             "url": "/collections/motorraeder",
             "secondary_label": "Probefahrt anfragen",
-            "secondary_url": "/pages/service#probefahrt",
-            "meta_color": "Violett",
-            "meta_year": "2026",
-            "meta_line": "Touring"
+            "secondary_url": "/pages/service#probefahrt"
           }
         },
         "street": {
@@ -31,10 +28,7 @@
             "cta_label": "Street Glide ansehen",
             "url": "/collections/motorraeder",
             "secondary_label": "Probefahrt anfragen",
-            "secondary_url": "/pages/service#probefahrt",
-            "meta_color": "Schwarz",
-            "meta_year": "2026",
-            "meta_line": "Touring"
+            "secondary_url": "/pages/service#probefahrt"
           }
         },
         "cvo": {
@@ -48,10 +42,7 @@
             "cta_label": "CVO Road Glide ST ansehen",
             "url": "/collections/motorraeder",
             "secondary_label": "Probefahrt anfragen",
-            "secondary_url": "/pages/service#probefahrt",
-            "meta_color": "Grau",
-            "meta_year": "2026",
-            "meta_line": "CVO"
+            "secondary_url": "/pages/service#probefahrt"
           }
         }
       },
