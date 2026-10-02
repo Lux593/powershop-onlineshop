@@ -29,11 +29,13 @@
     </div>
 
     {%- if bikes.size > 0 -%}
-      <div class="rail" id="{{ rail_id }}" aria-live="polite">
+      <div class="rail" id="{{ rail_id }}" aria-live="polite" data-stagger="80">
         {%- for bike in bikes limit: 12 -%}
           {% render 'bike-card', product: bike, sizes: '(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 86vw' %}
         {%- endfor -%}
       </div>
+      {%- comment -%} Fortschritt der Schiene (assets/home.js setzt --rail-progress); nur Orientierung, daher aria-hidden. {%- endcomment -%}
+      <div class="rail-progress" aria-hidden="true" hidden><span></span></div>
     {%- elsif request.design_mode -%}
       <div class="empty">
         <p class="muted">Wähle eine Kollektion mit Motorrädern.</p>

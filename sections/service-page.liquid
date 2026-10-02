@@ -1,10 +1,20 @@
 {%- liquid
-  assign event_count = 0
-  for block in section.blocks
-    if block.type == 'event'
-      assign event_count = event_count | plus: 1
-    endif
-  endfor
+  comment
+    Vergangene Events filtert das Snippet event-card. Chip und Abschnitt „Events“ erscheinen nur,
+    wenn danach mindestens eine Karte übrig bleibt (im Theme-Editor immer alle).
+  endcomment
+  capture event_cards
+    for block in section.blocks
+      if block.type == 'event'
+        render 'event-card', item: block
+      endif
+    endfor
+  endcapture
+  assign event_cards_text = event_cards | strip
+  assign has_events = false
+  if event_cards_text != blank
+    assign has_events = true
+  endif
   assign events_rendered = false
 
   comment
@@ -41,7 +51,7 @@
         {%- if block.type == 'event' -%}
           {%- unless events_rendered -%}
             {%- assign events_rendered = true -%}
-            <a class="chip" href="#events">Events</a>
+            {%- if has_events -%}<a class="chip" href="#events">Events</a>{%- endif -%}
           {%- endunless -%}
         {%- elsif block.settings.chip != blank -%}
           {%- if block.type != 'location' or location_has_data -%}
@@ -89,21 +99,19 @@
         {%- when 'event' -%}
           {%- unless events_rendered -%}
             {%- assign events_rendered = true -%}
-            <section class="service-block service-block--single" id="events" aria-labelledby="sv-events-{{ section.id }}">
-              <div class="service-block__text">
-                <h2 id="sv-events-{{ section.id }}">Community erleben</h2>
-                <p>Gemeinsame Ausfahrten, Bike Nights und Werkstatt-Tage – komm vorbei, auch ohne eigenes Bike.</p>
-              </div>
-              <div class="on-dark service-events">
-                <div class="event-grid">
-                  {%- for item in section.blocks -%}
-                    {%- if item.type == 'event' -%}
-                      {% render 'event-card', item: item %}
-                    {%- endif -%}
-                  {%- endfor -%}
+            {%- if has_events -%}
+              <section class="service-block service-block--single" id="events" aria-labelledby="sv-events-{{ section.id }}">
+                <div class="service-block__text">
+                  <h2 id="sv-events-{{ section.id }}">Community erleben</h2>
+                  <p>Gemeinsame Ausfahrten, Bike Nights und Werkstatt-Tage – komm vorbei, auch ohne eigenes Bike.</p>
                 </div>
-              </div>
-            </section>
+                <div class="on-dark service-events">
+                  <div class="event-grid">
+                    {{ event_cards }}
+                  </div>
+                </div>
+              </section>
+            {%- endif -%}
           {%- endunless -%}
 
         {%- when 'location' -%}

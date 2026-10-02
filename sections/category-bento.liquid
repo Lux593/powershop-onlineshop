@@ -13,14 +13,14 @@
     <div class="bento">
       <div class="bento__col bento__col--left">
         {%- if moto -%}
-          {%- render 'bento-tile', block: moto, modifier: 'bento-tile--moto', width: 1400, height: 1000 -%}
+          {%- render 'bento-tile', block: moto, modifier: 'bento-tile--moto', width: 1400, height: 1000, parallax: true -%}
         {%- endif -%}
         <div class="bento__pair">
           {%- if pair_a -%}
-            {%- render 'bento-tile', block: pair_a, modifier: '', width: 736, height: 738 -%}
+            {%- render 'bento-tile', block: pair_a, modifier: '', width: 736, height: 738, parallax: true -%}
           {%- endif -%}
           {%- if pair_b -%}
-            {%- render 'bento-tile', block: pair_b, modifier: '', width: 960, height: 867 -%}
+            {%- render 'bento-tile', block: pair_b, modifier: '', width: 960, height: 867, parallax: true -%}
           {%- endif -%}
         </div>
       </div>
@@ -29,7 +29,7 @@
           {%- render 'bento-tile', block: light, modifier: 'bento-tile--product bento-tile--light', width: 960, height: 867 -%}
         {%- endif -%}
         {%- if teile -%}
-          {%- render 'bento-tile', block: teile, modifier: 'bento-tile--teile', width: 1400, height: 787 -%}
+          {%- render 'bento-tile', block: teile, modifier: 'bento-tile--teile', width: 1400, height: 787, parallax: true -%}
         {%- endif -%}
       </div>
     </div>

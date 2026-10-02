@@ -1,9 +1,17 @@
+{%- capture story_image -%}
+  {%- render 'media', image: section.settings.image, asset: section.settings.image_asset, width: 980, height: 807, alt: section.settings.image_alt, sizes: '(min-width: 1024px) 50vw, 100vw' -%}
+{%- endcapture -%}
+{%- assign story_image_text = story_image | strip -%}
+
 <section class="section on-dark textured" aria-labelledby="story-title-{{ section.id }}" data-section-id="{{ section.id }}">
   <div class="container">
-    <div class="story">
-      <div class="story__media">
-        {%- render 'media', image: section.settings.image, asset: section.settings.image_asset, width: 980, height: 807, alt: section.settings.image_alt, sizes: '(min-width: 1024px) 50vw, 100vw' -%}
-      </div>
+    <div class="story{% if story_image_text == blank %} story--text{% endif %}">
+      {%- comment -%} Ohne Bild (Platzhalter ausgeblendet) entfällt die Bildfläche statt als schwarzer Block zu stehen. {%- endcomment -%}
+      {%- if story_image_text != blank -%}
+        <div class="story__media" data-parallax="0.08">
+          {{ story_image_text }}
+        </div>
+      {%- endif -%}
       <div class="story__text">
         <h2 id="story-title-{{ section.id }}">{{ section.settings.heading }}</h2>
         {{ section.settings.text }}
@@ -13,7 +21,9 @@
           <div class="stats">
             {%- for block in section.blocks -%}
               {%- if block.type == 'stat' -%}
-                <div {{ block.shopify_attributes }}><strong>{{ block.settings.value }}</strong><span>{{ block.settings.label }}</span></div>
+                {%- comment -%} Nur Zahlen ab 10 zählen hoch (eine „1“ von 0 an zählen zu lassen wäre Spielerei). {%- endcomment -%}
+                {%- assign stat_number = block.settings.value | replace: '.', '' | replace: ',', '.' | replace: '+', '' | plus: 0 -%}
+                <div {{ block.shopify_attributes }}><strong{% if stat_number > 9 %} data-countup{% endif %}>{{ block.settings.value }}</strong><span>{{ block.settings.label }}</span></div>
               {%- endif -%}
             {%- endfor -%}
           </div>
@@ -24,9 +34,17 @@
       </div>
     </div>
 
-    {%- assign has_events = false -%}
-    {%- for block in section.blocks -%}{%- if block.type == 'event' %}{% assign has_events = true %}{% endif -%}{%- endfor -%}
-    {%- if has_events -%}
+    {%- comment -%} Vergangene Events filtert das Snippet event-card. Überschrift und Link erscheinen nur, wenn danach eine Karte übrig bleibt. {%- endcomment -%}
+    {%- capture event_cards -%}
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'event' -%}
+          {%- assign event_url = block.settings.url | default: section.settings.events_url -%}
+          {% render 'event-card', item: block, url: event_url %}
+        {%- endif -%}
+      {%- endfor -%}
+    {%- endcapture -%}
+    {%- assign event_cards_text = event_cards | strip -%}
+    {%- if event_cards_text != blank -%}
       <div class="events">
         <div class="section-head">
           <h2 class="h3">{{ section.settings.events_heading }}</h2>
@@ -34,13 +52,8 @@
             <a class="btn btn--text" href="{{ section.settings.events_url }}">Alle Events {% render 'icon', name: 'arrow-right' %}</a>
           {%- endif -%}
         </div>
-        <div class="event-grid">
-          {%- for block in section.blocks -%}
-            {%- if block.type == 'event' -%}
-              {%- assign event_url = block.settings.url | default: section.settings.events_url -%}
-              {% render 'event-card', item: block, url: event_url %}
-            {%- endif -%}
-          {%- endfor -%}
+        <div class="event-grid" data-stagger="90">
+          {{ event_cards }}
         </div>
       </div>
     {%- endif -%}

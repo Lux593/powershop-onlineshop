@@ -6,12 +6,15 @@
   @param {string} modifier - Zusätzliche Klassen, z. B. "bento-tile--moto"
   @param {number} width - Breite der Standarddatei
   @param {number} height - Höhe der Standarddatei
+  @param {boolean} [parallax] - Bild driftet beim Scrollen (nur Fotokacheln, nicht die Freisteller)
 {% enddoc %}
 
 {%- assign tile_tag = 'div' -%}
 {%- if block.settings.url != blank -%}{%- assign tile_tag = 'a' -%}{%- endif -%}
-<{{ tile_tag }} class="bento-tile{% if modifier != blank %} {{ modifier }}{% endif %}"{% if block.settings.url != blank %} href="{{ block.settings.url }}"{% endif %} {{ block.shopify_attributes }}>
-  {%- render 'media', image: block.settings.image, asset: block.settings.image_asset, width: width, height: height, sizes: '(min-width: 1024px) 50vw, 100vw' -%}
+<{{ tile_tag }} class="bento-tile{% if modifier != blank %} {{ modifier }}{% endif %}" data-reveal="clip"{% if block.settings.url != blank %} href="{{ block.settings.url }}"{% endif %} {{ block.shopify_attributes }}>
+  <span class="bento-tile__media"{% if parallax %} data-parallax="0.12"{% endif %}>
+    {%- render 'media', image: block.settings.image, asset: block.settings.image_asset, width: width, height: height, sizes: '(min-width: 1024px) 50vw, 100vw' -%}
+  </span>
   <span class="bento-tile__label">
     <strong>{{ block.settings.title }}</strong>
     <span>{{ block.settings.subtitle }} {% render 'icon', name: 'arrow-right' %}</span>

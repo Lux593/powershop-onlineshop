@@ -1,0 +1,33 @@
+{%- comment -%}
+  Markenaussage. Mit Bewegung leuchten die Wörter beim Scrollen nacheinander auf (assets/home.js, data-split aus
+  assets/motion.js). Ohne Bewegung steht der ganze Satz in voller Helligkeit da. Kein Link, kein Button.
+{%- endcomment -%}
+{%- if section.settings.text != blank -%}
+  <section class="section statement on-dark textured" data-statement data-section-id="{{ section.id }}">
+    <div class="container">
+      <p class="statement__text" data-split="words">{{ section.settings.text | escape }}</p>
+    </div>
+  </section>
+{%- elsif request.design_mode -%}
+  <section class="section statement on-dark textured">
+    <div class="container"><p class="muted">Statement: Trage eine kurze Markenaussage ein.</p></div>
+  </section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Statement",
+  "settings": [
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Aussage",
+      "info": "Ein bis zwei Sätze. Die Wörter leuchten beim Scrollen nacheinander auf.",
+      "default": "Von der Probefahrt bis zum Umbau: Motorrad, Ausrüstung und Werkstatt aus einer Hand."
+    }
+  ],
+  "presets": [
+    { "name": "Statement" }
+  ]
+}
+{% endschema %}
