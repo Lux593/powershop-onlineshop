@@ -41,16 +41,26 @@
         <p class="muted">Wähle eine Kollektion mit Motorrädern.</p>
       </div>
     {%- else -%}
-      {%- comment -%} Ohne Fahrzeuge bleibt der Abschnitt eine Einladung mit einer Handlung statt einer leeren Fläche. {%- endcomment -%}
-      {%- assign service_url = pages['service'].url | default: routes.root_url -%}
+      {%- comment -%}
+        Ohne Fahrzeuge bleibt der Abschnitt eine Einladung mit einer Handlung statt einer leeren Fläche. Die Handlung gibt es
+        nur, wenn ihr Ziel existiert: die Seite „service“ (Anker #probefahrt) oder die E-Mail-Adresse aus den Theme-Einstellungen.
+        Ohne beides würde der Link auf einen toten Anker der Startseite zeigen.
+      {%- endcomment -%}
+      {%- assign service_url = pages['service'].url -%}
       <div class="showroom__empty">
         <p class="lead">Aktuelle Fahrzeuge zeigen wir dir gern im Showroom.</p>
-        <div class="chip-row" style="margin-top:var(--s-2)">
-          <a class="btn btn--primary" href="{{ service_url }}#probefahrt">Probefahrt anfragen</a>
-          {%- if settings.phone != blank -%}
-            <a class="btn btn--outline-dark" href="tel:{{ settings.phone | remove: ' ' | remove: '-' | remove: '(' | remove: ')' | remove: '/' }}">{% render 'icon', name: 'phone' %}Anrufen</a>
-          {%- endif -%}
-        </div>
+        {%- if service_url != blank or settings.email != blank or settings.phone != blank -%}
+          <div class="chip-row" style="margin-top:var(--s-2)">
+            {%- if service_url != blank -%}
+              <a class="btn btn--primary" href="{{ service_url }}#probefahrt">Probefahrt anfragen</a>
+            {%- elsif settings.email != blank -%}
+              <a class="btn btn--primary" href="mailto:{{ settings.email }}?subject={{ 'Probefahrt anfragen' | url_encode }}">Probefahrt anfragen</a>
+            {%- endif -%}
+            {%- if settings.phone != blank -%}
+              <a class="btn {% if service_url != blank or settings.email != blank %}btn--outline-dark{% else %}btn--primary{% endif %}" href="tel:{{ settings.phone | remove: ' ' | remove: '-' | remove: '(' | remove: ')' | remove: '/' }}">{% render 'icon', name: 'phone' %}Anrufen</a>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
       </div>
     {%- endif -%}
   </div>

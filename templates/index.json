@@ -145,7 +145,7 @@
       "block_order": ["years", "bikes", "shop", "event_1", "event_2", "event_3"],
       "settings": {
         "image_asset": "powershop-team.png",
-        "image_alt": "Das Team vom Power Shop",
+        "image_alt": "Das Team vom Power Shop, acht Porträtfotos mit Name und Funktion: Gerhard Link, Ingrid Link, Richard Link, Falk Link, Franziska Link, Jürgen Scheurer, Aaron Klosterhuber und Jean-Nicolas Kibler",
         "heading": "Mehr als ein Shop",
         "text": "<p>Bei uns trifft Showroom auf Werkstatt und Community. Wir beraten dich ehrlich, schrauben mit Leidenschaft und fahren selbst – vom ersten Führerschein-Traum bis zum kompletten Custom-Umbau.</p>",
         "button_label": "Über uns",

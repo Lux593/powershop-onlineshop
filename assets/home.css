@@ -205,8 +205,15 @@ html:not(.has-motion) .marquee__item { white-space: normal; overflow-wrap: anywh
 
 /* ---------- Story & Events ---------- */
 /* Teil Story; die Event-Regeln stehen weiter in sections.css (geteilt mit Service-Seite und Blog) */
-/* Reflow (200 % Zoom = 640 px): drei Spalten dürfen schrumpfen, lange Titel brechen um (überschreibt sections.css, M6 räumt auf) */
-@media (min-width: 640px) { .event-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+/* Event-Raster: eine Spalte, drei erst ab 900 px (überschreibt sections.css:10, M6 räumt auf). Bei drei Spalten ab 640 px
+   blieben den Textspalten nur 110 bis 197 px, der Titel brach in bis zu sechs Zeilen. Spalten dürfen schrumpfen (Reflow
+   bei 200 % Zoom), lange Titel brechen um. */
+.event-grid { grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 900px) { .event-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+/* Zwischen 640 und 899 px liegt eine Karte mit Bild als Zeile (Bild links): als Einzelspalte wäre jedes Bild über 400 px hoch */
+@media (min-width: 640px) and (max-width: 899px) {
+  .event-card:not(.event-card--text) { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); align-items: center; }
+}
 .event-card__body :is(h2, h3) { overflow-wrap: anywhere; hyphens: auto; }
 .story { display: grid; gap: 32px; align-items: center; }
 @media (min-width: 1024px) { .story { grid-template-columns: 1fr 1fr; gap: 64px; } .story--text { grid-template-columns: minmax(0, 1fr); max-width: 760px; } }

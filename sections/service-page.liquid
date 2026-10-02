@@ -102,8 +102,8 @@
             {%- if has_events -%}
               <section class="service-block service-block--single" id="events" aria-labelledby="sv-events-{{ section.id }}">
                 <div class="service-block__text">
-                  <h2 id="sv-events-{{ section.id }}">Community erleben</h2>
-                  <p>Gemeinsame Ausfahrten, Bike Nights und Werkstatt-Tage – komm vorbei, auch ohne eigenes Bike.</p>
+                  <h2 id="sv-events-{{ section.id }}">{{ section.settings.events_heading | default: 'Community erleben' | escape }}</h2>
+                  {%- if section.settings.events_text != blank -%}<p>{{ section.settings.events_text | escape }}</p>{%- endif -%}
                 </div>
                 <div class="on-dark service-events">
                   <div class="event-grid">
@@ -154,7 +154,10 @@
   "settings": [
     { "type": "text", "id": "heading", "label": "Überschrift", "default": "Service" },
     { "type": "text", "id": "intro", "label": "Einleitung", "default": "Probefahrt, Finanzierung, Werkstatt und Inzahlungnahme – schreib uns per WhatsApp, E-Mail oder ruf einfach an." },
-    { "type": "image_picker", "id": "banner_image", "label": "Bannerbild" }
+    { "type": "image_picker", "id": "banner_image", "label": "Bannerbild" },
+    { "type": "header", "content": "Abschnitt Events" },
+    { "type": "text", "id": "events_heading", "label": "Überschrift", "default": "Community erleben" },
+    { "type": "text", "id": "events_text", "label": "Text", "default": "Gemeinsame Ausfahrten, Bike Nights und Werkstatt-Tage – komm vorbei, auch ohne eigenes Bike." }
   ],
   "blocks": [
     {

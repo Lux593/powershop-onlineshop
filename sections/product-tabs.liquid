@@ -11,7 +11,7 @@
 {%- if has_products or request.design_mode -%}
 <section class="section product-tabs" aria-labelledby="news-title-{{ section.id }}" style="padding-top:var(--s-4)" data-section-id="{{ section.id }}">
   <div class="container">
-    <div class="section-head section-head--center">
+    <div class="section-head">
       <h2 id="news-title-{{ section.id }}">{{ section.settings.heading }}</h2>
       {%- if section.settings.subheading != blank -%}
         <p class="muted">{{ section.settings.subheading }}</p>
@@ -20,7 +20,7 @@
 
     {%- if section.blocks.size > 0 -%}
       {%- if section.blocks.size > 1 -%}
-        <div class="tabs tabs--slide" role="tablist" aria-label="{{ section.settings.heading | escape }} nach Bereich">
+        <div class="tabs tabs--left tabs--slide" role="tablist" aria-label="{{ section.settings.heading | escape }} nach Bereich">
           {%- for block in section.blocks -%}
             <button
               class="tab"
