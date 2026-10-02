@@ -107,9 +107,10 @@ Dateien, die noch Platzhalter sind, stehen in den Theme-Einstellungen unter **Pl
 Ein im Theme-Editor gewähltes Bild hat immer Vorrang und braucht keinen Eintrag.
 
 Das H-D Bar & Shield liegt als `assets/hd-bar-shield.png`: 190 × 154 px mit transparentem Hintergrund, rund das 2,75-Fache der größten
-Darstellung (Footer, ca. 69 × 56 px), damit es auch auf Smartphones mit 3-fachem Display scharf bleibt. Ein Ersatz aus dem Händlerportal
-am besten als PNG mit Transparenz im Seitenverhältnis 1024 : 830 (ca. 1,234) auf etwa diese Größe skalieren: Header und Footer messen die Breite
-aus dem Seitenverhältnis der Datei, ein anderes Verhältnis verschiebt dort die Navigation um Bruchteile eines Pixels. Größere Dateien kosten nur Ladezeit.
+Darstellung (Footer, ca. 69 × 56 px). Das ist scharf für 2-fache Displays und auf 3-fachen (bräuchten ca. 207 px) minimal weich.
+Ein Ersatz aus dem Händlerportal am besten als PNG mit Transparenz im Seitenverhältnis 1024 : 830 (ca. 1,234) auf etwa diese Größe skalieren:
+Header und Footer messen die Breite aus dem Seitenverhältnis der Datei, ein anderes Verhältnis verschiebt dort die Navigation um Bruchteile
+eines Pixels. Größere Dateien kosten nur Ladezeit.
 
-Der Loop im Hero ist KI-generiert. Herkunft, Dateien und die vor dem Livegang zu klärenden Rechtsfragen stehen in
-[`docs/hero-clip.md`](docs/hero-clip.md). Er lässt sich unter denselben Dateinamen ersetzen.
+Der Hero-Clip (`assets/hero-loop*` und `assets/hero-poster.webp`) ist KI-generiert. Herkunft, Dateien und die vor dem Livegang zu klärenden
+Rechtsfragen stehen in [`docs/hero-clip.md`](docs/hero-clip.md). Er lässt sich unter denselben Dateinamen ersetzen.
