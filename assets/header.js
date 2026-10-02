@@ -1,7 +1,6 @@
 /* ==========================================================================
    Header: Megamenü (Maus, Tastatur, Touch), Überlagerung über dem Hero, Ausblenden beim Scrollen.
-   Alle Listener außerhalb des Headers hängen an einem AbortController: ein Section-Reload im Theme-Editor
-   (PS.on startet für den neuen Header erneut) räumt die alten ab.
+   Listener an document und window hängen an einem AbortController: ein Section-Reload im Theme-Editor räumt die alten ab.
    ========================================================================== */
 (function () {
   var PS = window.PS;
@@ -57,11 +56,9 @@
     }, sig);
 
     /* ---------------- Überlagerung (Startseite) und Ausblenden beim Scrollen ----------------
-       is-over: oben transparent mit Verlauf (nur Startseite mit Hero), nach 40 px solid schwarz plus Blur.
-       is-away: Header weggeschoben, ab 400 px Tiefe beim Runterscrollen. --header-shown (1/0) steuert die Sticky-Offsets
-       (--header-offset in tokens.css). Nie bei offenem Menü oder Dialog, nie bei Fokus im Header (WCAG 2.4.11), und
-       nicht während ein Tab-Sprung oder ein Anker scrollt: sonst verdeckt der einfahrende Header das Ziel.
-       Ausblenden ist Bewegung: nur unter html.has-motion, sonst bleibt der Header stehen. */
+       is-over: oben transparent (Startseite mit Hero), ab 40 px solid. is-away: ab 400 px Tiefe beim Runterscrollen
+       weggeschoben, --header-shown (1/0) lenkt die Sticky-Offsets. Nie bei Menü, Dialog oder Fokus im Header (WCAG 2.4.11),
+       nicht während Tab-Sprung oder Anker scrollen (der einfahrende Header verdeckte das Ziel). Nur mit html.has-motion. */
     var wrap = header.closest('.site-header-wrap') || header;
     var over = document.body.hasAttribute('data-header-overlay') && !!document.querySelector('[data-hero]');
     var shown = true, lastY = window.scrollY, quiet = 0, queued = false;
@@ -94,13 +91,13 @@
     header.addEventListener('focusin', function () { show(true); });
     header.addEventListener('focusout', queue);
     document.addEventListener('keydown', function (e) { if (e.key === 'Tab') quiet = Date.now() + 700; }, sig);
-    // Anker: der Header bleibt, wie er ist (scroll-padding-top passt dazu), bis das Scrollen vorbei ist
+    // Anker: Header bleibt, wie er ist (scroll-padding-top passt dazu)
     document.addEventListener('click', function (e) {
       var a = e.target.closest && e.target.closest('a[href*="#"]');
       if (a && a.hash.length > 1) quiet = Date.now() + 1600;
     }, sig);
     window.addEventListener('pageshow', queue, sig);
-    // Header-Section entfernt (Theme-Editor): Listener abbauen
+    // Header im Editor entfernt
     document.addEventListener('shopify:section:unload', function (e) { if (e.target.contains(header)) ctrl.abort(); }, sig);
     update();
   });
