@@ -97,7 +97,20 @@
       var a = e.target.closest && e.target.closest('a[href*="#"]');
       if (a && a.hash.length > 1) quiet = Date.now() + 1600;
     }, sig);
-    window.addEventListener('pageshow', queue, sig);
+    // Direktaufruf mit Anker und Neuladen/Zurück mit wiederhergestellter Position: der Browser springt selbst, das ist kein Runterscrollen
+    var nav = window.performance && performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
+    if (location.hash.length > 1 || (nav && (nav.type === 'reload' || nav.type === 'back_forward'))) {
+      quiet = Date.now() + 1600;
+      window.addEventListener('load', function () { quiet = Math.max(quiet, Date.now() + 1000); }, { once: true, signal: ctrl.signal });
+    }
+    // Zurück aus dem bfcache: ein per Hover geöffnetes Megamenü bliebe sonst über dem Hero offen
+    window.addEventListener('pageshow', function (e) {
+      if (e.persisted) items.forEach(function (li) { setOpen(li, false); });
+      queue();
+    }, sig);
+    // Reduced-Motion zur Laufzeit: motion.js entfernt has-motion, ein weggeschobener Header kommt zurück
+    var rm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)');
+    if (rm && rm.addEventListener) rm.addEventListener('change', queue, sig);
     // Header im Editor entfernt
     document.addEventListener('shopify:section:unload', function (e) { if (e.target.contains(header)) ctrl.abort(); }, sig);
     update();

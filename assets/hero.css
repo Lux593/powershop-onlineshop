@@ -42,6 +42,11 @@
   width: 100%; height: 100%; max-width: none;
   object-fit: cover; object-position: 42% 45%;
 }
+/* Mobil (Hochformat) zeigt das Bild nur zu etwa einem Viertel der Breite: der Ausschnitt des Films liegt weiter links, damit beide Helme
+   über die ganze Loop-Länge im Bild bleiben (am Ausschnitt per Einzelbild-Zuschnitt geprüft). Gilt für Poster und Film des ersten Slides. */
+@media (max-width: 767px) {
+  .hero__slide--video .hero__img, .hero__slide--video .hero__video { object-position: 34% 45%; }
+}
 /* Film über dem Poster: der erste Film-Frame ist das Poster, die Überblendung fällt nicht auf */
 .hero__video { opacity: 0; transition: opacity 700ms var(--ease); }
 .hero.is-video .hero__video { opacity: 1; }
@@ -55,7 +60,7 @@
   --g-left: linear-gradient(90deg, rgb(10 10 10 / var(--ov)) 0%, rgb(10 10 10 / calc(var(--ov) * 0.5)) 36%, transparent 68%);
 }
 @media (max-width: 767px), (max-height: 540px) {
-  .hero { --g-bottom: linear-gradient(0deg, rgb(10 10 10 / calc(var(--ov) * 1.6)) 0%, rgb(10 10 10 / calc(var(--ov) * 1.3)) 50%, rgb(10 10 10 / var(--ov)) 68%, rgb(10 10 10 / calc(var(--ov) * 0.84)) 100%); }
+  .hero { --g-bottom: linear-gradient(0deg, rgb(10 10 10 / calc(var(--ov) * 1.6)) 0%, rgb(10 10 10 / calc(var(--ov) * 1.4)) 50%, rgb(10 10 10 / calc(var(--ov) * 1.12)) 68%, rgb(10 10 10 / calc(var(--ov) * 0.9)) 100%); }
 }
 .hero__veil { position: absolute; z-index: 3; inset: 0; background: var(--g-bottom); }
 @media (min-width: 768px) {
@@ -170,6 +175,29 @@
   .hero__fact dd { font-size: 28px; }
 }
 
+/* Kompakt: Telefone und niedrige Fenster (Querformat, Zoom). Dort füllt der Text die ganze Höhe und verdeckt den Film. Engere Abstände
+   und etwas kleinere Zeilen schaffen Bildfläche, ohne Inhalt wegzulassen. Chips und Buttons bleiben mindestens 44 px hoch. */
+@media (max-width: 767px), (max-height: 540px) {
+  .hero__caption-inner { padding-block: calc(var(--header-h) + 16px) 96px; }
+  .hero__content { gap: 18px; }
+  .hero__chip { min-height: 44px; }
+  .hero__panel { gap: 8px; }
+  .hero__sub { gap: 12px; }
+  .hero__blurb { font-size: 18px; }
+  .hero__offer { row-gap: 10px; }
+  .hero__price { font-size: 36px; }
+  .hero__actions { gap: 8px 10px; }
+  .hero__actions .btn { min-height: 48px; padding: 8px 20px; font-size: 17px; }
+  .hero__fact { margin-right: 14px; padding-right: 14px; }
+  .hero__fact dd { font-size: 19px; }
+}
+/* Sehr schmal (320 bis 359 px): Tabs und der längste Modellname bleiben einzeilig (Tab-Schrift nie unter 18,66 px: darunter gilt der strengere Kontrast) */
+@media (max-width: 359px) {
+  .hero__chips { column-gap: 14px; }
+  .hero__chip { font-size: 19px; }
+  .hero__poster { font-size: min(56px, 20svh); }
+}
+
 /* ---------- Pause-Taste und Scroll-Pfeil ---------- */
 .hero__pause {
   position: absolute; z-index: 6;
@@ -206,4 +234,10 @@
 @keyframes hero-scroll {
   0% { transform: translateY(-100%); }
   65%, 100% { transform: translateY(100%); }
+}
+/* hero.js blendet den Pfeil beim Scrollen per Inline-Opacity aus: mit Tastaturfokus bleibt er sichtbar (WCAG 2.4.7). !important: schlägt das Inline-Style. */
+.hero__scroll:focus-visible { opacity: 1 !important; }
+@media (max-width: 767px), (max-height: 540px) {
+  .hero__scroll { bottom: 12px; }
+  .hero__scroll-line { height: 24px; }
 }

@@ -19,12 +19,13 @@
     var rotate = motion && chips.length > 1; // endet mit dem ersten Tab-Klick
     var paused = !motion || !!slow;          // ohne Bewegung startet die Seite pausiert
     var seen = true, awake = false, cur = 0, auto = false, t0 = performance.now();
+    var began = !paused; // Fortschrittslinie läuft erst, wenn die Seite wirklich spielt: sonst steht sie bei 0 und der aktive Tab hat keinen Marker
 
     function going() { return !paused && seen && awake && !document.hidden; }
 
     function apply() {
       hero.classList.toggle('is-held', !going());
-      hero.classList.toggle('is-rotating', rotate);
+      hero.classList.toggle('is-rotating', rotate && began);
       if (btn) {
         btn.hidden = !video && !motion; // Ken-Burns und Scroll-Linie laufen auch ohne Film (2.2.2)
         btn.setAttribute('aria-pressed', paused);
@@ -43,7 +44,7 @@
       }
       var p = video.play();
       // iOS Low-Power und Autoplay-Sperren lehnen ab. AbortError (pause() dazwischen) ist normal.
-      if (p && p.catch) p.catch(function (e) { if (e.name === 'NotAllowedError') { paused = true; apply(); } });
+      if (p && p.catch) p.catch(function (e) { if (e.name === 'NotAllowedError') { paused = true; began = false; apply(); } });
     }
     if (video) {
       video.muted = true;
@@ -90,7 +91,7 @@
     }
     if (btn) btn.addEventListener('click', function () {
       paused = !paused;
-      if (!paused) awake = true;
+      if (!paused) { awake = true; began = true; }
       apply();
     });
     // Theme-Editor: gewählten Slide zeigen
@@ -115,19 +116,25 @@
     document.addEventListener('shopify:section:unload', function (e) { if (e.target.contains(hero)) off(); }, { signal: ac.signal });
     PS.motion.track(hero, off);
 
-    /* ---------------- Scrub (nur mit ScrollTrigger): Film-Scale, Abdunkeln, Text 0.15 Parallax ---------------- */
+    /* ---------------- Scrub (nur mit ScrollTrigger): Film-Scale, Abdunkeln, Text 0.15 Parallax ----------------
+       Nur die Textebene wandert, höchstens 40 px und nur in großen Fenstern: Pause-Taste und Weiter-Link bleiben stehen
+       (ein Fokus-Scroll schöbe sie sonst unter den Hero-Rand, WCAG 2.4.7/2.4.11). Der Pfeil blendet beim Scrollen aus,
+       damit der Text nicht über ihn läuft. Mobil und in niedrigen Fenstern (Zoom, Querformat) bleibt der Text stehen. */
     PS.motion.add(hero, function (gsap) {
-      var m = hero.querySelector('.hero__media'), d = hero.querySelector('.hero__dim');
-      // Pfeil und Pause-Taste wandern mit, sonst überlappen sie den Text
-      var c = [hero.querySelector('.hero__caption'), link, btn].filter(Boolean);
+      var m = hero.querySelector('.hero__media'), d = hero.querySelector('.hero__dim'), c = hero.querySelector('.hero__caption');
+      var roomy = matchMedia('(min-width: 768px) and (min-height: 541px)'), cap = 40, k = 1;
       var tl = gsap.timeline({
-        defaults: { ease: 'none' },
+        defaults: { ease: 'none', duration: 1 },
         scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: true, invalidateOnRefresh: true }
       });
       tl.fromTo(m, { scale: 1 }, { scale: 1.08 }, 0)
         .fromTo(d, { opacity: 0 }, { opacity: 0.55 }, 0)
-        .fromTo(c, { y: 0 }, { y: function () { return hero.offsetHeight * 0.15; } }, 0);
-      return [tl.scrollTrigger, tl, function () { gsap.set([m, d, c], { clearProps: 'all' }); }];
+        .fromTo(c, { y: 0 }, {
+          y: function () { var e = roomy.matches ? hero.offsetHeight * 0.15 : 0; k = e > cap ? cap / e : 1; return e; },
+          ease: function (p) { return p < k ? p : k; } // 0.15 des Scrolls, gedeckelt bei cap Pixeln
+        }, 0);
+      if (link) tl.fromTo(link, { opacity: 1 }, { opacity: 0, duration: 0.15 }, 0);
+      return [tl.scrollTrigger, tl, function () { gsap.set([m, d, c, link].filter(Boolean), { clearProps: 'all' }); }];
     });
 
     /* ---------------- Pfeil: erstes Element nach dem Hero (ein Band dazwischen verschiebt es) ---------------- */

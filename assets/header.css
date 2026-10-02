@@ -58,9 +58,8 @@ html:not(:has(.announce)) { --announce-h: 0px; }
     --focus-ring: var(--c-white); /* der orange Ring hielte über Film und Foto keine 3:1 */
     border-bottom-color: transparent;
   }
-  /* Orange Schrift hielte über hellem Bild keine 4,5:1: oben weiß, die orange Linie bleibt als Akzent */
+  /* Orange Schrift hielte über hellem Bild keine 4,5:1: oben weiß. Keine Dauer-Linie darunter: die orange Linie heißt im Header „Hover“ und „aktuelle Seite“. */
   [data-header-overlay]:has(#main > .shopify-section:first-child > .hero) .site-header:not(.is-solid) .mainnav__link--sale { color: var(--c-white); }
-  [data-header-overlay]:has(#main > .shopify-section:first-child > .hero) .site-header:not(.is-solid) .mainnav__link--sale::after { transform: scaleX(1); }
 }
 
 @media (max-width: 1023px) {
@@ -83,7 +82,10 @@ html:not(:has(.announce)) { --announce-h: 0px; }
 .mainnav__link::after { content: ""; position: absolute; left: 10px; right: 10px; bottom: 0; height: 3px; background: var(--c-orange); transform: scaleX(0); transition: transform var(--t-fast) var(--ease); }
 .mainnav__link:hover::after, .mainnav__item.is-open .mainnav__link::after, .mainnav__link[aria-current="page"]::after { transform: scaleX(1); }
 .mainnav__link--sale { color: var(--c-orange); } /* Orange-Text auf dunklem Grund */
-.mainnav__toggle { width: 28px; height: 44px; display: grid; place-items: center; margin-left: -8px; color: var(--c-muted-dark); }
+/* Mit Untermenü endet der Link am Text, der Knopf (30 x 44 px) schließt direkt an: kein Überlappen, volle Trefferfläche (WCAG 2.5.8) */
+.mainnav__item[data-mega] .mainnav__link { padding-right: 0; }
+.mainnav__item[data-mega] .mainnav__link::after { right: 0; }
+.mainnav__toggle { width: 30px; height: 44px; display: grid; place-items: center; color: var(--c-muted-dark); }
 .mainnav__toggle .icon { width: 16px; height: 16px; transition: transform var(--t-fast); }
 .mainnav__item.is-open .mainnav__toggle .icon { transform: rotate(180deg); }
 @media (min-width: 1024px) and (max-width: 1279px) {
