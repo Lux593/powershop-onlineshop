@@ -1,7 +1,8 @@
 # Power Shop – UI-Briefing & Komponenten
 
 Finales Briefing (Phase 6) für den Harley-Davidson-Onlineshop **Power Shop**. Er ist für eine deutsche Firma und offiziellen H-D-Vertragshändler auf Shopify gedacht.
-Das klickbare Mockup liegt im Repo (siehe `README.md`). Die Komponenten-Übersicht findest du unter `styleguide.html`.
+Das frühere klickbare HTML-Mockup ist nicht mehr im Repo. Maßgeblich ist das Theme: Bausteine liegen in `sections/` und `snippets/`, Stile in `assets/`
+(Überblick in `README.md`). Der Hero und die Bewegung sind seit diesem Briefing erweitert worden: `docs/auftrag-motion.md`, `docs/motion-api.md`, `docs/hero-clip.md`.
 
 > Rechtliche Punkte sind Umsetzungshinweise, **keine Rechtsberatung**. Rechtstexte, Preisangaben und Cookie-Consent bitte vor dem Livegang prüfen lassen.
 
@@ -28,7 +29,7 @@ Das klickbare Mockup liegt im Repo (siehe `README.md`). Die Komponenten-Übersic
 
 ## 2. Design-Tokens
 
-Quelle: `assets/css/tokens.css`. Im Shopify-Theme als Theme-Einstellungen bzw. CSS-Variablen übernehmen.
+Quelle: `assets/tokens.css` (CSS-Variablen).
 
 ### Farben
 
@@ -78,7 +79,7 @@ Quelle: `assets/css/tokens.css`. Im Shopify-Theme als Theme-Einstellungen bzw. C
 | Small / Caption | Inter 400–600 | 14 / 12 px |
 | Button | Barlow Condensed 600, Versalien, 1 px Letter-Spacing | 16 px, min. 48 px hoch |
 
-- Schriften liegen in `assets/fonts/` (OFL-Lizenz).
+- Schriften liegen als `*.woff2` in `assets/` (OFL-Lizenz) und werden in `snippets/fonts.liquid` eingebunden.
 - Kein Google-Fonts-CDN: Das LG München hat 2022 entschieden, dass dabei die IP-Adresse unzulässig an Google übertragen wird (DSGVO).
 
 ### Layout
@@ -129,7 +130,7 @@ Icons: Suche (auch Teilenummer) · Konto · Merkliste · Warenkorb
 
 ## 4. Seiten & Sektionen (Mapping auf Shopify-Sections)
 
-### Homepage (`index.html`)
+### Homepage (`templates/index.json`)
 
 | # | Sektion | Grund | Shopify-Section |
 |---|---|---|---|
@@ -145,17 +146,17 @@ Icons: Suche (auch Teilenummer) · Konto · Merkliste · Warenkorb
 
 ### Weitere Seiten
 
-| Seite | Datei | Kern |
+| Seite | Template | Kern |
 |---|---|---|
-| Kategorieseite | `kollektion.html?kat=…` | Banner, Filterleiste, Chips, Grid, Pagination |
-| PDP Bekleidung/Accessoires | `produkt-bekleidung.html?id=…` | Galerie, Farbe, Größe (Pflicht), Größentabelle, Akkordeons, GPSR |
-| PDP Teile | `produkt-teil.html?id=…` | Art.-Nr. kopierbar, Kompatibilitäts-Box, Zulassungs-Badge, Einbau-Hinweis |
-| PDP Motorrad | `motorrad.html?id=…` | Gesamtpreis + Steuerhinweis, Fakten-Grid, Kontakt-Box, Reservierung, Sticky-Bar mobil |
-| Service | `service.html` | Probefahrt · Finanzierung · Werkstatt · Inzahlungnahme · Events · Standort, je mit Kontakt-Box |
+| Kategorieseite | `templates/collection.json` | Banner, Filterleiste, Chips, Grid, Pagination |
+| PDP Bekleidung/Accessoires | `templates/product.json` | Galerie, Farbe, Größe (Pflicht), Größentabelle, Akkordeons, GPSR |
+| PDP Teile | `templates/product.teil.json` | Art.-Nr. kopierbar, Kompatibilitäts-Box, Zulassungs-Badge, Einbau-Hinweis |
+| PDP Motorrad | `templates/product.motorrad.json` | Gesamtpreis + Steuerhinweis, Fakten-Grid, Kontakt-Box, Reservierung, Sticky-Bar mobil |
+| Service | `templates/page.service.json` | Probefahrt · Finanzierung · Werkstatt · Inzahlungnahme · Events · Standort, je mit Kontakt-Box |
 
 ---
 
-## 5. Komponenten (siehe `styleguide.html`)
+## 5. Komponenten (Snippets in `snippets/`, Stile in `assets/components.css`)
 
 | Komponente | Varianten / Zustände | Hinweise |
 |---|---|---|
@@ -216,7 +217,7 @@ Icons: Suche (auch Teilenummer) · Konto · Merkliste · Warenkorb
 - [ ] **Motorräder:**
   - Neufahrzeuge mit **Gesamtpreis inkl. Überführung/Nebenkosten**
   - Gebrauchte mit Differenzbesteuerung: „MwSt. nicht ausweisbar (§ 25a UStG)“
-- [ ] **Finanzierung:** Monatsraten nur mit repräsentativem Beispiel (§ 17 PAngV). Im Mockup gibt es keine Raten.
+- [ ] **Finanzierung:** Monatsraten nur mit repräsentativem Beispiel (§ 17 PAngV). Das Theme zeigt keine Raten.
 - [ ] **Bewertungen:** Hinweis, ob und wie sie geprüft werden (UWG)
 - [ ] **GPSR** (EU 2023/988): Herstellerangaben und Sicherheitshinweise auf jeder PDP. Bei Textilien zusätzlich die Materialzusammensetzung.
 - [ ] **Teile:** Zulassungs-Hinweis (ABE/EG-Genehmigung · eintragungspflichtig · ohne Straßenzulassung)
@@ -228,7 +229,7 @@ Icons: Suche (auch Teilenummer) · Konto · Merkliste · Warenkorb
 - [ ] **Button-Lösung:** Der Bestell-Button heißt „Zahlungspflichtig bestellen“ (§ 312j BGB) – im Checkout prüfen.
 - [ ] **Rechtstexte:** Impressum, Datenschutz, AGB, Widerrufsbelehrung und Barrierefreiheitserklärung von einem Rechtstexte-Anbieter
 - [ ] **Barrierefreiheit (BFSG, seit 28.06.2025):** Ziel WCAG 2.1 AA
-  - Im Mockup umgesetzt: Skip-Link, Landmarks, Fokus-Stile, ARIA für Tabs/Dialoge/Karussell, Pause beim Autoplay, `prefers-reduced-motion`
+  - Im früheren Mockup umgesetzt, im Theme erneut zu prüfen: Skip-Link, Landmarks, Fokus-Stile, ARIA für Tabs/Dialoge/Karussell, Pause beim Autoplay, `prefers-reduced-motion`
   - axe-Prüfung: keine Verstöße
 - [ ] **Widerruf:** 14 Tage gesetzlich. Die freiwillige Rückgabefrist (z. B. 30 Tage) getrennt davon kommunizieren.
 
@@ -236,7 +237,7 @@ Icons: Suche (auch Teilenummer) · Konto · Merkliste · Warenkorb
 
 ## 8. Shopify-Umsetzung
 
-**Theme-Basis:** Horizon (kostenloses Standard-Theme). Sections wie in Kapitel 4 anlegen, Tokens als Theme-Einstellungen.
+**Theme-Basis:** Eigenes Theme „Power Shop“ (kein Horizon oder Dawn, kein Build-Step). Sections wie in Kapitel 4, Tokens als CSS-Variablen in `assets/tokens.css`.
 
 ### Metafelder
 
@@ -280,13 +281,13 @@ Icons: Suche (auch Teilenummer) · Konto · Merkliste · Warenkorb
 
 ## 9. Von euch zu liefern
 
-Im Mockup stehen dafür überall Platzhalter.
+Im Theme stehen dafür Platzhalter oder leere Felder (Theme-Einstellungen, siehe `README.md`).
 
 - **Firmendaten:** Name, Anschrift, Telefon, WhatsApp-Nummer, E-Mail, Öffnungszeiten, Ansprechpartner (Foto, Name, Rolle)
 - **Shop-Werte:** Versandschwelle und -kosten, Lieferzeiten, Rückgabefrist, Versandländer
 - **Reservierung:** Gebühr und Dauer; dazu der Newsletter-Rabatt
 - **Echte Fotos** laut `docs/bildliste.md` (gleiche Dateinamen, gleiches Seitenverhältnis)
-- **H-D-Logo** als Datei (am besten SVG aus dem Händlerportal) → `assets/brand/hd-bar-shield.png` ersetzen
+- **H-D-Logo** als Datei (am besten SVG aus dem Händlerportal) → `assets/hd-bar-shield.png` ersetzen (PNG mit Transparenz, ca. 190 px breit, Seitenverhältnis 1024 : 830, siehe `README.md`)
 - **Texte:** Über uns, Kennzahlen, Events
 - **Rechtstexte**
 

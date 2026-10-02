@@ -8,6 +8,8 @@ geschlossen: eigene Assets, Schriften und Icons, kein Build-Step.
 
 - **Briefing & Komponenten:** [`docs/briefing.md`](docs/briefing.md)
 - **Bildliste (Shotlist):** [`docs/bildliste.md`](docs/bildliste.md)
+- **Motion-Schicht (Vertrag, Datei-Aufteilung):** [`docs/motion-api.md`](docs/motion-api.md)
+- **Hero-Clip (Herkunft, offene Rechtsfragen):** [`docs/hero-clip.md`](docs/hero-clip.md)
 
 ## Shopify-Anbindung
 
@@ -41,14 +43,47 @@ nur für Tests in ein separates, nicht verbundenes Theme nötig.
 ```
 layout/     theme.liquid · password.liquid
 templates/  index · collection (+ .motorrad) · product (+ .motorrad, .teil) · page (+ .service) · cart · search · blog · article · 404
-sections/   24 Sections, u. a. hero · category-bento · service-tiles · showroom · story-events · header · footer
-snippets/   Karten, Preis, Galerie, Megamenü, Filter, Größentabelle …
-assets/     tokens.css (Design-Tokens) · base.css · components.css · sections.css (geteilte Reste) · theme.css · motion.css · Bereichs-CSS (header · hero · home · footer · shop) · JS-Module · Bilder · Schriften
+sections/   hero · service-tiles · product-tabs · category-bento · showroom · story-events · header · footer · collection · product · cart-drawer …
+snippets/   Karten, Preis, Galerie, Megamenü, Filter, Größentabelle, Bild-Snippet `media` …
+assets/     CSS, JS, Bilder, Videos, Schriften (flach, Shopify kennt keine Unterordner in assets/), Details unten
 config/     settings_schema.json · settings_data.json
 locales/    de.default.json
-docs/       briefing.md · bildliste.md
+docs/       Briefing, Bildliste, Motion-API, Hero-Clip, Auftrag Motion
 pics_to_use/ Quellbilder für Kategorien und Team
 ```
+
+### assets/
+
+| Datei | Inhalt |
+|---|---|
+| `tokens.css` · `base.css` · `components.css` | Design-Tokens, Reset und Typografie, wiederverwendbare Bausteine (Karten, Buttons, Tabs, Schienen) |
+| `sections.css` | geteilte Reste: Events, Service-Seite |
+| `theme.css` | Ergänzungen fürs Shopify-Theme |
+| `motion.css` · `motion.js` | Motion-Schicht: Einblenden beim Scrollen, Wort-Splitter, Zahlen-Zählen, Lauftext, Parallax, weiches Scrollen |
+| `gsap.min.js` · `ScrollTrigger.min.js` · `lenis.min.js` | Bibliotheken der Motion-Schicht, self-hosted, nur auf Startseite, Kollektion und Produkt |
+| `header.css` · `header.js` | Ankündigungsleiste, Header, Megamenü, Mobile-Menü, Such-Dialog |
+| `hero.css` · `hero.js` | Hero mit Modell-Tabs (`hero.js` lädt nur auf der Startseite) |
+| `home.css` · `home.js` | Startseiten-Bereiche: Service-Leiste, Produkt-Tabs, Kategorie-Bento, Showroom, Story |
+| `footer.css` | Footer und Cookie-Banner |
+| `shop.css` | Kategorieseite, Produktseite, Warenkorb und Drawer |
+| `theme.js` · `cart.js` · `search.js` · `contact.js` · `sections.js` | JS-Module auf allen Seiten: Kern (Dialoge, Tabs), Warenkorb, Suche, Kontakt-Box, Showroom und Quick-Add |
+| `collection.js` · `product.js` | JS nur auf Kollektion und Suche bzw. Produktseite |
+| `*.jpg` · `*.png` · `*.webp` · `*.mp4` · `*.webm` · `*.woff2` | Bilder, Videos und Schriften ([`docs/bildliste.md`](docs/bildliste.md), [`docs/hero-clip.md`](docs/hero-clip.md)) |
+
+Alle CSS-Dateien laden auf jeder Seite, die Reihenfolge in `layout/theme.liquid` ist die Kaskade. Welche Klasse in welcher Datei liegt
+und was beim Ändern geteilter Klassen zu beachten ist, steht in [`docs/motion-api.md`](docs/motion-api.md) unter „Dateiaufteilung“.
+
+## Bewegung
+
+Einblenden beim Scrollen, Parallax, Zahlen-Zählen und weiches Scrollen kommen aus `assets/motion.js`. Im Theme-Editor unter
+**Theme-Einstellungen → Animationen** gibt es drei Schalter:
+
+- **Animationen aktivieren** ist der Notaus: Ausgeschaltet erscheint alles sofort und ohne Bewegung.
+- **Weiches Scrollen** schaltet nur das gleitende Mausrad ab.
+- **Header auf der Startseite über dem Hero** schaltet den transparenten Header ein oder aus.
+
+Ohne JavaScript, bei „Bewegung reduzieren“ im Betriebssystem, im Datensparmodus und im Theme-Editor ist der Shop immer statisch.
+Wer neue Bereiche mit Bewegung baut, findet Attribute und Regeln in [`docs/motion-api.md`](docs/motion-api.md).
 
 ## Händlerdaten pflegen
 
@@ -71,4 +106,10 @@ Dateien, die noch Platzhalter sind, stehen in den Theme-Einstellungen unter **Pl
 (im Theme-Editor sind sie zu sehen). **Nach dem Austausch den Dateinamen aus dieser Liste streichen**, sonst bleibt das neue Foto ausgeblendet.
 Ein im Theme-Editor gewähltes Bild hat immer Vorrang und braucht keinen Eintrag.
 
-Das H-D Bar & Shield liegt als `assets/hd-bar-shield.png` (Seitenverhältnis ca. 1446 × 1174).
+Das H-D Bar & Shield liegt als `assets/hd-bar-shield.png`: 190 × 154 px mit transparentem Hintergrund, rund das 2,75-Fache der größten
+Darstellung (Footer, ca. 69 × 56 px), damit es auch auf Smartphones mit 3-fachem Display scharf bleibt. Ein Ersatz aus dem Händlerportal
+am besten als PNG mit Transparenz im Seitenverhältnis 1024 : 830 (ca. 1,234) auf etwa diese Größe skalieren: Header und Footer messen die Breite
+aus dem Seitenverhältnis der Datei, ein anderes Verhältnis verschiebt dort die Navigation um Bruchteile eines Pixels. Größere Dateien kosten nur Ladezeit.
+
+Der Loop im Hero ist KI-generiert. Herkunft, Dateien und die vor dem Livegang zu klärenden Rechtsfragen stehen in
+[`docs/hero-clip.md`](docs/hero-clip.md). Er lässt sich unter denselben Dateinamen ersetzen.
