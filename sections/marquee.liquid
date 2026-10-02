@@ -4,8 +4,14 @@
   (.marquee__item--rep) füllen sie, damit sie auch auf breiten Bildschirmen nie Lücken zeigt. Die Wiederholungen und
   der Klon sind aria-hidden. Der Pause-Button ist Pflicht (WCAG 2.2.2) und erscheint nur, solange die Spur läuft.
 {%- endcomment -%}
-{%- if section.blocks.size > 0 -%}
-  {%- assign repeats = 12 | divided_by: section.blocks.size | at_least: 2 -%}
+{%- assign terms = 0 -%}
+{%- assign last_term = 0 -%}
+{%- for block in section.blocks -%}
+  {%- if block.settings.text != blank -%}{%- assign terms = terms | plus: 1 -%}{%- assign last_term = forloop.index -%}{%- endif -%}
+{%- endfor -%}
+{%- if terms > 0 -%}
+  {%- comment -%} Mindestens 32 Einträge je Satz: auch kurze Begriffe füllen so Ultrawide und 4K (der Satz muss breiter als der Bildschirm sein). {%- endcomment -%}
+  {%- assign repeats = 32 | divided_by: terms | at_least: 2 -%}
   <section
     class="marquee"
     {% if section.settings.anchor_id != blank %}id="{{ section.settings.anchor_id | escape }}"{% endif %}
@@ -14,12 +20,12 @@
   >
     <div class="marquee__viewport">
       <div class="marquee__track" data-marquee="{{ section.settings.speed }}">
-        <ul class="marquee__set">
+        <ul class="marquee__set" role="list">
           {%- for round in (1..repeats) -%}
             {%- for block in section.blocks -%}
               {%- if block.settings.text != blank -%}
                 <li
-                  class="marquee__item{% if round > 1 %} marquee__item--rep{% endif %}{% if round == 1 and forloop.last %} marquee__item--last{% endif %}"
+                  class="marquee__item{% if round > 1 %} marquee__item--rep{% endif %}{% if round == 1 and forloop.index == last_term %} marquee__item--last{% endif %}"
                   {% if round > 1 %}aria-hidden="true"{% else %}{{ block.shopify_attributes }}{% endif %}
                 >{{ block.settings.text | escape }}</li>
               {%- endif -%}

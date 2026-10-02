@@ -20,6 +20,8 @@
 /* Trenner zwischen den Begriffen: ein gedrehtes Quadrat, kein Text (nichts für Screenreader) */
 .marquee__item::after { content: ""; width: 0.26em; height: 0.26em; margin-inline: 0.8em; background: currentColor; transform: rotate(45deg); }
 html:not(.has-motion) .marquee__item--last::after { display: none; }
+/* Statisch (kein JS, Reduced-Motion, Editor): ein Begriff, der breiter als der Bildschirm ist, bricht um statt abgeschnitten zu werden */
+html:not(.has-motion) .marquee__item { white-space: normal; overflow-wrap: anywhere; text-align: center; }
 /* Wiederholungen füllen die Spur nur in Bewegung (siehe sections/marquee.liquid) */
 .marquee__item--rep { display: none; }
 .has-motion .marquee__item--rep { display: inline-flex; }
@@ -45,7 +47,7 @@ html:not(.has-motion) .marquee__item--last::after { display: none; }
 .statement__text {
   --split-pad: 0.2em; /* Luft für Umlaute in den Wortmasken */
   font-family: var(--f-head); font-weight: 800; font-size: calc(var(--fs-display) * 0.6); line-height: 0.96;
-  letter-spacing: 0.005em; text-transform: uppercase; text-wrap: balance; hyphens: auto; overflow-wrap: anywhere;
+  letter-spacing: 0.005em; text-transform: uppercase; text-wrap: balance; hyphens: manual; overflow-wrap: anywhere;
 }
 /* Scrub (home.js setzt .is-scrub, solange ScrollTrigger läuft): gedimmt bleibt --c-muted-dark (8 : 1 auf Schwarz),
    erleuchtet wird Weiß. Dann entfällt das Hochgleiten der Wörter, nur die Farbe wechselt. */
@@ -56,12 +58,15 @@ html:not(.has-motion) .marquee__item--last::after { display: none; }
 
 /* ---------- Service-Leiste ---------- */
 /* Eine Leiste statt vier Karten: Die Felder teilen sich eine Fläche, die Haarlinien sind der Zwischenraum */
-.service-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--c-line); border: 1px solid var(--c-line); }
-@media (min-width: 1024px) { .service-tiles { grid-template-columns: repeat(4, 1fr); } }
+/* minmax(0, 1fr) und min-width: 0: lange Wörter (Inzahlungnahme) sprengen bei 320 px (400 % Zoom) sonst die Spalte */
+.service-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--c-line); border: 1px solid var(--c-line); }
+@media (min-width: 1024px) { .service-tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 .service-tile {
-  position: relative; display: grid; gap: 8px; align-content: start; padding: 24px 20px;
-  background: var(--c-white);
+  position: relative; display: grid; gap: 8px; align-content: start; min-width: 0; padding: 24px 20px;
+  background: var(--c-white); overflow-wrap: break-word;
 }
+/* Die Folgekachel malt sonst ihre weiße Fläche über den Fokusring */
+.service-tile:focus-visible { z-index: 1; }
 /* Wipe-Linie: läuft beim Überfahren von links ein und beim Verlassen nach rechts aus; auch bei Tastaturfokus */
 .service-tile::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--c-orange); transform: scaleX(0); transform-origin: right; transition: transform var(--t-med) var(--ease); }
 .service-tile:hover::after, .service-tile:focus-visible::after { transform: scaleX(1); transform-origin: left; }
@@ -76,6 +81,7 @@ html:not(.has-motion) .marquee__item--last::after { display: none; }
   .service-tile:nth-child(4) { --rd: 270ms; }
 }
 .service-tile h3 { font-size: 22px; margin-top: 8px; }
+@media (max-width: 479px) { .service-tile h3 { hyphens: auto; } }
 .service-tile p { font-size: var(--fs-small); color: var(--c-muted); }
 .service-tile .more { display: inline-flex; align-items: center; gap: 6px; font-size: var(--fs-small); font-weight: 600; margin-top: 4px; }
 .service-tile .more .icon { width: 16px; height: 16px; transition: transform var(--t-fast); }
@@ -115,6 +121,13 @@ html:not(.has-motion) .marquee__item--last::after { display: none; }
 }
 .has-motion .tabs--slide.has-ind.is-ready::after { transition: transform var(--t-slow) var(--ease-out); }
 .has-motion .tabs--slide.has-ind .tab[aria-selected="true"] { border-bottom-color: transparent; }
+/* .tabs schneidet per overflow-x ab: der Fokusring sitzt innen */
+.tabs--slide .tab:focus-visible { outline-offset: -3px; }
+/* Kontrastmodus: Der Indikator wird auf Canvas gezwungen und verschwindet, der aktive Tab behält seinen eigenen Strich */
+@media (forced-colors: active) {
+  .has-motion .tabs--slide.has-ind::after { display: none; }
+  .has-motion .tabs--slide.has-ind .tab[aria-selected="true"] { border-bottom-color: Highlight; }
+}
 @keyframes ps-tab-fwd { from { opacity: 0; translate: 28px 0; } }
 @keyframes ps-tab-back { from { opacity: 0; translate: -28px 0; } }
 .has-motion .tabs--slide.is-fwd ~ [role="tabpanel"]:not([hidden]) { animation: ps-tab-fwd var(--t-slow) var(--ease-out) backwards; }
@@ -192,6 +205,9 @@ html:not(.has-motion) .marquee__item--last::after { display: none; }
 
 /* ---------- Story & Events ---------- */
 /* Teil Story; die Event-Regeln stehen weiter in sections.css (geteilt mit Service-Seite und Blog) */
+/* Reflow (200 % Zoom = 640 px): drei Spalten dürfen schrumpfen, lange Titel brechen um (überschreibt sections.css, M6 räumt auf) */
+@media (min-width: 640px) { .event-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.event-card__body :is(h2, h3) { overflow-wrap: anywhere; hyphens: auto; }
 .story { display: grid; gap: 32px; align-items: center; }
 @media (min-width: 1024px) { .story { grid-template-columns: 1fr 1fr; gap: 64px; } .story--text { grid-template-columns: minmax(0, 1fr); max-width: 760px; } }
 .story__media { position: relative; aspect-ratio: 980 / 807; overflow: hidden; background: #000; }

@@ -1,4 +1,4 @@
-<section class="section--tight" id="{{ section.settings.anchor_id | default: 'nach-hero' }}" aria-labelledby="service-title-{{ section.id }}" data-section-id="{{ section.id }}">
+<section class="section--tight" id="{{ section.settings.anchor_id | default: 'service' }}" aria-labelledby="service-title-{{ section.id }}" data-section-id="{{ section.id }}">
   <h2 class="sr-only" id="service-title-{{ section.id }}">Unser Service</h2>
   <div class="container">
     <div class="service-tiles">
@@ -23,7 +23,7 @@
 {
   "name": "Service-Leiste",
   "settings": [
-    { "type": "text", "id": "anchor_id", "label": "Anker-ID", "default": "nach-hero", "info": "Ziel des Hero-Pfeils, solange kein Lauftext-Band darüber steht (dort trägt man „nach-hero“ ein)." }
+    { "type": "text", "id": "anchor_id", "label": "Anker-ID", "default": "service", "info": "Trage „nach-hero“ ein, wenn kein Lauftext-Band darüber steht: Dann springt der Hero-Pfeil hierher. Die ID „nach-hero“ darf nur einmal auf der Seite vorkommen." }
   ],
   "max_blocks": 4,
   "blocks": [

@@ -23,11 +23,10 @@
           lit = n;
           for (var i = 0; i < words.length; i++) words[i].classList.toggle('is-lit', i < n);
         }
+        // Dimmen erst nach gelungenem create (sonst bliebe der Text bei einem Fehler grau)
+        var st = ST.create({ trigger: text, start: 'top 85%', end: 'bottom 45%', onUpdate: paint, onRefresh: paint });
         sec.classList.add('is-scrub');
-        return [
-          ST.create({ trigger: text, start: 'top 85%', end: 'bottom 45%', onUpdate: paint, onRefresh: paint }),
-          function () { sec.classList.remove('is-scrub'); }
-        ];
+        return [st, function () { sec.classList.remove('is-scrub'); }];
       });
     }
     if (text.classList.contains('is-split')) return go();
@@ -64,6 +63,7 @@
       }
       prev = i;
       place();
+      M.refresh(); // Panelhöhe geändert
     });
     var ro = window.ResizeObserver && new ResizeObserver(place); // Größe der Leiste und Schriftwechsel
     if (ro) { ro.observe(list); tabs.forEach(function (t) { ro.observe(t); }); }
@@ -82,11 +82,11 @@
       rail.classList.toggle('is-start', x <= 2);
       rail.classList.toggle('is-end', x >= all - w - 2);
       if (!bar) return;
-      bar.hidden = fit;
+      if (bar.hidden !== fit) { bar.hidden = fit; M.refresh(); }
       bar.style.setProperty('--rail-progress', fit ? 1 : (x + w) / all);
     }
     rail.addEventListener('scroll', update, { passive: true });
-    var ro = window.ResizeObserver && new ResizeObserver(update);
+    var ro = window.ResizeObserver && new ResizeObserver(function () { update(); M.refresh(); });
     if (ro) ro.observe(rail); else window.addEventListener('resize', update);
     update();
     M.track(rail, ro);

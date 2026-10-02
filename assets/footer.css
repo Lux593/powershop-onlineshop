@@ -19,11 +19,12 @@
 @media (pointer: coarse) { .footer__cols a { min-height: 44px; } }
 .footer__cols h2 { font-size: 16px; letter-spacing: 0.12em; color: var(--c-white); margin-bottom: 14px; }
 .footer__cols ul { display: grid; gap: 2px; }
-/* Wipe-Unterstreichung: orange Linie läuft von links unter dem Linktext ein. Der Text sitzt mittig im Link, die Linie
-   darunter (Mitte + 0,75 em). Gilt auch für Tastaturfokus; Reduced-Motion macht den Wechsel sofort (base.css). */
+/* Wipe-Unterstreichung: orange Linie läuft von links unter dem Linktext ein. Sie sitzt am unteren Rand der Linkbox
+   (das Padding lässt Platz unter den Unterlängen) und läuft so auch bei einem Link über zwei Zeilen (320 px) unter
+   dem Text. Gilt auch für Tastaturfokus; Reduced-Motion macht den Wechsel sofort (base.css). */
 .footer__cols a {
-  display: inline-flex; align-items: center; min-height: 36px; font-size: var(--fs-small); color: var(--c-muted-dark);
-  background: linear-gradient(var(--c-orange), var(--c-orange)) no-repeat 0 calc(50% + 0.75em) / 0 2px;
+  display: inline-flex; align-items: center; min-height: 36px; padding-bottom: 4px; font-size: var(--fs-small); color: var(--c-muted-dark);
+  background: linear-gradient(var(--c-orange), var(--c-orange)) no-repeat 0 calc(100% - 2px) / 0 2px;
   transition: color var(--t-fast), background-size var(--t-med) var(--ease);
 }
 .footer__cols a:hover, .footer__cols a:focus-visible { color: var(--c-white); background-size: 100% 2px; }
