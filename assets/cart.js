@@ -8,51 +8,39 @@
 
   function drawer() { return document.getElementById('cart-drawer'); }
 
-  // Versandbalken: Der Drawer wird bei jedem Austausch neu gerendert, eine CSS-Transition hätte keinen Startwert.
-  // Darum den alten Stand vor dem Austausch merken und danach vom alten zum neuen Wert fahren (nur transform).
-  var barFrom = null; // Stand vor dem letzten Austausch, wenn der Drawer dabei zu war (läuft beim Öffnen)
-  function barValue() {
-    var bar = drawer() && drawer().querySelector('.progress__bar');
-    return bar ? +bar.getAttribute('aria-valuenow') || 0 : 0;
-  }
+  // Versandbalken: Der Drawer wird bei jedem Austausch neu gerendert (keine Transition ohne Startwert): alten Stand merken,
+  // danach vom alten zum neuen Wert fahren. War der Drawer dabei zu, läuft es beim Öffnen (barFrom).
+  var barFrom = null;
+  function bar() { var d = drawer(); return d && d.querySelector('.progress__bar'); }
   function fillBar(start) {
-    var bar = drawer() && drawer().querySelector('.progress__bar');
-    var fill = bar && bar.firstElementChild;
+    var b = bar(), fill = b && b.firstElementChild;
     if (!fill || !PS.motion.enabled) return;
-    var end = +bar.getAttribute('aria-valuenow') || 0;
     fill.style.setProperty('--p', start / 100);
-    void fill.offsetWidth; // Startwert festschreiben, sonst gibt es keine Transition
-    requestAnimationFrame(function () { fill.style.setProperty('--p', end / 100); });
+    void fill.offsetWidth; // Startwert festschreiben
+    requestAnimationFrame(function () { fill.style.setProperty('--p', (+b.getAttribute('aria-valuenow') || 0) / 100); });
   }
 
-  // Fokus: Drawer und Warenkorb-Seite werden neu gerendert, der bediente Knopf verschwindet. Danach zurück auf den gleichen
-  // Knopf (Zeile, Art, Beschriftung), sonst auf „Schließen“ bzw. den ersten Knopf (z. B. nach dem Entfernen der Zeile).
-  var spot = null;
-  function remember(el) { spot = { line: el.dataset.line, qty: el.hasAttribute('data-cart-qty'), label: el.getAttribute('aria-label') }; }
+  // Fokus: der bediente Knopf wird mit dem HTML ersetzt. Danach zurück auf den gleichen (Zeile + Beschriftung), sonst auf „Schließen“.
+  var spot;
+  function remember(el) { spot = [el.dataset.line, el.getAttribute('aria-label')]; }
   function restore(box) {
     var s = spot;
     spot = null;
-    if (!s || !box) return;
-    var again = Array.prototype.filter.call(box.querySelectorAll('[data-cart-change],[data-cart-qty]'), function (el) {
-      return el.dataset.line === s.line && el.hasAttribute('data-cart-qty') === s.qty && el.getAttribute('aria-label') === s.label;
-    })[0] || box.querySelector('[data-close],a.btn,button');
-    if (again) again.focus({ preventScroll: true });
+    var el = s && ([].filter.call(box.querySelectorAll('[data-line]'), function (e) { return e.dataset.line === s[0] && e.getAttribute('aria-label') === s[1]; })[0] || box.querySelector('[data-close],a.btn,button'));
+    if (el) el.focus({ preventScroll: true });
   }
 
   function applySections(sections, itemCount) {
     var html = sections && sections[SECTION];
     var counter = document.querySelector('[data-cart-count]');
     var previous = counter ? +counter.dataset.count || 0 : 0;
-    var before = barValue();
-    var current = drawer();
+    var d = drawer(), b = bar(), before = b ? +b.getAttribute('aria-valuenow') || 0 : 0;
     if (html) {
-      var doc = new DOMParser().parseFromString(html, 'text/html');
-      var fresh = doc.querySelector('dialog');
-      if (fresh && current) {
-        current.innerHTML = fresh.innerHTML;
-        current.classList.remove('is-entering'); // Zeilen-Stagger nur beim Öffnen, nicht bei jeder Mengenänderung
-        if (current.open) fillBar(before); else barFrom = before;
-        if (current.open) restore(current);
+      var fresh = new DOMParser().parseFromString(html, 'text/html').querySelector('dialog');
+      if (fresh && d) {
+        d.innerHTML = fresh.innerHTML;
+        d.classList.remove('is-entering'); // Zeilen-Stagger nur beim Öffnen, nicht bei jeder Mengenänderung
+        if (d.open) { fillBar(before); restore(d); } else barFrom = before;
       }
     }
     if (typeof itemCount === 'number') {
@@ -67,17 +55,17 @@
     document.dispatchEvent(new CustomEvent('ps:cart', { detail: { count: typeof itemCount === 'number' ? itemCount : previous, previous: previous } }));
   }
 
-  // Drawer geht auf: Zeilen laufen gestaffelt ein (CSS, .is-entering), der Versandbalken fährt zum Stand
+  // Öffnen: Zeilen laufen gestaffelt ein (CSS .is-entering), der Balken fährt zum Stand
   PS.on('[data-cart-drawer]', function (d) {
     d.addEventListener('ps:open', function () {
       d.classList.add('is-entering');
       setTimeout(function () { d.classList.remove('is-entering'); }, 1200);
-      fillBar(barFrom == null ? 0 : barFrom);
+      fillBar(barFrom || 0);
       barFrom = null;
     });
   });
 
-  // Warenkorb-Symbol wippt, wenn Artikel dazukommen (nicht beim Verringern oder Entfernen)
+  // Symbol wippt nur bei Zunahme
   document.addEventListener('ps:cart', function (e) {
     var d = e.detail;
     if (!d || !(d.count > d.previous) || !PS.motion.enabled) return;
@@ -168,17 +156,16 @@
     var input = e.target.closest('[data-cart-qty]');
     if (!input) return;
     var qty = Math.max(0, parseInt(input.value, 10) || 0);
-    if (document.activeElement === input) remember(input); // Enter im Feld; beim Wegtabben gehört der Fokus schon dem nächsten Element
+    if (document.activeElement === input) remember(input); // nicht beim Wegtabben
     PS.cart.change(+input.dataset.line, qty).catch(fail);
   });
 
-  // Produktformulare und Schnell-Hinzufügen: Drawer öffnet sich als Rückmeldung.
-  // Das Formular kann weitere Absenden-Buttons außerhalb haben (Sticky-Leiste, form="…"): alle sperren und markieren.
+  // Produktformulare und Schnell-Hinzufügen: Drawer öffnet sich als Rückmeldung. Auch Buttons außerhalb (form="…", Sticky-Leiste) sperren
   document.addEventListener('submit', function (e) {
     var form = e.target.closest('form[data-product-form]');
     if (!form) return;
     e.preventDefault();
-    var buttons = Array.prototype.filter.call(form.elements, function (el) { return el.type === 'submit'; });
+    var buttons = [].filter.call(form.elements, function (el) { return el.type === 'submit'; });
     var submit = e.submitter || buttons[0];
     function mark(busy, added) {
       buttons.forEach(function (b) {
@@ -190,7 +177,7 @@
     mark(true, false);
     PS.cart.add(new FormData(form))
       .then(function () {
-        mark(false, true); // Haken bleibt kurz stehen: Rückmeldung hinter dem Drawer und nach dem Schließen
+        mark(false, true);
         setTimeout(function () { mark(false, false); }, 1400);
         PS.openDialog('cart-drawer', submit);
       })
@@ -203,7 +190,7 @@
     add.disabled = true;
     PS.cart.add([{ id: +add.dataset.addVariant, quantity: 1 }])
       .then(function () {
-        // Fokus geht beim Schließen zurück: auf Touch und schmal zum „+“, am Desktop (dort ohne „+“) zur Größe
+        // Fokusrückgabe: „+“ (Touch, schmal), am Desktop (kein „+“) die Größe
         var card = add.closest('.pcard');
         var plus = card && PS.quick && PS.quick(card, false);
         PS.openDialog('cart-drawer', plus && plus.offsetParent ? plus : add);

@@ -306,6 +306,8 @@ html:not(.has-motion) .bcard:hover .bcard__media img { transform: none; }
    nicht im Accessibility-Tree (visibility hängt am Zustand des „+“-Buttons, PS.quick in sections.js). Am Desktop
    (Hover, ab 1024 px) zeigt Hover oder Tastaturfokus es wie bisher, dort gibt es kein „+“. */
 .pcard__quick { transition: transform 460ms var(--ease-out), visibility 0s linear 460ms; }
+/* Der „+“ steht im Markup vor dem Panel (Tab-Reihenfolge), liegt aber darüber */
+.pcard__plus { z-index: 1; }
 .pcard__plus .icon { transition: transform var(--t-med) var(--ease-out); }
 @media (hover: none), (max-width: 1023px) {
   .pcard__quick { visibility: hidden; }
@@ -358,7 +360,8 @@ html:not(.has-motion) .bcard:hover .bcard__media img { transform: none; }
 
 /* Lightbox: Klick oder Tippen zoomt an die Zeigerstelle, Maus oder Finger schwenken, „Zoom“ in der Kopfzeile für die Tastatur */
 .lightbox__tools { display: flex; align-items: center; gap: 4px; }
-.lightbox__stage { overflow: hidden; line-height: 0; cursor: zoom-in; }
+.lightbox__stage { position: relative; overflow: hidden; line-height: 0; cursor: zoom-in; }
+.lightbox__stage img { width: auto; max-width: 100%; margin-inline: auto; }
 .lightbox__stage.is-zoomed { cursor: zoom-out; touch-action: none; }
 .lightbox__stage.is-zoomed img { transform: scale(2.5); }
 .has-motion .lightbox__stage img { transition: transform 420ms var(--ease-out); }

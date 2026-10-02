@@ -52,7 +52,12 @@
             <div class="product-grid" data-grid data-cols="4">
               {%- for item in search.results -%}
                 {%- if item.object_type == 'product' -%}
-                  {% render 'result-card', product: item, reveal: true %}
+                  {%- comment -%} Erstblick: eager und ohne Einblenden, damit das LCP-Bild nicht versteckt startet {%- endcomment -%}
+                  {%- if forloop.index0 < 4 -%}
+                    {% render 'result-card', product: item, loading: 'eager' %}
+                  {%- else -%}
+                    {% render 'result-card', product: item, reveal: true %}
+                  {%- endif -%}
                 {%- endif -%}
               {%- endfor -%}
             </div>

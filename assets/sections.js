@@ -23,9 +23,8 @@
   });
 
   /* ---------------- Produktkarte: „+“ öffnet die Größenauswahl (Touch, schmale Fenster) ----------------
-     Der Zustand steckt in der Klasse .is-quick-open und in aria-expanded des „+“-Buttons, beides setzt nur
-     PS.quick. Das CSS koppelt die Sichtbarkeit des Panels daran: geschlossen ist es dort nicht mehr fokussierbar.
-     Am Desktop (Hover, ab 1024 px) bleibt das Panel per Hover und Tastaturfokus erreichbar, ohne „+“. */
+     Zustand = .is-quick-open + aria-expanded des „+“ (nur PS.quick setzt beides). Das CSS koppelt die Sichtbarkeit des
+     Panels daran. Am Desktop (Hover, ab 1024 px) zeigt Hover oder Tastaturfokus es, dort gibt es kein „+“. */
   PS.quick = function (card, open) {
     var toggle = card.querySelector('[data-quick-toggle]');
     card.classList.toggle('is-quick-open', open);

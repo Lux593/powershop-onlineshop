@@ -12,21 +12,21 @@
     var $$ = function (sel, ctx) { return Array.prototype.slice.call((ctx || root).querySelectorAll(sel)); };
 
     /* ---------- Galerie: Slides mit Scroll-Snap ----------
-       Die Schiene scrollt nativ (mobil wischen, Pfeiltasten auf der Schiene). Vorschaubilder und Variantenbild springen
-       per scrollTo zum Slide; aria-current der Vorschaubilder folgt dem sichtbaren Slide. */
+       Die Schiene scrollt nativ (wischen, Pfeiltasten). Vorschaubilder und Variantenbild springen per scrollTo,
+       aria-current der Vorschaubilder folgt dem sichtbaren Slide. */
     var track = $('[data-gallery-track]');
     var slides = $$('[data-slide]');
     var thumbs = $$('[data-thumb]');
     var thumbRow = $('.gallery__thumbs');
     var active = 0;
-    var holdUntil = 0; // während eines programmatischen Sprungs melden die Zwischen-Slides nichts
+    var holdUntil = 0; // beim Sprung melden die Zwischen-Slides nichts
 
     function behavior() { return PS.prefersReducedMotion() ? 'auto' : 'smooth'; }
     function mark(i) {
       active = i;
       thumbs.forEach(function (b, k) { b.setAttribute('aria-current', k === i ? 'true' : 'false'); });
       var b = thumbs[i];
-      // Nur die Vorschau-Zeile scrollen, nicht die Seite (scrollIntoView würde auch vertikal springen)
+      // nur die Vorschau-Zeile scrollen (scrollIntoView spränge auch vertikal)
       if (b && thumbRow) thumbRow.scrollTo({ left: b.offsetLeft - (thumbRow.clientWidth - b.offsetWidth) / 2, behavior: behavior() });
     }
     function showSlide(i) {
@@ -59,10 +59,13 @@
       if (!on) { big.style.transformOrigin = ''; return; }
       pan(event);
     }
-    // Der Zoom-Punkt folgt dem Zeiger (Prozent der Fläche); ohne Zeiger (Schalter) bleibt es die Mitte
+    // Zoom-Punkt folgt dem Zeiger (Prozent des Bildes, begrenzt), ohne Zeiger (Schalter) die Mitte
     function pan(event) {
       var r = stage.getBoundingClientRect();
-      big.style.transformOrigin = event && r.width ? ((event.clientX - r.left) / r.width * 100) + '% ' + ((event.clientY - r.top) / r.height * 100) + '%' : '50% 50%';
+      var at = function (v) { return Math.min(Math.max(v, 0), 1) * 100 + '%'; };
+      big.style.transformOrigin = event
+        ? at((event.clientX - r.left - big.offsetLeft) / big.offsetWidth) + ' ' + at((event.clientY - r.top - big.offsetTop) / big.offsetHeight)
+        : '50% 50%';
     }
     if (stage && big) {
       stage.addEventListener('click', function (e) { zoom(null, e); });
@@ -80,7 +83,7 @@
       if (event.target.closest('[data-zoom]')) {
         var slide = slides[active];
         if (big && slide) {
-          big.src = slide.dataset.full; // hochauflösend (2400 px), nicht die 600 bis 1200w des Slides
+          big.src = slide.dataset.full; // 2400 px statt der 600 bis 1200w des Slides
           big.alt = slide.querySelector('img').alt;
         }
         PS.openDialog('lightbox', event.target.closest('[data-zoom]'));
@@ -113,7 +116,7 @@
       var data = JSON.parse(jsonNode.textContent);
       var idField = $('[data-variant-id]', form);
       var errorNode = $('[data-option-error]', form);
-      // Kaufbutton und Text gibt es zweimal: im Formular und in der Sticky-Leiste (außerhalb, per form="…" verbunden)
+      // Kaufbutton und Text gibt es auch in der Sticky-Leiste (außerhalb, per form="…")
       var buyButtons = $$('[data-buy]');
       var buyTexts = $$('[data-buy-text]');
       var request = null;
@@ -239,19 +242,19 @@
       });
     }
 
-    /* ---------- Mobile Kaufleiste (Teile, Bekleidung): erscheint, sobald der Kaufbereich oben aus dem Bild ist ---------- */
+    /* ---------- Mobile Kaufleiste (Teile, Bekleidung): sichtbar, sobald der Kaufbereich oben aus dem Bild ist ---------- */
     var sticky = $('[data-sticky-buy]');
     var buyBox = $('.pdp__buy');
     if (sticky && buyBox && 'IntersectionObserver' in window) {
       var past = false;
       var atFooter = false;
       var sync = function () { sticky.classList.toggle('is-shown', past && !atFooter); };
-      // Wurzel = Streifen oberhalb des Bildes: ein Sprung über den Kaufbereich (Anker, Fling) wird sonst nie gemeldet
+      // Wurzel = Streifen über dem Bild: ein Sprung über den Kaufbereich (Anker) würde sonst nie gemeldet
       new IntersectionObserver(function (en) {
         past = en[en.length - 1].boundingClientRect.bottom <= 0;
         sync();
       }, { rootMargin: '9999px 0px -100% 0px', threshold: [0, 1] }).observe(buyBox);
-      // Am Seitenende nicht über der Fußzeile liegen bleiben
+      // am Seitenende nicht über der Fußzeile
       var footer = document.querySelector('.site-footer');
       if (footer) new IntersectionObserver(function (en) { atFooter = en[0].isIntersecting; sync(); }).observe(footer);
     }

@@ -38,7 +38,7 @@
           <button class="btn btn--primary btn--block" type="submit" name="checkout">Zur Kasse {% render 'icon', name: 'arrow-right' %}</button>
         </form>
         <a class="btn btn--text" href="{{ routes.all_products_collection_url }}" style="justify-self:center">Weiter einkaufen</a>
-        {% render 'payments', style: 'justify-content:center' %}
+        {% render 'payments', style: 'justify-content:center', light: true %}
       </aside>
     </div>
   {%- endif -%}

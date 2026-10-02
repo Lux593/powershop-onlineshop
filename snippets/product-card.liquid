@@ -70,6 +70,10 @@
     {%- endif -%}
 
     {%- if product.available -%}
+      {%- comment -%} Der Schalter steht vor dem Panel: auf Touch und schmal führt Tab nach dem Öffnen direkt in die Größenwahl {%- endcomment -%}
+      <button class="pcard__plus" type="button" data-quick-toggle aria-expanded="false" aria-label="Schnell hinzufügen: {{ product.title | escape }}">
+        {% render 'icon', name: 'plus' %}
+      </button>
       <div class="pcard__quick">
         {%- if size_option -%}
           {%- assign size_idx = size_option.position | minus: 1 -%}
@@ -104,9 +108,6 @@
           <a class="btn btn--secondary btn--block btn--sm" href="{{ product.url }}">Optionen wählen</a>
         {%- endif -%}
       </div>
-      <button class="pcard__plus" type="button" data-quick-toggle aria-expanded="false" aria-label="Schnell hinzufügen: {{ product.title | escape }}">
-        {% render 'icon', name: 'plus' %}
-      </button>
     {%- endif -%}
   </div>
 

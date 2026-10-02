@@ -3,26 +3,25 @@
    Die Filter selbst kommen von Shopify (Storefront Filtering). Dieses Modul
    holt die Section nach jeder Änderung neu (Section Rendering API) und tauscht
    Ergebnisse und Filterfelder aus. Ohne JavaScript funktionieren Links und
-   Formulare als normale Seitenaufrufe.
-   Der Austausch läuft in einer View Transition (nur [data-results] wird überblendet), solange
-   Bewegung aktiv ist und der Browser sie kennt. Neu eingefügtes HTML startet die Motion-Schicht selbst.
+   Formulare als normale Seitenaufrufe. Der Austausch läuft in einer View Transition (nur [data-results]),
+   solange Bewegung aktiv ist; neu eingefügtes HTML startet die Motion-Schicht selbst.
    ========================================================================== */
 (function () {
   var PS = (window.PS = window.PS || {});
-  var current = null; // die aktive Kollektion (eine pro Seite; ein Section-Reload im Theme-Editor ersetzt sie)
+  var current = null; // aktive Kollektion; ein Section-Reload im Theme-Editor ersetzt sie
 
-  // Dokument-Listener einmal auf Modulebene: innerhalb von PS.on summierten sie sich bei jedem Section-Reload
+  // Dokument-Listener einmal auf Modulebene (in PS.on summierten sie sich bei jedem Section-Reload)
   document.addEventListener('click', function (event) { if (current) current.outside(event); });
   window.addEventListener('popstate', function () { if (current) current.back(); });
 
-  /* ---------- Kategorie-Film: Start erst nach Load und Leerlauf, nie bei Datensparen oder reduzierter Bewegung ---------- */
+  /* ---------- Kategorie-Film: Start nach Load und Leerlauf, nie bei Datensparen oder reduzierter Bewegung ---------- */
   function initFilm(film, toggle) {
     var conn = navigator.connection;
     var userPaused = false;
     var started = false;
     var visible = false;
 
-    // Der Zustand des Schalters folgt den echten Ereignissen, nicht dem Klick
+    // Schalter folgt den echten Ereignissen, nicht dem Klick
     function sync() {
       if (!toggle) return;
       toggle.dataset.state = film.paused ? 'paused' : 'playing';
@@ -30,7 +29,7 @@
     }
     function play() {
       var pending = film.play();
-      if (pending && pending.catch) pending.catch(sync); // z. B. Stromsparmodus in iOS: Poster bleibt, Schalter zeigt „abspielen“
+      if (pending && pending.catch) pending.catch(sync); // z. B. iOS-Stromsparmodus: Poster bleibt
     }
     ['play', 'pause', 'ended'].forEach(function (name) { film.addEventListener(name, sync); });
     if (toggle) {
@@ -44,7 +43,7 @@
 
     if (!PS.motion.enabled || (conn && conn.saveData) || !('IntersectionObserver' in window)) return;
 
-    // Außerhalb des Bildes anhalten, danach nur fortsetzen, wenn der Film nicht von Hand angehalten wurde
+    // Außerhalb des Bildes anhalten, danach nur fortsetzen, wenn nicht von Hand angehalten
     var io = new IntersectionObserver(function (entries) {
       visible = entries[0].isIntersecting;
       if (visible && started && !userPaused && film.paused) play();
@@ -54,7 +53,7 @@
     var idle = window.requestIdleCallback ? function (fn) { window.requestIdleCallback(fn, { timeout: 2000 }); } : function (fn) { setTimeout(fn, 300); };
     function go() { idle(function () { started = true; if (visible && !userPaused) play(); }); }
     if (document.readyState === 'complete') go(); else window.addEventListener('load', go, { once: true });
-    // Bewegung wird zur Laufzeit abgeschaltet (reduzierte Bewegung): Film anhalten, Beobachter lösen
+    // Bewegung zur Laufzeit abgeschaltet: anhalten
     PS.motion.track(film, function () { io.disconnect(); started = false; film.pause(); });
   }
 
@@ -84,7 +83,7 @@
       return form.getAttribute('action') + (query ? '?' + query : '');
     }
 
-    /* ---------- Ladezustand: aria-busy sofort, der sichtbare Hinweis erst nach 160 ms (schnelle Antworten flackern nicht) ---------- */
+    /* ---------- Ladezustand: aria-busy sofort, sichtbarer Hinweis erst nach 160 ms ---------- */
     function busy(on) {
       var results = $('[data-results]');
       clearTimeout(busyTimer);
@@ -107,7 +106,7 @@
       results.classList.add('is-vt');
       html.classList.add('is-vt-results');
       var transition = document.startViewTransition(function () { update(true); });
-      // Übersprungene Übergänge melden sonst „Uncaught (in promise)“
+      // übersprungene Übergänge melden sonst „Uncaught (in promise)“
       transition.ready.catch(function () {});
       transition.updateCallbackDone.catch(function () {});
       transition.finished.then(done, done);
@@ -136,21 +135,24 @@
           var next = doc.querySelector('[data-collection]');
           if (!next) throw new Error('Section nicht gefunden');
 
-          // Vor dem Austausch lösen: der alte Stand soll nicht abgedunkelt in die Überblendung gehen
-          busy(false);
-          // Beim Blättern (Scroll nach oben) gibt es keine Überblendung: die Karten laufen über ihre Reveals ein
+          busy(false); // vor dem Austausch: der alte Stand geht nicht abgedunkelt in die Überblendung
+          // Beim Blättern (Scrollen) keine Überblendung, die Karten laufen über ihre Reveals ein
           swap(function (viaTransition) {
-            apply(next, doc, viaTransition);
-            // Adresse erst mit dem neuen Stand: sie gilt als „fertig“ (Adresszeile und Inhalt gehören zusammen)
-            if (options.push !== false) window.history.pushState({}, '', target.pathname + target.search);
-            last = target.pathname + target.search;
-            if (focusId) {
-              var again = document.getElementById(focusId);
-              if (again) again.focus();
-            }
-            if (options.scroll) {
-              var bar = $('[data-filterbar]');
-              if (bar) bar.scrollIntoView({ behavior: PS.prefersReducedMotion() ? 'auto' : 'smooth', block: 'start' });
+            try {
+              apply(next, doc, viaTransition);
+              // Adresse erst mit dem neuen Stand
+              if (options.push !== false) window.history.pushState({}, '', target.pathname + target.search);
+              last = target.pathname + target.search;
+              if (focusId) {
+                var again = document.getElementById(focusId);
+                if (again) again.focus();
+              }
+              if (options.scroll) {
+                var bar = $('[data-filterbar]');
+                if (bar) bar.scrollIntoView({ behavior: PS.prefersReducedMotion() ? 'auto' : 'smooth', block: 'start' });
+              }
+            } catch (e) {
+              window.location.href = target.pathname + target.search; // in der Überblendung gibt es kein äußeres catch
             }
           }, !options.scroll);
         })
@@ -167,7 +169,7 @@
       var results = $('[data-results]');
       var nextResults = $('[data-results]', next);
       if (results && nextResults) {
-        // Die Überblendung übernimmt die Bewegung: Reveal-Stagger nicht zusätzlich laufen lassen
+        // Die Überblendung bewegt: kein zusätzlicher Reveal-Stagger
         if (viaTransition) $$('[data-reveal]', nextResults).forEach(function (el) { el.removeAttribute('data-reveal'); });
         results.innerHTML = nextResults.innerHTML;
         var grid = $('[data-grid]', results);
@@ -294,7 +296,7 @@
           own.nextElementSibling.hidden = true;
         });
       },
-      // Vor und zurück im Browser. Springt nur der Anker (#main, Skip-Link), ändert sich nichts: nicht neu laden
+      // Vor und zurück; nur der Anker (#main) geändert: nicht neu laden
       back: function () {
         var here = window.location.pathname + window.location.search;
         if (here === last) return;
