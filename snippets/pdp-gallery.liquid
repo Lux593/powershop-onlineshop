@@ -1,5 +1,6 @@
 {% doc %}
-  Bildergalerie mit Vorschaubildern und Vergrößerung (Markup wie im Mockup: .gallery).
+  Bildergalerie: Slides mit Scroll-Snap (mobil wischen, am Desktop über die Vorschaubilder), Vergrößerung in einer
+  Lightbox mit Zoom (Markup wie im Mockup: .gallery). Die Steuerung übernimmt assets/product.js.
 
   @param {product} product - Produkt
   @param {boolean} [wide] - Breites Format (Motorräder)
@@ -20,15 +21,29 @@
 <div class="gallery{% if wide %} gallery--wide{% endif %}" data-gallery>
   <div class="gallery__main">
     {%- if first_image -%}
-      <img
-        src="{{ first_image | image_url: width: main_width }}"
-        srcset="{{ first_image | image_url: width: 600 }} 600w, {{ first_image | image_url: width: 900 }} 900w, {{ first_image | image_url: width: main_width }} {{ main_width }}w"
-        sizes="(min-width: 1024px) 58vw, 100vw"
-        alt="{{ first_image.alt | default: product.title | escape }}"
-        width="{{ first_image.width }}"
-        height="{{ first_image.height }}"
-        data-gallery-main
+      {%- comment -%}
+        Bei mehreren Bildern ist die Schiene ein fokussierbarer Scrollbereich (Pfeiltasten blättern). Das erste Bild ist das
+        LCP-Element: sofort laden, hohe Priorität. data-full ist die hochauflösende Quelle für den Zoom in der Lightbox.
+      {%- endcomment -%}
+      <div
+        class="gallery__track"
+        data-gallery-track
+        {% if product.images.size > 1 %}role="region" aria-label="Produktbilder, mit Pfeiltasten blättern" tabindex="0"{% endif %}
       >
+        {%- for image in product.images -%}
+          <div class="gallery__slide" data-slide data-media-id="{{ image.id }}" data-full="{{ image | image_url: width: 2400 }}">
+            <img
+              src="{{ image | image_url: width: main_width }}"
+              srcset="{{ image | image_url: width: 600 }} 600w, {{ image | image_url: width: 900 }} 900w, {{ image | image_url: width: main_width }} {{ main_width }}w"
+              sizes="(min-width: 1024px) 58vw, 100vw"
+              alt="{% if image.alt != blank %}{{ image.alt | escape }}{% elsif product.images.size > 1 %}{{ product.title | escape }}, Bild {{ forloop.index }} von {{ product.images.size }}{% else %}{{ product.title | escape }}{% endif %}"
+              width="{{ image.width }}"
+              height="{{ image.height }}"
+              {% if forloop.first %}fetchpriority="high"{% else %}loading="lazy"{% endif %}
+            >
+          </div>
+        {%- endfor -%}
+      </div>
     {%- else -%}
       {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
     {%- endif -%}
@@ -43,9 +58,7 @@
       {%- for image in product.images -%}
         <button
           type="button"
-          data-thumb="{{ image | image_url: width: main_width }}"
-          data-thumb-srcset="{{ image | image_url: width: 600 }} 600w, {{ image | image_url: width: 900 }} 900w, {{ image | image_url: width: main_width }} {{ main_width }}w"
-          data-thumb-alt="{{ image.alt | default: product.title | escape }}"
+          data-thumb
           data-media-id="{{ image.id }}"
           aria-current="{% if forloop.first %}true{% else %}false{% endif %}"
           aria-label="Bild {{ forloop.index }} von {{ product.images.size }}"
@@ -61,10 +74,18 @@
   <div class="modal__inner">
     <div class="modal__head">
       <span class="small">{{ product.title | escape }}</span>
-      <button class="icon-btn" type="button" data-close aria-label="Schließen">{% render 'icon', name: 'x' %}</button>
+      <div class="lightbox__tools">
+        {%- if first_image -%}
+          <button class="btn btn--text" type="button" data-zoom-toggle aria-pressed="false" aria-describedby="lightbox-zoom-hint">Zoom</button>
+          <span class="sr-only" id="lightbox-zoom-hint">Gezoomt verschiebst du das Bild mit den Pfeiltasten.</span>
+        {%- endif -%}
+        <button class="icon-btn" type="button" data-close aria-label="Schließen">{% render 'icon', name: 'x' %}</button>
+      </div>
     </div>
     {%- if first_image -%}
-      <img src="{{ first_image | image_url: width: 1600 }}" alt="{{ product.title | escape }}" width="{{ first_image.width }}" height="{{ first_image.height }}" loading="lazy" data-lightbox-img>
+      <div class="lightbox__stage" data-lightbox-stage>
+        <img src="{{ first_image | image_url: width: 1600 }}" alt="{{ product.title | escape }}" width="{{ first_image.width }}" height="{{ first_image.height }}" loading="lazy" data-lightbox-img>
+      </div>
     {%- endif -%}
   </div>
 </dialog>

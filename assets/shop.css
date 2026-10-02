@@ -6,7 +6,7 @@
 /* ---------- Kategorieseite ---------- */
 .page-banner { background: var(--c-black); overflow: hidden; }
 .page-banner__inner { display: grid; min-height: 220px; }
-.page-banner__text { display: grid; align-content: center; gap: 12px; padding-block: 32px; }
+.page-banner__text { display: grid; align-content: center; gap: 12px; padding-block: 32px; min-width: 0; overflow-wrap: anywhere; }
 .page-banner__text p { color: var(--c-muted-dark); max-width: 520px; }
 .page-banner__media { display: none; }
 @media (min-width: 1024px) {
@@ -120,7 +120,7 @@
 .pdp__info { display: grid; gap: 20px; }
 @media (min-width: 1024px) { .pdp__info { position: sticky; top: calc(var(--header-offset) + 24px); } }
 .pdp__crumbs { padding-top: 20px; }
-.pdp__title { font-size: 34px; }
+.pdp__title { font-size: 34px; overflow-wrap: anywhere; }
 @media (min-width: 1024px) { .pdp__title { font-size: 40px; } }
 .pdp__meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; font-size: var(--fs-small); color: var(--c-muted); }
 .pdp__price .price__now { font-size: 26px; font-family: var(--f-head); font-weight: 700; }
@@ -144,7 +144,7 @@
 .gallery__main img { width: 100%; height: 100%; object-fit: cover; }
 .gallery__zoom { position: absolute; right: 12px; bottom: 12px; width: 44px; height: 44px; display: grid; place-items: center; background: var(--c-white); border-radius: 50%; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); }
 .gallery__badges { position: absolute; top: 16px; left: 16px; display: flex; gap: 6px; }
-.gallery__thumbs { display: grid; grid-auto-flow: column; grid-auto-columns: 88px; gap: 8px; overflow-x: auto; scrollbar-width: none; }
+.gallery__thumbs { display: grid; grid-auto-flow: column; grid-auto-columns: 88px; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 6px; margin: -6px; /* Platz für den Fokusring */ }
 .gallery--wide .gallery__thumbs { grid-auto-columns: 128px; }
 .gallery__thumbs button { position: relative; aspect-ratio: 4 / 5; background: var(--c-stone); overflow: hidden; border: 2px solid transparent; }
 .gallery--wide .gallery__thumbs button { aspect-ratio: 16 / 10; }
@@ -235,18 +235,21 @@ body.has-sticky-contact { padding-bottom: 72px; }
 .pdp-sections .acc summary { font-size: 20px; }
 
 /* Warenkorb-/Merkliste-Drawer */
-.line-item { display: grid; grid-template-columns: 88px 1fr; gap: 14px; padding-block: 16px; border-bottom: 1px solid var(--c-line); }
+.line-item { display: grid; grid-template-columns: 88px minmax(0, 1fr); gap: 14px; padding-block: 16px; border-bottom: 1px solid var(--c-line); }
 .line-item img { width: 88px; aspect-ratio: 4 / 5; object-fit: cover; background: var(--c-stone); }
 .line-item__top { display: flex; justify-content: space-between; gap: 8px; }
-.line-item__name { font-weight: 500; font-size: 15px; line-height: 1.35; }
+.line-item__name { min-width: 0; font-weight: 500; font-size: 15px; line-height: 1.35; overflow-wrap: anywhere; }
 .line-item__meta { font-size: var(--fs-caption); color: var(--c-muted); margin-top: 2px; }
 .line-item__bottom { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 10px; }
 .line-item .qty button, .line-item .qty input { height: 40px; width: 40px; }
-.remove-btn { width: 40px; height: 40px; display: grid; place-items: center; color: var(--c-muted); }
+.remove-btn { flex: none; width: 40px; height: 40px; display: grid; place-items: center; color: var(--c-muted); }
 .remove-btn:hover { color: var(--c-black); }
 .progress { display: grid; gap: 8px; padding: 14px 16px; background: var(--c-offwhite); font-size: var(--fs-small); }
 .progress__bar { height: 6px; background: var(--c-line); overflow: hidden; }
-.progress__bar span { display: block; height: 100%; background: var(--c-orange); }
+/* Der Balken skaliert (transform) statt die Breite zu ändern: --p ist der Anteil 0 bis 1 (cart-drawer.liquid), cart.js fährt ihn
+   nach jedem Austausch vom alten zum neuen Wert, weil der Drawer neu gerendert wird */
+.progress__bar span { display: block; height: 100%; background: var(--c-orange); transform: scaleX(var(--p, 0)); transform-origin: left; }
+.has-motion .progress__bar span { transition: transform 900ms var(--ease-out); }
 .subtotal { display: flex; justify-content: space-between; align-items: baseline; font-weight: 600; }
 .subtotal strong { font-family: var(--f-head); font-size: 26px; }
 .drawer__empty { display: grid; gap: 16px; justify-items: center; text-align: center; padding: 48px 8px; color: var(--c-muted); }
@@ -267,3 +270,188 @@ body.has-sticky-contact { padding-bottom: 72px; }
 .approval { position: relative; }
 .approval .tip { position: static; }
 .approval .tip__bubble { left: 0; transform: none; width: min(340px, 100%); }
+
+/* ==========================================================================
+   Bewegung (M5): Megamenü, Karten, Kollektion, PDP, Warenkorb, Suche, Seitenübergänge.
+   Start- und Bewegungszustände gelten nur unter html.has-motion (Notaus, reduzierte Bewegung, Theme-Editor,
+   ohne JS: alles sichtbar und statisch). Animiert werden nur transform/translate, opacity und clip-path.
+   Attribute und Zustände der Motion-Schicht: docs/motion-api.md. Die Verträge dieses Blocks stehen noch nicht dort (Nachtrag: M6):
+   ps:cart (Zähler) in cart.js, PS.quick (Quick-Add) in sections.js, is-vt/is-vt-results (Ergebnis-Überblendung) in collection.js,
+   data-sticky-buy (Kaufleiste) in product.js.
+   ========================================================================== */
+
+/* ---------- Megamenü: Spalten laufen gestaffelt ein (40-ms-Schritte) ---------- */
+@keyframes ps-mega-in { from { opacity: 0; translate: 0 8px; } }
+.has-motion .mainnav__item.is-open .mega__inner > * { animation: ps-mega-in var(--t-med) var(--ease-out) backwards; animation-delay: calc(var(--i, 0) * 40ms); }
+.mega__inner > :nth-child(2) { --i: 1; }
+.mega__inner > :nth-child(3) { --i: 2; }
+.mega__inner > :nth-child(4) { --i: 3; }
+.mega__inner > :nth-child(5) { --i: 4; }
+.mega__inner > :nth-child(n+6) { --i: 5; }
+
+/* ---------- Karten ---------- */
+/* Bild blendet beim Laden ein: das inline onload der Karten-Snippets setzt .is-loaded. Nur für lazy Bilder: die ersten
+   Karten einer Kollektion laden eager (Erstblick, mögliches LCP-Element) und starten nie versteckt. Das Zweitbild (Hover) bleibt außen vor. */
+.has-motion .pcard__img[loading="lazy"]:not(.pcard__img--alt):not(.is-loaded),
+.has-motion .bcard__media img[loading="lazy"]:not(.is-loaded) { opacity: 0; }
+.pcard__img { transition: opacity 600ms var(--ease-out), transform 900ms var(--ease-out); }
+.bcard__media img { transition: opacity 600ms var(--ease-out), transform 900ms var(--ease-out); }
+/* Längerer Zoom nur mit Maus. Ohne Bewegung entfällt auch der Zoom der Fahrzeugkarte aus components.css */
+@media (hover: hover) {
+  .has-motion .pcard:hover .pcard__img,
+  .has-motion .pcard:focus-within .pcard__img { transform: scale(1.05); }
+  .has-motion .bcard:hover .bcard__media img { transform: scale(1.06); }
+}
+html:not(.has-motion) .bcard:hover .bcard__media img { transform: none; }
+
+/* Quick-Add: Panel gleitet länger ein. Auf Touch und in schmalen Fenstern ist es geschlossen nicht fokussierbar und
+   nicht im Accessibility-Tree (visibility hängt am Zustand des „+“-Buttons, PS.quick in sections.js). Am Desktop
+   (Hover, ab 1024 px) zeigt Hover oder Tastaturfokus es wie bisher, dort gibt es kein „+“. */
+.pcard__quick { transition: transform 460ms var(--ease-out), visibility 0s linear 460ms; }
+/* Der „+“ steht im Markup vor dem Panel (Tab-Reihenfolge), liegt aber darüber */
+.pcard__plus { z-index: 1; }
+/* Fokusring der runden Weißflächen über Fotos (auch Galerie-Zoom): weißer Innenring, schwarzer Außenring, auf dunklem wie hellem Foto sichtbar */
+.pcard__plus:focus-visible, .gallery__zoom:focus-visible {
+  outline: 2px solid var(--c-black); outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--c-white), 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+.pcard__plus .icon { transition: transform var(--t-med) var(--ease-out); }
+@media (hover: none), (max-width: 1023px) {
+  .pcard__quick { visibility: hidden; }
+  .pcard.is-quick-open .pcard__quick { visibility: visible; transition-delay: 0s; }
+}
+/* Fokus auf dem Titel: Bildfläche trägt einen zweifarbigen Ring, auf hellem wie dunklem Foto sichtbar */
+.pcard:has(.pcard__title a:focus-visible) .pcard__media::after {
+  content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  box-shadow: inset 0 0 0 3px var(--c-white), inset 0 0 0 5px var(--c-black);
+}
+
+/* Karten-Stagger: die Spalte bestimmt die Verzögerung. Standard-Spaltenzahl: 2, ab 640 px 3, ab 1024 px 4 (Motorräder 1/2/3).
+   Nach einer Spaltenwahl im Raster stimmt es nicht mehr genau, das Einblenden läuft nur einmal je Karte. */
+@media (max-width: 639px) {
+  .has-motion .product-grid:not(.product-grid--bikes) > [data-reveal]:nth-child(2n) { --rd: 70ms; }
+}
+@media (min-width: 640px) and (max-width: 1023px) {
+  .has-motion .product-grid:not(.product-grid--bikes) > [data-reveal]:nth-child(3n+2),
+  .has-motion .product-grid--bikes > [data-reveal]:nth-child(2n) { --rd: 70ms; }
+  .has-motion .product-grid:not(.product-grid--bikes) > [data-reveal]:nth-child(3n) { --rd: 140ms; }
+}
+@media (min-width: 1024px) {
+  .has-motion .product-grid:not(.product-grid--bikes) > [data-reveal]:nth-child(4n+2),
+  .has-motion .product-grid--bikes > [data-reveal]:nth-child(3n+2) { --rd: 70ms; }
+  .has-motion .product-grid:not(.product-grid--bikes) > [data-reveal]:nth-child(4n+3),
+  .has-motion .product-grid--bikes > [data-reveal]:nth-child(3n) { --rd: 140ms; }
+  .has-motion .product-grid:not(.product-grid--bikes) > [data-reveal]:nth-child(4n) { --rd: 210ms; }
+}
+
+/* ---------- Kollektion: Filter-/Sortierwechsel als View Transition ----------
+   collection.js benennt [data-results] nur für die Dauer des Wechsels und setzt html.is-vt-results.
+   Header und Filterleiste liegen im Root: dessen Standard-Überblendung würde sie mitblenden, daher aus
+   (mix-blend-mode normal, sonst addieren sich die zwei Abbilder zu einem helleren Bild). */
+[data-results].is-vt { view-transition-name: results; }
+:root.is-vt-results::view-transition-old(root),
+:root.is-vt-results::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+@keyframes ps-vt-out { to { opacity: 0; } }
+@keyframes ps-vt-in { from { opacity: 0; transform: translateY(12px); } }
+::view-transition-group(results) { animation-duration: 420ms; animation-timing-function: var(--ease-out); }
+::view-transition-old(results) { animation: ps-vt-out 160ms linear both; }
+::view-transition-new(results) { animation: ps-vt-in 420ms var(--ease-out) both; }
+
+/* ---------- Produktseite: Galerie als Slides (Scroll-Snap, mobil wischen) ---------- */
+.gallery__track { position: relative; display: flex; height: 100%; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none; }
+.gallery__track::-webkit-scrollbar { display: none; }
+.gallery__slide { flex: 0 0 100%; height: 100%; scroll-snap-align: start; scroll-snap-stop: always; }
+/* Fokus auf der Schiene (Pfeiltasten blättern): Ring innen, außen würde .gallery__main ihn abschneiden.
+   Der Ring liegt im ::after (weiß innen, schwarz außen): auf hellem wie dunklem Foto sichtbar. Die Outline bleibt als
+   transparente Linie für den Kontrastmodus (forced-colors zeichnet sie in Systemfarbe). */
+.gallery__track:focus-visible { outline: 2px solid transparent; outline-offset: -4px; }
+.gallery__main:has(.gallery__track:focus-visible)::after {
+  content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  box-shadow: inset 0 0 0 3px var(--c-white), inset 0 0 0 5px var(--c-black);
+}
+
+/* Lightbox: Klick oder Tippen zoomt an die Zeigerstelle, Maus oder Finger schwenken, „Zoom“ in der Kopfzeile für die Tastatur */
+.lightbox__tools { display: flex; align-items: center; gap: 4px; }
+.lightbox__stage { position: relative; overflow: hidden; line-height: 0; cursor: zoom-in; }
+.lightbox__stage img { width: auto; max-width: 100%; margin-inline: auto; }
+.lightbox__stage.is-zoomed { cursor: zoom-out; touch-action: none; }
+.lightbox__stage.is-zoomed img { transform: scale(2.5); }
+.has-motion .lightbox__stage img { transition: transform 420ms var(--ease-out); }
+
+/* ---------- Produktseite: Kaufleiste (Teile, Bekleidung) und Kontaktleiste (Motorräder) ---------- */
+.sticky-buy {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 150; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 10px 12px calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid var(--c-steel);
+  transform: translateY(100%); visibility: hidden;
+}
+.sticky-buy.is-shown { transform: none; visibility: visible; }
+.has-motion .sticky-buy { transition: transform 420ms var(--ease-out), visibility 0s linear 420ms; }
+.has-motion .sticky-buy.is-shown { transition-delay: 0s; }
+.sticky-buy__price { min-width: 0; }
+.sticky-buy .price { gap: 0 8px; }
+.sticky-buy .price__now { font-family: var(--f-head); font-size: 22px; font-weight: 700; line-height: 1.1; }
+/* Der Hinweis (pdp-sticky-buy.liquid) darf umbrechen: nie abgeschnitten, auch nicht bei 320 px */
+.sticky-buy .price__note { font-size: 11px; line-height: 1.3; }
+.sticky-buy .btn { flex: none; padding: 0 16px; }
+@media (min-width: 1024px) { .sticky-buy { display: none; } }
+/* In niedrigen Fenstern (Querformat, 400 % Zoom) nähme die Leiste zu viel vom Bild: dort entfällt sie */
+@media (max-height: 480px) { .sticky-buy { display: none; } }
+/* Die feste Leiste darf fokussierte Elemente nicht verdecken (2.4.11): Scroll-Puffer, solange sie steht */
+@media (max-width: 1023px) and (min-height: 481px) { html:has(.sticky-buy.is-shown) { scroll-padding-bottom: calc(96px + env(safe-area-inset-bottom)); } }
+@media (max-width: 1023px) { html:has(.sticky-contact) { scroll-padding-bottom: calc(96px + env(safe-area-inset-bottom)); } }
+@keyframes ps-bar-in { from { translate: 0 100%; } }
+.has-motion .sticky-contact { animation: ps-bar-in 600ms var(--ease-out) 600ms backwards; }
+
+/* Warenkorb-Button: Fortschrittsband beim Senden, kurzes Aufblitzen und Icon-Sprung nach dem Hinzufügen (cart.js setzt .is-busy / .is-added) */
+.btn[data-buy] { position: relative; overflow: hidden; }
+.btn[data-buy]::before, .btn[data-buy]::after { content: ""; position: absolute; opacity: 0; pointer-events: none; }
+.btn[data-buy]::before { left: 0; right: 0; bottom: 0; height: 3px; background: var(--c-black); transform: scaleX(0); }
+.btn[data-buy]::after { inset: 0; background: var(--c-white); }
+.btn.is-busy[disabled] { opacity: 0.8; }
+@keyframes ps-busy {
+  0% { transform: scaleX(0); transform-origin: left; }
+  50% { transform: scaleX(1); transform-origin: left; }
+  50.01% { transform-origin: right; }
+  100% { transform: scaleX(0); transform-origin: right; }
+}
+@keyframes ps-flash { from { opacity: 0.5; } to { opacity: 0; } }
+@keyframes ps-pop { 40% { transform: scale(1.35) rotate(-8deg); } }
+.has-motion .btn.is-busy::before { opacity: 1; animation: ps-busy 1s var(--ease) infinite; }
+.has-motion .btn.is-added::after { animation: ps-flash 700ms var(--ease-out) both; }
+.has-motion .btn.is-added .icon { animation: ps-pop 560ms var(--ease-out); }
+
+/* ---------- Warenkorb-Drawer: Zeilen laufen beim Öffnen gestaffelt ein, Symbol wippt bei Zunahme ---------- */
+/* cart.js setzt .is-entering nur beim Öffnen (ps:open) und nimmt es beim ersten Austausch wieder weg: nicht bei jeder Mengenänderung */
+@keyframes ps-line-in { from { opacity: 0; translate: 24px 0; } }
+.has-motion .drawer.is-entering .drawer__body > *,
+.has-motion .drawer.is-entering .drawer__foot { animation: ps-line-in 480ms var(--ease-out) backwards; animation-delay: calc(120ms + var(--i, 0) * 55ms); }
+.has-motion .drawer.is-entering .drawer__foot { animation-delay: 340ms; }
+.drawer__body > :nth-child(2) { --i: 1; }
+.drawer__body > :nth-child(3) { --i: 2; }
+.drawer__body > :nth-child(4) { --i: 3; }
+.drawer__body > :nth-child(5) { --i: 4; }
+.drawer__body > :nth-child(6) { --i: 5; }
+.drawer__body > :nth-child(n+7) { --i: 6; }
+@keyframes ps-bump { 35% { transform: scale(1.3); } 70% { transform: scale(0.92); } }
+.has-motion [data-cart-trigger].is-bump .icon,
+.has-motion [data-cart-trigger].is-bump .count { animation: ps-bump 600ms var(--ease-out); }
+
+/* ---------- Suche: Dialog fährt ein (leicht skaliert), Hintergrund blendet ein ----------
+   Der Blur kostet mobil Leistung: nur Desktop mit Maus. Unter reduzierter Bewegung gibt es html.has-motion nicht, dann weder Animation noch Blur. */
+@keyframes ps-search-in { from { opacity: 0; transform: translateY(-14px) scale(0.985); } }
+@keyframes ps-backdrop-in { from { opacity: 0; } }
+.has-motion .search-dialog[open] { transform-origin: top center; animation: ps-search-in 420ms var(--ease-out); }
+.has-motion .search-dialog[open]::backdrop { animation: ps-backdrop-in 320ms ease-out; }
+@media (min-width: 1024px) and (hover: hover) {
+  .has-motion .search-dialog::backdrop { backdrop-filter: blur(6px); }
+}
+
+/* ---------- Seitenübergänge (Cross-Document, Opt-in in layout/theme.liquid) ----------
+   Kurzer Überblend-Fade der Seite, der Header (view-transition-name: site-header) bleibt stehen. Alle Gruppen
+   kürzer als die Standard-Dauer von 250 ms; die Ergebnisse der Kollektion (oben) behalten ihre längere Fahrt. */
+::view-transition-group(*) { animation-duration: 200ms; animation-timing-function: ease-out; }
+/* Das globale Reduced-Motion aus base.css greift auf ::view-transition-* nicht; der Opt-in steht ohnehin nur
+   in no-preference, dies sichert die Same-Document-Übergänge zusätzlich ab */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+}

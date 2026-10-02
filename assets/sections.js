@@ -22,15 +22,26 @@
     });
   });
 
-  /* ---------------- Produktkarte: „+“ öffnet die Größenauswahl (Touch) ---------------- */
+  /* ---------------- Produktkarte: „+“ öffnet die Größenauswahl (Touch, schmale Fenster) ----------------
+     Zustand = .is-quick-open + aria-expanded des „+“ (nur PS.quick setzt beides). Das CSS koppelt die Sichtbarkeit des
+     Panels daran. Am Desktop (Hover, ab 1024 px) zeigt Hover oder Tastaturfokus es, dort gibt es kein „+“. */
+  PS.quick = function (card, open) {
+    var toggle = card.querySelector('[data-quick-toggle]');
+    card.classList.toggle('is-quick-open', open);
+    if (toggle) toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    return toggle;
+  };
   document.addEventListener('click', function (e) {
     var toggle = e.target.closest('[data-quick-toggle]');
-    if (!toggle) return;
-    var card = toggle.closest('.pcard');
+    var card = toggle && toggle.closest('.pcard');
     if (!card) return;
     var open = !card.classList.contains('is-quick-open');
-    document.querySelectorAll('.pcard.is-quick-open').forEach(function (c) { c.classList.remove('is-quick-open'); });
-    card.classList.toggle('is-quick-open', open);
-    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    document.querySelectorAll('.pcard.is-quick-open').forEach(function (c) { PS.quick(c, false); });
+    PS.quick(card, open);
+  });
+  document.addEventListener('keydown', function (e) {
+    var card = e.key === 'Escape' && e.target.closest && e.target.closest('.pcard.is-quick-open');
+    var toggle = card && PS.quick(card, false);
+    if (toggle) toggle.focus();
   });
 })();

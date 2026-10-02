@@ -105,7 +105,7 @@
           {%- capture bike_badges -%}{% render 'bike-badge', zustand: zustand, status: status %}{%- endcapture -%}
           {% render 'pdp-gallery', product: product, wide: true, badges: bike_badges %}
         </div>
-        <div class="pdp__info">
+        <div class="pdp__info" data-stagger="60">
           <h1 class="pdp__title">{{ product.title | escape }}</h1>
           {%- if family != blank or fzg_nr != blank -%}
             <p class="pdp__meta">
@@ -202,7 +202,7 @@
 
       {%- if similar.size > 1 -%}
         <section class="section--tight">
-          <div class="section-head">
+          <div class="section-head" data-reveal>
             <h2>Ähnliche Bikes</h2>
             <div class="rail-nav">
               <button type="button" data-rail-prev="rail-bikes-{{ section.id }}" aria-label="Zurück">{% render 'icon', name: 'chevron-left' %}</button>
@@ -214,7 +214,7 @@
             {%- for item in similar -%}
               {%- if item.id != product.id and shown < 6 -%}
                 {%- assign shown = shown | plus: 1 -%}
-                {% render 'bike-card', product: item %}
+                {% render 'bike-card', product: item, reveal: true %}
               {%- endif -%}
             {%- endfor -%}
           </div>
@@ -285,7 +285,7 @@
       <div class="pdp__crumbs">{{ breadcrumb_html }}</div>
       <div class="pdp">
         {% render 'pdp-gallery', product: product, badges: badges_html %}
-        <div class="pdp__info">
+        <div class="pdp__info" data-stagger="60">
           <h1 class="pdp__title">{{ product.title | escape }}</h1>
           <div class="pdp__meta">
             {%- if product.vendor != blank -%}
@@ -403,7 +403,7 @@
 
       {%- if similar.size > 1 -%}
         <section class="section--tight">
-          <div class="section-head">
+          <div class="section-head" data-reveal>
             <h2>Wird oft zusammen gekauft</h2>
             <div class="rail-nav">
               <button type="button" data-rail-prev="rail-similar-{{ section.id }}" aria-label="Zurück">{% render 'icon', name: 'chevron-left' %}</button>
@@ -415,7 +415,7 @@
             {%- for item in similar -%}
               {%- if item.id != product.id and shown < 8 -%}
                 {%- assign shown = shown | plus: 1 -%}
-                {% render 'product-card', product: item %}
+                {% render 'product-card', product: item, reveal: true %}
               {%- endif -%}
             {%- endfor -%}
           </div>
@@ -428,6 +428,7 @@
         </div>
       </section>
     </div>
+    {%- render 'pdp-sticky-buy', product: product -%}
   </div>
 
 {%- comment -%} ===================== BEKLEIDUNG / ACCESSOIRES ===================== {%- endcomment -%}
@@ -443,7 +444,7 @@
       <div class="pdp__crumbs">{{ breadcrumb_html }}</div>
       <div class="pdp">
         {% render 'pdp-gallery', product: product, badges: badges_html %}
-        <div class="pdp__info">
+        <div class="pdp__info" data-stagger="60">
           <h1 class="pdp__title">{{ product.title | escape }}</h1>
           <div class="pdp__meta">
             {%- if product.vendor != blank or product.type != blank -%}
@@ -498,7 +499,7 @@
 
       {%- if similar.size > 1 -%}
         <section class="section--tight">
-          <div class="section-head">
+          <div class="section-head" data-reveal>
             <h2>Das könnte dir auch gefallen</h2>
             <div class="rail-nav">
               <button type="button" data-rail-prev="rail-similar-{{ section.id }}" aria-label="Zurück">{% render 'icon', name: 'chevron-left' %}</button>
@@ -510,13 +511,14 @@
             {%- for item in similar -%}
               {%- if item.id != product.id and shown < 8 -%}
                 {%- assign shown = shown | plus: 1 -%}
-                {% render 'product-card', product: item %}
+                {% render 'product-card', product: item, reveal: true %}
               {%- endif -%}
             {%- endfor -%}
           </div>
         </section>
       {%- endif -%}
     </div>
+    {%- render 'pdp-sticky-buy', product: product -%}
   </div>
 {%- endif -%}
 

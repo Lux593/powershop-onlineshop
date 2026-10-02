@@ -8,13 +8,40 @@
 
   function drawer() { return document.getElementById('cart-drawer'); }
 
+  // Versandbalken: Der Drawer wird bei jedem Austausch neu gerendert (keine Transition ohne Startwert): alten Stand merken,
+  // danach vom alten zum neuen Wert fahren. War der Drawer dabei zu, läuft es beim Öffnen (barFrom).
+  var barFrom = null;
+  function bar() { var d = drawer(); return d && d.querySelector('.progress__bar'); }
+  function fillBar(start) {
+    var b = bar(), fill = b && b.firstElementChild;
+    if (!fill || !PS.motion.enabled) return;
+    fill.style.setProperty('--p', start / 100);
+    void fill.offsetWidth; // Startwert festschreiben
+    requestAnimationFrame(function () { fill.style.setProperty('--p', (+b.getAttribute('aria-valuenow') || 0) / 100); });
+  }
+
+  // Fokus: der bediente Knopf wird mit dem HTML ersetzt. Danach zurück auf den gleichen (Zeile + Beschriftung), sonst auf „Schließen“.
+  var spot;
+  function remember(el) { spot = [el.dataset.line, el.getAttribute('aria-label')]; }
+  function restore(box) {
+    var s = spot;
+    spot = null;
+    var el = s && ([].filter.call(box.querySelectorAll('[data-line]'), function (e) { return e.dataset.line === s[0] && e.getAttribute('aria-label') === s[1]; })[0] || box.querySelector('[data-close],a.btn,button'));
+    if (el) el.focus({ preventScroll: true });
+  }
+
   function applySections(sections, itemCount) {
     var html = sections && sections[SECTION];
+    var counter = document.querySelector('[data-cart-count]');
+    var previous = counter ? +counter.dataset.count || 0 : 0;
+    var d = drawer(), b = bar(), before = b ? +b.getAttribute('aria-valuenow') || 0 : 0;
     if (html) {
-      var doc = new DOMParser().parseFromString(html, 'text/html');
-      var fresh = doc.querySelector('dialog');
-      var current = drawer();
-      if (fresh && current) current.innerHTML = fresh.innerHTML;
+      var fresh = new DOMParser().parseFromString(html, 'text/html').querySelector('dialog');
+      if (fresh && d) {
+        d.innerHTML = fresh.innerHTML;
+        d.classList.remove('is-entering'); // Zeilen-Stagger nur beim Öffnen, nicht bei jeder Mengenänderung
+        if (d.open) { fillBar(before); restore(d); } else barFrom = before;
+      }
     }
     if (typeof itemCount === 'number') {
       document.querySelectorAll('[data-cart-count]').forEach(function (el) {
@@ -25,8 +52,30 @@
         el.setAttribute('aria-label', 'Warenkorb, ' + itemCount + ' Artikel');
       });
     }
-    document.dispatchEvent(new CustomEvent('ps:cart'));
+    document.dispatchEvent(new CustomEvent('ps:cart', { detail: { count: typeof itemCount === 'number' ? itemCount : previous, previous: previous } }));
   }
+
+  // Öffnen: Zeilen laufen gestaffelt ein (CSS .is-entering), der Balken fährt zum Stand
+  PS.on('[data-cart-drawer]', function (d) {
+    d.addEventListener('ps:open', function () {
+      d.classList.add('is-entering');
+      setTimeout(function () { d.classList.remove('is-entering'); }, 1200);
+      fillBar(barFrom || 0);
+      barFrom = null;
+    });
+  });
+
+  // Symbol wippt nur bei Zunahme
+  document.addEventListener('ps:cart', function (e) {
+    var d = e.detail;
+    if (!d || !(d.count > d.previous) || !PS.motion.enabled) return;
+    document.querySelectorAll('[data-cart-trigger]').forEach(function (el) {
+      el.classList.remove('is-bump');
+      void el.offsetWidth;
+      el.classList.add('is-bump');
+      setTimeout(function () { el.classList.remove('is-bump'); }, 700);
+    });
+  });
 
   function request(url, options) {
     return fetch(url, options).then(function (res) {
@@ -90,7 +139,7 @@
       .then(function (html) {
         var doc = new DOMParser().parseFromString(html, 'text/html');
         var fresh = doc.querySelector('[data-cart-page]');
-        if (fresh) page.innerHTML = fresh.innerHTML;
+        if (fresh) { page.innerHTML = fresh.innerHTML; restore(page); }
       });
   });
 
@@ -99,6 +148,7 @@
     var btn = e.target.closest('[data-cart-change]');
     if (!btn) return;
     e.preventDefault();
+    remember(btn);
     btn.disabled = true;
     PS.cart.change(+btn.dataset.line, +btn.dataset.quantity).catch(fail).then(function () { btn.disabled = false; });
   });
@@ -106,20 +156,32 @@
     var input = e.target.closest('[data-cart-qty]');
     if (!input) return;
     var qty = Math.max(0, parseInt(input.value, 10) || 0);
+    if (document.activeElement === input) remember(input); // nicht beim Wegtabben
     PS.cart.change(+input.dataset.line, qty).catch(fail);
   });
 
-  // Produktformulare und Schnell-Hinzufügen: Drawer öffnet sich als Rückmeldung
+  // Produktformulare und Schnell-Hinzufügen: Drawer öffnet sich als Rückmeldung. Auch Buttons außerhalb (form="…", Sticky-Leiste) sperren
   document.addEventListener('submit', function (e) {
     var form = e.target.closest('form[data-product-form]');
     if (!form) return;
     e.preventDefault();
-    var submit = form.querySelector('[type="submit"]');
-    if (submit) submit.disabled = true;
+    var buttons = [].filter.call(form.elements, function (el) { return el.type === 'submit'; });
+    var submit = e.submitter || buttons[0];
+    function mark(busy, added) {
+      buttons.forEach(function (b) {
+        b.disabled = busy;
+        b.classList.toggle('is-busy', busy);
+        b.classList.toggle('is-added', added);
+      });
+    }
+    mark(true, false);
     PS.cart.add(new FormData(form))
-      .then(function () { PS.openDialog('cart-drawer', submit); })
-      .catch(fail)
-      .then(function () { if (submit) submit.disabled = false; });
+      .then(function () {
+        mark(false, true);
+        setTimeout(function () { mark(false, false); }, 1400);
+        PS.openDialog('cart-drawer', submit);
+      })
+      .catch(function (err) { mark(false, false); fail(err); });
   });
   document.addEventListener('click', function (e) {
     var add = e.target.closest('[data-add-variant]');
@@ -128,9 +190,10 @@
     add.disabled = true;
     PS.cart.add([{ id: +add.dataset.addVariant, quantity: 1 }])
       .then(function () {
+        // Fokusrückgabe: „+“ (Touch, schmal), am Desktop (kein „+“) die Größe
         var card = add.closest('.pcard');
-        if (card) card.classList.remove('is-quick-open');
-        PS.openDialog('cart-drawer', add);
+        var plus = card && PS.quick && PS.quick(card, false);
+        PS.openDialog('cart-drawer', plus && plus.offsetParent ? plus : add);
       })
       .catch(fail)
       .then(function () { add.disabled = false; });

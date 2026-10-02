@@ -35,7 +35,7 @@
             {%- endif -%}
           </span>
           <div class="progress__bar" role="progressbar" aria-label="Fortschritt bis zum kostenlosen Versand" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ pct }}">
-            <span style="width:{{ pct }}%"></span>
+            <span style="--p: {{ pct | divided_by: 100.0 }}"></span>
           </div>
         </div>
       {%- endif -%}

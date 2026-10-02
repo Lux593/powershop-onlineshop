@@ -5,6 +5,7 @@
   @param {product} product - Produkt
   @param {string} [sizes] - sizes-Attribut für die Bilder
   @param {string} [loading] - "lazy" (Standard) oder "eager"
+  @param {boolean} [reveal] - Karte blendet beim Scrollen ein (data-reveal, Stagger über die Spalte in shop.css)
 
   @example
   {% render 'product-card', product: product %}
@@ -40,14 +41,14 @@
   endif
 -%}
 
-<article class="pcard" data-product-id="{{ product.id }}">
+<article class="pcard" data-product-id="{{ product.id }}"{% if reveal %} data-reveal{% endif %}>
   <div class="pcard__media">
     <a href="{{ product.url }}" tabindex="-1" aria-hidden="true">
       {%- if product.featured_image -%}
         {{
           product.featured_image
           | image_url: width: 900
-          | image_tag: class: 'pcard__img', alt: '', loading: img_loading, sizes: img_sizes, widths: '300, 450, 600, 900'
+          | image_tag: class: 'pcard__img', alt: '', loading: img_loading, sizes: img_sizes, widths: '300, 450, 600, 900', onload: "this.classList.add('is-loaded')"
         }}
         {%- assign second_image = product.images[1] -%}
         {%- if second_image -%}
@@ -69,6 +70,10 @@
     {%- endif -%}
 
     {%- if product.available -%}
+      {%- comment -%} Der Schalter steht vor dem Panel: auf Touch und schmal führt Tab nach dem Öffnen direkt in die Größenwahl {%- endcomment -%}
+      <button class="pcard__plus" type="button" data-quick-toggle aria-expanded="false" aria-label="Schnell hinzufügen: {{ product.title | escape }}">
+        {% render 'icon', name: 'plus' %}
+      </button>
       <div class="pcard__quick">
         {%- if size_option -%}
           {%- assign size_idx = size_option.position | minus: 1 -%}
@@ -103,9 +108,6 @@
           <a class="btn btn--secondary btn--block btn--sm" href="{{ product.url }}">Optionen wählen</a>
         {%- endif -%}
       </div>
-      <button class="pcard__plus" type="button" data-quick-toggle aria-expanded="false" aria-label="Schnell hinzufügen: {{ product.title | escape }}">
-        {% render 'icon', name: 'plus' %}
-      </button>
     {%- endif -%}
   </div>
 

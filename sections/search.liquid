@@ -16,7 +16,11 @@
         </form>
       </div>
       <div class="page-banner__media">
-        {%- render 'media', image: section.settings.banner_image, asset: 'banner-neuheiten.jpg', width: 1200, height: 600, sizes: '50vw', loading: 'eager' -%}
+        {%- comment -%} Am Desktop das LCP-Element: eager mit hoher Priorität (lazy verzögerte es dort bei langsamer Verbindung gemessen um mehrere Sekunden). Unter 1024 px ausgeblendet. {%- endcomment -%}
+        {%- capture banner_html -%}
+          {%- render 'media', image: section.settings.banner_image, asset: 'banner-neuheiten.jpg', width: 1200, height: 600, sizes: '50vw', loading: 'eager' -%}
+        {%- endcapture -%}
+        {{- banner_html | replace: '<img', '<img fetchpriority="high"' -}}
       </div>
     </div>
   </section>
@@ -39,6 +43,9 @@
         {%- render 'results-toolbar', results: search, action: routes.search_url, terms: search.terms, default_cols: '4' -%}
       {%- endif -%}
 
+      {%- comment -%} Ansage der Trefferzahl: liegt außerhalb von [data-results], das collection.js ersetzt {%- endcomment -%}
+      <div class="sr-only" role="status" aria-live="polite" aria-atomic="true" data-live></div>
+
       {%- paginate search.results by section.settings.per_page -%}
         <div data-results>
           {%- capture reset_link -%}{{ routes.search_url }}?q={{ search.terms | url_encode }}{%- endcapture -%}
@@ -49,7 +56,12 @@
             <div class="product-grid" data-grid data-cols="4">
               {%- for item in search.results -%}
                 {%- if item.object_type == 'product' -%}
-                  {% render 'result-card', product: item %}
+                  {%- comment -%} Erstblick: eager und ohne Einblenden, damit das LCP-Bild nicht versteckt startet {%- endcomment -%}
+                  {%- if forloop.index0 < 4 -%}
+                    {% render 'result-card', product: item, loading: 'eager' %}
+                  {%- else -%}
+                    {% render 'result-card', product: item, reveal: true %}
+                  {%- endif -%}
                 {%- endif -%}
               {%- endfor -%}
             </div>
