@@ -19,7 +19,7 @@
         {%- capture banner_html -%}
           {%- render 'media', image: section.settings.banner_image, asset: 'banner-neuheiten.jpg', width: 1200, height: 600, sizes: '50vw', loading: 'lazy' -%}
         {%- endcapture -%}
-        {{- banner_html | replace: '<img ', '<img fetchpriority="high" ' -}}
+        {{- banner_html | replace: '<img', '<img fetchpriority="high"' -}}
       </div>
     </div>
   </section>

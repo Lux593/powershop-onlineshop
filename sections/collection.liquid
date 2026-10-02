@@ -132,7 +132,7 @@
           {%- capture banner_html -%}
             {%- render 'media', image: banner_image, asset: banner_asset, width: 1200, height: 600, sizes: '50vw', loading: 'lazy' -%}
           {%- endcapture -%}
-          {{- banner_html | replace: '<img ', '<img fetchpriority="high" ' -}}
+          {{- banner_html | replace: '<img', '<img fetchpriority="high"' -}}
         {%- endif -%}
       </div>
     </div>
