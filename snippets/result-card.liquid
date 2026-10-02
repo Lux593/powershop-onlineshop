@@ -5,6 +5,7 @@
   @param {product} product - Produkt
   @param {string} [sizes] - sizes-Attribut für das Bild
   @param {string} [loading] - "lazy" (Standard) oder "eager"
+  @param {boolean} [reveal] - Karte blendet beim Scrollen ein (Kollektion, Suche)
 
   @example
   {% render 'result-card', product: product %}
@@ -17,7 +18,7 @@
   endif
 -%}
 {%- if is_bike -%}
-  {% render 'bike-card', product: product, sizes: sizes %}
+  {% render 'bike-card', product: product, sizes: sizes, reveal: reveal %}
 {%- else -%}
-  {% render 'product-card', product: product, sizes: sizes, loading: loading %}
+  {% render 'product-card', product: product, sizes: sizes, loading: loading, reveal: reveal %}
 {%- endif -%}

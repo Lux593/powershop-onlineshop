@@ -267,3 +267,80 @@ body.has-sticky-contact { padding-bottom: 72px; }
 .approval { position: relative; }
 .approval .tip { position: static; }
 .approval .tip__bubble { left: 0; transform: none; width: min(340px, 100%); }
+
+/* ==========================================================================
+   Bewegung (M5): Megamenü, Karten, Kollektion, PDP, Warenkorb, Suche, Seitenübergänge.
+   Start- und Bewegungszustände gelten nur unter html.has-motion (Notaus, reduzierte Bewegung, Theme-Editor,
+   ohne JS: alles sichtbar und statisch). Animiert werden nur transform/translate, opacity und clip-path.
+   Verträge: docs/motion-api.md
+   ========================================================================== */
+
+/* ---------- Megamenü: Spalten laufen gestaffelt ein (40-ms-Schritte) ---------- */
+@keyframes ps-mega-in { from { opacity: 0; translate: 0 8px; } }
+.has-motion .mainnav__item.is-open .mega__inner > * { animation: ps-mega-in var(--t-med) var(--ease-out) backwards; animation-delay: calc(var(--i, 0) * 40ms); }
+.mega__inner > :nth-child(2) { --i: 1; }
+.mega__inner > :nth-child(3) { --i: 2; }
+.mega__inner > :nth-child(4) { --i: 3; }
+.mega__inner > :nth-child(5) { --i: 4; }
+.mega__inner > :nth-child(n+6) { --i: 5; }
+
+/* ---------- Karten ---------- */
+/* Bild blendet beim Laden ein: das inline onload der Karten-Snippets setzt .is-loaded. Nur für lazy Bilder: die ersten
+   Karten einer Kollektion laden eager (Erstblick, mögliches LCP-Element) und starten nie versteckt. Das Zweitbild (Hover) bleibt außen vor. */
+.has-motion .pcard__img[loading="lazy"]:not(.pcard__img--alt):not(.is-loaded),
+.has-motion .bcard__media img[loading="lazy"]:not(.is-loaded) { opacity: 0; }
+.pcard__img { transition: opacity 600ms var(--ease-out), transform 900ms var(--ease-out); }
+.bcard__media img { transition: opacity 600ms var(--ease-out), transform 900ms var(--ease-out); }
+/* Längerer Zoom nur mit Maus. Ohne Bewegung entfällt auch der Zoom der Fahrzeugkarte aus components.css */
+@media (hover: hover) {
+  .has-motion .pcard:hover .pcard__img,
+  .has-motion .pcard:focus-within .pcard__img { transform: scale(1.05); }
+  .has-motion .bcard:hover .bcard__media img { transform: scale(1.06); }
+}
+html:not(.has-motion) .bcard:hover .bcard__media img { transform: none; }
+
+/* Quick-Add: Panel gleitet länger ein. Auf Touch und in schmalen Fenstern ist es geschlossen nicht fokussierbar und
+   nicht im Accessibility-Tree (visibility hängt am Zustand des „+“-Buttons, PS.quick in sections.js). Am Desktop
+   (Hover, ab 1024 px) zeigt Hover oder Tastaturfokus es wie bisher, dort gibt es kein „+“. */
+.pcard__quick { transition: transform 460ms var(--ease-out), visibility 0s linear 460ms; }
+.pcard__plus .icon { transition: transform var(--t-med) var(--ease-out); }
+@media (hover: none), (max-width: 1023px) {
+  .pcard__quick { visibility: hidden; }
+  .pcard.is-quick-open .pcard__quick { visibility: visible; transition-delay: 0s; }
+}
+/* Fokus auf dem Titel: Bildfläche trägt einen zweifarbigen Ring, auf hellem wie dunklem Foto sichtbar */
+.pcard:has(.pcard__title a:focus-visible) .pcard__media::after {
+  content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  box-shadow: inset 0 0 0 3px var(--c-white), inset 0 0 0 5px var(--c-black);
+}
+
+/* Karten-Stagger: die Spalte bestimmt die Verzögerung. Standard-Spaltenzahl: 2, ab 640 px 3, ab 1024 px 4 (Motorräder 1/2/3).
+   Nach einer Spaltenwahl im Raster stimmt es nicht mehr genau, das Einblenden läuft nur einmal je Karte. */
+@media (max-width: 639px) {
+  .has-motion .product-grid:not(.product-grid--bikes) > [data-reveal]:nth-child(2n) { --rd: 70ms; }
+}
+@media (min-width: 640px) and (max-width: 1023px) {
+  .has-motion .product-grid:not(.product-grid--bikes) > [data-reveal]:nth-child(3n+2),
+  .has-motion .product-grid--bikes > [data-reveal]:nth-child(2n) { --rd: 70ms; }
+  .has-motion .product-grid:not(.product-grid--bikes) > [data-reveal]:nth-child(3n) { --rd: 140ms; }
+}
+@media (min-width: 1024px) {
+  .has-motion .product-grid:not(.product-grid--bikes) > [data-reveal]:nth-child(4n+2),
+  .has-motion .product-grid--bikes > [data-reveal]:nth-child(3n+2) { --rd: 70ms; }
+  .has-motion .product-grid:not(.product-grid--bikes) > [data-reveal]:nth-child(4n+3),
+  .has-motion .product-grid--bikes > [data-reveal]:nth-child(3n) { --rd: 140ms; }
+  .has-motion .product-grid:not(.product-grid--bikes) > [data-reveal]:nth-child(4n) { --rd: 210ms; }
+}
+
+/* ---------- Kollektion: Filter-/Sortierwechsel als View Transition ----------
+   collection.js benennt [data-results] nur für die Dauer des Wechsels und setzt html.is-vt-results.
+   Header und Filterleiste liegen im Root: dessen Standard-Überblendung würde sie mitblenden, daher aus
+   (mix-blend-mode normal, sonst addieren sich die zwei Abbilder zu einem helleren Bild). */
+[data-results].is-vt { view-transition-name: results; }
+:root.is-vt-results::view-transition-old(root),
+:root.is-vt-results::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+@keyframes ps-vt-out { to { opacity: 0; } }
+@keyframes ps-vt-in { from { opacity: 0; transform: translateY(12px); } }
+::view-transition-group(results) { animation-duration: 420ms; animation-timing-function: var(--ease-out); }
+::view-transition-old(results) { animation: ps-vt-out 160ms linear both; }
+::view-transition-new(results) { animation: ps-vt-in 420ms var(--ease-out) both; }

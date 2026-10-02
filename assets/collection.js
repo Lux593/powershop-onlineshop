@@ -4,68 +4,70 @@
    holt die Section nach jeder Änderung neu (Section Rendering API) und tauscht
    Ergebnisse und Filterfelder aus. Ohne JavaScript funktionieren Links und
    Formulare als normale Seitenaufrufe.
+   Der Austausch läuft in einer View Transition (nur [data-results] wird überblendet), solange
+   Bewegung aktiv ist und der Browser sie kennt. Neu eingefügtes HTML startet die Motion-Schicht selbst.
    ========================================================================== */
 (function () {
   var PS = (window.PS = window.PS || {});
+  var current = null; // die aktive Kollektion (eine pro Seite; ein Section-Reload im Theme-Editor ersetzt sie)
+
+  // Dokument-Listener einmal auf Modulebene: innerhalb von PS.on summierten sie sich bei jedem Section-Reload
+  document.addEventListener('click', function (event) { if (current) current.outside(event); });
+  window.addEventListener('popstate', function () { if (current) current.back(); });
+
+  /* ---------- Kategorie-Film: Start erst nach Load und Leerlauf, nie bei Datensparen oder reduzierter Bewegung ---------- */
+  function initFilm(film, toggle) {
+    var conn = navigator.connection;
+    var userPaused = false;
+    var started = false;
+    var visible = false;
+
+    // Der Zustand des Schalters folgt den echten Ereignissen, nicht dem Klick
+    function sync() {
+      if (!toggle) return;
+      toggle.dataset.state = film.paused ? 'paused' : 'playing';
+      toggle.setAttribute('aria-label', film.paused ? 'Film abspielen' : 'Film pausieren');
+    }
+    function play() {
+      var pending = film.play();
+      if (pending && pending.catch) pending.catch(sync); // z. B. Stromsparmodus in iOS: Poster bleibt, Schalter zeigt „abspielen“
+    }
+    ['play', 'pause', 'ended'].forEach(function (name) { film.addEventListener(name, sync); });
+    if (toggle) {
+      toggle.hidden = false;
+      toggle.addEventListener('click', function () {
+        userPaused = !film.paused;
+        if (film.paused) play(); else film.pause();
+      });
+    }
+    sync();
+
+    if (!PS.motion.enabled || (conn && conn.saveData) || !('IntersectionObserver' in window)) return;
+
+    // Außerhalb des Bildes anhalten, danach nur fortsetzen, wenn der Film nicht von Hand angehalten wurde
+    var io = new IntersectionObserver(function (entries) {
+      visible = entries[0].isIntersecting;
+      if (visible && started && !userPaused && film.paused) play();
+      else if (!visible && !film.paused) film.pause();
+    }, { threshold: 0.2 });
+    io.observe(film);
+    var idle = window.requestIdleCallback ? function (fn) { window.requestIdleCallback(fn, { timeout: 2000 }); } : function (fn) { setTimeout(fn, 300); };
+    function go() { idle(function () { started = true; if (visible && !userPaused) play(); }); }
+    if (document.readyState === 'complete') go(); else window.addEventListener('load', go, { once: true });
+    // Bewegung wird zur Laufzeit abgeschaltet (reduzierte Bewegung): Film anhalten, Beobachter lösen
+    PS.motion.track(film, function () { io.disconnect(); started = false; film.pause(); });
+  }
 
   PS.on('[data-collection]', function (root) {
     var sectionId = root.dataset.sectionId;
-
     var film = root.querySelector('[data-film]');
-    if (film) {
-      var toggle = root.querySelector('[data-film-toggle]');
-      var reduceMotion = PS.prefersReducedMotion();
+    if (film) initFilm(film, root.querySelector('[data-film-toggle]'));
 
-      function setPlaying(playing) {
-        if (!toggle) return;
-        toggle.dataset.state = playing ? 'playing' : 'paused';
-        toggle.setAttribute('aria-label', playing ? 'Film pausieren' : 'Film abspielen');
-      }
-      function playFilm() {
-        var pending = film.play();
-        if (pending && pending.catch) pending.catch(function () { setPlaying(false); });
-        setPlaying(true);
-      }
-      function pauseFilm(remember) {
-        if (remember && !film.paused) film.dataset.resume = 'true';
-        film.pause();
-        if (!remember) setPlaying(false);
-      }
-
-      if (reduceMotion) {
-        film.removeAttribute('autoplay');
-        film.autoplay = false;
-        pauseFilm(false);
-      } else {
-        setPlaying(true);
-      }
-
-      if (toggle) {
-        toggle.addEventListener('click', function () {
-          if (film.paused) playFilm();
-          else pauseFilm(false);
-        });
-      }
-
-      if ('IntersectionObserver' in window) {
-        var filmObserver = new IntersectionObserver(function (entries) {
-          entries.forEach(function (entry) {
-            if (entry.isIntersecting) {
-              if (film.dataset.resume === 'true') {
-                film.dataset.resume = '';
-                playFilm();
-              }
-            } else if (!film.paused) {
-              pauseFilm(true);
-            }
-          });
-        }, { threshold: 0.2 });
-        filmObserver.observe(film);
-      }
-    }
     var cols = null;
     var controller = null;
     var timer = null;
+    var busyTimer = null;
+    var last = window.location.pathname + window.location.search;
 
     function $(sel, ctx) { return (ctx || root).querySelector(sel); }
     function $$(sel, ctx) { return Array.prototype.slice.call((ctx || root).querySelectorAll(sel)); }
@@ -82,6 +84,35 @@
       return form.getAttribute('action') + (query ? '?' + query : '');
     }
 
+    /* ---------- Ladezustand: aria-busy sofort, der sichtbare Hinweis erst nach 160 ms (schnelle Antworten flackern nicht) ---------- */
+    function busy(on) {
+      var results = $('[data-results]');
+      clearTimeout(busyTimer);
+      if (!results) return;
+      if (on) {
+        results.setAttribute('aria-busy', 'true');
+        busyTimer = setTimeout(function () { results.classList.add('is-loading'); }, 160);
+      } else {
+        results.removeAttribute('aria-busy');
+        results.classList.remove('is-loading');
+      }
+    }
+
+    /* ---------- Austausch, wenn möglich als View Transition ---------- */
+    function swap(update, animate) {
+      var results = $('[data-results]');
+      var html = document.documentElement;
+      if (!animate || !results || !document.startViewTransition || !PS.motion.enabled) { update(false); return; }
+      var done = function () { results.classList.remove('is-vt'); html.classList.remove('is-vt-results'); };
+      results.classList.add('is-vt');
+      html.classList.add('is-vt-results');
+      var transition = document.startViewTransition(function () { update(true); });
+      // Übersprungene Übergänge melden sonst „Uncaught (in promise)“
+      transition.ready.catch(function () {});
+      transition.updateCallbackDone.catch(function () {});
+      transition.finished.then(done, done);
+    }
+
     /* ---------- Section nachladen und austauschen ---------- */
     function load(url, options) {
       options = options || {};
@@ -92,8 +123,7 @@
       if (controller) controller.abort();
       controller = new AbortController();
 
-      var results = $('[data-results]');
-      if (results) results.classList.add('is-loading');
+      busy(true);
       var focusId = document.activeElement && document.activeElement.id;
 
       fetch(request.pathname + request.search, { signal: controller.signal })
@@ -105,43 +135,50 @@
           var doc = new DOMParser().parseFromString(html, 'text/html');
           var next = doc.querySelector('[data-collection]');
           if (!next) throw new Error('Section nicht gefunden');
-          apply(next, doc);
 
-          if (options.push !== false) {
-            window.history.pushState({}, '', target.pathname + target.search);
-          }
-          if (focusId) {
-            var again = document.getElementById(focusId);
-            if (again) again.focus();
-          }
-          if (options.scroll) {
-            var bar = $('[data-filterbar]');
-            if (bar) bar.scrollIntoView({ behavior: PS.prefersReducedMotion() ? 'auto' : 'smooth', block: 'start' });
-          }
+          // Vor dem Austausch lösen: der alte Stand soll nicht abgedunkelt in die Überblendung gehen
+          busy(false);
+          // Beim Blättern (Scroll nach oben) gibt es keine Überblendung: die Karten laufen über ihre Reveals ein
+          swap(function (viaTransition) {
+            apply(next, doc, viaTransition);
+            // Adresse erst mit dem neuen Stand: sie gilt als „fertig“ (Adresszeile und Inhalt gehören zusammen)
+            if (options.push !== false) window.history.pushState({}, '', target.pathname + target.search);
+            last = target.pathname + target.search;
+            if (focusId) {
+              var again = document.getElementById(focusId);
+              if (again) again.focus();
+            }
+            if (options.scroll) {
+              var bar = $('[data-filterbar]');
+              if (bar) bar.scrollIntoView({ behavior: PS.prefersReducedMotion() ? 'auto' : 'smooth', block: 'start' });
+            }
+          }, !options.scroll);
         })
         .catch(function (error) {
           if (error.name === 'AbortError') return;
+          busy(false);
           // Im Zweifel normal navigieren, dann stimmt der Stand auf jeden Fall
           window.location.href = target.pathname + target.search;
         });
     }
 
-    function apply(next, doc) {
+    function apply(next, doc, viaTransition) {
       // Ergebnisse
       var results = $('[data-results]');
       var nextResults = $('[data-results]', next);
       if (results && nextResults) {
+        // Die Überblendung übernimmt die Bewegung: Reveal-Stagger nicht zusätzlich laufen lassen
+        if (viaTransition) $$('[data-reveal]', nextResults).forEach(function (el) { el.removeAttribute('data-reveal'); });
         results.innerHTML = nextResults.innerHTML;
-        results.classList.remove('is-loading');
         var grid = $('[data-grid]', results);
         if (grid && cols) grid.dataset.cols = cols;
       }
 
       // Filterfelder: nur den Inhalt tauschen, damit offene Menüs offen bleiben
-      var current = $$('[data-fdrop]');
+      var existing = $$('[data-fdrop]');
       var incoming = $$('[data-fdrop]', next);
-      if (current.length === incoming.length) {
-        current.forEach(function (el, i) {
+      if (existing.length === incoming.length) {
+        existing.forEach(function (el, i) {
           var fresh = incoming[i];
           var panel = $('.fdrop__panel, .acc__body', el);
           var freshPanel = $('.fdrop__panel, .acc__body', fresh);
@@ -186,10 +223,10 @@
         var url = anyForm ? urlFromForm(anyForm) : window.location.pathname + '?sort_by=' + encodeURIComponent(input.value);
         // Ohne Filterformular: aktuelle Adresse behalten und nur die Sortierung setzen
         if (!anyForm) {
-          var current = new URL(window.location.href);
-          current.searchParams.set('sort_by', input.value);
-          current.searchParams.delete('page');
-          url = current.pathname + current.search;
+          var now = new URL(window.location.href);
+          now.searchParams.set('sort_by', input.value);
+          now.searchParams.delete('page');
+          url = now.pathname + now.search;
         }
         load(url);
       }
@@ -248,18 +285,21 @@
       }
     });
 
-    // Klick außerhalb schließt offene Filter-Menüs
-    document.addEventListener('click', function (event) {
-      if (root.contains(event.target)) return;
-      $$('.fdrop__btn[aria-expanded="true"]').forEach(function (own) {
-        own.setAttribute('aria-expanded', 'false');
-        own.nextElementSibling.hidden = true;
-      });
-    });
-
-    // Vor und zurück im Browser
-    window.addEventListener('popstate', function () {
-      load(window.location.pathname + window.location.search, { push: false });
-    });
+    current = {
+      // Klick außerhalb schließt offene Filter-Menüs
+      outside: function (event) {
+        if (root.contains(event.target)) return;
+        $$('.fdrop__btn[aria-expanded="true"]').forEach(function (own) {
+          own.setAttribute('aria-expanded', 'false');
+          own.nextElementSibling.hidden = true;
+        });
+      },
+      // Vor und zurück im Browser. Springt nur der Anker (#main, Skip-Link), ändert sich nichts: nicht neu laden
+      back: function () {
+        var here = window.location.pathname + window.location.search;
+        if (here === last) return;
+        load(here, { push: false });
+      }
+    };
   });
 })();

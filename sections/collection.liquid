@@ -105,28 +105,34 @@
       <div class="page-banner__media">
         {%- if film_file != blank -%}
           <div class="film-banner__frame">
+            {%- comment -%} Kein autoplay im Markup: collection.js startet den Film nach Load und Leerlauf, nicht bei Datensparen oder reduzierter Bewegung. Ohne JS bleibt das Poster. {%- endcomment -%}
             <video
               class="film-banner__video"
               data-film
               width="960"
               height="720"
               poster="{{ film_poster | asset_url }}"
-              autoplay
               muted
               loop
               playsinline
-              preload="metadata"
+              preload="none"
               aria-label="{{ film_label | escape }}"
             >
               <source src="{{ film_file | asset_url }}" type="video/mp4">
             </video>
-            <button class="film-banner__toggle" type="button" data-film-toggle data-state="playing" aria-label="Film pausieren">
+            <button class="film-banner__toggle" type="button" data-film-toggle data-state="paused" aria-label="Film abspielen" hidden>
               {% render 'icon', name: 'pause', class: 'film-banner__icon--pause' %}
               {% render 'icon', name: 'play', class: 'film-banner__icon--play' %}
             </button>
           </div>
         {%- else -%}
-          {%- render 'media', image: banner_image, asset: banner_asset, width: 1200, height: 600, sizes: '50vw', loading: 'eager' -%}
+          {%- comment -%}
+            Das Banner ist unter 1024 px ausgeblendet: lazy lädt es dort nicht. Am Desktop ist es der Erstblick, daher hohe Priorität.
+          {%- endcomment -%}
+          {%- capture banner_html -%}
+            {%- render 'media', image: banner_image, asset: banner_asset, width: 1200, height: 600, sizes: '50vw', loading: 'lazy' -%}
+          {%- endcapture -%}
+          {{- banner_html | replace: '<img ', '<img fetchpriority="high" ' -}}
         {%- endif -%}
       </div>
     </div>
@@ -153,9 +159,10 @@
           <div class="product-grid{% if is_bikes %} product-grid--bikes{% endif %}" data-grid data-cols="{{ default_cols }}">
             {%- for product in collection.products -%}
               {%- if forloop.index0 < 4 -%}
+                {%- comment -%} Erstblick: eager und ohne Einblenden, damit das LCP-Bild nicht versteckt startet {%- endcomment -%}
                 {% render 'result-card', product: product, loading: 'eager' %}
               {%- else -%}
-                {% render 'result-card', product: product %}
+                {% render 'result-card', product: product, reveal: true %}
               {%- endif -%}
             {%- endfor -%}
           </div>

@@ -16,7 +16,10 @@
         </form>
       </div>
       <div class="page-banner__media">
-        {%- render 'media', image: section.settings.banner_image, asset: 'banner-neuheiten.jpg', width: 1200, height: 600, sizes: '50vw', loading: 'eager' -%}
+        {%- capture banner_html -%}
+          {%- render 'media', image: section.settings.banner_image, asset: 'banner-neuheiten.jpg', width: 1200, height: 600, sizes: '50vw', loading: 'lazy' -%}
+        {%- endcapture -%}
+        {{- banner_html | replace: '<img ', '<img fetchpriority="high" ' -}}
       </div>
     </div>
   </section>
@@ -49,7 +52,7 @@
             <div class="product-grid" data-grid data-cols="4">
               {%- for item in search.results -%}
                 {%- if item.object_type == 'product' -%}
-                  {% render 'result-card', product: item %}
+                  {% render 'result-card', product: item, reveal: true %}
                 {%- endif -%}
               {%- endfor -%}
             </div>
