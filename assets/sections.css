@@ -381,6 +381,56 @@
   .page-banner__media::before { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(to right, var(--c-black), transparent 40%); }
 }
 
+/* Film-Intro (Herren, Damen, Motorräder): schmale Bühne.
+   Text und Schnellwahl links, Filmfenster 4:3 rechts. Höhe ≈ 400px statt 600px,
+   damit Filter und erste Produkte im ersten Bildschirm sichtbar bleiben. */
+.page-banner--film .page-banner__inner { grid-template-columns: minmax(0, 1fr); gap: 24px; padding-block: 28px; min-height: 0; }
+.page-banner--film .page-banner__text { grid-template-columns: minmax(0, 1fr); padding-block: 0; align-content: center; gap: 12px; }
+.page-banner--film .page-banner__media { display: block; position: static; margin: 0; }
+.page-banner--film .page-banner__media::before { content: none; }
+.film-banner__frame { position: relative; aspect-ratio: 4 / 3; overflow: hidden; background: var(--c-black); }
+.film-banner__video { width: 100%; height: 100%; object-fit: cover; }
+.page-banner--film .page-banner__text h1 { font-size: clamp(56px, 7vw, 88px); }
+.page-banner--film .film-banner__lead { max-width: 40ch; }
+.film-banner__link {
+  color: var(--c-orange); font-weight: 600; min-height: 44px;
+  display: inline-flex; align-items: center; width: fit-content;
+  text-decoration: underline; text-underline-offset: 3px;
+}
+.film-banner__link:hover { color: var(--c-white); }
+
+/* Schnellwahl: die Unterkategorien aus dem Hauptmenü, auf Mobil eine scrollbare Zeile */
+.film-banner__chips {
+  display: flex; gap: 8px; margin-top: 4px;
+  overflow-x: auto; scrollbar-width: none;
+  margin-inline: calc(-1 * var(--gutter)); padding-inline: var(--gutter);
+}
+.film-banner__chips::-webkit-scrollbar { display: none; }
+.film-banner__chips li { flex: none; }
+.chip--dark { background: transparent; color: var(--c-white); border-color: #555; }
+.chip--dark:hover,
+.chip--dark:focus-visible { background: rgba(242, 103, 34, 0.08); border-color: var(--c-orange); }
+
+/* Pause: kleine Fläche unten rechts im Film (44px Trefferfläche) */
+.film-banner__toggle {
+  position: absolute; right: 12px; bottom: 12px; width: 44px; height: 44px;
+  display: grid; place-items: center; color: var(--c-white);
+  background: rgba(10, 10, 10, 0.72); border-radius: var(--radius);
+  transition: background-color var(--t-fast);
+}
+.film-banner__toggle:hover { background: var(--c-black); }
+.film-banner__toggle .icon { width: 20px; height: 20px; }
+.film-banner__toggle[data-state="playing"] .film-banner__icon--play,
+.film-banner__toggle[data-state="paused"] .film-banner__icon--pause { display: none; }
+
+@media (min-width: 768px) {
+  .page-banner--film .page-banner__inner {
+    grid-template-columns: minmax(0, 1fr) clamp(300px, 34vw, 448px);
+    align-items: center; gap: 48px; padding-block: 32px;
+  }
+  .film-banner__chips { flex-wrap: wrap; overflow: visible; margin-inline: 0; padding-inline: 0; }
+}
+
 .filterbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding-block: 20px; border-bottom: 1px solid var(--c-line); }
 .filterbar__label { font-size: var(--fs-small); color: var(--c-muted); margin-right: 4px; }
 .filterbar__right { margin-left: auto; display: flex; align-items: center; gap: 12px; }

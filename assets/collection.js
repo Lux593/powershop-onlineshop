@@ -10,6 +10,59 @@
 
   PS.on('[data-collection]', function (root) {
     var sectionId = root.dataset.sectionId;
+
+    var film = root.querySelector('[data-film]');
+    if (film) {
+      var toggle = root.querySelector('[data-film-toggle]');
+      var reduceMotion = PS.prefersReducedMotion();
+
+      function setPlaying(playing) {
+        if (!toggle) return;
+        toggle.dataset.state = playing ? 'playing' : 'paused';
+        toggle.setAttribute('aria-label', playing ? 'Film pausieren' : 'Film abspielen');
+      }
+      function playFilm() {
+        var pending = film.play();
+        if (pending && pending.catch) pending.catch(function () { setPlaying(false); });
+        setPlaying(true);
+      }
+      function pauseFilm(remember) {
+        if (remember && !film.paused) film.dataset.resume = 'true';
+        film.pause();
+        if (!remember) setPlaying(false);
+      }
+
+      if (reduceMotion) {
+        film.removeAttribute('autoplay');
+        film.autoplay = false;
+        pauseFilm(false);
+      } else {
+        setPlaying(true);
+      }
+
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          if (film.paused) playFilm();
+          else pauseFilm(false);
+        });
+      }
+
+      if ('IntersectionObserver' in window) {
+        var filmObserver = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              if (film.dataset.resume === 'true') {
+                film.dataset.resume = '';
+                playFilm();
+              }
+            } else if (!film.paused) {
+              pauseFilm(true);
+            }
+          });
+        }, { threshold: 0.2 });
+        filmObserver.observe(film);
+      }
+    }
     var cols = null;
     var controller = null;
     var timer = null;

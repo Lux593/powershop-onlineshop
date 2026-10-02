@@ -5,17 +5,38 @@
     assign default_cols = '3'
   endif
 
+  assign film_file = ''
+  assign film_poster = ''
+  assign film_lead = ''
+  assign film_label = ''
+  assign film_link_label = ''
+  assign film_link_url = ''
+
   case collection.handle
     when 'herren'
       assign banner_asset = 'banner-herren.jpg'
+      assign film_file = 'clothing-herren.mp4'
+      assign film_poster = 'clothing-herren-poster.jpg'
+      assign film_lead = 'Jacken, Hoodies und Denim aus dem Laden. Zum Fahren und für danach.'
+      assign film_label = 'Bekleidung im Laden.'
     when 'damen'
       assign banner_asset = 'banner-damen.jpg'
+      assign film_file = 'clothing-damen.mp4'
+      assign film_poster = 'clothing-damen-poster.jpg'
+      assign film_lead = 'Hoodies, Jacken und Shirts aus dem Laden. Für die Tour und danach.'
+      assign film_label = 'Bekleidung im Laden.'
     when 'teile'
       assign banner_asset = 'banner-teile.jpg'
     when 'accessoires'
       assign banner_asset = 'banner-accessoires.jpg'
     when 'motorraeder'
       assign banner_asset = 'banner-motorraeder.jpg'
+      assign film_file = 'bikes-intro.mp4'
+      assign film_poster = 'bikes-intro-poster.jpg'
+      assign film_lead = 'Neue Maschinen, direkt vor der Tür. Aufsteigen und Probe fahren.'
+      assign film_label = 'Ein Fahrer setzt den Helm auf und steigt auf ein Motorrad. Im Bild steht: Get a Harley.'
+      assign film_link_label = 'Probefahrt anfragen'
+      assign film_link_url = '/pages/service#probefahrt'
     when 'sale'
       assign banner_asset = 'banner-sale.jpg'
     else
@@ -34,22 +55,79 @@
 -%}
 
 <div data-collection data-section-id="{{ section.id }}">
-  <section class="page-banner on-dark textured">
+  <section class="page-banner on-dark textured{% if film_file != blank %} page-banner--film{% endif %}">
     <div class="container page-banner__inner">
       <div class="page-banner__text">
-        <nav class="breadcrumb" aria-label="Brotkrumen">
-          <ol>
-            <li><a href="{{ routes.root_url }}">Home</a></li>
-            <li><span aria-current="page">{{ collection.title | escape }}</span></li>
-          </ol>
-        </nav>
+        {%- unless film_file != blank -%}
+          <nav class="breadcrumb" aria-label="Brotkrumen">
+            <ol>
+              <li><a href="{{ routes.root_url }}">Home</a></li>
+              <li><span aria-current="page">{{ collection.title | escape }}</span></li>
+            </ol>
+          </nav>
+        {%- endunless -%}
         <h1>{{ collection.title | escape }}</h1>
-        {%- if collection.description != blank -%}
+        {%- if film_file != blank -%}
+          <p class="film-banner__lead">{{ film_lead | escape }}</p>
+          {%- if film_link_label != blank -%}
+            <a class="film-banner__link" href="{{ film_link_url }}">{{ film_link_label | escape }}</a>
+          {%- endif -%}
+          {%- comment -%} Schnellwahl: Unterpunkte des passenden Hauptmenü-Eintrags {%- endcomment -%}
+          {%- assign menu_parent = '' -%}
+          {%- for top in linklists['main-menu'].links -%}
+            {%- if top.url == collection.url -%}{%- assign menu_parent = top -%}{%- endif -%}
+          {%- endfor -%}
+          {%- comment -%} Das Menü hat drei Ebenen (Hauptpunkt, Gruppe, Eintrag). Die Chips zeigen die Einträge, höchstens sechs. {%- endcomment -%}
+          {%- if menu_parent != blank and menu_parent.links.size > 0 -%}
+            {%- assign chip_count = 0 -%}
+            <nav aria-label="{{ collection.title | escape }}: Kategorien">
+              <ul class="film-banner__chips">
+                {%- for group in menu_parent.links -%}
+                  {%- if group.links.size > 0 -%}
+                    {%- for item in group.links -%}
+                      {%- if item.url != collection.url and chip_count < 6 -%}
+                        <li><a class="chip chip--dark" href="{{ item.url }}">{{ item.title | escape }}</a></li>
+                        {%- assign chip_count = chip_count | plus: 1 -%}
+                      {%- endif -%}
+                    {%- endfor -%}
+                  {%- elsif group.url != collection.url and chip_count < 6 -%}
+                    <li><a class="chip chip--dark" href="{{ group.url }}">{{ group.title | escape }}</a></li>
+                    {%- assign chip_count = chip_count | plus: 1 -%}
+                  {%- endif -%}
+                {%- endfor -%}
+              </ul>
+            </nav>
+          {%- endif -%}
+        {%- elsif collection.description != blank -%}
           <p>{{ collection.description | strip_html | truncate: 240 }}</p>
         {%- endif -%}
       </div>
       <div class="page-banner__media">
-        {%- render 'media', image: banner_image, asset: banner_asset, width: 1200, height: 600, sizes: '50vw', loading: 'eager' -%}
+        {%- if film_file != blank -%}
+          <div class="film-banner__frame">
+            <video
+              class="film-banner__video"
+              data-film
+              width="960"
+              height="720"
+              poster="{{ film_poster | asset_url }}"
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              aria-label="{{ film_label | escape }}"
+            >
+              <source src="{{ film_file | asset_url }}" type="video/mp4">
+            </video>
+            <button class="film-banner__toggle" type="button" data-film-toggle data-state="playing" aria-label="Film pausieren">
+              {% render 'icon', name: 'pause', class: 'film-banner__icon--pause' %}
+              {% render 'icon', name: 'play', class: 'film-banner__icon--play' %}
+            </button>
+          </div>
+        {%- else -%}
+          {%- render 'media', image: banner_image, asset: banner_asset, width: 1200, height: 600, sizes: '50vw', loading: 'eager' -%}
+        {%- endif -%}
       </div>
     </div>
   </section>
