@@ -96,7 +96,7 @@ html:not(:has(.announce)) { --announce-h: 0px; }
 /* Megamenü */
 .mega {
   position: absolute; left: 0; right: 0; top: 100%;
-  background: var(--c-anthracite); border-top: 1px solid var(--c-steel); box-shadow: 0 24px 48px rgba(0, 0, 0, 0.45);
+  background: var(--c-black); border-top: 1px solid var(--c-steel); box-shadow: 0 24px 48px rgba(0, 0, 0, 0.45);
   visibility: hidden; opacity: 0; transform: translateY(-6px);
   transition: opacity var(--t-fast), transform var(--t-fast), visibility 0s linear var(--t-fast);
 }

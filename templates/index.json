@@ -61,23 +61,6 @@
         "scroll_target": "nach-hero"
       }
     },
-    "marquee": {
-      "type": "marquee",
-      "blocks": {
-        "motorcycles": { "type": "item", "settings": { "text": "Motorräder" } },
-        "apparel": { "type": "item", "settings": { "text": "Bekleidung" } },
-        "parts": { "type": "item", "settings": { "text": "Teile & Zubehör" } },
-        "accessories": { "type": "item", "settings": { "text": "Accessoires" } },
-        "service": { "type": "item", "settings": { "text": "Service" } },
-        "testdrive": { "type": "item", "settings": { "text": "Probefahrt" } }
-      },
-      "block_order": ["motorcycles", "apparel", "parts", "accessories", "service", "testdrive"],
-      "settings": {
-        "aria_label": "Sortiment und Service",
-        "anchor_id": "nach-hero",
-        "speed": 60
-      }
-    },
     "service": {
       "type": "service-tiles",
       "blocks": {
@@ -154,5 +137,5 @@
       }
     }
   },
-  "order": ["hero", "marquee", "service", "news", "statement", "bento", "showroom", "story"]
+  "order": ["hero", "service", "news", "statement", "bento", "showroom", "story"]
 }

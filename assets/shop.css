@@ -455,3 +455,22 @@ html:not(.has-motion) .bcard:hover .bcard__media img { transform: none; }
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
 }
+
+/* ---------- Produktkarten: kleineres Bild ---------- */
+/* Quadratisch statt 4:5: die Karten wirken kompakter, in Kollektion und Suche passen mehr Artikel auf den Bildschirm. */
+.pcard__media { aspect-ratio: 1 / 1; }
+
+/* ---------- Spaltenwahl: 5 Spalten ab 1280 px ---------- */
+.grid-toggle [data-cols="5"] { display: none; }
+@media (min-width: 1280px) { .grid-toggle [data-cols="5"] { display: grid; } }
+@media (max-width: 1279px) {
+  .grid-toggle:has([data-cols="5"][aria-pressed="true"]) [data-cols="4"] { color: var(--c-black); border-color: var(--c-black); }
+}
+
+/* ---------- Produktseite: kleineres Foto ---------- */
+/* Foto und Infospalte teilen sich die Breite gleichmäßig, das Foto ist quadratisch statt 4:5 und nie höher als das
+   Fenster minus Kopfbereich: es ist auf jedem Bildschirm vollständig zu sehen. Die breite Galerie der Motorräder (16:10)
+   behält ihr Format. */
+@media (min-width: 1024px) { .pdp { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+.gallery__main { aspect-ratio: 1 / 1; max-height: max(360px, calc(100svh - 200px)); }
+.gallery__thumbs button { aspect-ratio: 1 / 1; }
