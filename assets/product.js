@@ -11,28 +11,78 @@
     var $ = function (sel, ctx) { return (ctx || root).querySelector(sel); };
     var $$ = function (sel, ctx) { return Array.prototype.slice.call((ctx || root).querySelectorAll(sel)); };
 
-    /* ---------- Galerie ---------- */
-    var main = $('[data-gallery-main]');
+    /* ---------- Galerie: Slides mit Scroll-Snap ----------
+       Die Schiene scrollt nativ (mobil wischen, Pfeiltasten auf der Schiene). Vorschaubilder und Variantenbild springen
+       per scrollTo zum Slide; aria-current der Vorschaubilder folgt dem sichtbaren Slide. */
+    var track = $('[data-gallery-track]');
+    var slides = $$('[data-slide]');
+    var thumbs = $$('[data-thumb]');
+    var thumbRow = $('.gallery__thumbs');
+    var active = 0;
+    var holdUntil = 0; // während eines programmatischen Sprungs melden die Zwischen-Slides nichts
 
-    function showImage(button) {
-      if (!main || !button) return;
-      main.src = button.dataset.thumb;
-      if (button.dataset.thumbSrcset) main.srcset = button.dataset.thumbSrcset;
-      if (button.dataset.thumbAlt) main.alt = button.dataset.thumbAlt;
-      $$('[data-thumb]').forEach(function (b) { b.setAttribute('aria-current', b === button ? 'true' : 'false'); });
+    function behavior() { return PS.prefersReducedMotion() ? 'auto' : 'smooth'; }
+    function mark(i) {
+      active = i;
+      thumbs.forEach(function (b, k) { b.setAttribute('aria-current', k === i ? 'true' : 'false'); });
+      var b = thumbs[i];
+      // Nur die Vorschau-Zeile scrollen, nicht die Seite (scrollIntoView würde auch vertikal springen)
+      if (b && thumbRow) thumbRow.scrollTo({ left: b.offsetLeft - (thumbRow.clientWidth - b.offsetWidth) / 2, behavior: behavior() });
+    }
+    function showSlide(i) {
+      if (!track || !slides[i]) return;
+      holdUntil = Date.now() + 700;
+      mark(i);
+      track.scrollTo({ left: slides[i].offsetLeft, behavior: behavior() });
     }
     function showImageById(id) {
       if (!id) return;
-      showImage($('[data-media-id="' + id + '"]'));
+      for (var i = 0; i < slides.length; i++) if (slides[i].dataset.mediaId == id) { if (i !== active) showSlide(i); return; }
+    }
+    if (track && slides.length > 1 && 'IntersectionObserver' in window) {
+      var seen = new IntersectionObserver(function (entries) {
+        if (Date.now() < holdUntil) return;
+        entries.forEach(function (en) { if (en.isIntersecting) mark(slides.indexOf(en.target)); });
+      }, { root: track, threshold: 0.6 });
+      slides.forEach(function (s) { seen.observe(s); });
+    }
+
+    /* ---------- Lightbox: hochauflösende Quelle, Zoom per Klick/Tippen, Schwenken mit Maus oder Finger ---------- */
+    var stage = $('[data-lightbox-stage]');
+    var big = $('[data-lightbox-img]');
+    var zoomToggle = $('[data-zoom-toggle]');
+    function zoom(on, event) {
+      if (!stage) return;
+      on = on == null ? !stage.classList.contains('is-zoomed') : on;
+      stage.classList.toggle('is-zoomed', on);
+      if (zoomToggle) zoomToggle.setAttribute('aria-pressed', on);
+      if (!on) { big.style.transformOrigin = ''; return; }
+      pan(event);
+    }
+    // Der Zoom-Punkt folgt dem Zeiger (Prozent der Fläche); ohne Zeiger (Schalter) bleibt es die Mitte
+    function pan(event) {
+      var r = stage.getBoundingClientRect();
+      big.style.transformOrigin = event && r.width ? ((event.clientX - r.left) / r.width * 100) + '% ' + ((event.clientY - r.top) / r.height * 100) + '%' : '50% 50%';
+    }
+    if (stage && big) {
+      stage.addEventListener('click', function (e) { zoom(null, e); });
+      stage.addEventListener('pointermove', function (e) {
+        if (stage.classList.contains('is-zoomed') && (e.pointerType === 'mouse' || e.buttons)) pan(e);
+      });
+      if (zoomToggle) zoomToggle.addEventListener('click', function () { zoom(); });
+      stage.closest('dialog').addEventListener('close', function () { zoom(false); });
     }
 
     root.addEventListener('click', function (event) {
       var thumb = event.target.closest('[data-thumb]');
-      if (thumb) { showImage(thumb); return; }
+      if (thumb) { showSlide(thumbs.indexOf(thumb)); return; }
 
       if (event.target.closest('[data-zoom]')) {
-        var lightbox = $('[data-lightbox-img]');
-        if (lightbox && main) lightbox.src = main.currentSrc || main.src;
+        var slide = slides[active];
+        if (big && slide) {
+          big.src = slide.dataset.full; // hochauflösend (2400 px), nicht die 600 bis 1200w des Slides
+          big.alt = slide.querySelector('img').alt;
+        }
         PS.openDialog('lightbox', event.target.closest('[data-zoom]'));
         return;
       }
@@ -63,8 +113,9 @@
       var data = JSON.parse(jsonNode.textContent);
       var idField = $('[data-variant-id]', form);
       var errorNode = $('[data-option-error]', form);
-      var buyButton = $('[data-buy]', form);
-      var buyText = $('[data-buy-text]', form);
+      // Kaufbutton und Text gibt es zweimal: im Formular und in der Sticky-Leiste (außerhalb, per form="…" verbunden)
+      var buyButtons = $$('[data-buy]');
+      var buyTexts = $$('[data-buy-text]');
       var request = null;
 
       var selected = rows.map(function (row) {
@@ -99,10 +150,9 @@
       };
 
       var refreshBuy = function (variant) {
-        if (!buyButton) return;
         var can = variant ? variant.available : data.variants.some(function (v) { return v.available; });
-        buyButton.disabled = !can;
-        if (buyText) buyText.textContent = can ? 'In den Warenkorb' : 'Ausverkauft';
+        buyButtons.forEach(function (b) { b.disabled = !can; });
+        buyTexts.forEach(function (t) { t.textContent = can ? 'In den Warenkorb' : 'Ausverkauft'; });
       };
 
       var refreshDynamic = function (variant) {
@@ -187,6 +237,23 @@
         var empty = $('[data-compat-empty]');
         if (empty) empty.hidden = shown > 0;
       });
+    }
+
+    /* ---------- Mobile Kaufleiste (Teile, Bekleidung): erscheint, sobald der Kaufbereich oben aus dem Bild ist ---------- */
+    var sticky = $('[data-sticky-buy]');
+    var buyBox = $('.pdp__buy');
+    if (sticky && buyBox && 'IntersectionObserver' in window) {
+      var past = false;
+      var atFooter = false;
+      var sync = function () { sticky.classList.toggle('is-shown', past && !atFooter); };
+      // Wurzel = Streifen oberhalb des Bildes: ein Sprung über den Kaufbereich (Anker, Fling) wird sonst nie gemeldet
+      new IntersectionObserver(function (en) {
+        past = en[en.length - 1].boundingClientRect.bottom <= 0;
+        sync();
+      }, { rootMargin: '9999px 0px -100% 0px', threshold: [0, 1] }).observe(buyBox);
+      // Am Seitenende nicht über der Fußzeile liegen bleiben
+      var footer = document.querySelector('.site-footer');
+      if (footer) new IntersectionObserver(function (en) { atFooter = en[0].isIntersecting; sync(); }).observe(footer);
     }
 
     /* ---------- Mobile Kontaktleiste (Motorräder) ---------- */

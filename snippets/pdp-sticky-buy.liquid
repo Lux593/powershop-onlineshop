@@ -1,0 +1,21 @@
+{% doc %}
+  Mobile Kaufleiste der Produktseite (Teile, Bekleidung): Preis und „In den Warenkorb“, sobald der Kaufbereich oben aus dem
+  Bild ist. Der Button gehört per form="…" zum Produktformular aus pdp-buy.liquid (gleiche ID); product.js blendet die Leiste
+  ein und hält Text und Sperre des Buttons im Gleichlauf, cart.js sperrt beide beim Absenden. Ab 1024 px ausgeblendet.
+  Ohne JavaScript bleibt sie versteckt, das Formular im Kaufbereich funktioniert wie gewohnt.
+
+  @param {product} product - Produkt
+
+  @example
+  {% render 'pdp-sticky-buy', product: product %}
+{% enddoc %}
+
+{%- assign form_id = 'product-form-' | append: product.id -%}
+<div class="sticky-buy on-dark" data-sticky-buy>
+  <div class="sticky-buy__price" data-pdp-dynamic="sticky-price">
+    {%- render 'price', product: product, variant: product.selected_variant, long: true -%}
+  </div>
+  <button class="btn btn--primary" type="submit" form="{{ form_id }}" name="add" data-buy{% unless product.available %} disabled{% endunless %}>
+    {% render 'icon', name: 'shopping-bag' %}<span data-buy-text>{% if product.available %}In den Warenkorb{% else %}Ausverkauft{% endif %}</span>
+  </button>
+</div>
