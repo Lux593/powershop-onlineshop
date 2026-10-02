@@ -5,6 +5,7 @@
    ========================================================================== */
 (function () {
   var PS = (window.PS = window.PS || {});
+  var footerIO; // ein Beobachter für die Fußzeile: ein Section-Reload im Editor ersetzt ihn, statt weitere anzuhäufen
 
   PS.on('[data-pdp]', function (root) {
     var sectionId = root.dataset.sectionId;
@@ -47,25 +48,27 @@
       slides.forEach(function (s) { seen.observe(s); });
     }
 
-    /* ---------- Lightbox: hochauflösende Quelle, Zoom per Klick/Tippen, Schwenken mit Maus oder Finger ---------- */
+    /* ---------- Lightbox: hochauflösende Quelle, Zoom per Klick/Tippen, Schwenken mit Maus, Finger oder Pfeiltasten ---------- */
     var stage = $('[data-lightbox-stage]');
     var big = $('[data-lightbox-img]');
     var zoomToggle = $('[data-zoom-toggle]');
+    var at = [50, 50]; // Zoompunkt in Prozent des Bildes
     function zoom(on, event) {
       if (!stage) return;
       on = on == null ? !stage.classList.contains('is-zoomed') : on;
       stage.classList.toggle('is-zoomed', on);
       if (zoomToggle) zoomToggle.setAttribute('aria-pressed', on);
       if (!on) { big.style.transformOrigin = ''; return; }
-      pan(event);
+      if (event) pan(event); else move(50, 50); // ohne Zeiger (Schalter) die Mitte
     }
-    // Zoom-Punkt folgt dem Zeiger (Prozent des Bildes, begrenzt), ohne Zeiger (Schalter) die Mitte
+    function move(x, y) {
+      at = [Math.min(Math.max(x, 0), 100), Math.min(Math.max(y, 0), 100)];
+      big.style.transformOrigin = at[0] + '% ' + at[1] + '%';
+    }
+    // Zoompunkt folgt dem Zeiger
     function pan(event) {
       var r = stage.getBoundingClientRect();
-      var at = function (v) { return Math.min(Math.max(v, 0), 1) * 100 + '%'; };
-      big.style.transformOrigin = event
-        ? at((event.clientX - r.left - big.offsetLeft) / big.offsetWidth) + ' ' + at((event.clientY - r.top - big.offsetTop) / big.offsetHeight)
-        : '50% 50%';
+      move((event.clientX - r.left - big.offsetLeft) / big.offsetWidth * 100, (event.clientY - r.top - big.offsetTop) / big.offsetHeight * 100);
     }
     if (stage && big) {
       stage.addEventListener('click', function (e) { zoom(null, e); });
@@ -73,7 +76,15 @@
         if (stage.classList.contains('is-zoomed') && (e.pointerType === 'mouse' || e.buttons)) pan(e);
       });
       if (zoomToggle) zoomToggle.addEventListener('click', function () { zoom(); });
-      stage.closest('dialog').addEventListener('close', function () { zoom(false); });
+      var box = stage.closest('dialog');
+      box.addEventListener('close', function () { zoom(false); });
+      // Tastatur: Pfeiltasten schwenken das gezoomte Bild (Schalter und Schließen-Knopf nutzen sie nicht)
+      box.addEventListener('keydown', function (e) {
+        var k = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[e.key];
+        if (!k || !stage.classList.contains('is-zoomed')) return;
+        e.preventDefault();
+        move(at[0] + k[0] * 12, at[1] + k[1] * 12);
+      });
     }
 
     root.addEventListener('click', function (event) {
@@ -256,7 +267,11 @@
       }, { rootMargin: '9999px 0px -100% 0px', threshold: [0, 1] }).observe(buyBox);
       // am Seitenende nicht über der Fußzeile
       var footer = document.querySelector('.site-footer');
-      if (footer) new IntersectionObserver(function (en) { atFooter = en[0].isIntersecting; sync(); }).observe(footer);
+      if (footer) {
+        if (footerIO) footerIO.disconnect();
+        footerIO = new IntersectionObserver(function (en) { atFooter = en[0].isIntersecting; sync(); });
+        footerIO.observe(footer);
+      }
     }
 
     /* ---------- Mobile Kontaktleiste (Motorräder) ---------- */

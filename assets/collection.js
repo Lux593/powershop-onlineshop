@@ -66,7 +66,9 @@
     var controller = null;
     var timer = null;
     var busyTimer = null;
-    var last = window.location.pathname + window.location.search;
+    var seq = 0;   // Zähler der Ladevorgänge: nur der jüngste darf austauschen
+    var vt = null; // laufende View Transition
+    var last = window.location.pathname + window.location.search; // jüngste angeforderte Adresse (nicht erst die angewendete)
 
     function $(sel, ctx) { return (ctx || root).querySelector(sel); }
     function $$(sel, ctx) { return Array.prototype.slice.call((ctx || root).querySelectorAll(sel)); }
@@ -102,10 +104,11 @@
       var results = $('[data-results]');
       var html = document.documentElement;
       if (!animate || !results || !document.startViewTransition || !PS.motion.enabled) { update(false); return; }
-      var done = function () { results.classList.remove('is-vt'); html.classList.remove('is-vt-results'); };
       results.classList.add('is-vt');
       html.classList.add('is-vt-results');
-      var transition = document.startViewTransition(function () { update(true); });
+      var transition = vt = document.startViewTransition(function () { update(true); });
+      // Nur die jüngste Überblendung räumt auf: eine übersprungene darf die Klassen der nächsten nicht vorzeitig entfernen
+      var done = function () { if (vt !== transition) return; vt = null; results.classList.remove('is-vt'); html.classList.remove('is-vt-results'); };
       // übersprungene Übergänge melden sonst „Uncaught (in promise)“
       transition.ready.catch(function () {});
       transition.updateCallbackDone.catch(function () {});
@@ -118,12 +121,16 @@
       var target = new URL(url, window.location.origin);
       var request = new URL(target.href);
       request.searchParams.set('section_id', sectionId);
+      var mine = ++seq;
+      last = target.pathname + target.search; // sofort: ein schnelles Zurück/Vor bricht diesen Ladevorgang dann ab
 
       if (controller) controller.abort();
       controller = new AbortController();
 
       busy(true);
-      var focusId = document.activeElement && document.activeElement.id;
+      var active = document.activeElement;
+      var focusId = active && active.id;
+      var hadFocus = active && active !== document.body && root.contains(active);
 
       fetch(request.pathname + request.search, { signal: controller.signal })
         .then(function (response) {
@@ -131,6 +138,7 @@
           return response.text();
         })
         .then(function (html) {
+          if (mine !== seq) return; // ein jüngerer Ladevorgang hat übernommen
           var doc = new DOMParser().parseFromString(html, 'text/html');
           var next = doc.querySelector('[data-collection]');
           if (!next) throw new Error('Section nicht gefunden');
@@ -138,14 +146,17 @@
           busy(false); // vor dem Austausch: der alte Stand geht nicht abgedunkelt in die Überblendung
           // Beim Blättern (Scrollen) keine Überblendung, die Karten laufen über ihre Reveals ein
           swap(function (viaTransition) {
+            if (mine !== seq) return; // die Überblendung startet verzögert: inzwischen kann ein jüngerer Ladevorgang laufen
             try {
               apply(next, doc, viaTransition);
               // Adresse erst mit dem neuen Stand
               if (options.push !== false) window.history.pushState({}, '', target.pathname + target.search);
-              last = target.pathname + target.search;
-              if (focusId) {
-                var again = document.getElementById(focusId);
-                if (again) again.focus();
+              var again = focusId && document.getElementById(focusId);
+              if (again) again.focus();
+              else if (hadFocus && document.activeElement === document.body) {
+                // Das fokussierte Element ist mit dem Austausch verschwunden (Seitenlink, Filter-Chip): Fokus auf die Überschrift der Ergebnisse
+                var head = $('[data-results] h2');
+                if (head) { head.tabIndex = -1; head.focus({ preventScroll: true }); }
               }
               if (options.scroll) {
                 var bar = $('[data-filterbar]');
@@ -171,6 +182,15 @@
       if (results && nextResults) {
         // Die Überblendung bewegt: kein zusätzlicher Reveal-Stagger
         if (viaTransition) $$('[data-reveal]', nextResults).forEach(function (el) { el.removeAttribute('data-reveal'); });
+        // Die Trefferzahl sagt die Live-Region [data-live] außerhalb an: eine mit ersetzte Region würde nicht verlässlich gelesen
+        var own = $('[data-active]', nextResults);
+        var count = $('.active-filters__count', nextResults);
+        var live = $('[data-live]');
+        if (own) own.removeAttribute('aria-live');
+        if (live && count) {
+          live.textContent = '';
+          setTimeout(function () { live.textContent = count.textContent.replace(/\s+/g, ' ').trim(); }, 60);
+        }
         results.innerHTML = nextResults.innerHTML;
         var grid = $('[data-grid]', results);
         if (grid && cols) grid.dataset.cols = cols;

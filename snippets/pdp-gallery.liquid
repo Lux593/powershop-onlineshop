@@ -36,7 +36,7 @@
               src="{{ image | image_url: width: main_width }}"
               srcset="{{ image | image_url: width: 600 }} 600w, {{ image | image_url: width: 900 }} 900w, {{ image | image_url: width: main_width }} {{ main_width }}w"
               sizes="(min-width: 1024px) 58vw, 100vw"
-              alt="{{ image.alt | default: product.title | escape }}"
+              alt="{% if image.alt != blank %}{{ image.alt | escape }}{% elsif product.images.size > 1 %}{{ product.title | escape }}, Bild {{ forloop.index }} von {{ product.images.size }}{% else %}{{ product.title | escape }}{% endif %}"
               width="{{ image.width }}"
               height="{{ image.height }}"
               {% if forloop.first %}fetchpriority="high"{% else %}loading="lazy"{% endif %}
@@ -75,7 +75,10 @@
     <div class="modal__head">
       <span class="small">{{ product.title | escape }}</span>
       <div class="lightbox__tools">
-        {%- if first_image -%}<button class="btn btn--text" type="button" data-zoom-toggle aria-pressed="false">Zoom</button>{%- endif -%}
+        {%- if first_image -%}
+          <button class="btn btn--text" type="button" data-zoom-toggle aria-pressed="false" aria-describedby="lightbox-zoom-hint">Zoom</button>
+          <span class="sr-only" id="lightbox-zoom-hint">Gezoomt verschiebst du das Bild mit den Pfeiltasten.</span>
+        {%- endif -%}
         <button class="icon-btn" type="button" data-close aria-label="Schließen">{% render 'icon', name: 'x' %}</button>
       </div>
     </div>

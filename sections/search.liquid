@@ -16,8 +16,9 @@
         </form>
       </div>
       <div class="page-banner__media">
+        {%- comment -%} Am Desktop das LCP-Element: eager mit hoher Priorität (lazy verzögerte es dort bei langsamer Verbindung gemessen um mehrere Sekunden). Unter 1024 px ausgeblendet. {%- endcomment -%}
         {%- capture banner_html -%}
-          {%- render 'media', image: section.settings.banner_image, asset: 'banner-neuheiten.jpg', width: 1200, height: 600, sizes: '50vw', loading: 'lazy' -%}
+          {%- render 'media', image: section.settings.banner_image, asset: 'banner-neuheiten.jpg', width: 1200, height: 600, sizes: '50vw', loading: 'eager' -%}
         {%- endcapture -%}
         {{- banner_html | replace: '<img', '<img fetchpriority="high"' -}}
       </div>
@@ -41,6 +42,9 @@
       {%- if show_toolbar -%}
         {%- render 'results-toolbar', results: search, action: routes.search_url, terms: search.terms, default_cols: '4' -%}
       {%- endif -%}
+
+      {%- comment -%} Ansage der Trefferzahl: liegt außerhalb von [data-results], das collection.js ersetzt {%- endcomment -%}
+      <div class="sr-only" role="status" aria-live="polite" aria-atomic="true" data-live></div>
 
       {%- paginate search.results by section.settings.per_page -%}
         <div data-results>

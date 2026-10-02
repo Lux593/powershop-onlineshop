@@ -127,10 +127,12 @@
           </div>
         {%- else -%}
           {%- comment -%}
-            Das Banner ist unter 1024 px ausgeblendet: lazy lädt es dort nicht. Am Desktop ist es der Erstblick, daher hohe Priorität.
+            Am Desktop ist das Banner der Erstblick und das LCP-Element: eager mit hoher Priorität, damit der Preload-Scanner es früh
+            findet (lazy verzögerte es dort bei langsamer Verbindung gemessen um mehrere Sekunden). Unter 1024 px ist es ausgeblendet und lädt trotzdem mit,
+            das kostet dort eine kleine Datei. Ein Medien-Preload würde die Bildauswahl aus media.liquid duplizieren.
           {%- endcomment -%}
           {%- capture banner_html -%}
-            {%- render 'media', image: banner_image, asset: banner_asset, width: 1200, height: 600, sizes: '50vw', loading: 'lazy' -%}
+            {%- render 'media', image: banner_image, asset: banner_asset, width: 1200, height: 600, sizes: '50vw', loading: 'eager' -%}
           {%- endcapture -%}
           {{- banner_html | replace: '<img', '<img fetchpriority="high"' -}}
         {%- endif -%}
@@ -142,6 +144,9 @@
     {%- unless collection_empty -%}
       {%- render 'results-toolbar', results: collection, action: collection.url, bikes: is_bikes, default_cols: default_cols -%}
     {%- endunless -%}
+
+    {%- comment -%} Ansage der Trefferzahl nach Filter, Sortierung und Seitenwechsel: liegt außerhalb von [data-results], das ersetzt wird (collection.js) {%- endcomment -%}
+    <div class="sr-only" role="status" aria-live="polite" aria-atomic="true" data-live></div>
 
     {%- paginate collection.products by section.settings.per_page -%}
       <div data-results>

@@ -4,16 +4,33 @@
   ein und hält Text und Sperre des Buttons im Gleichlauf, cart.js sperrt beide beim Absenden. Ab 1024 px ausgeblendet.
   Ohne JavaScript bleibt sie versteckt, das Formular im Kaufbereich funktioniert wie gewohnt.
 
+  Der Preis ist hier bewusst eine Kurzform (nicht price.liquid): nur der aktuelle Preis, ein vollständiger Hinweis ohne Link
+  und ohne Streichpreis. Der Streichpreis samt Erklärung („niedrigster Preis der letzten 30 Tage“) und der Versandlink stehen
+  im Kaufbereich. Ein Link in der engen Leiste wäre beim Fokus teils abgeschnitten.
+
   @param {product} product - Produkt
 
   @example
   {% render 'pdp-sticky-buy', product: product %}
 {% enddoc %}
 
-{%- assign form_id = 'product-form-' | append: product.id -%}
+{%- liquid
+  assign form_id = 'product-form-' | append: product.id
+  assign v = product.selected_or_first_available_variant
+  assign show_from = false
+  if product.selected_variant == blank and product.price_varies
+    assign show_from = true
+  endif
+-%}
 <div class="sticky-buy on-dark" data-sticky-buy>
   <div class="sticky-buy__price" data-pdp-dynamic="sticky-price">
-    {%- render 'price', product: product, variant: product.selected_variant, long: true -%}
+    <p class="price" data-price>
+      <span class="price__now">{% if show_from %}ab {% endif %}{{ v.price | money }}</span>
+      {%- if v.unit_price_measurement -%}
+        <span class="price__unit">({{ v.unit_price | money }} / {{ v.unit_price_measurement.reference_value }} {{ v.unit_price_measurement.reference_unit }})</span>
+      {%- endif -%}
+      <span class="price__note">inkl. MwSt., zzgl. Versand</span>
+    </p>
   </div>
   <button class="btn btn--primary" type="submit" form="{{ form_id }}" name="add" data-buy{% unless product.available %} disabled{% endunless %}>
     {% render 'icon', name: 'shopping-bag' %}<span data-buy-text>{% if product.available %}In den Warenkorb{% else %}Ausverkauft{% endif %}</span>
