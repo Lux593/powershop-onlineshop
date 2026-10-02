@@ -48,6 +48,9 @@
       gesetzt ist (Setting, kein Datensparen, keine reduzierte Bewegung, ohne JavaScript nie): daher setzt ein Skript die Regel
       statt eines festen style-Blocks. Fällt has-motion durch den Failsafe weg (motion.js fehlt), geht die Regel mit. Der Header
       behält einen Namen und bleibt beim Überblenden stehen. Die ::view-transition-Regeln stehen in shop.css.
+      Der Weg ZUM Warenkorb oder zur Kasse (Link, Drawer-Button, POST /cart): die Zielseite hat keinen Opt-in, die Transition
+      bricht sonst mit einem unbehandelten InvalidStateError ab. Daher überspringt pageswap sie für /cart, /checkout(s) und
+      /orders (auch mit Sprachpräfix). Alle anderen Übergänge bleiben.
     {%- endcomment -%}
     {%- unless template.name == 'cart' or request.design_mode -%}
       {%- if settings.motion_enabled -%}
@@ -57,6 +60,12 @@
             var s = document.head.appendChild(document.createElement('style'));
             s.textContent = '@media (prefers-reduced-motion: no-preference) { @view-transition { navigation: auto; } [data-header] { view-transition-name: site-header; } }';
             setTimeout(function () { if (!d.classList.contains('has-motion')) s.remove(); }, 3600);
+            addEventListener('pageswap', function (e) {
+              try {
+                var u = e.viewTransition && e.activation && e.activation.entry && e.activation.entry.url;
+                if (u && /^(\/[a-z]{2}(-[a-z]{2})?)?\/(cart|checkouts?|orders)(\/|$)/i.test(new URL(u).pathname)) e.viewTransition.skipTransition();
+              } catch (x) { /* ohne Transition weiter */ }
+            });
           })(document.documentElement);
         </script>
       {%- endif -%}

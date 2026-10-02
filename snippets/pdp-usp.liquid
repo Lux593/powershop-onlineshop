@@ -1,9 +1,31 @@
 {% doc %}
   Liste mit Lieferzeit, Rückgabe und Abholung auf der Produktseite. Werte kommen aus den Theme-Einstellungen.
+  Leere oder 0-Werte erzeugen keine Aussage („versandkostenfrei ab 0 €“, „ Tage Rückgabe“ stehen nie im Shop).
 {% enddoc %}
 
+{%- liquid
+  assign return_days = settings.return_days | default: 0
+  assign delivery_time = settings.delivery_time | strip
+  assign ship_line = ''
+  if settings.free_shipping_threshold > 0
+    assign ship_line = settings.free_shipping_threshold | times: 100 | money_without_trailing_zeros | prepend: 'versandkostenfrei ab '
+  endif
+  if delivery_time != blank
+    assign delivery_line = 'Lieferzeit ' | append: delivery_time
+    if ship_line != blank
+      assign ship_line = delivery_line | append: ' · ' | append: ship_line
+    else
+      assign ship_line = delivery_line
+    endif
+  elsif ship_line != blank
+    assign ship_line = ship_line | capitalize
+  endif
+-%}
+
 <ul class="usp">
-  <li>{% render 'icon', name: 'truck' %}Lieferzeit {{ settings.delivery_time }} · versandkostenfrei ab {{ settings.free_shipping_threshold | times: 100 | money_without_trailing_zeros }}</li>
-  <li>{% render 'icon', name: 'rotate-ccw' %}{{ settings.return_days }} Tage Rückgabe (gesetzliches Widerrufsrecht: 14 Tage)</li>
+  {%- if ship_line != blank -%}
+    <li>{% render 'icon', name: 'truck' %}{{ ship_line }}</li>
+  {%- endif -%}
+  <li>{% render 'icon', name: 'rotate-ccw' %}{% if return_days > 0 %}{{ return_days }} Tage Rückgabe (gesetzliches Widerrufsrecht: 14 Tage){% else %}Gesetzliches Widerrufsrecht: 14 Tage{% endif %}</li>
   <li>{% render 'icon', name: 'store' %}Abholung im Power Shop möglich</li>
 </ul>

@@ -1,6 +1,12 @@
 {%- liquid
   assign discount = settings.newsletter_discount | default: 0
   assign news_heading = section.settings.news_heading | replace: '{rabatt}', discount
+  comment
+    Ohne Rabatt (leer oder 0) bliebe „0 % auf deine erste Bestellung“ stehen: dann gilt die neutrale Überschrift.
+  endcomment
+  if discount <= 0 and section.settings.news_heading contains '{rabatt}'
+    assign news_heading = 'Newsletter'
+  endif
 
   comment
     Die Spalte „Soziale Netze“ erscheint erst, wenn mindestens ein Profil hinterlegt ist.
@@ -9,7 +15,17 @@
     Auch der einzelne Menüpunkt einer ausgeblendeten Spalte (z. B. nur „Impressum“) steht dann in der Fußzeile:
     Pflichtlinks (Impressum, Datenschutz, AGB, Widerruf) verschwinden so nie, egal wie das Menü gepflegt ist.
     Das Raster passt sich an die Zahl der sichtbaren Spalten an.
+    Rückfall für Rechtstexte: Richtlinien aus Einstellungen > Richtlinien, die in keinem Menü verlinkt sind (Menü fehlt oder
+    ist unvollständig), erscheinen in der Fußzeile. Versand steht schon im Preishinweis, bleibt hier also draußen.
   endcomment
+  assign menu_urls = ' '
+  for block in section.blocks
+    if block.type == 'links'
+      for link in linklists[block.settings.menu].links
+        assign menu_urls = menu_urls | append: link.url | append: ' '
+      endfor
+    endif
+  endfor
   assign has_social = false
   if settings.social_instagram != blank or settings.social_facebook != blank or settings.social_youtube != blank or settings.social_tiktok != blank
     assign has_social = true
@@ -137,6 +153,13 @@
             {%- endif -%}
           {%- endfor -%}
         {%- endunless -%}
+        {%- if section.settings.show_policy_fallback -%}
+          {%- for policy in shop.policies -%}
+            {%- if policy.url == blank or policy.url == shop.shipping_policy.url or menu_urls contains policy.url -%}
+              {%- continue -%}
+            {%- endif %} · <a href="{{ policy.url }}">{{ policy.title }}</a>
+          {%- endfor -%}
+        {%- endif -%}
         {%- if footer_cookie_settings %} · <a href="#" data-cookie-settings>Cookie-Einstellungen</a>{% endif -%}
         {%- if footer_size_guide %} · <a href="#" data-open="sizeguide">Größentabelle</a>{% endif -%}
       </p>
@@ -148,6 +171,7 @@
 {
   "name": "Footer",
   "settings": [
+    { "type": "checkbox", "id": "show_policy_fallback", "label": "Fehlende Richtlinien in der Fußzeile verlinken", "default": true, "info": "Verlinkt Datenschutz, AGB, Widerruf, Impressum und weitere Richtlinien aus Einstellungen > Richtlinien, sofern sie in keinem Menü stehen. Ausschalten, wenn die Rechtstexte bewusst nur über eigene Seiten laufen." },
     { "type": "checkbox", "id": "show_newsletter", "label": "Newsletter-Band anzeigen", "default": true },
     { "type": "text", "id": "news_heading", "label": "Newsletter-Überschrift", "info": "{rabatt} wird durch den Newsletter-Rabatt aus den Theme-Einstellungen ersetzt.", "default": "{rabatt} % auf deine erste Bestellung" },
     { "type": "textarea", "id": "news_text", "label": "Newsletter-Text", "default": "News zu neuen Modellen, Events und Kollektionen. Der Gutschein gilt für Bekleidung, Teile und Accessoires – nicht für Motorräder." },

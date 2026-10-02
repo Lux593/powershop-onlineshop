@@ -54,3 +54,30 @@
 .cart-page__lines .line-item { padding-block: 20px; border-bottom: 1px solid var(--c-line); }
 .cart-page__summary { display: grid; gap: 16px; padding: 24px; background: var(--c-white); border: 1px solid var(--c-line); }
 @media (min-width: 1024px) { .cart-page__summary { position: sticky; top: calc(var(--header-offset) + 24px); } }
+
+/* ---------- Kontrastmodus (forced-colors, z. B. Windows) ----------
+   Dort ersetzt der Browser Hintergrund- und Randfarben durch Systemfarben: Zustände, die nur über sie laufen, gehen verloren
+   (gewählter Umschalter, Spalten-Wahl, Farbfelder, Tab-Linie). Gewählt wird deshalb mit Systemfarben, die der Modus
+   beibehält. Gebündelt hier, auch für Klassen aus shop.css und hero.css: ihre Selektoren sind eine Stufe spezifischer, weil
+   diese Dateien später laden. Der Tab-Indikator der Produkt-Tabs steht in home.css. */
+@media (forced-colors: active) {
+  .segmented button[aria-pressed="true"],
+  .chip[aria-pressed="true"], .chip.is-active,
+  .size-chip[aria-pressed="true"],
+  .pagination button[aria-current="page"], .pagination a[aria-current="page"] {
+    forced-color-adjust: none; background: Highlight; color: HighlightText;
+  }
+  /* Tabs: nur der gewählte trägt einen Strich (die transparente Linie würde sonst bei allen in Systemfarbe sichtbar) */
+  .tab { border-bottom-color: Canvas; }
+  .tab[aria-selected="true"] { border-bottom-color: Highlight; }
+  /* Farbfelder tragen ihre Farbe als Hintergrund und wären sonst leere Kreise; der Rand hält dunkle Farben auf dunklem Grund sichtbar */
+  .swatch, .fgroup__swatch { forced-color-adjust: none; border: 1px solid CanvasText; }
+  /* Ring um das gewählte Feld; ungewählt unsichtbar (die transparente Linie würde sonst in Systemfarbe sichtbar) */
+  .swatch-btn, .filterbar .grid-toggle button, .gallery .gallery__thumbs button { border-color: Canvas; }
+  .swatch-btn[aria-pressed="true"], .filterbar .grid-toggle button[aria-pressed="true"], .gallery .gallery__thumbs button[aria-current="true"] { border-color: Highlight; }
+  .filterbar .grid-toggle button { border-width: 2px; }
+  /* Hero-Tabs: die orange Linie (Hintergrund) würde als Canvas-Balken den Rand überdecken. Sie bleibt in Systemfarbe stehen und
+     darf nicht entfallen: hero.js wechselt den Slide über ihr animationend. Der gewählte Tab behält zusätzlich einen kräftigen Strich. */
+  .hero__chips .hero__chip::after { forced-color-adjust: none; background: Highlight; }
+  .hero__chips .hero__chip[aria-selected="true"] { border-bottom-color: Highlight; border-bottom-width: 5px; }
+}

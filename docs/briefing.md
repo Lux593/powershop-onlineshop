@@ -230,7 +230,7 @@ Icons: Suche (auch Teilenummer) · Konto · Merkliste · Warenkorb
 - [ ] **Rechtstexte:** Impressum, Datenschutz, AGB, Widerrufsbelehrung und Barrierefreiheitserklärung von einem Rechtstexte-Anbieter
 - [ ] **Barrierefreiheit (BFSG, seit 28.06.2025):** Ziel WCAG 2.1 AA
   - Im früheren Mockup umgesetzt, im Theme erneut zu prüfen: Skip-Link, Landmarks, Fokus-Stile, ARIA für Tabs/Dialoge/Karussell, Pause beim Autoplay, `prefers-reduced-motion`
-  - axe-Prüfung: keine Verstöße
+  - axe-Prüfung: „keine Verstöße“ galt für das Mockup. Für das Theme im Preview-Theme erneut laufen lassen, zusätzlich Kontrastmodus (Windows, `forced-colors`), Tastatur und Screenreader prüfen
 - [ ] **Widerruf:** 14 Tage gesetzlich. Die freiwillige Rückgabefrist (z. B. 30 Tage) getrennt davon kommunizieren.
 
 ---

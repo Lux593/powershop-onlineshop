@@ -10,6 +10,7 @@ geschlossen: eigene Assets, Schriften und Icons, kein Build-Step.
 - **Bildliste (Shotlist):** [`docs/bildliste.md`](docs/bildliste.md)
 - **Motion-Schicht (Vertrag, Datei-Aufteilung):** [`docs/motion-api.md`](docs/motion-api.md)
 - **Hero-Clip (Herkunft, offene Rechtsfragen):** [`docs/hero-clip.md`](docs/hero-clip.md)
+- **Freigabeliste (Zahlen, Zusagen, Texte, Rechtliches, Bildrechte des Händlers):** [`docs/freigaben.md`](docs/freigaben.md)
 
 ## Shopify-Anbindung
 
@@ -48,7 +49,7 @@ snippets/   Karten, Preis, Galerie, Megamenü, Filter, Größentabelle, Bild-Sni
 assets/     CSS, JS, Bilder, Videos, Schriften (flach, Shopify kennt keine Unterordner in assets/), Details unten
 config/     settings_schema.json · settings_data.json
 locales/    de.default.json
-docs/       Briefing, Bildliste, Motion-API, Hero-Clip, Auftrag Motion
+docs/       Briefing, Bildliste, Freigabeliste, Motion-API, Hero-Clip, Auftrag Motion
 pics_to_use/ Quellbilder für Kategorien und Team
 ```
 
@@ -58,7 +59,7 @@ pics_to_use/ Quellbilder für Kategorien und Team
 |---|---|
 | `tokens.css` · `base.css` · `components.css` | Design-Tokens, Reset und Typografie, wiederverwendbare Bausteine (Karten, Buttons, Tabs, Schienen) |
 | `sections.css` | geteilte Reste: Events, Service-Seite |
-| `theme.css` | Ergänzungen fürs Shopify-Theme |
+| `theme.css` | Ergänzungen fürs Shopify-Theme, Kontrastmodus (`forced-colors`) für gewählte Zustände |
 | `motion.css` · `motion.js` | Motion-Schicht: Einblenden beim Scrollen, Wort-Splitter, Zahlen-Zählen, Lauftext, Parallax, weiches Scrollen |
 | `gsap.min.js` · `ScrollTrigger.min.js` · `lenis.min.js` | Bibliotheken der Motion-Schicht, self-hosted, nur auf Startseite, Kollektion und Produkt |
 | `header.css` · `header.js` | Ankündigungsleiste, Header, Megamenü, Mobile-Menü, Such-Dialog |
@@ -94,8 +95,16 @@ Firmenname, Adresse, Telefon, WhatsApp, E-Mail und Ansprechperson haben **keine 
 unsichtbar: Die Kontaktbox zeigt nur Kanäle, die eingetragen sind, und erscheint ohne jeden Kanal gar nicht (im Theme-Editor steht dann
 ein Hinweis). Die Öffnungszeiten erscheinen erst, wenn **„Öffnungszeiten anzeigen“** eingeschaltet ist. Ohne Firmenname steht im Footer der Shop-Name.
 
-Versandschwelle, Rückgabefrist, Newsletter-Rabatt und Reservierungsgebühr haben noch **Beispielwerte** und erscheinen so im Shop
-(Ankündigungsleiste, Warenkorb, Newsletter, Bike-Seite). Vor dem Livegang prüfen und anpassen.
+Versandschwelle, Versandkosten, Lieferzeit, Rückgabefrist, Reservierung, Newsletter-Rabatt und Zahlarten haben noch **Beispielwerte** und
+erscheinen so im Shop (Ankündigungsleiste, Produktseiten, Warenkorb, Newsletter, Bike-Seite). Vor dem Livegang prüfen und anpassen.
+Ein leerer oder 0-Wert erzeugt im Shop keine Aussage („ab 0 €“ oder „ Tage Rückgabe“ stehen nie dort).
+
+Alles, was der Händler freigeben muss (diese Werte, kontakt- und rechtsrelevante Texte, Kennzahlen, Events, Zusicherungen, Bildrechte), steht mit
+Fundstelle in [`docs/freigaben.md`](docs/freigaben.md).
+
+Die Rechtslinks im Footer kommen aus den Shopify-Menüs `footer`, `customer-service` und `legal`: **vor dem Livegang im Admin anlegen**.
+Fehlt ein Rechtstext dort, verlinkt der Footer ersatzweise die Richtlinien aus Einstellungen > Richtlinien (Schalter im Footer-Abschnitt).
+Der Link „Cookie-Einstellungen“ wirkt nur mit aktivem Shopify-Cookie-Banner.
 
 ## Bilder austauschen
 

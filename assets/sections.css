@@ -8,7 +8,7 @@
 .events { margin-top: var(--s-8); }
 .event-grid { display: grid; gap: 16px; }
 @media (min-width: 640px) { .event-grid { grid-template-columns: repeat(3, 1fr); } }
-.event-card { position: relative; display: grid; background: var(--c-anthracite); border: 1px solid var(--c-steel); transition: border-color var(--t-fast); }
+.event-card { position: relative; display: grid; background: var(--c-anthracite); color: var(--c-white); border: 1px solid var(--c-steel); transition: border-color var(--t-fast); } /* eigene Textfarbe: die Karte steht auch auf hellem Grund (Blog, Service-Seite) */
 .event-card:hover { border-color: var(--c-orange); }
 .event-card__media { position: relative; aspect-ratio: 16 / 10; overflow: hidden; }
 .event-card__media img { width: 100%; height: 100%; object-fit: cover; }

@@ -100,7 +100,9 @@
     if (cookie) {
       e.preventDefault();
       var cp = window.Shopify && window.Shopify.customerPrivacy;
+      // Ohne aktives Cookie-Banner (Shopify Customer Privacy API) bliebe der Klick stumm: dann eine Rückmeldung
       if (cp && typeof cp.showPreferences === 'function') cp.showPreferences();
+      else PS.toast('Die Cookie-Einstellungen sind gerade nicht verfügbar. Bitte lade die Seite neu.', 'circle-alert');
     }
   });
 

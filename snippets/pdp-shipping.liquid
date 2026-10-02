@@ -1,0 +1,20 @@
+{% doc %}
+  Absatz zu Lieferung, Versand und Rückgabe in den Akkordeons der Produktseite. Werte kommen aus den Theme-Einstellungen,
+  leere oder 0-Werte erzeugen keine Aussage (nie „ab 0 €“ oder „ Tage Rückgabe“).
+
+  @param {boolean} [apparel] - Bekleidung: mit Versandkosten unter der Grenze und Rückgabefrist. Ohne: Teile, mit Sperrgut-Hinweis.
+{% enddoc %}
+
+<p>
+  {%- if settings.delivery_time != blank -%}Lieferzeit {{ settings.delivery_time }}. {% endif -%}
+  {%- if settings.free_shipping_threshold > 0 -%}
+    Versandkostenfrei ab {{ settings.free_shipping_threshold | times: 100 | money_without_trailing_zeros }}
+    {%- if apparel and settings.shipping_cost_text != blank %}, darunter {{ settings.shipping_cost_text }}{% endif %}.{{ ' ' }}
+  {%- endif -%}
+  {%- if apparel -%}
+    {%- if settings.return_days > 0 -%}{{ settings.return_days }} Tage kostenlose Rückgabe; dein gesetzliches Widerrufsrecht (14 Tage) bleibt unberührt.
+    {%- else -%}Dein gesetzliches Widerrufsrecht (14 Tage) bleibt unberührt.{%- endif -%}
+  {%- else -%}
+    Sperrgut kann gesondert berechnet werden.
+  {%- endif -%}
+</p>

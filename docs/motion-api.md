@@ -78,6 +78,7 @@ parallel an verschiedenen Dateien arbeiten. Inhalt und Reihenfolge der Regeln si
 | `assets/shop.css` | Kategorieseite (Banner, Film-Intro, Filter), Produktseite, Warenkorb und Drawer | Kategorie, PDP, Warenkorb, Suche (M5) |
 | `snippets/search-dialog.liquid` | Markup des Such-Dialogs, aus `sections/header.liquid` per `{% render %}` | Suche (M5), eingebunden im Header |
 | `assets/sections.css` | geteilte Reste: Events, Service-Seite, eine `min-width`-Regel für Grid-Kinder mehrerer Bereiche | Rest, Aufräumen in M6 |
+| `assets/theme.css` | Shopify-Ergänzungen; am Ende der Block `@media (forced-colors: active)` für gewählte Zustände (Umschalter, Chips, Farbfelder, Hero-Tabs, Spalten-Wahl), auch für Klassen aus `shop.css`/`hero.css` (dort mit einer Stufe mehr Spezifität). Der Tab-Indikator der Produkt-Tabs steht in `home.css`. | Rest |
 | `assets/sections.js` | globale Section-Module: Showroom, Quick-Toggle der Produktkarte | Rest (Quick-Toggle: M5) |
 
 CSS-Ladereihenfolge (`layout/theme.liquid`, entspricht der Kaskade): tokens, base, components, sections, theme, motion, header, hero, home,

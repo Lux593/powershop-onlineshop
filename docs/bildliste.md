@@ -54,6 +54,21 @@ Austausch den Dateinamen aus der Liste streichen (siehe `README.md`).
 `story-werkstatt.jpg` (1200 × 900, Mechaniker bei der Arbeit in der Werkstatt) liegt noch in `assets/` und steht in der Platzhalterliste,
 ist aber derzeit in keiner Section und keinem Template eingebunden.
 
+## Bildnachweis und Nutzungsrechte
+
+**Offen, vor dem Livegang klären.** Für keines der Fotos in `assets/` ist die Quelle oder Lizenz dokumentiert.
+
+- `hero-ride-cvo.png` trägt in den EXIF-Daten den Vermerk „2023 Harley-Davidson Motor Company. Usage: Unlimited Worldwide“. Ob die Nutzung im
+  Onlineshop des Händlers damit gedeckt ist (Händlerportal, Lizenzbedingungen), muss der Händler bei Harley-Davidson bestätigen.
+- Der Commit „Hero und Sortiment an den Katalog 2026 anpassen“ (`bfbd9cc`) nennt harley-davidson.com/ch als Quelle für Katalogdaten und
+  Touring-Fotos. Herkunft und Rechte von `hero-ride-road.png`, `hero-ride-street.png`, `bento-herren.jpg` und `mega-herren.jpg` (ohne
+  Metadaten) sind nicht belegt.
+- Die EXIF-Daten bleiben unverändert: ein Entfernen des Urhebervermerks wäre eine Entscheidung des Händlers, keine technische Aufräumarbeit.
+- Je Bild nach der Klärung hier Quelle, Lizenz und gegebenenfalls den geforderten Bildnachweis eintragen.
+- Die Dateien `hero-ride-*.png` sind JPEG mit falscher Endung, das Umbenennen folgt mit den Datei-Umbenennungen in M6b.
+
+Die gesamte Liste der offenen Händlerfreigaben steht in [`freigaben.md`](freigaben.md).
+
 ## Videos und Poster
 
 | Datei | Format | Einsatz |
