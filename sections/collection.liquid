@@ -58,14 +58,13 @@
   <section class="page-banner on-dark textured{% if film_file != blank %} page-banner--film{% endif %}">
     <div class="container page-banner__inner">
       <div class="page-banner__text">
-        {%- unless film_file != blank -%}
-          <nav class="breadcrumb" aria-label="Brotkrumen">
-            <ol>
-              <li><a href="{{ routes.root_url }}">Home</a></li>
-              <li><span aria-current="page">{{ collection.title | escape }}</span></li>
-            </ol>
-          </nav>
-        {%- endunless -%}
+        {%- comment -%} Brotkrumen auf jeder Kategorieseite, auch mit Film: Die Produktseiten verlinken auf sie zurück, die Orientierung soll überall gleich sein {%- endcomment -%}
+        <nav class="breadcrumb" aria-label="Brotkrumen">
+          <ol>
+            <li><a href="{{ routes.root_url }}">Home</a></li>
+            <li><span aria-current="page">{{ collection.title | escape }}</span></li>
+          </ol>
+        </nav>
         <h1>{{ collection.title | escape }}</h1>
         {%- if film_file != blank -%}
           <p class="film-banner__lead">{{ film_lead | escape }}</p>

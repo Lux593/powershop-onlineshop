@@ -126,7 +126,7 @@
         <p class="pcard__fits">
           {% render 'icon', name: 'check' %}Passt für:
           {% if families.size > 2 %}{{ families.size }} Modellfamilien{% else %}{{ families | join: ', ' }}{% endif %}
-          {%- if years.size > 0 %} {{ years.first }}–{{ years.last }}{% endif -%}
+          {%- if years.size > 1 %} {{ years.first }}–{{ years.last }}{% elsif years.size == 1 %} {{ years.first }}{% endif -%}
         </p>
       {%- endif -%}
     {%- elsif color_option and color_option.values.size > 1 -%}

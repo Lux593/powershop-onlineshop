@@ -51,7 +51,7 @@
     assign status = product.metafields.bike.status.value
     assign year = product.metafields.bike.baujahr.value
     assign ez = product.metafields.bike.erstzulassung.value
-    assign km = product.metafields.bike.km.value | default: 0
+    assign km = product.metafields.bike.km.value
     assign kw = product.metafields.bike.leistung_kw.value
     assign ps = product.metafields.bike.leistung_ps.value
     assign ccm = product.metafields.bike.hubraum_ccm.value
@@ -69,6 +69,17 @@
     if zustand == 'neu'
       assign is_new_bike = true
     endif
+    comment
+      Ohne Kilometerstand: Neufahrzeuge zeigen 0 km, Gebrauchte „auf Anfrage“ (nicht „0 km“ als Tatsache).
+    endcomment
+    assign km_known = true
+    if km == blank
+      if is_new_bike
+        assign km = 0
+      else
+        assign km_known = false
+      endif
+    endif
     assign is_reserved = false
     if status == 'reserviert'
       assign is_reserved = true
@@ -78,16 +89,26 @@
       assign can_reserve = true
     endif
 
-    assign bike_label = product.title
-    if is_new_bike
-      assign bike_label = bike_label | append: ' (Modelljahr ' | append: year
-    else
-      assign bike_label = bike_label | append: ' (EZ ' | append: ez
+    comment
+      Betreff der Anfrage: „Titel (Modelljahr …, Fzg.-Nr. …)“. Fehlende Angaben entfallen samt Trenner,
+      es bleibt nie „Modelljahr , Fzg.-Nr.“ oder „()“ stehen.
+    endcomment
+    assign label_parts = ''
+    if is_new_bike and year != blank
+      assign label_parts = 'Modelljahr ' | append: year
+    elsif is_new_bike == false and ez != blank
+      assign label_parts = 'EZ ' | append: ez
     endif
     if from_price != true and fzg_nr != blank
-      assign bike_label = bike_label | append: ', Fzg.-Nr. ' | append: fzg_nr
+      if label_parts != blank
+        assign label_parts = label_parts | append: ', '
+      endif
+      assign label_parts = label_parts | append: 'Fzg.-Nr. ' | append: fzg_nr
     endif
-    assign bike_label = bike_label | append: ')'
+    assign bike_label = product.title
+    if label_parts != blank
+      assign bike_label = bike_label | append: ' (' | append: label_parts | append: ')'
+    endif
 
     assign bike_topics = 'probefahrt,finanzierung,inzahlungnahme'
     if can_reserve
@@ -123,8 +144,8 @@
           </div>
 
           <dl class="bike-facts">
-            <div><dt>{% render 'icon', name: 'calendar' %}{% if is_new_bike %}Modelljahr{% else %}Erstzulassung{% endif %}</dt><dd>{% if is_new_bike %}{{ year }}{% else %}{{ ez }}{% endif %}</dd></div>
-            <div><dt>{% render 'icon', name: 'gauge' %}km-Stand</dt><dd>{% render 'number-de', value: km %} km</dd></div>
+            <div><dt>{% render 'icon', name: 'calendar' %}{% if is_new_bike %}Modelljahr{% else %}Erstzulassung{% endif %}</dt><dd>{% if is_new_bike %}{{ year | default: 'auf Anfrage' }}{% else %}{{ ez | default: 'auf Anfrage' }}{% endif %}</dd></div>
+            <div><dt>{% render 'icon', name: 'gauge' %}km-Stand</dt><dd>{% if km_known %}{% render 'number-de', value: km %} km{% else %}auf Anfrage{% endif %}</dd></div>
             <div><dt>{% render 'icon', name: 'zap' %}Leistung</dt><dd>{% if kw != blank %}{{ kw }} kW ({{ ps }} PS){% else %}auf Anfrage{% endif %}</dd></div>
             <div><dt>{% render 'icon', name: 'cog' %}Hubraum</dt><dd>{% if ccm != blank %}{% render 'number-de', value: ccm %} cm³{% else %}auf Anfrage{% endif %}</dd></div>
             <div><dt>{% render 'icon', name: 'palette' %}Farbe</dt><dd>{{ color | default: '–' | escape }}</dd></div>
@@ -142,7 +163,9 @@
             {%- if can_reserve -%}
               <div class="reserve-note">
                 <strong>{% render 'icon', name: 'clock' %}Reservierung möglich</strong>
-                <p>{{ settings.reservation_hours }} h Reservierung gegen {{ settings.reservation_fee | times: 100 | money_without_trailing_zeros }} Gebühr – wird beim Kauf angerechnet, sonst erstattet.</p>
+                {%- if settings.reservation_hours > 0 and settings.reservation_fee > 0 -%}
+                  <p>{{ settings.reservation_hours }} h Reservierung gegen {{ settings.reservation_fee | times: 100 | money_without_trailing_zeros }} Gebühr – wird beim Kauf angerechnet, sonst erstattet.</p>
+                {%- endif -%}
                 <ol>
                   <li>Wähle oben „Reservierung“ und schreib uns per WhatsApp oder E-Mail.</li>
                   <li>Wir prüfen die Verfügbarkeit und senden dir einen Zahlungslink.</li>
@@ -235,7 +258,7 @@
       endif
     -%}
     {%- if sticky_count > 0 -%}
-      <div class="sticky-contact" data-sticky-contact aria-label="Schnellkontakt" style="grid-template-columns:repeat({{ sticky_count }}, 1fr)">
+      <div class="sticky-contact" data-sticky-contact aria-label="Schnellkontakt" style="grid-template-columns:repeat({{ sticky_count }}, minmax(0, 1fr))">
         {%- if settings.phone != blank -%}
           <a class="btn btn--primary" href="tel:{{ settings.phone | remove: ' ' | remove: '-' | remove: '(' | remove: ')' | remove: '/' }}">{% render 'icon', name: 'phone' %}Anrufen</a>
         {%- endif -%}
@@ -255,6 +278,17 @@
     assign part_no = product.metafields.part.teilenummer.value | default: current_variant.sku
     assign families = product.metafields.part.modellfamilien.value
     assign years = product.metafields.part.baujahre.value
+    comment
+      Baujahre: als Liste behandelt (wie in product-card.liquid) und nie roh ausgegeben (sonst „20172018…“).
+      Mehrere Jahre als „erstes–letztes“, ein einzelnes Jahr oder ein Text unverändert.
+    endcomment
+    assign years_sorted = years | sort
+    assign years_label = ''
+    if years_sorted.size > 1
+      assign years_label = years_sorted.first | append: '–' | append: years_sorted.last
+    elsif years_sorted.size == 1
+      assign years_label = years_sorted.first
+    endif
     assign approval = product.metafields.part.zulassung.value
     assign compat = product.metafields.part.kompatibilitaet.value
 
@@ -305,7 +339,7 @@
                 {%- if current_variant.inventory_management != blank and current_variant.inventory_quantity <= 0 -%}
                   <p class="stock stock--order">Lieferbar in 5–7 Werktagen</p>
                 {%- else -%}
-                  <p class="stock">Auf Lager – Lieferzeit {{ settings.delivery_time }}</p>
+                  <p class="stock">Auf Lager{% if settings.delivery_time != blank %} – Lieferzeit {{ settings.delivery_time }}{% endif %}</p>
                 {%- endif -%}
               {%- else -%}
                 <p class="stock stock--order">Aktuell nicht lieferbar – frag uns nach dem Liefertermin.</p>
@@ -318,7 +352,7 @@
               <div class="compat__head">
                 {% render 'icon', name: 'circle-check' %}
                 <div>
-                  <strong>Passt für: {{ families | join: ', ' | escape }}{% if years != blank %} {{ years | escape }}{% endif %}</strong>
+                  <strong>Passt für: {{ families | join: ', ' | escape }}{% if years_label != blank %} {{ years_label | escape }}{% endif %}</strong>
                   <p>{% if compat.size > 0 %}{{ compat.size }} kompatible Modelle · {% endif %}Angaben laut Hersteller</p>
                 </div>
               </div>
@@ -394,7 +428,7 @@
             {% render 'accordion', title: 'Lieferumfang', body: scope_body %}
             {% render 'pdp-gpsr', product: product %}
             {%- capture ship_body -%}
-              <p>Lieferzeit {{ settings.delivery_time }}. Versandkostenfrei ab {{ settings.free_shipping_threshold | times: 100 | money_without_trailing_zeros }}. Sperrgut kann gesondert berechnet werden.</p>
+              {% render 'pdp-shipping' %}
             {%- endcapture -%}
             {% render 'accordion', title: 'Versand', body: ship_body %}
           </div>
@@ -478,7 +512,7 @@
               {% render 'accordion', title: 'Passform', body: fit_body %}
             {%- endif -%}
             {%- capture ship_body -%}
-              <p>Lieferzeit {{ settings.delivery_time }}. Versandkostenfrei ab {{ settings.free_shipping_threshold | times: 100 | money_without_trailing_zeros }}, darunter {{ settings.shipping_cost_text }}. {{ settings.return_days }} Tage kostenlose Rückgabe; dein gesetzliches Widerrufsrecht (14 Tage) bleibt unberührt.</p>
+              {% render 'pdp-shipping', apparel: true %}
             {%- endcapture -%}
             {% render 'accordion', title: 'Versand & Rückgabe', body: ship_body %}
             {% render 'pdp-gpsr', product: product %}

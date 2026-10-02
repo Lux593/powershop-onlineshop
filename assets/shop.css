@@ -36,9 +36,12 @@
 
 /* Schnellwahl: die Unterkategorien aus dem Hauptmenü, auf Mobil eine scrollbare Zeile */
 .film-banner__chips {
-  display: flex; gap: 8px; margin-top: 4px;
+  display: flex; gap: 8px;
   overflow-x: auto; scrollbar-width: none;
   margin-inline: calc(-1 * var(--gutter)); padding-inline: var(--gutter);
+  /* overflow-x:auto schneidet auch vertikal: 6 px Luft oben und unten (Ring 2 px + Abstand 3 px), am Rand ausgeglichen (Netto-Abstand wie vorher: oben 4 px, unten 0) */
+  padding-block: 6px; margin-block: -2px -6px;
+  scroll-padding-inline: 12px;
 }
 .film-banner__chips::-webkit-scrollbar { display: none; }
 .film-banner__chips li { flex: none; }
@@ -63,7 +66,7 @@
     grid-template-columns: minmax(0, 1fr) clamp(300px, 34vw, 448px);
     align-items: center; gap: 48px; padding-block: 32px;
   }
-  .film-banner__chips { flex-wrap: wrap; overflow: visible; margin-inline: 0; padding-inline: 0; }
+  .film-banner__chips { flex-wrap: wrap; overflow: visible; margin: 4px 0 0; padding: 0; }
 }
 
 .filterbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding-block: 20px; border-bottom: 1px solid var(--c-line); }
@@ -110,7 +113,9 @@
 .empty--strip p { max-width: 60ch; }
 .empty--strip .chip-row { justify-content: flex-start; }
 @media (min-width: 768px) {
-  .empty--strip { grid-template-columns: auto minmax(0, 1fr) auto; gap: 24px 28px; min-height: 480px; padding-block: 120px; }
+  /* Symbol links, Text und Buttons untereinander in der zweiten Spalte: Handlung steht beim Text, nicht 600 px weiter rechts */
+  .empty--strip { grid-template-columns: auto minmax(0, 1fr); align-content: center; gap: 24px 28px; min-height: 480px; padding-block: 120px; }
+  .empty--strip .chip-row { grid-column: 2; }
 }
 .filter-sheet .acc summary { padding-inline: 0; }
 
@@ -124,6 +129,11 @@
 @media (min-width: 1024px) { .pdp__title { font-size: 40px; } }
 .pdp__meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; font-size: var(--fs-small); color: var(--c-muted); }
 .pdp__price .price__now { font-size: 26px; font-family: var(--f-head); font-weight: 700; }
+/* Das Formular (pdp-buy.liquid) ist kein Grid-Kind von .pdp__info: der 20-px-Rhythmus der Infospalte greift in ihm nicht.
+   Abstand über den Folgegeschwister statt über gap, damit die leere Fehlermeldung (role="alert") keinen Leerraum erzeugt. */
+.pdp-form > .pdp__row ~ .pdp__row,
+.pdp-form > .pdp__row ~ .pdp__buy { margin-top: 20px; }
+.pdp-form > [data-option-error]:not(:empty) { margin-top: 12px; }
 .pdp__row { display: grid; gap: 10px; }
 .pdp__row-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: var(--fs-small); }
 .pdp__buy { display: grid; grid-template-columns: auto 1fr auto; gap: 8px; }
@@ -158,6 +168,7 @@
 .compat { border: 1px solid var(--c-black); background: var(--c-white); }
 .compat__head { display: flex; gap: 12px; padding: 16px; align-items: flex-start; }
 .compat__head > .icon { color: var(--c-success); width: 24px; height: 24px; margin-top: 2px; }
+.compat__head > div { min-width: 0; overflow-wrap: anywhere; }
 .compat__head strong { display: block; }
 .compat__head p { font-size: var(--fs-small); color: var(--c-muted); }
 .compat details summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; min-height: 48px; padding: 0 16px; border-top: 1px solid var(--c-line); font-weight: 600; font-size: var(--fs-small); }
@@ -225,7 +236,14 @@
 .reserved-banner { display: flex; gap: 12px; align-items: center; padding: 14px 16px; background: var(--c-muted); color: var(--c-white); font-size: var(--fs-small); }
 
 .sticky-contact { position: fixed; left: 0; right: 0; bottom: 0; z-index: 150; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 10px 12px calc(10px + env(safe-area-inset-bottom)); background: var(--c-black); border-top: 1px solid var(--c-steel); }
-.sticky-contact .btn { padding: 0 8px; min-height: 48px; }
+.sticky-contact .btn { padding: 0 8px; min-height: 48px; min-width: 0; }
+/* Schmale Fenster: drei Schaltflächen teilen sich bei 320 px nur 280 px (1.4.10). Erst engere Abstände (Symbol und Text passen bis
+   etwa 345 px), darunter entfallen die Symbole, der Text bleibt */
+@media (max-width: 379px) {
+  .sticky-contact { gap: 6px; padding-inline: 8px; }
+  .sticky-contact .btn { padding: 0 4px; letter-spacing: 0.5px; }
+}
+@media (max-width: 344px) { .sticky-contact .btn .icon { display: none; } }
 @media (min-width: 1024px) { .sticky-contact { display: none; } }
 body.has-sticky-contact { padding-bottom: 72px; }
 @media (min-width: 1024px) { body.has-sticky-contact { padding-bottom: 0; } }
@@ -326,6 +344,11 @@ html:not(.has-motion) .bcard:hover .bcard__media img { transform: none; }
   box-shadow: inset 0 0 0 3px var(--c-white), inset 0 0 0 5px var(--c-black);
 }
 
+/* Der Titel (h3, line-clamp, overflow:hidden) schneidet seinen eigenen Fokusring links, oben und unten ab, übrig bliebe ein einzelner
+   Strich rechts wie ein Textcursor. Der Ring liegt daher auf der Bildfläche (oben); am Titel zeigt Unterstreichen den Fokus,
+   die transparente Linie bleibt für den Kontrastmodus (forced-colors färbt sie in Systemfarbe). */
+.pcard__title a:focus-visible { outline-color: transparent; text-decoration: underline; text-underline-offset: 3px; }
+
 /* Karten-Stagger: die Spalte bestimmt die Verzögerung. Standard-Spaltenzahl: 2, ab 640 px 3, ab 1024 px 4 (Motorräder 1/2/3).
    Nach einer Spaltenwahl im Raster stimmt es nicht mehr genau, das Einblenden läuft nur einmal je Karte. */
 @media (max-width: 639px) {
@@ -343,6 +366,10 @@ html:not(.has-motion) .bcard:hover .bcard__media img { transform: none; }
   .has-motion .product-grid--bikes > [data-reveal]:nth-child(3n) { --rd: 140ms; }
   .has-motion .product-grid:not(.product-grid--bikes) > [data-reveal]:nth-child(4n) { --rd: 210ms; }
 }
+
+/* Seitenwechsel scrollt die Filterleiste nach oben (collection.js). Dabei fährt der Header wieder ein: das Ziel rechnet ihn immer mit
+   (scroll-padding-top der Seite zählt ihn nur, solange er sichtbar ist), sonst läge die Leiste beim Ankommen darunter. */
+[data-filterbar] { scroll-margin-top: calc(var(--header-h) * (1 - var(--header-shown, 1))); }
 
 /* ---------- Kollektion: Filter-/Sortierwechsel als View Transition ----------
    collection.js benennt [data-results] nur für die Dauer des Wechsels und setzt html.is-vt-results.
@@ -455,3 +482,14 @@ html:not(.has-motion) .bcard:hover .bcard__media img { transform: none; }
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
 }
+
+/* ==========================================================================
+   Korrekturen aus der Gesamtreview (M5-Nachlauf)
+   ========================================================================== */
+
+/* Suchfeld (header.css): Der Fokus lag nur auf der orangen Unterkante, 2,81:1 auf dem Dialoggrund und damit schwächer als der
+   ungefokussierte schwarze Strich. Der schwarze Ring bleibt, orange ist Akzent. */
+.search__input:focus { outline: 2px solid var(--c-black); outline-offset: 4px; }
+
+/* Warenkorb-Seite (theme.css:50 nennt das nicht definierte --s-5, die Deklaration war ungültig und der Titel klebte an der Positionsliste) */
+.cart-page__title { margin-block: var(--s-3) var(--s-6); }

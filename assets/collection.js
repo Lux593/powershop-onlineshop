@@ -41,10 +41,26 @@
     }
     sync();
 
+    // Tab im Hintergrund: anhalten, beim Zurückkehren nur fortsetzen, was dieses Modul angehalten hat (nicht, was von Hand pausiert wurde).
+    // Wie im Hero; steht vor der Bewegungsprüfung, denn auch ein von Hand gestarteter Film soll im Hintergrund nicht weiterlaufen.
+    var hiddenPaused = false;
+    var ac = new AbortController();
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) {
+        if (!film.paused) { hiddenPaused = true; film.pause(); }
+      } else if (hiddenPaused) {
+        hiddenPaused = false;
+        if (film.paused && !userPaused && (!io || visible)) play();
+      }
+    }, { signal: ac.signal });
+    // Section-Reload im Theme-Editor: der Film wird ersetzt, der Listener geht mit
+    document.addEventListener('shopify:section:unload', function (e) { if (e.target.contains(film)) ac.abort(); }, { signal: ac.signal });
+
+    var io = null;
     if (!PS.motion.enabled || (conn && conn.saveData) || !('IntersectionObserver' in window)) return;
 
     // Außerhalb des Bildes anhalten, danach nur fortsetzen, wenn nicht von Hand angehalten
-    var io = new IntersectionObserver(function (entries) {
+    io = new IntersectionObserver(function (entries) {
       visible = entries[0].isIntersecting;
       if (visible && started && !userPaused && film.paused) play();
       else if (!visible && !film.paused) film.pause();
@@ -54,13 +70,23 @@
     function go() { idle(function () { started = true; if (visible && !userPaused) play(); }); }
     if (document.readyState === 'complete') go(); else window.addEventListener('load', go, { once: true });
     // Bewegung zur Laufzeit abgeschaltet: anhalten
-    PS.motion.track(film, function () { io.disconnect(); started = false; film.pause(); });
+    PS.motion.track(film, function () { io.disconnect(); io = null; started = false; film.pause(); });
   }
 
   PS.on('[data-collection]', function (root) {
     var sectionId = root.dataset.sectionId;
     var film = root.querySelector('[data-film]');
     if (film) initFilm(film, root.querySelector('[data-film-toggle]'));
+
+    // Schnellwahl-Chips (mobil eine waagerecht scrollbare Zeile): Chrome scrollt einen nur halb sichtbaren Chip beim Fokus nicht nach,
+    // er und sein Fokusring lägen am Rand abgeschnitten. Der Chip wird ganz in die Zeile gerückt (scroll-padding-inline in shop.css lässt Platz für den Ring).
+    var chips = root.querySelector('.film-banner__chips');
+    if (chips) {
+      chips.addEventListener('focusin', function (e) {
+        if (chips.scrollWidth <= chips.clientWidth) return; // ab 768 px umbrechend, nichts zu scrollen
+        e.target.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: PS.prefersReducedMotion() ? 'auto' : 'smooth' });
+      });
+    }
 
     var cols = null;
     var controller = null;

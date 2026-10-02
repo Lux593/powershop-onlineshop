@@ -30,6 +30,37 @@
     if (el) el.focus({ preventScroll: true });
   }
 
+  // Statusmeldung (4.1.3): eigene Live-Region außerhalb des Drawers. Dessen Inhalt wird bei jeder Änderung ersetzt, eine mit
+  // ersetzte Region würde nicht verlässlich gelesen. Die Region entsteht beim Start, damit sie vor der ersten Meldung schon im Baum steht.
+  var live;
+  function liveRegion() {
+    if (live || !document.body) return live;
+    live = document.createElement('div');
+    live.className = 'sr-only';
+    live.setAttribute('role', 'status');
+    live.setAttribute('aria-live', 'polite');
+    live.setAttribute('aria-atomic', 'true');
+    document.body.appendChild(live);
+    return live;
+  }
+  function announce(text) {
+    var region = liveRegion();
+    if (!region) return;
+    region.textContent = '';
+    setTimeout(function () { region.textContent = text; }, 60); // leeren, dann füllen: gleiche Meldungen werden erneut gelesen
+  }
+  // Nach Mengenänderung oder Entfernen: Stückzahl und Zwischensumme (Text aus dem frisch gerenderten Drawer, schon formatiert)
+  function announceCart(cart) {
+    var count = cart && cart.item_count;
+    if (typeof count !== 'number') return;
+    var d = drawer();
+    var sub = d && d.querySelector('.subtotal strong');
+    announce(count > 0
+      ? 'Warenkorb aktualisiert: ' + (count === 1 ? '1 Artikel' : count + ' Artikel') + (sub ? ', Zwischensumme ' + sub.textContent.replace(/\s+/g, ' ').trim() : '') + '.'
+      : 'Warenkorb aktualisiert: leer.');
+  }
+  if (document.body) liveRegion(); else document.addEventListener('DOMContentLoaded', liveRegion, { once: true });
+
   function applySections(sections, itemCount) {
     var html = sections && sections[SECTION];
     var counter = document.querySelector('[data-cart-count]');
@@ -123,12 +154,18 @@
         body: JSON.stringify({ line: line, quantity: quantity, sections: SECTION, sections_url: window.location.pathname })
       }).then(function (cart) {
         applySections(cart.sections, cart.item_count);
+        announceCart(cart);
         return cart;
       });
     }
   };
 
-  function fail(err) { PS.toast(err.message, 'circle-alert'); }
+  // Eigene und API-Meldungen (Error) bleiben stehen. Netzwerkfehler (TypeError: „Failed to fetch“) oder ein ungültiges Antwortformat
+  // (SyntaxError) zeigen einen deutschen Satz statt der rohen Browsermeldung.
+  function fail(err) {
+    var own = err && err.name === 'Error' && err.message;
+    PS.toast(own ? err.message : 'Das hat nicht geklappt. Bitte versuch es noch einmal.', 'circle-alert');
+  }
 
   // Warenkorb-Seite: nach jeder Änderung den Seiteninhalt neu vom Server holen
   document.addEventListener('ps:cart', function () {

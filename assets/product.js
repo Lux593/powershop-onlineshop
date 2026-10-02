@@ -27,8 +27,12 @@
       active = i;
       thumbs.forEach(function (b, k) { b.setAttribute('aria-current', k === i ? 'true' : 'false'); });
       var b = thumbs[i];
-      // nur die Vorschau-Zeile scrollen (scrollIntoView spränge auch vertikal)
-      if (b && thumbRow) thumbRow.scrollTo({ left: b.offsetLeft - (thumbRow.clientWidth - b.offsetWidth) / 2, behavior: behavior() });
+      // nur die Vorschau-Zeile scrollen (scrollIntoView spränge auch vertikal). Lage über die Rechtecke: offsetLeft bezöge sich auf den
+      // offsetParent (hier body) und läge um den Seitenabstand der Zeile daneben
+      if (b && thumbRow) {
+        var inRow = b.getBoundingClientRect().left - thumbRow.getBoundingClientRect().left + thumbRow.scrollLeft;
+        thumbRow.scrollTo({ left: inRow - (thumbRow.clientWidth - b.offsetWidth) / 2, behavior: behavior() });
+      }
     }
     function showSlide(i) {
       if (!track || !slides[i]) return;
@@ -112,9 +116,11 @@
       // Teilenummer kopieren
       var copy = event.target.closest('[data-copy]');
       if (copy) {
+        // Erfolg nur melden, wenn das Kopieren geklappt hat (fehlende Berechtigung, unsicherer Kontext, altes System)
         var done = function () { PS.toast('Teilenummer ' + copy.dataset.copy + ' kopiert.', 'copy'); };
-        if (navigator.clipboard) navigator.clipboard.writeText(copy.dataset.copy).then(done, done);
-        else done();
+        var failed = function () { PS.toast('Kopieren hat nicht geklappt. Bitte markiere die Nummer von Hand.', 'circle-alert'); };
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(copy.dataset.copy).then(done, failed);
+        else failed();
       }
     });
 

@@ -15,7 +15,7 @@
   assign status = product.metafields.bike.status.value
   assign year = product.metafields.bike.baujahr.value
   assign ez = product.metafields.bike.erstzulassung.value
-  assign km = product.metafields.bike.km.value | default: 0
+  assign km = product.metafields.bike.km.value
   assign kw = product.metafields.bike.leistung_kw.value
   assign ps = product.metafields.bike.leistung_ps.value
   assign color = product.metafields.bike.farbe.value
@@ -23,6 +23,19 @@
   assign tax = product.metafields.bike.besteuerung.value
   assign from_price = product.metafields.bike.ab_preis.value
   assign img_sizes = sizes | default: '(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw'
+
+  comment
+    Fehlende Angaben nicht als Tatsache zeigen: ohne Kilometerstand zeigen Neufahrzeuge 0 km, Gebrauchte „auf Anfrage“.
+    Fehlt das Modelljahr oder die Erstzulassung, steht dort „auf Anfrage“ statt einer leeren Angabe.
+  endcomment
+  assign km_known = true
+  if km == blank
+    if zustand == 'neu'
+      assign km = 0
+    else
+      assign km_known = false
+    endif
+  endif
 -%}
 
 <article class="bcard{% if status == 'reserviert' %} is-reserved{% endif %}" data-product-id="{{ product.id }}" data-zustand="{{ zustand }}"{% if reveal %} data-reveal{% endif %}>
@@ -38,9 +51,9 @@
     <ul class="facts">
       <li>
         {% render 'icon', name: 'calendar' %}
-        {%- if zustand == 'neu' %}Modelljahr {{ year }}{% else %}EZ {{ ez }}{% endif -%}
+        {%- if zustand == 'neu' %}Modelljahr {{ year | default: 'auf Anfrage' }}{% else %}EZ {{ ez | default: 'auf Anfrage' }}{% endif -%}
       </li>
-      <li>{% render 'icon', name: 'gauge' %}{% render 'number-de', value: km %} km</li>
+      <li>{% render 'icon', name: 'gauge' %}{% if km_known %}{% render 'number-de', value: km %} km{% else %}km auf Anfrage{% endif %}</li>
       <li>
         {% render 'icon', name: 'zap' %}
         {%- if kw != blank %}{{ kw }} kW ({{ ps }} PS){% else %}{{ color }}{% endif -%}
@@ -54,8 +67,9 @@
       </span>
     </div>
     <div class="bcard__actions">
-      <a class="btn btn--outline-dark btn--sm" href="{{ product.url }}">Details</a>
-      <a class="btn btn--primary btn--sm" href="{{ product.url }}#kontakt">Anfragen</a>
+      {%- comment -%} Der Name beginnt mit dem sichtbaren Text (2.5.3) und nennt das Modell: in der Linkliste sind die Karten sonst nicht zu unterscheiden (2.4.4) {%- endcomment -%}
+      <a class="btn btn--outline-dark btn--sm" href="{{ product.url }}" aria-label="Details: {{ product.title | escape }}">Details</a>
+      <a class="btn btn--primary btn--sm" href="{{ product.url }}#kontakt" aria-label="Anfragen: {{ product.title | escape }}">Anfragen</a>
     </div>
   </div>
 </article>
