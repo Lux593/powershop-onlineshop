@@ -10,15 +10,15 @@
 
     <a class="brand" href="{{ routes.root_url }}" aria-label="{{ shop.name }} – zur Startseite">
       <span class="wordmark">Power<span>Shop</span></span>
+      <span class="brand__divider" aria-hidden="true"></span>
+      <img
+        class="brand__hd"
+        src="{{ 'hd-bar-shield.png' | asset_url }}"
+        alt=""
+        width="49"
+        height="40"
+      >
     </a>
-    <span class="brand__divider" aria-hidden="true"></span>
-    <img
-      class="brand__hd"
-      src="{{ 'hd-bar-shield.png' | asset_url }}"
-      alt="Harley-Davidson – offizieller Vertragshändler"
-      width="49"
-      height="40"
-    >
 
     <nav class="mainnav" aria-label="Hauptnavigation">
       <ul class="mainnav__list">

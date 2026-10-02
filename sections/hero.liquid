@@ -153,8 +153,6 @@
                   assign price_text = 'ab ' | append: price_text
                 endif
               endif
-              assign meta_color = block.settings.meta_color | default: bike.metafields.bike.farbe.value
-              assign meta_year = block.settings.meta_year | default: bike.metafields.bike.baujahr.value
               assign cta_label = block.settings.cta_label | default: block.settings.label
               assign detail_url = bike.url | default: block.settings.url
             -%}
@@ -184,13 +182,6 @@
                     {%- endif -%}
                   </div>
                 </div>
-                {%- if meta_color != blank or meta_year != blank or block.settings.meta_line != blank -%}
-                  <dl class="hero__meta">
-                    {%- if meta_color != blank -%}<div class="hero__fact"><dt>Farbe</dt><dd>{{ meta_color }}</dd></div>{%- endif -%}
-                    {%- if meta_year != blank -%}<div class="hero__fact"><dt>Modelljahr</dt><dd>{{ meta_year }}</dd></div>{%- endif -%}
-                    {%- if block.settings.meta_line != blank -%}<div class="hero__fact"><dt>Baureihe</dt><dd>{{ block.settings.meta_line }}</dd></div>{%- endif -%}
-                  </dl>
-                {%- endif -%}
               </div>
             </div>
           {%- endfor -%}
@@ -258,15 +249,12 @@
         { "type": "image_picker", "id": "poster", "label": "Standbild zum Film", "info": "Erstes Bild des Films, erscheint sofort und wenn der Film nicht läuft." },
         { "type": "text", "id": "poster_asset", "label": "Standard-Standbild im Theme", "info": "Wird benutzt, solange kein Standbild gewählt ist.", "default": "hero-poster.webp" },
         { "type": "header", "content": "Angebot" },
-        { "type": "product", "id": "product", "label": "Motorrad", "info": "Liefert Preis, Link, Farbe und Jahr." },
+        { "type": "product", "id": "product", "label": "Motorrad", "info": "Liefert Preis und Link." },
         { "type": "text", "id": "price_text", "label": "Preistext (überschreibt den Produktpreis)", "info": "Zum Beispiel: ab 31.500 €" },
         { "type": "text", "id": "cta_label", "label": "Button-Text", "info": "Ohne Eingabe gilt der Tab-Text." },
         { "type": "url", "id": "url", "label": "Link (falls kein Motorrad gewählt)" },
         { "type": "text", "id": "secondary_label", "label": "Zweiter Button", "default": "Probefahrt anfragen" },
-        { "type": "url", "id": "secondary_url", "label": "Zweiter Button Link" },
-        { "type": "text", "id": "meta_color", "label": "Farbe" },
-        { "type": "text", "id": "meta_year", "label": "Modelljahr" },
-        { "type": "text", "id": "meta_line", "label": "Baureihe", "default": "Touring" }
+        { "type": "url", "id": "secondary_url", "label": "Zweiter Button Link" }
       ]
     }
   ],
@@ -280,9 +268,7 @@
           "settings": {
             "label": "Street Glide",
             "blurb": "Die tiefe Scheibe für die offene Straße.",
-            "image_asset": "hero-ride-street.png",
-            "meta_color": "Schwarz",
-            "meta_year": "2026"
+            "image_asset": "hero-ride-street.png"
           }
         },
         {
@@ -290,10 +276,7 @@
           "settings": {
             "label": "CVO",
             "blurb": "Die CVO-Ausstattung für die große Tour.",
-            "image_asset": "hero-ride-cvo.png",
-            "meta_color": "Grau",
-            "meta_year": "2026",
-            "meta_line": "CVO"
+            "image_asset": "hero-ride-cvo.png"
           }
         }
       ]

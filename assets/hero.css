@@ -132,7 +132,7 @@
 }
 .hero__panel > *, .hero__sub > * { min-width: 0; max-width: 100%; }
 /* Lange deutsche Wörter (Texte sind im Editor änderbar) brechen um statt aus dem Bild zu laufen (WCAG 1.4.10) */
-.hero__blurb, .hero__price, .hero__fact { -webkit-hyphens: auto; hyphens: auto; overflow-wrap: anywhere; }
+.hero__blurb, .hero__price { -webkit-hyphens: auto; hyphens: auto; overflow-wrap: anywhere; }
 .hero__poster {
   --split-pad: 0.2em; /* Platz für Umlaute auf Versalien in der Wortmaske */
   margin: 0;
@@ -152,11 +152,6 @@
 .hero__actions { display: flex; flex-wrap: wrap; gap: 12px; }
 .hero__actions .btn { min-height: 56px; padding: 10px 24px; font-size: 18px; white-space: normal; text-align: center; line-height: 1.1; -webkit-hyphens: auto; hyphens: auto; overflow-wrap: anywhere; }
 /* Datenblatt statt Punktkette: Farbe, Modelljahr und Baureihe als beschriftete Werte mit feinen Trennlinien */
-.hero__meta { display: flex; flex-wrap: wrap; row-gap: 12px; margin: 0; }
-.hero__fact { display: grid; gap: 2px; min-width: 0; max-width: 100%; margin: 0 20px 0 0; padding-right: 20px; border-right: 1px solid rgb(255 255 255 / 0.28); }
-.hero__fact:last-child { margin-right: 0; padding-right: 0; border-right: 0; }
-.hero__fact dt { font-size: var(--fs-small); color: var(--c-offwhite); }
-.hero__fact dd { margin: 0; font-family: var(--f-head); font-weight: 700; font-size: 22px; line-height: 1.1; letter-spacing: 0.04em; text-transform: uppercase; color: var(--c-white); }
 
 @media (min-width: 640px) {
   .hero__chip { font-size: 24px; }
@@ -171,8 +166,6 @@
   .hero__price { font-size: 56px; }
   .hero__actions { flex-wrap: nowrap; gap: 14px; }
   .hero__actions .btn { min-height: 64px; padding: 0 32px; font-size: 20px; white-space: nowrap; }
-  .hero__fact { margin-right: 28px; padding-right: 28px; }
-  .hero__fact dd { font-size: 28px; }
 }
 
 /* Kompakt: Telefone und niedrige Fenster (Querformat, Zoom). Dort füllt der Text die ganze Höhe und verdeckt den Film. Engere Abstände
@@ -188,8 +181,6 @@
   .hero__price { font-size: 36px; }
   .hero__actions { gap: 8px 10px; }
   .hero__actions .btn { min-height: 48px; padding: 8px 20px; font-size: 17px; }
-  .hero__fact { margin-right: 14px; padding-right: 14px; }
-  .hero__fact dd { font-size: 19px; }
 }
 /* Sehr schmal (320 bis 359 px): Tabs und der längste Modellname bleiben einzeilig (Tab-Schrift nie unter 18,66 px: darunter gilt der strengere Kontrast) */
 @media (max-width: 359px) {
