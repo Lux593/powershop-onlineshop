@@ -25,6 +25,20 @@
     requestAnimationFrame(function () { fill.style.setProperty('--p', end / 100); });
   }
 
+  // Fokus: Drawer und Warenkorb-Seite werden neu gerendert, der bediente Knopf verschwindet. Danach zurück auf den gleichen
+  // Knopf (Zeile, Art, Beschriftung), sonst auf „Schließen“ bzw. den ersten Knopf (z. B. nach dem Entfernen der Zeile).
+  var spot = null;
+  function remember(el) { spot = { line: el.dataset.line, qty: el.hasAttribute('data-cart-qty'), label: el.getAttribute('aria-label') }; }
+  function restore(box) {
+    var s = spot;
+    spot = null;
+    if (!s || !box) return;
+    var again = Array.prototype.filter.call(box.querySelectorAll('[data-cart-change],[data-cart-qty]'), function (el) {
+      return el.dataset.line === s.line && el.hasAttribute('data-cart-qty') === s.qty && el.getAttribute('aria-label') === s.label;
+    })[0] || box.querySelector('[data-close],a.btn,button');
+    if (again) again.focus({ preventScroll: true });
+  }
+
   function applySections(sections, itemCount) {
     var html = sections && sections[SECTION];
     var counter = document.querySelector('[data-cart-count]');
@@ -38,6 +52,7 @@
         current.innerHTML = fresh.innerHTML;
         current.classList.remove('is-entering'); // Zeilen-Stagger nur beim Öffnen, nicht bei jeder Mengenänderung
         if (current.open) fillBar(before); else barFrom = before;
+        if (current.open) restore(current);
       }
     }
     if (typeof itemCount === 'number') {
@@ -136,7 +151,7 @@
       .then(function (html) {
         var doc = new DOMParser().parseFromString(html, 'text/html');
         var fresh = doc.querySelector('[data-cart-page]');
-        if (fresh) page.innerHTML = fresh.innerHTML;
+        if (fresh) { page.innerHTML = fresh.innerHTML; restore(page); }
       });
   });
 
@@ -145,6 +160,7 @@
     var btn = e.target.closest('[data-cart-change]');
     if (!btn) return;
     e.preventDefault();
+    remember(btn);
     btn.disabled = true;
     PS.cart.change(+btn.dataset.line, +btn.dataset.quantity).catch(fail).then(function () { btn.disabled = false; });
   });
@@ -152,6 +168,7 @@
     var input = e.target.closest('[data-cart-qty]');
     if (!input) return;
     var qty = Math.max(0, parseInt(input.value, 10) || 0);
+    if (document.activeElement === input) remember(input); // Enter im Feld; beim Wegtabben gehört der Fokus schon dem nächsten Element
     PS.cart.change(+input.dataset.line, qty).catch(fail);
   });
 

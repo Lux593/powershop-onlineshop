@@ -246,7 +246,10 @@ body.has-sticky-contact { padding-bottom: 72px; }
 .remove-btn:hover { color: var(--c-black); }
 .progress { display: grid; gap: 8px; padding: 14px 16px; background: var(--c-offwhite); font-size: var(--fs-small); }
 .progress__bar { height: 6px; background: var(--c-line); overflow: hidden; }
-.progress__bar span { display: block; height: 100%; background: var(--c-orange); }
+/* Der Balken skaliert (transform) statt die Breite zu ändern: --p ist der Anteil 0 bis 1 (cart-drawer.liquid), cart.js fährt ihn
+   nach jedem Austausch vom alten zum neuen Wert, weil der Drawer neu gerendert wird */
+.progress__bar span { display: block; height: 100%; background: var(--c-orange); transform: scaleX(var(--p, 0)); transform-origin: left; }
+.has-motion .progress__bar span { transition: transform 900ms var(--ease-out); }
 .subtotal { display: flex; justify-content: space-between; align-items: baseline; font-weight: 600; }
 .subtotal strong { font-family: var(--f-head); font-size: 26px; }
 .drawer__empty { display: grid; gap: 16px; justify-items: center; text-align: center; padding: 48px 8px; color: var(--c-muted); }
@@ -395,3 +398,29 @@ html:not(.has-motion) .bcard:hover .bcard__media img { transform: none; }
 .has-motion .btn.is-busy::before { opacity: 1; animation: ps-busy 1s var(--ease) infinite; }
 .has-motion .btn.is-added::after { animation: ps-flash 700ms var(--ease-out) both; }
 .has-motion .btn.is-added .icon { animation: ps-pop 560ms var(--ease-out); }
+
+/* ---------- Warenkorb-Drawer: Zeilen laufen beim Öffnen gestaffelt ein, Symbol wippt bei Zunahme ---------- */
+/* cart.js setzt .is-entering nur beim Öffnen (ps:open) und nimmt es beim ersten Austausch wieder weg: nicht bei jeder Mengenänderung */
+@keyframes ps-line-in { from { opacity: 0; translate: 24px 0; } }
+.has-motion .drawer.is-entering .drawer__body > *,
+.has-motion .drawer.is-entering .drawer__foot { animation: ps-line-in 480ms var(--ease-out) backwards; animation-delay: calc(120ms + var(--i, 0) * 55ms); }
+.has-motion .drawer.is-entering .drawer__foot { animation-delay: 340ms; }
+.drawer__body > :nth-child(2) { --i: 1; }
+.drawer__body > :nth-child(3) { --i: 2; }
+.drawer__body > :nth-child(4) { --i: 3; }
+.drawer__body > :nth-child(5) { --i: 4; }
+.drawer__body > :nth-child(6) { --i: 5; }
+.drawer__body > :nth-child(n+7) { --i: 6; }
+@keyframes ps-bump { 35% { transform: scale(1.3); } 70% { transform: scale(0.92); } }
+.has-motion [data-cart-trigger].is-bump .icon,
+.has-motion [data-cart-trigger].is-bump .count { animation: ps-bump 600ms var(--ease-out); }
+
+/* ---------- Suche: Dialog fährt ein (leicht skaliert), Hintergrund blendet ein ----------
+   Der Blur kostet mobil Leistung: nur Desktop mit Maus. Unter reduzierter Bewegung gibt es html.has-motion nicht, dann weder Animation noch Blur. */
+@keyframes ps-search-in { from { opacity: 0; transform: translateY(-14px) scale(0.985); } }
+@keyframes ps-backdrop-in { from { opacity: 0; } }
+.has-motion .search-dialog[open] { transform-origin: top center; animation: ps-search-in 420ms var(--ease-out); }
+.has-motion .search-dialog[open]::backdrop { animation: ps-backdrop-in 320ms ease-out; }
+@media (min-width: 1024px) and (hover: hover) {
+  .has-motion .search-dialog::backdrop { backdrop-filter: blur(6px); }
+}
