@@ -65,11 +65,6 @@
           {% render 'icon', name: 'user' %}
         </a>
       {%- endif -%}
-      {%- if section.settings.show_wishlist -%}
-        <button class="icon-btn hide-mobile" type="button" data-open="wish-drawer" aria-label="Merkliste">
-          {% render 'icon', name: 'heart' %}<span class="count" data-wish-count></span>
-        </button>
-      {%- endif -%}
       <button class="icon-btn" type="button" data-open="cart-drawer" aria-label="Warenkorb, {{ cart.item_count }} Artikel" data-cart-trigger>
         {% render 'icon', name: 'shopping-bag' %}<span class="count" data-cart-count data-count="{{ cart.item_count }}">{% if cart.item_count > 0 %}{{ cart.item_count }}{% endif %}</span>
       </button>
@@ -140,13 +135,6 @@
       "id": "search_terms",
       "label": "Beliebte Suchen (eine pro Zeile)",
       "default": "Lederjacke\nStreet Glide\nAuspuff\nHelm\nGebraucht"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_wishlist",
-      "label": "Merkliste anzeigen",
-      "default": false,
-      "info": "Die Merkliste ist noch nicht umgesetzt."
     }
   ],
   "blocks": [
