@@ -8,6 +8,7 @@ geschlossen: eigene Assets, Schriften und Icons, kein Build-Step.
 
 - **Briefing & Komponenten:** [`docs/briefing.md`](docs/briefing.md)
 - **Bildliste (Shotlist):** [`docs/bildliste.md`](docs/bildliste.md)
+- **Übergabe (Stand, Test-Checkliste, Offenes):** [`docs/uebergabe.md`](docs/uebergabe.md)
 - **Motion-Schicht (Vertrag, Datei-Aufteilung):** [`docs/motion-api.md`](docs/motion-api.md)
 - **Hero-Clip (Herkunft, offene Rechtsfragen):** [`docs/hero-clip.md`](docs/hero-clip.md)
 - **Freigabeliste (Zahlen, Zusagen, Texte, Rechtliches, Bildrechte des Händlers):** [`docs/freigaben.md`](docs/freigaben.md)

@@ -1,0 +1,77 @@
+# Übergabe: Power Shop Theme mit Video-Hero und Motion
+
+Stand: 3. Oktober 2026. Dieser Stand liegt auf GitHub in `main` (und im Branch `claude/laughing-brahmagupta-fldc3b`).
+Weil `main` mit dem Shopify-Theme verbunden ist, ist er **live**, sobald die Integration ihn eingespielt hat.
+
+## Was neu ist
+
+- **Startseite**: Vollbild-Hero mit Film (Loop aus einem Road-Glide-Foto, KI-erzeugt, siehe `docs/hero-clip.md`), Modell-Tabs mit Wechsel und Pause-Taste,
+  Header transparent über dem Hero. Darunter Service-Kacheln, Neuheiten, Statement, Bento, Showroom und Story mit Einblend-Effekten.
+- **Header**: Logo und H-D-Icon führen gemeinsam zur Startseite, der Header blendet beim Runterscrollen aus und beim Hochscrollen wieder ein.
+  Das Megamenü ist einfarbig schwarz.
+- **Kollektion und Produkt**: Karten mit quadratischem Bild (4 Spalten ab 900 px, 5 ab 1280 px), Produktseite mit Slide-Galerie, Zoom und Kaufleiste auf dem Handy.
+- **Warenkorb und Suche**: animierter Drawer, Versandbalken, Statusmeldungen für Screenreader; Seitenübergänge mit kurzem Fade (nicht auf Warenkorb und Kasse).
+- **Barrierefreiheit**: Pause für alles, was länger als 5 Sekunden läuft; Reduced-Motion, Windows-Kontrastmodus, Fokus nie verdeckt; angehobene Formularrahmen.
+
+## Notaus im Theme-Editor
+
+*Theme-Einstellungen → Animationen*: **Animationen aktivieren**, **Weiches Scrollen** und **Header auf der Startseite über dem Hero**.
+Mit ausgeschaltetem „Animationen aktivieren“ ist die Seite statisch: keine Einblend-Effekte, kein Scrub, der Film startet nicht von selbst (Standbild mit Play-Taste), alles bleibt sichtbar und bedienbar.
+
+## Film und Bilder austauschen
+
+Die Dateien kommen aus `assets/` und lassen sich unter **demselben Namen** ersetzen:
+
+| Datei | Zweck |
+|---|---|
+| `hero-loop.mp4`, `hero-loop-720.mp4`, `hero-loop.webm` | Film (Desktop, mobil, Alternative); 16:9, ohne Ton, loopfähig |
+| `hero-poster.webp`, `hero-poster-960.webp` | Standbild (erstes Bild des Loops), LCP-Bild |
+| `hero-ride-road.jpg`, `hero-ride-street.jpg`, `hero-ride-cvo.jpg` | Fotos der Tabs 1 bis 3 |
+
+Im Theme-Editor kann pro Modell stattdessen ein eigener Film und ein Standbild gewählt werden. Weitere Details: `docs/hero-clip.md`, `docs/bildliste.md`.
+
+## Messwerte (Harness mit Testdaten, nicht der echte Shop)
+
+| | Startseite Desktop | Startseite Handy | Kollektion | Produkt |
+|---|---|---|---|---|
+| JavaScript (Brotli) | 66,0 KiB | 60,7 KiB | 20 bis 25 KiB | 20 bis 26 KiB |
+| CLS | unter 0,004 | 0 | unter 0,004 | unter 0,004 |
+
+axe (WCAG 2.1 A/AA) in 42 Läufen ohne Verstoß; 140 Fixture-Tests, 10 Harness-Abläufe und `theme check` ohne Befund.
+Das ursprüngliche Ziel von ca. 60 KB JavaScript auf der Startseite ist mit Maus und weichem Scrollen knapp verfehlt (GSAP, ScrollTrigger und Lenis machen ca. 46 KiB aus).
+
+## Vor weiteren Änderungen: Preview-Theme verbinden
+
+Änderungen am Branch `main` gehen sofort live. Zum Testen vorher ein zweites, **unveröffentlichtes** Theme anlegen:
+
+1. Shopify-Admin → *Onlineshop → Themes → Theme hinzufügen → Aus GitHub verbinden*.
+2. Repository `Lux593/powershop-onlineshop` wählen und den Branch `claude/laughing-brahmagupta-fldc3b` (oder einen eigenen Test-Branch) verbinden.
+3. Im Preview prüfen (Checkliste unten), erst danach den Branch nach `main` mergen.
+
+## Checkliste im Preview-Theme (nur dort prüfbar)
+
+- Theme-Editor: Sections hinzufügen, entfernen, neu laden; Hero-Einstellungen; Notaus-Schalter.
+- Kollektion: Filter, Sortierung, Seitenwechsel, 5-Spalten-Umschalter.
+- Produkt: Varianten, Galerie, Zoom, „In den Warenkorb“, Kaufleiste auf dem Handy.
+- Warenkorb-Drawer, Warenkorb-Seite, **Checkout-Branding** und der Weg dorthin (Seitenübergänge dürfen nicht stören).
+- iPhone/Safari: Film startet (im Stromsparmodus bleibt das Standbild mit Play-Taste), Header-Verhalten, Handy-Menü.
+- Film über das Shopify-CDN (Range-Anfragen), Bilder in richtiger Größe (srcset), echtes mobiles Lighthouse.
+- Cookie-Banner und „Cookie-Einstellungen“ im Footer.
+- Prüfen, dass die Bilder der Hero-Tabs und des Teamfotos erscheinen. Falls im Theme-Editor eigene Werte gesetzt wurden, die noch auf die alten Dateinamen
+  (`hero-ride-*.png`, `powershop-team.png`) zeigen, dort die neuen Dateien (`.jpg`, `.webp`) wählen.
+
+## Offen beim Händler und im Shopify-Admin (kein Code)
+
+- Fragenliste: `docs/haendler-fragen.md`; Fundstellen und Status: `docs/freigaben.md`.
+- Besonders wichtig vor Werbung und Verkauf: Kontaktdaten, Rechtstexte und Menüs (`footer`, `customer-service`, `legal`), Versand/Rückgabe/Zahlarten (heute Beispielwerte),
+  Zusicherungen auf Bike-Seiten, Kennzahlen und Events auf der Startseite, Hero-Preise, Größentabellen, Bewertungen.
+- Seite `/pages/service` (Vorlage `page.service`) anlegen; sie wird vielfach verlinkt.
+- Produkte den Kollektionen zuordnen (heute sind alle leer); Cookie-Banner aktivieren.
+- Rechte: Bildquellen, Einwilligungen für Personen auf Teamfoto und Film-Intros, KI-Kennzeichnung des Hero-Films, Händlervertrag.
+
+## Wenn etwas schiefgeht
+
+- Vorheriger Stand von `main` vor dieser Arbeit: Commit `a4d8926`. Zurücksetzen bedeutet, das Live-Theme auf den alten Stand zu setzen; das ist ein
+  Force-Push und wird nur auf ausdrückliche Anweisung gemacht.
+- Schneller und ohne Git: Im Theme-Editor **Animationen aktivieren** ausschalten, oder ein früheres Theme in Shopify wieder veröffentlichen, falls noch eines vorhanden ist.
+- Technische Hintergründe: `docs/motion-api.md` (Motion-Schicht und Dateiaufteilung), `README.md`.
