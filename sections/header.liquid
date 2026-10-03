@@ -8,8 +8,9 @@
       {% render 'icon', name: 'menu' %}
     </button>
 
-    <a class="brand" href="{{ routes.root_url }}" aria-label="{{ shop.name }} – zur Startseite">
+    <a class="brand" href="{{ routes.root_url }}">
       <span class="wordmark">Power<span>Shop</span></span>
+      <span class="sr-only"> – zur Startseite</span>
       <span class="brand__divider" aria-hidden="true"></span>
       <img
         class="brand__hd"

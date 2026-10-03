@@ -16,6 +16,8 @@ Wo noch nichts eingetragen ist, zeigt der Shop entweder nichts an oder einen **B
    (Die Anzeige kennt keine Feiertage; sicherer sind nur die Zeiten.)
 3. **Rechtstexte**: Gibt es Impressum, Datenschutzerklärung, AGB und Widerrufsbelehrung, und liegen sie im Shop-Admin? Sollen sie von einem Rechtstexte-Anbieter kommen?
    Die Links im Footer entstehen nur, wenn im Admin die Menüs `footer`, `customer-service` und `legal` angelegt sind.
+   **Live geprüft am 3. Oktober:** Nur die Datenschutzerklärung (`/policies/privacy-policy`) existiert. Impressum (`/policies/legal-notice`), AGB und Widerruf liefern „404“.
+   Für einen Shop in Deutschland sind Impressum, AGB und Widerrufsbelehrung vor dem Verkauf Pflicht.
 4. **Cookie-Einstellungen**: Ist das Shopify-Cookie-Banner (Datenschutz-Einstellungen) im Admin aktiv? Der Link „Cookie-Einstellungen" im Footer funktioniert nur damit.
 5. **Barrierefreiheit**: Greift die Ausnahme für Kleinstunternehmen (BFSG), oder soll eine Barrierefreiheitserklärung erstellt werden? Wer ist Ansprechperson für Hinweise?
 
@@ -53,7 +55,7 @@ Wo noch nichts eingetragen ist, zeigt der Shop entweder nichts an oder einen **B
     - Service-Kacheln: „Fairer Preis für dein altes Bike", „Individuell zu Laufzeit und Rate"
     - Story: „Wir beraten dich ehrlich …", „Community", „Custom-Umbau"
     - Mega-Menü-Teaser („Neue Kollektion", „Riding Gear", „Performance-Teile", „Geschenkideen") und „Beliebte Suchen"
-22. **Seite „Service"** (`/pages/service`): Soll sie angelegt werden? Sie ist 21-mal verlinkt (Hero, Service-Kacheln, Menü, Events, Kollektionen) und existiert im Shop vermutlich noch nicht.
+22. **Seite „Service"** (`/pages/service`): Soll sie angelegt werden? Sie ist 21-mal verlinkt (Hero, Service-Kacheln, Menü, Events, Kollektionen) und liefert live „404“ (geprüft am 3. Oktober).
     Inhalte: Probefahrt, Finanzierung, Werkstatt, Inzahlungnahme, Kontaktwege, Ablauf.
 23. **Story-Button**: Wohin soll er führen (z. B. „Über uns")? Ohne Ziel wird er nicht angezeigt.
 
@@ -75,6 +77,9 @@ Wo noch nichts eingetragen ist, zeigt der Shop entweder nichts an oder einen **B
     Dazu der Hinweis zu Lederjacken („Sitzen eng …"): Stimmt er so?
 32. **Zusatzfelder je Produkt** (Metafelder): Bikes (Baujahr, Laufleistung, Besteuerung, Zustand), Teile (passende Baujahre und Modelle), Bekleidung (Pflegehinweis). Wer pflegt sie, und aus welcher Quelle?
 33. **Neuheiten**: Ist die Kollektion „Neuheiten" nach „neu" sortiert? Sonst ist „Frisch eingetroffen" nicht zutreffend.
+
+34. **Suchmaschinen-Texte**: Titel und Beschreibung für die Startseite (Shopify-Admin → *Einstellungen → Preferences / Präferenzen → Titel und Meta-Beschreibung der Startseite*).
+    Heute fehlt die Meta-Beschreibung; das Theme gibt sie aus, sobald sie dort steht. Ca. 150 Zeichen, ohne unbelegte Versprechen.
 
 ---
 
