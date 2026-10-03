@@ -119,9 +119,11 @@
 .tab[aria-selected="true"] { color: var(--c-black); border-bottom-color: var(--c-orange); }
 .tabs--left { justify-content: flex-start; }
 /* Die drei Tabs des Neuheiten-Blocks (Bekleidung, Teile & Zubehör, Accessoires) sind bei 18 px mit 24 px Abstand bis 393 px breiter als der Container:
-   der letzte Tab wäre abgeschnitten. Enger Abstand ab Handybreite, bei sehr schmalen Fenstern etwas kleinere Schrift (16 px, Kontrast des Grau 5,8 : 1 reicht). */
-@media (max-width: 479px) { .tabs { gap: var(--s-2); } }
-@media (max-width: 379px) { .tab { font-size: 16px; padding: 0 2px; } }
+   der letzte Tab wäre abgeschnitten. Gemessen: enger Abstand ab Handybreite (passt ab 380 px), darunter 16 px Schrift und 12 px Abstand
+   (passt ab 340 px), unter 340 px 15 px (passt bei 320 px). Das Grau der Tabs hat 5,8 : 1, auch die kleine Schrift hält 4,5 : 1. */
+@media (max-width: 479px) { .tabs { gap: var(--s-1); } }
+@media (max-width: 379px) { .tabs { gap: 12px; } .tab { font-size: 16px; padding: 0 2px; } }
+@media (max-width: 339px) { .tab { font-size: 15px; } }
 
 /* Segment-Umschalter (z. B. Neu | Gebraucht) */
 .segmented { display: inline-flex; border: 1px solid var(--c-black); border-radius: var(--radius); }
