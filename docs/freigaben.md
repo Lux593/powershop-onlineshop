@@ -59,6 +59,7 @@ Versand, Rückgabe, Reservierung prüfen oder leeren.** Ein leerer oder 0-Wert e
 | `sections/product.liquid:456` | Überschrift „Wird oft zusammen gekauft“ (Teile): belegt eine Kaufstatistik, die das Theme nicht hat; es sind nur die ersten Produkte der Kollektion. Vorschlag neutral, z. B. „Das passt dazu“, erst nach Freigabe. | offen | |
 | `snippets/price.liquid:42` | Hinweis „Streichpreis = niedrigster Preis der letzten 30 Tage“ (PAngV): behauptet eine Eigenschaft des Vergleichspreises. Nur mit Bestätigung, dass der Streichpreis so gepflegt wird. | offen | |
 | `assets/contact.js` (`openState`) | Anzeige „Jetzt geöffnet – bis … Uhr“ / „Gerade geschlossen“: rechnet in der Zeitzone des Besuchers, kennt keine Feiertage und Betriebsferien. Eine Aussage des Händlers: Anzeige freigeben (mit Zeitzone und Feiertagen, siehe Frage 2 in `docs/haendler-fragen.md`) oder „Öffnungszeiten“ in den Theme-Einstellungen leer lassen. | offen | |
+| `sections/showroom.liquid:20, 53-56, 88` | Neue neutrale Statustexte im Showroom: „Aktuell sind keine Neufahrzeuge eingestellt.“, „Aktuell sind keine Gebrauchten oder Vorführer eingestellt.“, Links „Alle Motorräder“ / „Alle Motorräder ansehen“. Sie erscheinen, wenn eine Gruppe leer ist beziehungsweise (Handlung) wenn keine Kontaktdaten gepflegt sind. Wortlaut kurz bestätigen. | offen | |
 | `snippets/size-guide.liquid:23-90` | Größentabellen (Werte in cm) | offen | |
 
 ## 5. Bildrechte

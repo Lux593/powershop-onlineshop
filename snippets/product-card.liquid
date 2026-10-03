@@ -104,8 +104,7 @@
           </div>
         {%- elsif product.variants.size == 1 -%}
           <button class="btn btn--secondary btn--block btn--sm" type="button" data-add-variant="{{ product.selected_or_first_available_variant.id }}">
-            {% render 'icon', name: 'shopping-bag' %}In den Warenkorb<span class="sr-only">: {{ card_title }}</span>
-          </button>
+            {% render 'icon', name: 'shopping-bag' %}In den Warenkorb<span class="sr-only">: {{ card_title }}</span></button>
         {%- else -%}
           <a class="btn btn--secondary btn--block btn--sm" href="{{ product.url }}">Optionen wählen<span class="sr-only">: {{ card_title }}</span></a>
         {%- endif -%}
