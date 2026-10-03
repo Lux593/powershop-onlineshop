@@ -38,10 +38,10 @@
 
       {%- for block in section.blocks -%}
         {%- assign collection = block.settings.collection -%}
+        {%- comment -%} Tab und Tabpanel gibt es nur bei mehreren Blöcken; mit einem Block steht keine Tab-Liste, auf die sich das Panel beziehen könnte. {%- endcomment -%}
         <div
           id="panel-{{ block.id }}"
-          role="tabpanel"
-          aria-labelledby="tab-{{ block.id }}"
+          {% if section.blocks.size > 1 %}role="tabpanel" aria-labelledby="tab-{{ block.id }}"{% endif %}
           {% unless forloop.first %}hidden{% endunless %}
           {% if section.blocks.size == 1 %}{{ block.shopify_attributes }}{% endif %}
         >

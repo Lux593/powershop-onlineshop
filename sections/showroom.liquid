@@ -29,11 +29,32 @@
     </div>
 
     {%- if bikes.size > 0 -%}
+      {%- comment -%}
+        Der Umschalter Neu / Gebraucht blendet Karten per CSS aus (assets/theme.css). Gezählt wird deshalb je Zustand: Mit einem
+        gemeinsamen Limit könnten zwölf Neufahrzeuge die Gebrauchten verdrängen, und der Umschalter zeigte eine leere Schiene.
+        Alles außer „neu“ (gebraucht, Vorführer) gehört zur zweiten Gruppe, wie im Umschalter.
+      {%- endcomment -%}
+      {%- assign new_count = 0 -%}
+      {%- assign used_count = 0 -%}
       <div class="rail" id="{{ rail_id }}" aria-live="polite" data-stagger="80">
-        {%- for bike in bikes limit: 12 -%}
-          {% render 'bike-card', product: bike, sizes: '(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 86vw' %}
+        {%- for bike in bikes -%}
+          {%- assign bike_zustand = bike.metafields.bike.zustand.value | default: 'neu' -%}
+          {%- if bike_zustand == 'neu' and new_count < 12 -%}
+            {%- assign new_count = new_count | plus: 1 -%}
+            {% render 'bike-card', product: bike, sizes: '(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 86vw' %}
+          {%- elsif bike_zustand != 'neu' and used_count < 12 -%}
+            {%- assign used_count = used_count | plus: 1 -%}
+            {% render 'bike-card', product: bike, sizes: '(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 86vw' %}
+          {%- endif -%}
         {%- endfor -%}
       </div>
+      {%- comment -%} Hat eine Gruppe keine Fahrzeuge, nennt der Hinweis es, statt eine leere Fläche zu lassen (CSS zeigt nur den der gewählten Gruppe). {%- endcomment -%}
+      {%- if new_count == 0 -%}
+        <p class="showroom__none" data-showroom-none="neu">Aktuell sind keine Neufahrzeuge eingestellt. <a class="text-link" href="{{ section.settings.collection.url }}">Alle Motorräder ansehen</a></p>
+      {%- endif -%}
+      {%- if used_count == 0 -%}
+        <p class="showroom__none" data-showroom-none="gebraucht">Aktuell sind keine Gebrauchten oder Vorführer eingestellt. <a class="text-link" href="{{ section.settings.collection.url }}">Alle Motorräder ansehen</a></p>
+      {%- endif -%}
       {%- comment -%} Fortschritt der Schiene (assets/home.js setzt --rail-progress); nur Orientierung, daher aria-hidden. {%- endcomment -%}
       <div class="rail-progress" aria-hidden="true" hidden><span></span></div>
     {%- elsif request.design_mode -%}
@@ -47,6 +68,7 @@
         Ohne beides würde der Link auf einen toten Anker der Startseite zeigen.
       {%- endcomment -%}
       {%- assign service_url = pages['service'].url -%}
+      {%- assign bikes_url = collections['motorraeder'].url | default: routes.all_products_collection_url -%}
       <div class="showroom__empty">
         <p class="lead">Aktuelle Fahrzeuge zeigen wir dir gern im Showroom.</p>
         {%- if service_url != blank or settings.email != blank or settings.phone != blank -%}
@@ -54,11 +76,16 @@
             {%- if service_url != blank -%}
               <a class="btn btn--primary" href="{{ service_url }}#probefahrt">Probefahrt anfragen</a>
             {%- elsif settings.email != blank -%}
-              <a class="btn btn--primary" href="mailto:{{ settings.email }}?subject={{ 'Probefahrt anfragen' | url_encode }}">Probefahrt anfragen</a>
+              <a class="btn btn--primary" href="{% render 'contact-href', kind: 'mail' %}?subject={{ 'Probefahrt anfragen' | url_encode }}">Probefahrt anfragen</a>
             {%- endif -%}
             {%- if settings.phone != blank -%}
-              <a class="btn {% if service_url != blank or settings.email != blank %}btn--outline-dark{% else %}btn--primary{% endif %}" href="tel:{{ settings.phone | remove: ' ' | remove: '-' | remove: '(' | remove: ')' | remove: '/' }}">{% render 'icon', name: 'phone' %}Anrufen</a>
+              <a class="btn {% if service_url != blank or settings.email != blank %}btn--outline-dark{% else %}btn--primary{% endif %}" href="{% render 'contact-href', kind: 'tel' %}">{% render 'icon', name: 'phone' %}Anrufen</a>
             {%- endif -%}
+          </div>
+        {%- else -%}
+          {%- comment -%} Weder Service-Seite noch Kontaktdaten: Die Handlung führt trotzdem irgendwohin, zur Übersicht der Motorräder. {%- endcomment -%}
+          <div class="chip-row" style="margin-top:var(--s-2)">
+            <a class="btn btn--primary" href="{{ bikes_url }}">Alle Motorräder ansehen</a>
           </div>
         {%- endif -%}
       </div>

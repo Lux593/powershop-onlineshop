@@ -134,7 +134,7 @@
 }
 .hero__panel > *, .hero__sub > * { min-width: 0; max-width: 100%; }
 /* Lange deutsche Wörter (Texte sind im Editor änderbar) brechen um statt aus dem Bild zu laufen (WCAG 1.4.10) */
-.hero__blurb, .hero__price { -webkit-hyphens: auto; hyphens: auto; overflow-wrap: anywhere; }
+.hero__blurb, .hero__price { -webkit-hyphens: auto; hyphens: auto; overflow-wrap: anywhere; hyphenate-limit-chars: 8 4 4; } /* kurze Wörter („große“) nicht trennen */
 .hero__poster {
   --split-pad: 0.2em; /* Platz für Umlaute auf Versalien in der Wortmaske */
   margin: 0;
@@ -153,8 +153,6 @@
 }
 .hero__actions { display: flex; flex-wrap: wrap; gap: 12px; }
 .hero__actions .btn { min-height: 56px; padding: 10px 24px; font-size: 18px; white-space: normal; text-align: center; line-height: 1.1; -webkit-hyphens: auto; hyphens: auto; overflow-wrap: anywhere; }
-/* Datenblatt statt Punktkette: Farbe, Modelljahr und Baureihe als beschriftete Werte mit feinen Trennlinien */
-
 @media (min-width: 640px) {
   .hero__chip { font-size: 24px; }
   .hero__chips { column-gap: 32px; }
@@ -166,6 +164,9 @@
   .hero__blurb { font-size: 26px; }
   .hero__offer { flex-direction: row; align-items: center; flex-wrap: nowrap; gap: 18px 36px; }
   .hero__price { font-size: 56px; }
+  /* Die Headline (Modellname) liegt links unten, das Fahrzeug rechts davon. Mit 11 vw (bis 200 px) lief sie bei Road Glide und Street Glide über Verkleidung und
+     Vorderrad: ab hier höchstens 9 vw (1440 px: 130 statt 158 px), das Motiv bleibt frei, die Headline bleibt das Größte im Bild. */
+  .hero__poster { font-size: min(var(--fs-display), 20svh, 9vw); }
   .hero__actions { flex-wrap: nowrap; gap: 14px; }
   .hero__actions .btn { min-height: 64px; padding: 0 32px; font-size: 20px; white-space: nowrap; }
 }
@@ -183,6 +184,15 @@
   .hero__price { font-size: 36px; }
   .hero__actions { gap: 8px 10px; }
   .hero__actions .btn { min-height: 48px; padding: 8px 20px; font-size: 17px; }
+}
+/* Niedrige Fenster (Handy im Querformat, Zoom): Der Text füllte mit Headline, Preis und Buttons das ganze Bild und der Hero war höher als das Fenster; die Pause-Taste
+   (WCAG 2.2.2) lag unter dem Falz. Kleinere Headline und weniger Fuß, die Taste sitzt oben rechts unter dem Header und ist im ersten Bild erreichbar. */
+@media (max-height: 540px) {
+  .hero__caption-inner { padding-block-end: 64px; }
+  .hero__poster { font-size: min(var(--fs-display), 14svh); }
+  .hero__pause { top: calc(var(--header-h) + 8px); bottom: auto; }
+  /* Der Pfeil wandert an den rechten Rand: in der Mitte läge er über der Button-Zeile */
+  .hero__scroll { left: auto; right: max(var(--gutter), calc((100% - var(--container)) / 2 + var(--gutter))); translate: none; }
 }
 /* Sehr schmal (320 bis 359 px): Tabs und der längste Modellname bleiben einzeilig (Tab-Schrift nie unter 18,66 px: darunter gilt der strengere Kontrast) */
 @media (max-width: 359px) {

@@ -6,17 +6,18 @@
 /* ---------- Story & Events ---------- */
 /* Teil Events; die Story-Regeln stehen in home.css */
 .events { margin-top: var(--s-8); }
-/* Event-Raster: eine Spalte, drei erst ab 900 px. Bei drei Spalten ab 640 px blieben den Textspalten nur 110 bis 197 px, der Titel
-   brach in bis zu sechs Zeilen. Spalten dürfen schrumpfen (Reflow bei 200 % Zoom), lange Titel brechen um. */
+/* Event-Raster: eine Spalte, drei erst ab 1180 px. Bei drei Spalten ab 640 px blieben den Textspalten nur 110 bis 197 px, der Titel
+   brach in bis zu sechs Zeilen; zwischen 900 und 1179 px waren die Karten nur etwa 315 px breit, der Titel 197 px, der Ort brach um.
+   Spalten dürfen schrumpfen (Reflow bei 200 % Zoom), lange Titel brechen um. */
 .event-grid { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
-@media (min-width: 900px) { .event-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1180px) { .event-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 .event-card { position: relative; display: grid; background: var(--c-anthracite); color: var(--c-white); border: 1px solid var(--c-steel); transition: border-color var(--t-fast); } /* eigene Textfarbe: die Karte steht auch auf hellem Grund (Blog, Service-Seite) */
 .event-card:hover { border-color: var(--c-orange); }
 .event-card__media { position: relative; aspect-ratio: 16 / 10; overflow: hidden; }
 .event-card__media img { width: 100%; height: 100%; object-fit: cover; }
 .date-badge { position: absolute; top: 12px; left: 12px; display: grid; place-items: center; width: 60px; padding: 8px 0; background: var(--c-orange); color: var(--c-black); line-height: 1; text-align: center; }
 .date-badge strong { font-family: var(--f-head); font-size: 28px; font-weight: 800; }
-.date-badge span { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; }
+.date-badge span { font-size: var(--fs-caption); font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; }
 .event-card__body { padding: 18px 20px 20px; display: grid; gap: 6px; }
 .event-card__body h3 { font-size: 22px; }
 .event-card__body p { display: flex; align-items: center; gap: 6px; font-size: var(--fs-small); color: var(--c-muted-dark); }

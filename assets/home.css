@@ -178,11 +178,13 @@
 
 /* ---------- Story & Events ---------- */
 /* Teil Story; die Event-Regeln stehen weiter in sections.css (geteilt mit Service-Seite und Blog) */
-/* Event-Raster: siehe sections.css. Zwischen 640 und 899 px liegt eine Karte mit Bild als Zeile (Bild links): als Einzelspalte wäre jedes Bild über 400 px hoch */
-@media (min-width: 640px) and (max-width: 899px) {
+/* Event-Raster: siehe sections.css. Zwischen 640 und 1179 px liegt eine Karte mit Bild als Zeile (Bild links): als Einzelspalte wäre jedes Bild über 400 px hoch */
+@media (min-width: 640px) and (max-width: 1179px) {
   .event-card:not(.event-card--text) { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); align-items: center; }
 }
-.event-card__body :is(h2, h3) { overflow-wrap: anywhere; hyphens: auto; }
+/* Titel brechen an Leerzeichen und vorhandenen Bindestrichen („Saisonabschluss-“ / „Ausfahrt“), nicht mitten im Wort. Ein Wort, das gar nicht passt,
+   bricht als letzter Ausweg trotzdem (break-word), damit bei 320 px nichts überläuft (WCAG 1.4.10). */
+.event-card__body :is(h2, h3) { overflow-wrap: break-word; hyphens: manual; text-wrap: wrap; }
 .story { display: grid; gap: 32px; align-items: center; }
 @media (min-width: 1024px) { .story { grid-template-columns: 1fr 1fr; gap: 64px; } .story--text { grid-template-columns: minmax(0, 1fr); max-width: 760px; } }
 .story__media { position: relative; aspect-ratio: 980 / 807; overflow: hidden; background: var(--c-pure-black); }

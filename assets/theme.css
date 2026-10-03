@@ -6,6 +6,10 @@
 /* Showroom: Umschalter Neu / Gebraucht blendet Karten über ein Zustand-Attribut aus */
 [data-showroom-state="neu"] .bcard:not([data-zustand="neu"]),
 [data-showroom-state="gebraucht"] .bcard[data-zustand="neu"] { display: none; }
+/* Hinweis, wenn die gewählte Gruppe keine Fahrzeuge hat (sections/showroom.liquid); die andere Gruppe zeigt ihn nie */
+.showroom__none { display: none; padding-block: var(--s-3); color: var(--c-muted); }
+[data-showroom-state="neu"] .showroom__none[data-showroom-none="neu"],
+[data-showroom-state="gebraucht"] .showroom__none[data-showroom-none="gebraucht"] { display: block; }
 
 /* Section-Wrapper von Shopify dürfen das Layout nicht beeinflussen */
 .shopify-section { display: block; }
