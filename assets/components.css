@@ -218,7 +218,7 @@
 .pcard .swatches { margin-top: 4px; }
 
 /* ---------- Bike-Karte ---------- */
-.bcard { display: flex; flex-direction: column; background: var(--c-white); border: 1px solid var(--c-line); min-width: 0; }
+.bcard { position: relative; display: flex; flex-direction: column; background: var(--c-white); border: 1px solid var(--c-line); min-width: 0; } /* position: relative begrenzt die sr-only Texte der Karte (Zustand): in einer Schiene lägen sie sonst außerhalb und weiteten die Seite nach rechts */
 .bcard__media { position: relative; display: block; aspect-ratio: 16 / 10; overflow: hidden; background: var(--c-anthracite); }
 .bcard__media img { width: 100%; height: 100%; object-fit: cover; transition: transform 600ms var(--ease); }
 .bcard:hover .bcard__media img { transform: scale(1.04); }
