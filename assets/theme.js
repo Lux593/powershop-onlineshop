@@ -114,10 +114,7 @@
     var cookie = e.target.closest('[data-cookie-settings]');
     if (cookie) {
       e.preventDefault();
-      var cp = window.Shopify && window.Shopify.customerPrivacy;
-      // Ohne aktives Cookie-Banner (Shopify Customer Privacy API) bliebe der Klick stumm: dann eine Rückmeldung
-      if (cp && typeof cp.showPreferences === 'function') cp.showPreferences();
-      else PS.toast('Die Cookie-Einstellungen sind gerade nicht verfügbar. Bitte lade die Seite neu.', 'circle-alert');
+      showCookieSettings();
     }
   });
 
@@ -134,6 +131,28 @@
 
   /* ---------------- Tabs (ARIA) ---------------- */
   PS.selectTab = function (tab) {
+  // Cookie-Einstellungen öffnen. Das Cookie-Banner von Shopify bringt window.privacyBanner mit (showPreferences), die Customer Privacy API
+  // (Shopify.customerPrivacy) lädt dagegen erst nach der Einwilligung. Beide sind Schnittstellen von Shopify, das Theme baut nichts nach.
+  // Ist keine da (Banner aus, Skript noch nicht geladen), lädt loadFeatures die Customer Privacy API nach; scheitert auch das,
+  // steht eine Rückmeldung statt eines stummen Klicks.
+  function showCookieSettings() {
+    var pb = window.privacyBanner;
+    if (pb && typeof pb.showPreferences === 'function') { pb.showPreferences(); return; }
+    function viaApi() {
+      var cp = window.Shopify && window.Shopify.customerPrivacy;
+      if (cp && typeof cp.showPreferences === 'function') { cp.showPreferences(); return true; }
+      return false;
+    }
+    if (viaApi()) return;
+    function fail() { PS.toast('Die Cookie-Einstellungen sind gerade nicht verfügbar. Bitte lade die Seite neu.', 'circle-alert'); }
+    var S = window.Shopify;
+    if (S && typeof S.loadFeatures === 'function') {
+      try {
+        S.loadFeatures([{ name: 'consent-tracking-api', version: '0.1' }], function (error) { if (error || !viaApi()) fail(); });
+      } catch (err) { fail(); }
+    } else fail();
+  }
+
     if (!tab) return;
     var list = tab.closest('[role="tablist"]');
     var activePanel = document.getElementById(tab.getAttribute('aria-controls'));

@@ -6,28 +6,34 @@
 
 /* ---------- Footer ---------- */
 .site-footer { border-top: 2px solid var(--c-orange); }
-.footer__news { display: grid; gap: 24px; padding-block: 48px; border-bottom: 1px solid var(--c-steel); }
+/* Die Trennlinie unter dem Newsletter liegt auf der Breite des Inhalts (der Container hat links und rechts einen Abstand, ein Rahmen liefe 24 px darüber hinaus) */
+.footer__news { display: grid; gap: 24px; padding-block: 48px 49px; background: linear-gradient(var(--c-steel), var(--c-steel)) no-repeat var(--gutter) 100% / calc(100% - var(--gutter) * 2) 1px; }
 @media (min-width: 1024px) { .footer__news { grid-template-columns: 1fr 1fr; align-items: center; gap: 64px; } }
 .footer__news p { color: var(--c-muted-dark); margin-top: 8px; }
 .news-form { display: grid; gap: 10px; }
 .news-form__row { display: flex; gap: 8px; }
 .news-form__row .input { flex: 1; }
+/* Unter 360 px blieben dem Feld neben dem Button 130 px: der Platzhalter „Deine E-Mail-Adresse“ (165 px) wäre abgeschnitten. Der Button rückt in die nächste Zeile. */
+@media (max-width: 359px) { .news-form__row { flex-wrap: wrap; } .news-form__row .btn { flex: 1 1 100%; } }
 .news-form small { color: var(--c-muted-dark); font-size: var(--fs-caption); }
 .news-form small a { text-decoration: underline; }
 .footer__cols { display: grid; gap: 32px; padding-block: 48px; grid-template-columns: 1fr 1fr; }
+/* Zwischen 640 und 1023 px stehen die Link-Spalten nebeneinander (höchstens drei): mit zwei Spalten läge die dritte Liste allein in der zweiten Zeile
+   neben einer leeren Fläche. Die Händlerkarte bleibt darunter in voller Breite. */
+@media (min-width: 640px) and (max-width: 1023px) { .footer__cols { grid-template-columns: repeat(var(--footer-cols-md, 3), minmax(0, 1fr)); } }
 @media (min-width: 1024px) { .footer__cols { grid-template-columns: repeat(var(--footer-cols, 4), 1fr) 1.3fr; } }
-@media (pointer: coarse) { .footer__cols a { min-height: 44px; } }
+@media (pointer: coarse) { .footer__cols a, .footer__cols button { min-height: 44px; } }
 .footer__cols h2 { font-size: 16px; letter-spacing: 0.12em; color: var(--c-white); margin-bottom: 14px; }
 .footer__cols ul { display: grid; gap: 2px; }
 /* Wipe-Unterstreichung: orange Linie läuft von links unter dem Linktext ein. Sie sitzt am unteren Rand der Linkbox
    (das Padding lässt Platz unter den Unterlängen) und läuft so auch bei einem Link über zwei Zeilen (320 px) unter
    dem Text. Gilt auch für Tastaturfokus; Reduced-Motion macht den Wechsel sofort (base.css). */
-.footer__cols a {
-  display: inline-flex; align-items: center; min-height: 36px; padding-bottom: 4px; font-size: var(--fs-small); color: var(--c-muted-dark);
+.footer__cols a, .footer__cols button {
+  display: inline-flex; align-items: center; text-align: start; min-height: 36px; padding-bottom: 4px; font-size: var(--fs-small); color: var(--c-muted-dark);
   background: linear-gradient(var(--c-orange), var(--c-orange)) no-repeat 0 calc(100% - 2px) / 0 2px;
   transition: color var(--t-fast), background-size var(--t-med) var(--ease);
 }
-.footer__cols a:hover, .footer__cols a:focus-visible { color: var(--c-white); background-size: 100% 2px; }
+.footer__cols a:hover, .footer__cols a:focus-visible, .footer__cols button:hover, .footer__cols button:focus-visible { color: var(--c-white); background-size: 100% 2px; }
 .footer__dealer { grid-column: 1 / -1; display: flex; gap: 16px; align-items: center; padding: 20px; border: 1px solid var(--c-steel); background: var(--c-anthracite); align-self: start; }
 @media (min-width: 1024px) { .footer__dealer { grid-column: auto; flex-direction: column; align-items: flex-start; } }
 .footer__dealer img { height: 56px; width: auto; }
@@ -36,5 +42,5 @@
 .footer__bottom { border-top: 1px solid var(--c-steel); padding-block: 20px; font-size: var(--fs-caption); color: var(--c-muted-dark); }
 .footer__bottom .container { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; }
 .payments { display: flex; flex-wrap: wrap; gap: 6px; }
-.payments li { padding: 5px 8px; border: 1px solid var(--c-steel); border-radius: var(--radius); font-size: 11px; font-weight: 600; letter-spacing: 0.04em; color: var(--c-on-dark); }
-.footer__bottom a { text-decoration: underline; }
+.payments li { padding: 4px 8px; border: 1px solid var(--c-steel); border-radius: var(--radius); font-size: var(--fs-caption); font-weight: 600; letter-spacing: 0.04em; color: var(--c-on-dark); }
+.footer__bottom a, .footer__bottom button { text-decoration: underline; }

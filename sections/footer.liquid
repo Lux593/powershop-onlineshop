@@ -77,14 +77,14 @@
             required
             placeholder="Deine E-Mail-Adresse"
             autocomplete="email"
-            {% if form.errors %}aria-invalid="true"{% endif %}
+            {% if form.errors %}aria-invalid="true" aria-describedby="news-error"{% endif %}
           >
           <button class="btn btn--primary" type="submit">Anmelden</button>
         </div>
         {%- if form.posted_successfully? -%}
           <p role="status"><strong>Fast geschafft:</strong> Bitte bestätige deine Anmeldung in der E-Mail (Double-Opt-in).</p>
         {%- elsif form.errors -%}
-          <p role="alert">Bitte gib eine gültige E-Mail-Adresse ein.</p>
+          <p id="news-error" role="alert">Bitte gib eine gültige E-Mail-Adresse ein.</p>
         {%- endif -%}
         <small>
           Du erhältst eine E-Mail zur Bestätigung (Double-Opt-in). Abmeldung jederzeit möglich.
@@ -94,7 +94,7 @@
     </div>
   {%- endif -%}
 
-  <div class="container footer__cols" style="--footer-cols: {{ footer_cols }}">
+  <div class="container footer__cols" style="--footer-cols: {{ footer_cols }}; --footer-cols-md: {{ footer_cols | at_most: 3 }}">
     {%- for block in section.blocks -%}
       {%- case block.type -%}
         {%- when 'links' -%}
@@ -103,13 +103,13 @@
               <h2>{{ block.settings.title }}</h2>
               <ul>
                 {%- for link in linklists[block.settings.menu].links -%}
-                  <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+                  <li><a href="{{ link.url }}">{{ link.title | escape }}</a></li>
                 {%- endfor -%}
                 {%- if block.settings.show_size_guide -%}
-                  <li><a href="#" data-open="sizeguide">Größentabelle</a></li>
+                  <li><button type="button" data-open="sizeguide">Größentabelle</button></li>
                 {%- endif -%}
                 {%- if block.settings.show_cookie_settings -%}
-                  <li><a href="#" data-cookie-settings>Cookie-Einstellungen</a></li>
+                  <li><button type="button" data-cookie-settings>Cookie-Einstellungen</button></li>
                 {%- endif -%}
               </ul>
             </div>
@@ -149,7 +149,7 @@
           {%- for block in section.blocks -%}
             {%- if block.type == 'links' -%}
               {%- assign solo_links = linklists[block.settings.menu].links -%}
-              {%- if solo_links.size == 1 %} · <a href="{{ solo_links.first.url }}">{{ solo_links.first.title }}</a>{% endif -%}
+              {%- if solo_links.size == 1 %} · <a href="{{ solo_links.first.url }}">{{ solo_links.first.title | escape }}</a>{% endif -%}
             {%- endif -%}
           {%- endfor -%}
         {%- endunless -%}
@@ -157,11 +157,11 @@
           {%- for policy in shop.policies -%}
             {%- if policy.url == blank or policy.url == shop.shipping_policy.url or menu_urls contains policy.url -%}
               {%- continue -%}
-            {%- endif %} · <a href="{{ policy.url }}">{{ policy.title }}</a>
+            {%- endif %} · <a href="{{ policy.url }}">{{ policy.title | escape }}</a>
           {%- endfor -%}
         {%- endif -%}
-        {%- if footer_cookie_settings %} · <a href="#" data-cookie-settings>Cookie-Einstellungen</a>{% endif -%}
-        {%- if footer_size_guide %} · <a href="#" data-open="sizeguide">Größentabelle</a>{% endif -%}
+        {%- if footer_cookie_settings %} · <button type="button" data-cookie-settings>Cookie-Einstellungen</button>{% endif -%}
+        {%- if footer_size_guide %} · <button type="button" data-open="sizeguide">Größentabelle</button>{% endif -%}
       </p>
     </div>
   </div>
