@@ -105,10 +105,49 @@ Kollektion und Suche (assets/collection.js, Regeln in shop.css)
                            entfernt nur die jüngste Überblendung. Ohne View Transition (Browser, Reduced-Motion, Setting aus)
                            wird ohne Überblendung getauscht. Reveals im neuen HTML startet motion.js selbst (MutationObserver).
 
-Produktseite (snippets/pdp-sticky-buy.liquid, assets/product.js)
+Produktseite (snippets/pdp-buy.liquid, snippets/pdp-sticky-buy.liquid, assets/product.js)
   [data-sticky-buy]        Mobile Kaufleiste (Teile, Bekleidung). product.js setzt .is-shown, sobald der Kaufbereich
                            (.pdp__buy) oben aus dem Bild ist, und nimmt es am Seitenende (Footer sichtbar) wieder weg.
   [data-sticky-contact]    Kontaktleiste der Motorräder statt der Kaufleiste; product.js setzt body.has-sticky-contact.
+  [data-variant-id]        Das versteckte Feld „id“ des Formulars trägt immer die gewählte Variante: Liquid füllt es bei genau einer
+                           Option Farbe/Color (die erste verfügbare Variante gilt als gewählt), product.js beim Start, nach jeder
+                           Auswahl und im Submit-Handler unmittelbar vor dem Absenden. Ohne vollständige Auswahl bleibt es leer.
+  Live-Region              product.js legt beim Start eine sr-only Region (role=status) an und sagt nach einer Variantenwahl
+                           „Option / Option, Preis, ausverkauft“ an (Preis und Lager tauschen sich per innerHTML aus).
+
+Warenkorb (assets/cart.js, snippets/cart-line.liquid)
+  PS.cart.add(payload)             Alle Schreibzugriffe laufen über eine Warteschlange, nie zwei Anfragen gleichzeitig: Die Antwort mit dem
+  PS.cart.change(target, quantity) älteren Stand könnte sonst den neueren Drawer überschreiben. target = Schlüssel der Position
+                                   (item.key, Attribut data-key an allen Steuerungen einer Position; bleibt bei Änderungen an anderen
+                                   Positionen gültig) oder Zeilennummer ab 1 (Rückfall, data-line). cart.js sendet den Schlüssel als „id“.
+                                   PS.cart.refresh gibt es nicht mehr (war ungenutzt).
+  Fehlermeldungen                  Nur ein 422 (Bestand, Mengengrenze) zeigt die Meldung der API, Shopify liefert sie in der Shop-Sprache.
+                                   Alles andere zeigt einen deutschen Satz statt rohem Englisch („Cannot find variant“).
+  Steuerungen                      aria-label nennen das Produkt („Menge erhöhen: Titel“), ebenso Größenknöpfe und „In den Warenkorb“ der Produktkarte.
+
+Toast (assets/theme.js, PS.toast(msg, icon))
+  Bestätigungen bleiben 3,6 s. Meldungen mit dem Icon circle-alert (Fehler, Hinweise) bleiben 10 s, halten an, solange Zeiger oder
+  Fokus darauf sind (WCAG 2.2.1), und schließen mit Klick oder Escape (.toast--alert).
+
+Cookie-Einstellungen ([data-cookie-settings], Footer-Knopf, assets/theme.js)
+  Reihenfolge: window.privacyBanner.showPreferences() (Cookie-Banner von Shopify) → Shopify.customerPrivacy.showPreferences() →
+  Shopify.loadFeatures consent-tracking-api und danach showPreferences → Hinweis „nicht verfügbar“. Die Schnittstellen gehören Shopify.
+
+Schienen (.rail, assets/theme.js)
+  Die Pfeile ([data-rail-prev], [data-rail-next]) sperren am Anfang und Ende über aria-disabled, nicht über disabled: ein per Tastatur
+  bedienter Pfeil behält so den Fokus. Das CSS (components.css) behandelt beide Schreibweisen gleich.
+
+Tooltip (.tip, assets/sections.js, components.css; WCAG 1.4.13)
+  Die Blase bleibt sichtbar, solange Zeiger oder Fokus auf Knopf oder Blase liegen (die Brücke ::before füllt den Spalt). Escape blendet
+  sie aus (.tip.is-dismissed), ohne dass Fokus oder Zeiger wandern; sie kommt wieder, sobald beide die Info verlassen haben.
+
+Showroom (sections/showroom.liquid, assets/theme.css, assets/sections.js)
+  Das Limit von zwölf Karten gilt je Zustand (Neu / alles andere), nicht für die ganze Kollektion. Hat die gewählte Gruppe keine Fahrzeuge,
+  zeigt .showroom__none[data-showroom-none="neu|gebraucht"] einen Hinweis; das CSS blendet nur den der gewählten Gruppe ein.
+
+Kontakt (snippets/contact-href.liquid, assets/contact.js)
+  Telefon, WhatsApp und E-Mail aus den Händlerdaten gehen nur über contact-href in href-Attribute (Leerzeichen, +, Klammern entfernt,
+  Anführungszeichen maskiert); contact.js bereinigt die Nummer für wa.me auf Ziffern und kodiert die E-Mail.
 
 Hero (sections/hero.liquid, assets/hero.js; nur Startseite, PS.on('[data-hero]'))
   Film                     Poster-<img> (LCP, nie versteckt) plus <video data-src ...>. Der Film startet nach window.load und
@@ -169,7 +208,7 @@ Die Regeln und Module liegen nach Bereich getrennt (früher alles in `sections.c
 | `snippets/search-dialog.liquid` | Markup des Such-Dialogs, aus `sections/header.liquid` per `{% render %}` |
 | `assets/sections.css` | geteilte Reste: Events (Raster und Karten), Service-Seite, eine `min-width`-Regel für Grid-Kinder mehrerer Bereiche |
 | `assets/theme.css` | Shopify-Ergänzungen; am Ende der Block `@media (forced-colors: active)` für gewählte Zustände (Umschalter, Chips, Farbfelder, Hero-Tabs, Spalten-Wahl), auch für Klassen aus `shop.css`/`hero.css` (dort mit einer Stufe mehr Spezifität). Der Tab-Indikator der Produkt-Tabs steht in `home.css`. |
-| `assets/sections.js` | globale Section-Module: Showroom, Quick-Toggle der Produktkarte (`PS.quick`) |
+| `assets/sections.js` | globale Section-Module: Showroom, Quick-Toggle der Produktkarte (`PS.quick`), Escape für Tooltips |
 
 CSS-Ladereihenfolge (`layout/theme.liquid`, entspricht der Kaskade): tokens, base, components, sections, theme, motion, header, hero, home,
 footer, shop. Auf der Startseite laden alle elf Dateien, auf allen anderen Seiten zehn (ohne `hero.css`). Die Sonderlayouts laden nur sechs: `layout/password.liquid` und

@@ -34,10 +34,10 @@ Im Theme-Editor kann pro Modell stattdessen ein eigener Film und ein Standbild g
 
 | | Startseite Desktop | Startseite Handy | Kollektion | Produkt |
 |---|---|---|---|---|
-| JavaScript (Brotli) | 66,0 KiB | 60,7 KiB | 20 bis 25 KiB | 20 bis 26 KiB |
+| JavaScript (Brotli) | 67,4 KiB | 62,2 KiB | 22 bis 27 KiB | 22 bis 28 KiB |
 | CLS | unter 0,004 | 0 | unter 0,004 | unter 0,004 |
 
-axe (WCAG 2.1 A/AA) in 42 Läufen ohne Verstoß; 140 Fixture-Tests, 10 Harness-Abläufe und `theme check` ohne Befund.
+axe (WCAG 2.1 A/AA) in 42 Läufen ohne Verstoß; 181 Fixture-Tests, 10 Harness-Abläufe und `theme check` ohne Befund.
 Das ursprüngliche Ziel von ca. 60 KB JavaScript auf der Startseite ist mit Maus und weichem Scrollen knapp verfehlt (GSAP, ScrollTrigger und Lenis machen ca. 46 KiB aus).
 
 ## Ladezeit mobil (Lighthouse): was gemessen wurde
@@ -67,7 +67,7 @@ Körnung und Header-Blur weglassen, GSAP weglassen (im Rauschen). Die Warenkorb-
 - Warenkorb-Drawer, Warenkorb-Seite, **Checkout-Branding** und der Weg dorthin (Seitenübergänge dürfen nicht stören).
 - iPhone/Safari: Film startet (im Stromsparmodus bleibt das Standbild mit Play-Taste), Header-Verhalten, Handy-Menü.
 - Film über das Shopify-CDN (Range-Anfragen), Bilder in richtiger Größe (srcset), echtes mobiles Lighthouse.
-- Cookie-Banner und „Cookie-Einstellungen“ im Footer.
+- Cookie-Banner und „Cookie-Einstellungen“ im Footer: Der Link öffnet zuerst `window.privacyBanner.showPreferences()` (so live gefunden), dann die Customer Privacy API. Im Preview prüfen, dass der Dialog mit den Schaltern erscheint.
 - Prüfen, dass die Bilder der Hero-Tabs und des Teamfotos erscheinen. Falls im Theme-Editor eigene Werte gesetzt wurden, die noch auf die alten Dateinamen
   (`hero-ride-*.png`, `powershop-team.png`) zeigen, dort die neuen Dateien (`.jpg`, `.webp`) wählen.
 
@@ -79,6 +79,11 @@ Körnung und Header-Blur weglassen, GSAP weglassen (im Rauschen). Die Warenkorb-
 - Seite `/pages/service` (Vorlage `page.service`) anlegen; sie wird vielfach verlinkt.
 - Produkte den Kollektionen zuordnen (heute sind alle leer); Cookie-Banner aktivieren.
 - Rechte: Bildquellen, Einwilligungen für Personen auf Teamfoto und Film-Intros, KI-Kennzeichnung des Hero-Films, Händlervertrag.
+
+## Bekannte Abweichung: Lenis
+
+`assets/lenis.min.js` ist nicht byteidentisch zu npm `lenis@1.3.26`: Es ist das Original plus eingefügtem Lizenzkopf, ohne die letzte Zeile `//# sourceMappingURL=lenis.min.js.map`
+(Original-SHA-256 `Uxlcl5fnznv51/qSQrCCCeV/Rt5MnawSamSU+ngOM0Y=` laut Sicherheitsprüfung, hier nicht erneut gegen npm abgeglichen). `gsap.min.js` und `ScrollTrigger.min.js` (3.15.0) sind byteidentisch zum npm-Paket.
 
 ## Wenn etwas schiefgeht
 

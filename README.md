@@ -130,7 +130,7 @@ Fundstelle in [`docs/freigaben.md`](docs/freigaben.md).
 
 Die Rechtslinks im Footer kommen aus den Shopify-Menüs `footer`, `customer-service` und `legal`: **vor dem Livegang im Admin anlegen**.
 Fehlt ein Rechtstext dort, verlinkt der Footer ersatzweise die Richtlinien aus Einstellungen > Richtlinien (Schalter im Footer-Abschnitt).
-Der Link „Cookie-Einstellungen“ wirkt nur mit aktivem Shopify-Cookie-Banner.
+Der Link „Cookie-Einstellungen“ (ein Knopf im Footer) öffnet die Einstellungen des Shopify-Cookie-Banners (`window.privacyBanner`, danach die Customer Privacy API) und wirkt nur mit aktivem Banner.
 
 ## Bilder austauschen
 
