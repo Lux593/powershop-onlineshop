@@ -101,9 +101,9 @@
         {%- if group.links.size == 0 -%}
           {%- comment -%} Ohne Unterpunkte steht nur der Titel als Link, kein leeres Listenelement {%- endcomment -%}
         {%- elsif forloop.index0 == tile_group_index -%}
-          {%- comment -%} Spalten nach Kachelzahl: bis drei nebeneinander, vier als 2 x 2, mehr in Dreierzeilen {%- endcomment -%}
-          {%- assign tile_cols = group.links.size | at_most: 3 -%}
-          {%- if group.links.size == 4 -%}{%- assign tile_cols = 2 -%}{%- endif -%}
+          {%- comment -%} Drei Spalten wie bisher; genau vier Kacheln stehen in einer Zeile, statt drei plus einer allein in Zeile 2 {%- endcomment -%}
+          {%- assign tile_cols = 3 -%}
+          {%- if group.links.size == 4 -%}{%- assign tile_cols = 4 -%}{%- endif -%}
           <div class="mega__families" style="--tile-cols: {{ tile_cols }}">
             {%- for child in group.links -%}
               <a class="mega-tile" href="{{ child.url }}">
