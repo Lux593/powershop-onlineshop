@@ -20,13 +20,15 @@
     requestAnimationFrame(function () { fill.style.setProperty('--p', (+b.getAttribute('aria-valuenow') || 0) / 100); });
   }
 
-  // Fokus: der bediente Knopf wird mit dem HTML ersetzt. Danach zurück auf den gleichen (Zeile + Beschriftung), sonst auf „Schließen“.
+  // Fokus: der bediente Knopf wird mit dem HTML ersetzt. Danach zurück auf den gleichen (Position + Beschriftung), sonst auf „Schließen“.
+  // Eine Position erkennt man am Schlüssel (data-key, bleibt bei jeder anderen Änderung gleich), nicht an der Zeilennummer.
   var spot;
-  function remember(el) { spot = [el.dataset.line, el.getAttribute('aria-label')]; }
+  function rowOf(el) { return el.dataset.key || el.dataset.line; }
+  function remember(el) { spot = [rowOf(el), el.getAttribute('aria-label')]; }
   function restore(box) {
     var s = spot;
     spot = null;
-    var el = s && ([].filter.call(box.querySelectorAll('[data-line]'), function (e) { return e.dataset.line === s[0] && e.getAttribute('aria-label') === s[1]; })[0] || box.querySelector('[data-close],a.btn,button'));
+    var el = s && ([].filter.call(box.querySelectorAll('[data-line]'), function (e) { return rowOf(e) === s[0] && e.getAttribute('aria-label') === s[1]; })[0] || box.querySelector('[data-close],a.btn,button'));
     if (el) el.focus({ preventScroll: true });
   }
 
@@ -108,57 +110,72 @@
     });
   });
 
+  // Die Meldung der API zeigen wir nur bei 422 (Bestand, Mengengrenze): Shopify liefert sie in der Sprache des Shops und sie sagt,
+  // was der Kunde tun kann. Alles andere („Cannot find variant“ u. a.) wäre rohes Englisch und hilft nicht: dann ein deutscher Satz.
   function request(url, options) {
     return fetch(url, options).then(function (res) {
       return res.json().then(function (data) {
-        if (!res.ok) throw new Error(data.description || data.message || 'Der Warenkorb konnte nicht aktualisiert werden.');
+        if (!res.ok) throw new Error(res.status === 422 && (data.description || data.message) || 'Der Warenkorb konnte nicht aktualisiert werden. Bitte versuch es noch einmal.');
         return data;
       });
     });
   }
 
-  function refresh() {
-    return fetch(PS.routes.root + '?sections=' + SECTION)
-      .then(function (res) { return res.json(); })
-      .then(function (sections) { applySections(sections); });
+  // Alle Schreibzugriffe laufen nacheinander. Zwei gleichzeitige Anfragen könnten sich überholen: Die Antwort mit dem älteren
+  // Warenkorb-Stand überschriebe den neueren Drawer, und eine nach Zeilennummer adressierte Änderung träfe nach einer
+  // Entfernung die falsche Position.
+  var queue = Promise.resolve();
+  function enqueue(job) {
+    var run = queue.then(job, job);
+    queue = run.catch(function () {});
+    return run;
   }
 
   PS.cart = {
-    refresh: refresh,
-
     /* items: [{ id: variantId, quantity: n, properties: {...} }] oder FormData */
     add: function (payload) {
-      var body;
-      var headers = { Accept: 'application/json' };
-      if (payload instanceof FormData) {
-        payload.append('sections', SECTION);
-        payload.append('sections_url', window.location.pathname);
-        body = payload;
-      } else {
-        headers['Content-Type'] = 'application/json';
-        body = JSON.stringify({ items: payload, sections: SECTION, sections_url: window.location.pathname });
-      }
-      return request(PS.routes.cartAdd + '.js', { method: 'POST', headers: headers, body: body })
-        .then(function (data) {
-          return fetch('/cart.js').then(function (r) { return r.json(); }).then(function (cart) {
-            applySections(data.sections, cart.item_count);
-            return cart;
-          });
-        });
+      return enqueue(function () { return addNow(payload); });
     },
 
-    change: function (line, quantity) {
-      return request(PS.routes.cartChange + '.js', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({ line: line, quantity: quantity, sections: SECTION, sections_url: window.location.pathname })
-      }).then(function (cart) {
-        applySections(cart.sections, cart.item_count);
-        announceCart(cart);
-        return cart;
-      });
+    /* target: Schlüssel der Position (item.key, bleibt bei Änderungen an anderen Positionen gültig) oder Zeilennummer ab 1 */
+    change: function (target, quantity) {
+      return enqueue(function () { return changeNow(target, quantity); });
     }
   };
+
+  function addNow(payload) {
+    var body;
+    var headers = { Accept: 'application/json' };
+    if (payload instanceof FormData) {
+      payload.append('sections', SECTION);
+      payload.append('sections_url', window.location.pathname);
+      body = payload;
+    } else {
+      headers['Content-Type'] = 'application/json';
+      body = JSON.stringify({ items: payload, sections: SECTION, sections_url: window.location.pathname });
+    }
+    return request(PS.routes.cartAdd + '.js', { method: 'POST', headers: headers, body: body })
+      .then(function (data) {
+        return fetch('/cart.js').then(function (r) { return r.json(); }).then(function (cart) {
+          applySections(data.sections, cart.item_count);
+          return cart;
+        });
+      });
+  }
+
+  function changeNow(target, quantity) {
+    var body = { quantity: quantity, sections: SECTION, sections_url: window.location.pathname };
+    if (typeof target === 'string') body.id = target; else body.line = target;
+    return request(PS.routes.cartChange + '.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify(body)
+    }).then(function (cart) {
+      applySections(cart.sections, cart.item_count);
+      announceCart(cart);
+      return cart;
+    });
+  }
 
   // Eigene und API-Meldungen (Error) bleiben stehen. Netzwerkfehler (TypeError: „Failed to fetch“) oder ein ungültiges Antwortformat
   // (SyntaxError) zeigen einen deutschen Satz statt der rohen Browsermeldung.
@@ -168,33 +185,38 @@
   }
 
   // Warenkorb-Seite: nach jeder Änderung den Seiteninhalt neu vom Server holen
+  var pageSeq = 0;
   document.addEventListener('ps:cart', function () {
     var page = document.querySelector('[data-cart-page]');
     if (!page) return;
+    var seq = ++pageSeq; // überholt eine neuere Anfrage diese, bleibt der neuere Stand stehen
     fetch(window.location.pathname + '?section_id=' + encodeURIComponent(page.dataset.sectionId))
       .then(function (res) { return res.text(); })
       .then(function (html) {
+        if (seq !== pageSeq) return;
         var doc = new DOMParser().parseFromString(html, 'text/html');
         var fresh = doc.querySelector('[data-cart-page]');
         if (fresh) { page.innerHTML = fresh.innerHTML; restore(page); }
       });
   });
 
-  // Menge ändern / Position entfernen (Buttons im Drawer und auf der Warenkorb-Seite)
+  // Menge ändern / Position entfernen (Buttons im Drawer und auf der Warenkorb-Seite). Adressiert wird über den Schlüssel der Position
+  // (cart-line.liquid: data-key), die Zeilennummer nur als Rückfall.
+  function target(el) { return el.dataset.key || +el.dataset.line; }
   document.addEventListener('click', function (e) {
     var btn = e.target.closest('[data-cart-change]');
     if (!btn) return;
     e.preventDefault();
     remember(btn);
     btn.disabled = true;
-    PS.cart.change(+btn.dataset.line, +btn.dataset.quantity).catch(fail).then(function () { btn.disabled = false; });
+    PS.cart.change(target(btn), +btn.dataset.quantity).catch(fail).then(function () { btn.disabled = false; });
   });
   document.addEventListener('change', function (e) {
     var input = e.target.closest('[data-cart-qty]');
     if (!input) return;
     var qty = Math.max(0, parseInt(input.value, 10) || 0);
     if (document.activeElement === input) remember(input); // nicht beim Wegtabben
-    PS.cart.change(+input.dataset.line, qty).catch(fail);
+    PS.cart.change(target(input), qty).catch(fail);
   });
 
   // Produktformulare und Schnell-Hinzufügen: Drawer öffnet sich als Rückmeldung. Auch Buttons außerhalb (form="…", Sticky-Leiste) sperren

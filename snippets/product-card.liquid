@@ -31,6 +31,8 @@
     endif
   endfor
 
+  assign card_title = product.title | escape
+
   assign discount = 0
   if product.compare_at_price > product.price
     assign discount = product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price
@@ -95,17 +97,17 @@
                   class="size-chip{% unless variant.available %} is-soldout{% endunless %}"
                   type="button"
                   data-add-variant="{{ variant.id }}"
-                  {% unless variant.available %}disabled aria-label="Größe {{ variant_size | escape }} ausverkauft"{% else %}aria-label="Größe {{ variant_size | escape }} in den Warenkorb"{% endunless %}
-                >{{ variant_size }}</button>
+                  {% unless variant.available %}disabled aria-label="Größe {{ variant_size | escape }}: {{ card_title }} ausverkauft"{% else %}aria-label="Größe {{ variant_size | escape }}: {{ card_title }} in den Warenkorb"{% endunless %}
+                >{{ variant_size | escape }}</button>
               {%- endif -%}
             {%- endfor -%}
           </div>
         {%- elsif product.variants.size == 1 -%}
           <button class="btn btn--secondary btn--block btn--sm" type="button" data-add-variant="{{ product.selected_or_first_available_variant.id }}">
-            {% render 'icon', name: 'shopping-bag' %}In den Warenkorb
+            {% render 'icon', name: 'shopping-bag' %}In den Warenkorb<span class="sr-only">: {{ card_title }}</span>
           </button>
         {%- else -%}
-          <a class="btn btn--secondary btn--block btn--sm" href="{{ product.url }}">Optionen wählen</a>
+          <a class="btn btn--secondary btn--block btn--sm" href="{{ product.url }}">Optionen wählen<span class="sr-only">: {{ card_title }}</span></a>
         {%- endif -%}
       </div>
     {%- endif -%}
@@ -113,9 +115,9 @@
 
   <div class="pcard__body">
     <p class="caption muted">
-      {%- if is_part and product.vendor != blank -%}{{ product.vendor }}{%- else -%}{{ product.type }}{%- endif -%}
+      {%- if is_part and product.vendor != blank -%}{{ product.vendor | escape }}{%- else -%}{{ product.type | escape }}{%- endif -%}
     </p>
-    <h3 class="pcard__title"><a href="{{ product.url }}">{{ product.title }}</a></h3>
+    <h3 class="pcard__title"><a href="{{ product.url }}">{{ card_title }}</a></h3>
     {% render 'rating', product: product %}
     {% render 'price', product: product %}
 
@@ -125,7 +127,7 @@
       {%- if families != blank -%}
         <p class="pcard__fits">
           {% render 'icon', name: 'check' %}Passt für:
-          {% if families.size > 2 %}{{ families.size }} Modellfamilien{% else %}{{ families | join: ', ' }}{% endif %}
+          {% if families.size > 2 %}{{ families.size }} Modellfamilien{% else %}{{ families | join: ', ' | escape }}{% endif %}
           {%- if years.size > 1 %} {{ years.first }}–{{ years.last }}{% elsif years.size == 1 %} {{ years.first }}{% endif -%}
         </p>
       {%- endif -%}
