@@ -26,7 +26,7 @@
   font-weight: 600; font-size: var(--fs-small);
 }
 .pagination a:hover { background: var(--c-stone); }
-.pagination a[aria-current="page"] { background: var(--c-black); color: var(--c-white); pointer-events: none; }
+.pagination a[aria-current="page"], .pagination span[aria-current="page"] { background: var(--c-black); color: var(--c-white); pointer-events: none; }
 .pagination .is-disabled { opacity: 0.35; }
 .pagination .icon { width: 20px; height: 20px; }
 
@@ -68,7 +68,7 @@
   .segmented button[aria-pressed="true"],
   .chip[aria-pressed="true"], .chip.is-active,
   .size-chip[aria-pressed="true"],
-  .pagination button[aria-current="page"], .pagination a[aria-current="page"] {
+  .pagination button[aria-current="page"], .pagination a[aria-current="page"], .pagination span[aria-current="page"] {
     forced-color-adjust: none; background: Highlight; color: HighlightText;
   }
   /* Tabs: nur der gewählte trägt einen Strich (die transparente Linie würde sonst bei allen in Systemfarbe sichtbar) */

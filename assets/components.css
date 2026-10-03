@@ -208,7 +208,7 @@
 }
 .pcard__body { display: grid; gap: 4px; }
 .pcard__title { font-family: var(--f-body); font-size: 15px; font-weight: 500; line-height: 1.35; text-transform: none; letter-spacing: 0;
-  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; } /* 4 statt 2 Zeilen: Mit den Textabständen aus WCAG 1.4.12 (Zeilenhöhe 1,5, Buchstaben 0,12 em) wird aus zwei Zeilen drei, die dritte wäre abgeschnitten */
 .pcard__title a:hover { text-decoration: underline; text-underline-offset: 3px; }
 .pcard__fits { font-size: var(--fs-caption); color: var(--c-muted); display: flex; align-items: center; gap: 6px; }
 .pcard__fits .icon { width: 14px; height: 14px; }
@@ -231,6 +231,7 @@
 .bcard__price strong { font-family: var(--f-head); font-size: 28px; font-weight: 700; }
 .bcard__actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .bcard__actions .btn { padding: 0 12px; }
+.bcard__actions > :only-child { grid-column: 1 / -1; } /* ohne „Anfragen“ (keine Kontaktdaten) füllt „Details“ die Zeile */
 .bcard.is-reserved .bcard__media img { filter: grayscale(0.6) brightness(0.8); }
 
 /* ---------- Overlays: Dialog, Bottom-Sheet, Drawer ---------- */
@@ -238,6 +239,10 @@ dialog { padding: 0; border: 0; color: var(--c-text); background: var(--c-white)
 dialog::backdrop { background: rgba(10, 10, 10, 0.6); }
 .modal { width: min(820px, calc(100% - 32px)); max-height: calc(100% - 64px); margin: auto; box-shadow: var(--shadow-lg); }
 .modal__inner { display: flex; flex-direction: column; max-height: inherit; }
+/* Ab 640 px ist max-height des Dialogs eine Prozentangabe (calc(100% - 64px)). Geerbt bezöge sie sich auf die automatische Höhe des Dialogs und fiele weg:
+   Der Inhalt wüchse über den Dialog hinaus, der Dialog selbst würde zum Scrollbereich (zusätzlicher Tab-Stopp, 4 px Überlauf bei 1440 x 900) und der Body scrollte nie.
+   Mit der Fensterhöhe ist die Grenze eindeutig: der Body scrollt, der Dialog nicht. */
+@media (min-width: 640px) { .modal__inner { max-height: calc(100vh - 64px); max-height: calc(100dvh - 64px); } }
 .modal__head { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 16px 16px 24px; border-bottom: 1px solid var(--c-line); }
 .modal__body { padding: 24px; overflow: auto; }
 .modal__foot { padding: 16px 24px; border-top: 1px solid var(--c-line); display: flex; gap: 12px; justify-content: flex-end; }
@@ -269,6 +274,7 @@ dialog::backdrop { background: rgba(10, 10, 10, 0.6); }
   box-shadow: var(--shadow-lg); font-size: var(--fs-small); animation: toast-in var(--t-med) var(--ease);
 }
 .toast .icon { color: var(--c-orange); }
+.toast--alert { pointer-events: auto; cursor: pointer; } /* Fehler und Hinweise: Der Zeiger darauf hält die Anzeige an, ein Klick schließt sie (assets/theme.js) */
 @keyframes toast-in { from { transform: translateY(12px); opacity: 0; } to { transform: none; opacity: 1; } }
 
 /* ---------- Karussell (horizontal, scroll-snap) ---------- */
@@ -278,9 +284,12 @@ dialog::backdrop { background: rgba(10, 10, 10, 0.6); }
 .rail-nav { display: flex; gap: 8px; }
 .rail-nav button { width: 48px; height: 48px; display: grid; place-items: center; border: 1px solid var(--c-black); border-radius: 50%; }
 .rail-nav button:hover { background: var(--c-black); color: var(--c-white); }
-.rail-nav button[disabled] { opacity: 0.3; pointer-events: none; }
+.rail-nav button[disabled], .rail-nav button[aria-disabled="true"] { opacity: 0.3; pointer-events: none; }
 
-/* ---------- Tooltip (Info) ---------- */
+/* ---------- Tooltip (Info) ----------
+   WCAG 1.4.13: Die Blase bleibt sichtbar, solange Zeiger oder Fokus auf Knopf oder Blase liegen (die Brücke ::before füllt den Spalt,
+   über den der Zeiger zur Blase wandert) und lässt sich mit Escape schließen, ohne dass Fokus oder Zeiger wandern
+   (assets/sections.js setzt dafür .is-dismissed, bis Zeiger und Fokus weg sind). */
 .tip { position: relative; display: inline-flex; }
 .tip__btn { width: 28px; height: 28px; display: grid; place-items: center; color: var(--c-muted); }
 .tip__bubble {
@@ -289,7 +298,9 @@ dialog::backdrop { background: rgba(10, 10, 10, 0.6); }
   font-size: var(--fs-caption); line-height: 1.5; box-shadow: var(--shadow-lg); z-index: 5;
   opacity: 0; visibility: hidden; transition: opacity var(--t-fast);
 }
+.tip__bubble::before { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 12px; }
 .tip:hover .tip__bubble, .tip:focus-within .tip__bubble { opacity: 1; visibility: visible; }
+.tip.is-dismissed .tip__bubble { opacity: 0; visibility: hidden; }
 
 /* ---------- Zustände ohne Bild ----------
    Platzhalterbilder bleiben im Shop unsichtbar (snippets/is-placeholder.liquid). Karten und Banner

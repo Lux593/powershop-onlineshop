@@ -48,8 +48,9 @@
     {%- render 'bike-badge', zustand: zustand, status: status -%}
   </a>
   <div class="bcard__body">
-    <h3 class="bcard__title"><a href="{{ product.url }}">{{ product.title }}</a></h3>
-    {%- if family != blank -%}<p class="caption muted">{{ family }}</p>{%- endif -%}
+    <h3 class="bcard__title"><a href="{{ product.url }}">{{ product.title | escape }}</a></h3>
+    <p class="sr-only">{% render 'bike-badge', zustand: zustand, status: status, plain: true %}</p>
+    {%- if family != blank -%}<p class="caption muted">{{ family | escape }}</p>{%- endif -%}
     <ul class="facts">
       <li>
         {% render 'icon', name: 'calendar' %}
@@ -58,7 +59,7 @@
       <li>{% render 'icon', name: 'gauge' %}{% if km_known %}{% render 'number-de', value: km %} km{% else %}km auf Anfrage{% endif %}</li>
       <li>
         {% render 'icon', name: 'zap' %}
-        {%- if kw != blank %}{{ kw }} kW ({{ ps }} PS){% else %}{{ color }}{% endif -%}
+        {%- if kw != blank %}{{ kw }} kW ({{ ps }} PS){% else %}{{ color | escape }}{% endif -%}
       </li>
     </ul>
     <div class="bcard__price">
@@ -71,7 +72,10 @@
     <div class="bcard__actions">
       {%- comment -%} Der Name beginnt mit dem sichtbaren Text (2.5.3) und nennt das Modell: in der Linkliste sind die Karten sonst nicht zu unterscheiden (2.4.4) {%- endcomment -%}
       <a class="btn btn--outline-dark btn--sm" href="{{ product.url }}" aria-label="Details: {{ product.title | escape }}">Details</a>
-      <a class="btn btn--primary btn--sm" href="{{ product.url }}#kontakt" aria-label="Anfragen: {{ product.title | escape }}">Anfragen</a>
+      {%- comment -%} Das Ziel #kontakt gibt es nur, wenn die Kontakt-Box Kanäle hat (Händlerdaten) oder im Editor; sonst läge der Link auf einem toten Anker {%- endcomment -%}
+      {%- if settings.phone != blank or settings.whatsapp != blank or settings.email != blank or request.design_mode -%}
+        <a class="btn btn--primary btn--sm" href="{{ product.url }}#kontakt" aria-label="Anfragen: {{ product.title | escape }}">Anfragen</a>
+      {%- endif -%}
     </div>
   </div>
 </article>

@@ -44,4 +44,19 @@
     var toggle = card && PS.quick(card, false);
     if (toggle) toggle.focus();
   });
+
+  /* ---------------- Tooltip: Escape schließt die Blase (WCAG 1.4.13) ----------------
+     Escape blendet die offene Blase aus, Fokus und Zeiger bleiben. Sie kommt wieder, sobald beide die Info verlassen haben. */
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    document.querySelectorAll('.tip').forEach(function (tip) {
+      if (tip.matches(':hover, :focus-within')) tip.classList.add('is-dismissed');
+    });
+  });
+  function rearm(e, other) {
+    var tip = e.target.closest && e.target.closest('.tip.is-dismissed');
+    if (tip && !tip.contains(e.relatedTarget) && !tip.matches(other)) tip.classList.remove('is-dismissed');
+  }
+  document.addEventListener('mouseout', function (e) { rearm(e, ':focus-within'); });
+  document.addEventListener('focusout', function (e) { rearm(e, ':hover'); });
 })();

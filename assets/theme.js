@@ -47,6 +47,8 @@
   function lenis(act) { try { PS.lenis && PS.lenis[act](); } catch (e) { /* Dialog geht vor */ } }
 
   /* ---------------- Toast ---------------- */
+  // Bestätigungen bleiben 3,6 s. Fehler und Hinweise (Icon circle-alert) bleiben 10 s und halten an, solange der Zeiger darauf liegt
+  // oder der Fokus darin ist (WCAG 2.2.1); Escape oder ein Klick schließt sie sofort.
   PS.toast = function (msg, icon) {
     var wrap = document.querySelector('[data-toast-wrap]');
     if (!wrap) return;
@@ -56,8 +58,19 @@
       '<svg class="icon" aria-hidden="true" focusable="false"><use href="#i-' + (icon || 'circle-check') + '"></use></svg>' +
       '<span>' + PS.esc(msg) + '</span>';
     wrap.appendChild(t);
-    setTimeout(function () { t.remove(); }, 3600);
+    var alertToast = icon === 'circle-alert';
+    t.classList.toggle('toast--alert', alertToast);
+    var timer, ms = alertToast ? 10000 : 3600;
+    function arm() { clearTimeout(timer); timer = setTimeout(function () { t.remove(); }, ms); }
+    t.addEventListener('mouseenter', function () { clearTimeout(timer); });
+    t.addEventListener('mouseleave', arm);
+    t.addEventListener('click', function () { clearTimeout(timer); t.remove(); });
+    arm();
   };
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    document.querySelectorAll('[data-toast-wrap] .toast').forEach(function (t) { t.remove(); });
+  });
 
   /* ---------------- Dialoge (Drawer, Modal, Suche) ---------------- */
   var lastTrigger = null;
@@ -118,19 +131,6 @@
     }
   });
 
-  // „close“ blubbert nicht – daher Capture auf document (gilt auch für später eingefügte Dialoge)
-  document.addEventListener('close', function (e) {
-    if (e.target.tagName !== 'DIALOG') return;
-    if (!document.querySelector('dialog[open]')) {
-      document.body.classList.remove('is-locked');
-      lenis('start');
-    }
-    // preventScroll: sonst scrollt focus() die Seite wegen scroll-padding-top nach oben, wenn der Auslöser im sticky Header liegt
-    if (lastTrigger && document.contains(lastTrigger) && lastTrigger.focus) lastTrigger.focus({ preventScroll: true });
-  }, true);
-
-  /* ---------------- Tabs (ARIA) ---------------- */
-  PS.selectTab = function (tab) {
   // Cookie-Einstellungen öffnen. Das Cookie-Banner von Shopify bringt window.privacyBanner mit (showPreferences), die Customer Privacy API
   // (Shopify.customerPrivacy) lädt dagegen erst nach der Einwilligung. Beide sind Schnittstellen von Shopify, das Theme baut nichts nach.
   // Ist keine da (Banner aus, Skript noch nicht geladen), lädt loadFeatures die Customer Privacy API nach; scheitert auch das,
@@ -153,6 +153,19 @@
     } else fail();
   }
 
+  // „close“ blubbert nicht – daher Capture auf document (gilt auch für später eingefügte Dialoge)
+  document.addEventListener('close', function (e) {
+    if (e.target.tagName !== 'DIALOG') return;
+    if (!document.querySelector('dialog[open]')) {
+      document.body.classList.remove('is-locked');
+      lenis('start');
+    }
+    // preventScroll: sonst scrollt focus() die Seite wegen scroll-padding-top nach oben, wenn der Auslöser im sticky Header liegt
+    if (lastTrigger && document.contains(lastTrigger) && lastTrigger.focus) lastTrigger.focus({ preventScroll: true });
+  }, true);
+
+  /* ---------------- Tabs (ARIA) ---------------- */
+  PS.selectTab = function (tab) {
     if (!tab) return;
     var list = tab.closest('[role="tablist"]');
     var activePanel = document.getElementById(tab.getAttribute('aria-controls'));
@@ -197,12 +210,15 @@
       var first = rail.firstElementChild;
       return first ? first.getBoundingClientRect().width + parseFloat(getComputedStyle(rail).columnGap || 0) : rail.clientWidth;
     }
+    // aria-disabled statt disabled: Ein per Tastatur bedienter Pfeil, der am Ende gesperrt wird, verlöre sonst den Fokus (der Browser
+    // setzt ihn auf body). Gesperrt ist er für Screenreader und optisch (components.css), der Klick tut dann nichts.
+    function lock(button, on) { if (on) button.setAttribute('aria-disabled', 'true'); else button.removeAttribute('aria-disabled'); }
     function update() {
-      prev.disabled = rail.scrollLeft <= 4;
-      next.disabled = rail.scrollLeft + rail.clientWidth >= rail.scrollWidth - 4;
+      lock(prev, rail.scrollLeft <= 4);
+      lock(next, rail.scrollLeft + rail.clientWidth >= rail.scrollWidth - 4);
     }
-    prev.addEventListener('click', function () { rail.scrollBy({ left: -step(), behavior: PS.prefersReducedMotion() ? 'auto' : 'smooth' }); });
-    next.addEventListener('click', function () { rail.scrollBy({ left: step(), behavior: PS.prefersReducedMotion() ? 'auto' : 'smooth' }); });
+    prev.addEventListener('click', function () { if (prev.getAttribute('aria-disabled') !== 'true') rail.scrollBy({ left: -step(), behavior: PS.prefersReducedMotion() ? 'auto' : 'smooth' }); });
+    next.addEventListener('click', function () { if (next.getAttribute('aria-disabled') !== 'true') rail.scrollBy({ left: step(), behavior: PS.prefersReducedMotion() ? 'auto' : 'smooth' }); });
     rail.addEventListener('scroll', update, { passive: true });
     window.addEventListener('resize', update);
     update();

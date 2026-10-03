@@ -3,9 +3,17 @@
 
   @param {string} zustand - "neu", "gebraucht" oder "vorfuehrer"
   @param {string} [status] - "reserviert" überschreibt das Badge
+  @param {boolean} [plain] - nur der Text für Screenreader („Zustand: Neu“) statt des Abzeichens. Die Karte versteckt ihr Bild samt Abzeichen
+    (aria-hidden), der Zustand steht dort sonst nirgends als Text.
 {% enddoc %}
 
-{%- if status == 'reserviert' -%}
+{%- if plain -%}
+  {%- if status == 'reserviert' -%}Status: Reserviert
+  {%- elsif zustand == 'neu' -%}Zustand: Neu
+  {%- elsif zustand == 'vorfuehrer' -%}Zustand: Vorführer
+  {%- else -%}Zustand: Gebraucht
+  {%- endif -%}
+{%- elsif status == 'reserviert' -%}
   <span class="badge badge--reserved">{% render 'icon', name: 'clock' %}Reserviert</span>
 {%- elsif zustand == 'neu' -%}
   <span class="badge">Neu</span>

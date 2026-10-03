@@ -19,7 +19,7 @@
       {%- if part.is_link -%}
         <a href="{{ part.url }}" aria-label="Seite {{ part.title }}" data-filter-link>{{ part.title }}</a>
       {%- elsif part.title == paginate.current_page -%}
-        <a aria-current="page" aria-label="Seite {{ part.title }}">{{ part.title }}</a>
+        <span aria-current="page"><span class="sr-only">Seite </span>{{ part.title }}</span>
       {%- else -%}
         <span aria-hidden="true">{{ part.title }}</span>
       {%- endif -%}
