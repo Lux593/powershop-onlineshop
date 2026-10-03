@@ -40,6 +40,17 @@ Im Theme-Editor kann pro Modell stattdessen ein eigener Film und ein Standbild g
 axe (WCAG 2.1 A/AA) in 42 Läufen ohne Verstoß; 140 Fixture-Tests, 10 Harness-Abläufe und `theme check` ohne Befund.
 Das ursprüngliche Ziel von ca. 60 KB JavaScript auf der Startseite ist mit Maus und weichem Scrollen knapp verfehlt (GSAP, ScrollTrigger und Lenis machen ca. 46 KiB aus).
 
+## Ladezeit mobil (Lighthouse): was gemessen wurde
+
+Lighthouse mobil (Moto G Power, Slow 4G, CPU 4x) schwankt auf der Startseite stark: in 29 Läufen gegen den Live-Shop liegt der Median bei Score 95, FCP 2,0 s, LCP 2,6 s.
+Läufe, in denen Chrome den ersten Frame um etwa eine Sekunde verzögert (beobachteter FCP 1,2 bis 1,5 s statt 0,3 s), kommen auf Score 55 bis 75 und LCP 5 bis 7 s. Der Hero ist dabei nicht schuld:
+das Poster ist im HTML auffindbar, `fetchpriority="high"`, nie ausgeblendet und der Hauptthread ist in der Wartezeit leer. Im Nachbau mit HTTP/2 und Brotli trat die Verzögerung nur unter CPU-Last auf und verschwand
+mit dem Chrome-Flag `--disable-features=PaintHolding,PaintHoldingCrossOrigin` (0 von 8 statt 7 von 8). Der Effekt ist ein Mess- und Browserverhalten, kein belegter Theme-Defekt. Vermutung aus der Spurauswertung: Lighthouse
+rechnet bei spätem LCP alle bis dahin geladenen Skripte in den simulierten Wert ein (überwiegend Shopify-Plattformskripte, nicht änderbar).
+
+Geprüft und **ohne Gewinn** (keine Änderung am Theme): alle 11 Stylesheets zu einer Datei (FCP 1909 statt 1833 ms, LCP im Rauschen), Schrift-Preloads weglassen, Bewegung aus, Seitenübergänge aus,
+Körnung und Header-Blur weglassen, GSAP weglassen (im Rauschen). Die Warenkorb-Überschrift hat im Repo und live kein `data-reveal`. Nicht geprüft: kritisches CSS inline, GSAP-Stack erst nach Idle laden.
+
 ## Vor weiteren Änderungen: Preview-Theme verbinden
 
 Änderungen am Branch `main` gehen sofort live. Zum Testen vorher ein zweites, **unveröffentlichtes** Theme anlegen:
