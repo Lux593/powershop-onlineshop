@@ -15,7 +15,7 @@
   assign result_count = results.products_count | default: results.results_count
   assign any_active = false
 -%}
-<div class="active-filters" data-active aria-live="polite">
+<div class="active-filters" data-active>
   <span class="active-filters__count"><strong>{{ result_count }}</strong> {% if result_count == 1 %}{{ singular }}{% else %}{{ plural }}{% endif %}</span>
   {%- for filter in results.filters -%}
     {%- for value in filter.active_values -%}

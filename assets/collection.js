@@ -99,6 +99,34 @@
     function $(sel, ctx) { return (ctx || root).querySelector(sel); }
     function $$(sel, ctx) { return Array.prototype.slice.call((ctx || root).querySelectorAll(sel)); }
 
+    /* ---------- Spaltenwahl: fünf Spalten gibt es erst ab 1280 px ----------
+       Darunter zeigt das Raster vier, der Fünf-Knopf ist ausgeblendet und der Vier-Knopf trägt den Zustand (aria-pressed, nicht nur
+       die Farbe). Die Wahl „fünf“ merkt sich data-five-held und kehrt mit dem Fenster zurück. */
+    var wide = window.matchMedia('(min-width: 1280px)');
+    function syncCols() {
+      var group = $('.grid-toggle');
+      var five = group && $('[data-cols="5"]', group);
+      var four = group && $('[data-cols="4"]', group);
+      if (!five || !four) return;
+      if (wide.matches) {
+        if (!group.hasAttribute('data-five-held')) return;
+        group.removeAttribute('data-five-held');
+        four.setAttribute('aria-pressed', 'false');
+        five.setAttribute('aria-pressed', 'true');
+      } else if (five.getAttribute('aria-pressed') === 'true') {
+        group.setAttribute('data-five-held', '');
+        five.setAttribute('aria-pressed', 'false');
+        four.setAttribute('aria-pressed', 'true');
+      }
+    }
+    syncCols();
+    wide.addEventListener('change', syncCols);
+    document.addEventListener('shopify:section:unload', function gone(e) {
+      if (!e.target.contains(root)) return;
+      wide.removeEventListener('change', syncCols);
+      document.removeEventListener('shopify:section:unload', gone);
+    });
+
     /* ---------- URL aus einem Filterformular ---------- */
     function urlFromForm(form) {
       var params = new URLSearchParams();
@@ -212,10 +240,8 @@
         // Die Überblendung bewegt: kein zusätzlicher Reveal-Stagger
         if (viaTransition) $$('[data-reveal]', nextResults).forEach(function (el) { el.removeAttribute('data-reveal'); });
         // Die Trefferzahl sagt die Live-Region [data-live] außerhalb an: eine mit ersetzte Region würde nicht verlässlich gelesen
-        var own = $('[data-active]', nextResults);
         var count = $('.active-filters__count', nextResults);
         var live = $('[data-live]');
-        if (own) own.removeAttribute('aria-live');
         if (live && count) {
           live.textContent = '';
           setTimeout(function () { live.textContent = count.textContent.replace(/\s+/g, ' ').trim(); }, 60);
@@ -309,6 +335,8 @@
       var colsButton = event.target.closest('.grid-toggle [data-cols]');
       if (colsButton) {
         cols = colsButton.dataset.cols;
+        var toggleGroup = colsButton.closest('.grid-toggle');
+        if (toggleGroup) toggleGroup.removeAttribute('data-five-held'); // eine eigene Wahl ersetzt die gemerkte
         $$('.grid-toggle [data-cols]').forEach(function (b) { b.setAttribute('aria-pressed', b === colsButton ? 'true' : 'false'); });
         var grid = $('[data-grid]');
         if (grid) grid.dataset.cols = cols;

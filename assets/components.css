@@ -36,15 +36,15 @@
   position: absolute; top: 4px; right: 2px; min-width: 18px; height: 18px; padding: 0 5px;
   display: grid; place-items: center; border-radius: 9px;
   background: var(--c-orange); color: var(--c-black);
-  font-size: 11px; font-weight: 600; line-height: 1;
+  font-size: var(--fs-caption); font-weight: 600; line-height: 1;
 }
 .icon-btn .count:empty, .icon-btn .count[data-count="0"] { display: none; }
 
 /* ---------- Badges ---------- */
 .badge {
   display: inline-flex; align-items: center; gap: 4px;
-  padding: 5px 8px; border-radius: var(--radius);
-  font-size: 11px; font-weight: 600; line-height: 1; letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 4.5px 8px; border-radius: var(--radius);
+  font-size: var(--fs-caption); font-weight: 600; line-height: 1; letter-spacing: 0.08em; text-transform: uppercase;
   background: var(--c-black); color: var(--c-white);
 }
 .badge--sale { background: var(--c-orange); color: var(--c-black); }

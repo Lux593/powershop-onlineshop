@@ -47,8 +47,8 @@
           <input
             type="checkbox"
             id="{{ id_prefix }}-{{ filter.param_name | handleize }}-{{ forloop.index }}"
-            name="{{ value.param_name }}"
-            value="{{ value.value }}"
+            name="{{ value.param_name | escape }}"
+            value="{{ value.value | escape }}"
             {% if value.active %}checked{% endif %}
             {% if value.count == 0 and value.active == false %}disabled{% endif %}
           >

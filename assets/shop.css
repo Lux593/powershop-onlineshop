@@ -57,6 +57,7 @@
   transition: background-color var(--t-fast);
 }
 .film-banner__toggle:hover { background: var(--c-black); }
+.film-banner__toggle { --focus-ring: var(--c-white); } /* der orange Ring hielte über dem laufenden Film keine 3:1; der Knopf hat selbst dunklen Grund (wie im Hero und im Header) */
 .film-banner__toggle .icon { width: 20px; height: 20px; }
 .film-banner__toggle[data-state="playing"] .film-banner__icon--play,
 .film-banner__toggle[data-state="paused"] .film-banner__icon--pause { display: none; }
@@ -83,7 +84,7 @@
 .fdrop__btn:hover, .fdrop__btn[aria-expanded="true"] { border-color: var(--c-line); background: var(--c-white); }
 .fdrop__btn .icon { width: 16px; height: 16px; transition: transform var(--t-fast); }
 .fdrop__btn[aria-expanded="true"] .icon { transform: rotate(180deg); }
-.fdrop__btn .dot { min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--c-black); color: var(--c-white); font-size: 11px; display: grid; place-items: center; }
+.fdrop__btn .dot { min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--c-black); color: var(--c-white); font-size: var(--fs-caption); display: grid; place-items: center; }
 .fdrop__panel {
   position: absolute; left: 0; top: calc(100% + 6px); z-index: 50; min-width: 240px; max-height: 360px; overflow: auto;
   padding: 16px; background: var(--c-white); border: 1px solid var(--c-line); box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
@@ -111,6 +112,7 @@
 /* Leere Kategorie: hohe Fläche, Inhalt bleibt mittig */
 .empty--strip { text-align: left; justify-items: start; align-items: center; min-height: 320px; padding: 72px 0; gap: 16px; }
 .empty--strip p { max-width: 60ch; }
+.empty--strip h2 + p { margin-top: 8px; } /* Überschrift und Satz standen ohne Abstand direkt aufeinander (der gap gilt nur für die Grid-Kinder, nicht für Überschrift und Absatz im Textblock) */
 .empty--strip .chip-row { justify-content: flex-start; }
 @media (min-width: 768px) {
   /* Symbol links, Text und Buttons untereinander in der zweiten Spalte: Handlung steht beim Text, nicht 600 px weiter rechts */
@@ -124,6 +126,9 @@
 @media (min-width: 1024px) { .pdp { grid-template-columns: 7fr 5fr; gap: 56px; align-items: start; } }
 .pdp__info { display: grid; gap: 20px; }
 @media (min-width: 1024px) { .pdp__info { position: sticky; top: calc(var(--header-offset) + 24px); } }
+/* Bekleidung und Teile: Die Infospalte ist höher als das quadratische Foto, links bliebe beim Lesen eine leere Fläche. Dann läuft die Galerie
+   mit (sticky); in der Infospalte hätte Sticky ohne Spielraum keine Wirkung. Motorräder: Galerie steckt in einem Wrapper, dort gilt die Infospalte. */
+@media (min-width: 1024px) { .pdp > .gallery { position: sticky; top: calc(var(--header-offset) + 24px); } }
 .pdp__crumbs { padding-top: 20px; }
 .pdp__title { font-size: 34px; overflow-wrap: anywhere; }
 @media (min-width: 1024px) { .pdp__title { font-size: 40px; } }
@@ -257,6 +262,7 @@ body.has-sticky-contact { padding-bottom: 72px; }
 .line-item__name { min-width: 0; font-weight: 500; font-size: 15px; line-height: 1.35; overflow-wrap: anywhere; }
 .line-item__meta { font-size: var(--fs-caption); color: var(--c-muted); margin-top: 2px; }
 .line-item__bottom { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 10px; }
+.line-item__bottom > :last-child { white-space: nowrap; } /* Zeilenpreis bleibt einzeilig („39,95 / €“ brach bei 320 px um) */
 .line-item .qty button, .line-item .qty input { height: 40px; width: 40px; }
 .remove-btn { flex: none; width: 40px; height: 40px; display: grid; place-items: center; color: var(--c-muted); }
 .remove-btn:hover { color: var(--c-black); }
@@ -342,7 +348,7 @@ html:not(.has-motion) .bcard:hover .bcard__media img { transform: none; }
    die transparente Linie bleibt für den Kontrastmodus (forced-colors färbt sie in Systemfarbe). */
 .pcard__title a:focus-visible { outline-color: transparent; text-decoration: underline; text-underline-offset: 3px; }
 
-/* Karten-Stagger: die Spalte bestimmt die Verzögerung. Standard-Spaltenzahl: 2, ab 640 px 3, ab 1024 px 4 (Motorräder 1/2/3).
+/* Karten-Stagger: die Spalte bestimmt die Verzögerung. Standard-Spaltenzahl: 2, ab 640 px 3, ab 1024 px 4, ab 1280 px 5 (Motorräder 1/2/3).
    Nach einer Spaltenwahl im Raster stimmt es nicht mehr genau, das Einblenden läuft nur einmal je Karte. */
 @media (max-width: 639px) {
   .has-motion .product-grid:not(.product-grid--bikes) > [data-reveal]:nth-child(2n) { --rd: 70ms; }
@@ -358,6 +364,14 @@ html:not(.has-motion) .bcard:hover .bcard__media img { transform: none; }
   .has-motion .product-grid:not(.product-grid--bikes) > [data-reveal]:nth-child(4n+3),
   .has-motion .product-grid--bikes > [data-reveal]:nth-child(3n) { --rd: 140ms; }
   .has-motion .product-grid:not(.product-grid--bikes) > [data-reveal]:nth-child(4n) { --rd: 210ms; }
+}
+/* Ab 1280 px hat das Raster fünf Spalten (siehe unten): die Staffelung folgt der Spalte, die Regeln hier decken jede Karte ab und ersetzen die der vier Spalten */
+@media (min-width: 1280px) {
+  .has-motion .product-grid:not(.product-grid--bikes) > [data-reveal]:nth-child(5n+1) { --rd: 0ms; }
+  .has-motion .product-grid:not(.product-grid--bikes) > [data-reveal]:nth-child(5n+2) { --rd: 70ms; }
+  .has-motion .product-grid:not(.product-grid--bikes) > [data-reveal]:nth-child(5n+3) { --rd: 140ms; }
+  .has-motion .product-grid:not(.product-grid--bikes) > [data-reveal]:nth-child(5n+4) { --rd: 210ms; }
+  .has-motion .product-grid:not(.product-grid--bikes) > [data-reveal]:nth-child(5n) { --rd: 280ms; }
 }
 
 /* Seitenwechsel scrollt die Filterleiste nach oben (collection.js). Dabei fährt der Header wieder ein: das Ziel rechnet ihn immer mit
@@ -411,7 +425,7 @@ html:not(.has-motion) .bcard:hover .bcard__media img { transform: none; }
 .sticky-buy .price { gap: 0 8px; }
 .sticky-buy .price__now { font-family: var(--f-head); font-size: 22px; font-weight: 700; line-height: 1.1; }
 /* Der Hinweis (pdp-sticky-buy.liquid) darf umbrechen: nie abgeschnitten, auch nicht bei 320 px */
-.sticky-buy .price__note { font-size: 11px; line-height: 1.3; }
+.sticky-buy .price__note { font-size: var(--fs-caption); line-height: 1.3; }
 .sticky-buy .btn { flex: none; padding: 0 16px; }
 @media (min-width: 1024px) { .sticky-buy { display: none; } }
 /* In niedrigen Fenstern (Querformat, 400 % Zoom) nähme die Leiste zu viel vom Bild: dort entfällt sie */
@@ -491,9 +505,6 @@ html:not(.has-motion) .bcard:hover .bcard__media img { transform: none; }
 /* ---------- Spaltenwahl: 5 Spalten ab 1280 px ---------- */
 .grid-toggle [data-cols="5"] { display: none; }
 @media (min-width: 1280px) { .grid-toggle [data-cols="5"] { display: grid; } }
-@media (max-width: 1279px) {
-  .grid-toggle:has([data-cols="5"][aria-pressed="true"]) [data-cols="4"] { color: var(--c-black); border-color: var(--c-black); }
-}
 
 /* ---------- Produktseite: kleineres Foto ---------- */
 /* Foto und Infospalte teilen sich die Breite gleichmäßig, das Foto ist quadratisch statt 4:5 und nie höher als das
