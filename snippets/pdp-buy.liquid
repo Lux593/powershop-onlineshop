@@ -15,6 +15,18 @@
   if current_variant == blank and product.has_only_default_variant
     assign current_variant = product.variants.first
   endif
+
+  comment
+    Genau eine Option und sie ist die Farbe: Der erste Farbwert gilt als gewählt (Markup unten), also ist die Variante damit
+    schon bestimmt. Ohne diese Zuordnung bliebe das Feld „id“ leer, der Kaufbutton aktiv und der Kauf scheiterte.
+    Gewählt wird die erste verfügbare Variante, damit eine ausverkaufte erste Farbe nicht den Kauf sperrt.
+  endcomment
+  if current_variant == blank and product.options.size == 1
+    assign only_key = product.options_with_values.first.name | downcase
+    if only_key == 'farbe' or only_key == 'color'
+      assign current_variant = product.selected_or_first_available_variant
+    endif
+  endif
   assign form_id = 'product-form-' | append: product.id
 -%}
 
@@ -41,7 +53,7 @@
       -%}
       <div class="pdp__row" data-option-row data-option-index="{{ option_index }}" data-option-label="{{ option.name | escape }}">
         <div class="pdp__row-head">
-          <span><strong>{{ option.name | escape }}:</strong> <span data-option-name>{{ selected_value | default: 'bitte wählen' }}</span></span>
+          <span><strong>{{ option.name | escape }}:</strong> <span data-option-name>{{ selected_value | default: 'bitte wählen' | escape }}</span></span>
           {%- if is_size and size_type != blank -%}
             <button class="text-link small" type="button" data-open="sizeguide" data-type="{{ size_type }}">{% render 'icon', name: 'ruler', class: 'icon--sm' %} Größentabelle</button>
           {%- endif -%}

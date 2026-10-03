@@ -1,0 +1,33 @@
+{% doc %}
+  Schiene mit weiteren Produkten unter der Produktseite (Teile, Bekleidung): Überschrift, Pfeile, bis zu acht Produktkarten.
+  Die Motorrad-Seite hat eine eigene Schiene mit Bike-Karten (sections/product.liquid).
+
+  @param {product} product - Aktuelles Produkt (erscheint nicht in der Schiene)
+  @param {object} similar - Produkte, aus denen die Schiene besteht (meist die Kollektion des Produkts)
+  @param {string} heading - Überschrift der Schiene
+  @param {string} section_id - ID der Section (macht die Schiene eindeutig)
+
+  @example
+  {% render 'product-rail', product: product, similar: similar, heading: 'Das könnte dir auch gefallen', section_id: section.id %}
+{% enddoc %}
+
+{%- if similar.size > 1 -%}
+  <section class="section--tight">
+    <div class="section-head" data-reveal>
+      <h2>{{ heading }}</h2>
+      <div class="rail-nav">
+        <button type="button" data-rail-prev="rail-similar-{{ section_id }}" aria-label="Zurück">{% render 'icon', name: 'chevron-left' %}</button>
+        <button type="button" data-rail-next="rail-similar-{{ section_id }}" aria-label="Weiter">{% render 'icon', name: 'chevron-right' %}</button>
+      </div>
+    </div>
+    <div class="rail" id="rail-similar-{{ section_id }}" style="grid-auto-columns:minmax(220px, calc((100% - 72px) / 4))">
+      {%- assign shown = 0 -%}
+      {%- for item in similar -%}
+        {%- if item.id != product.id and shown < 8 -%}
+          {%- assign shown = shown | plus: 1 -%}
+          {% render 'product-card', product: item, reveal: true %}
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  </section>
+{%- endif -%}

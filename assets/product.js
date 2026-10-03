@@ -153,6 +153,12 @@
         return matching(selected)[0] || null;
       };
 
+      // Das versteckte Feld „id“ trägt immer die gewählte Variante: auch beim Start (Farbe als einzige Option ist schon gewählt)
+      // und unmittelbar vor dem Absenden, nicht nur nach einem Klick auf eine Option
+      var syncId = function (variant) {
+        if (idField) idField.value = variant ? variant.id : '';
+      };
+
       var refreshAvailability = function () {
         rows.forEach(function (row, i) {
           $$('[data-option-value]', row).forEach(function (button) {
@@ -175,6 +181,22 @@
         buyTexts.forEach(function (t) { t.textContent = can ? 'In den Warenkorb' : 'Ausverkauft'; });
       };
 
+      // Statusmeldung (4.1.3): Preis und Verfügbarkeit tauschen sich per innerHTML aus, ohne dass ein Screenreader es bemerkt.
+      // Eine eigene Live-Region (entsteht beim Start) sagt nach der Auswahl Variante, Preis und Verfügbarkeit an.
+      var live = document.createElement('div');
+      live.className = 'sr-only';
+      live.setAttribute('role', 'status');
+      live.setAttribute('aria-live', 'polite');
+      live.setAttribute('aria-atomic', 'true');
+      root.appendChild(live);
+      var announceVariant = function (variant) {
+        var price = $('[data-pdp-dynamic="price"] .price__now');
+        var text = [variant.options.join(' / '), price && price.textContent.replace(/\s+/g, ' ').trim(), variant.available ? '' : 'ausverkauft']
+          .filter(Boolean).join(', ');
+        live.textContent = '';
+        setTimeout(function () { live.textContent = text; }, 60); // leeren, dann füllen: gleiche Meldungen werden erneut gelesen
+      };
+
       var refreshDynamic = function (variant) {
         if (!variant) return;
         if (request) request.abort();
@@ -188,13 +210,14 @@
               var fresh = doc.querySelector('[data-pdp-dynamic="' + node.dataset.pdpDynamic + '"]');
               if (fresh) node.innerHTML = fresh.innerHTML;
             });
+            announceVariant(variant);
           })
           .catch(function (error) { if (error.name !== 'AbortError') { /* Preis bleibt stehen */ } });
       };
 
       var apply = function () {
         var variant = current();
-        if (idField) idField.value = variant ? variant.id : '';
+        syncId(variant);
         refreshAvailability();
         refreshBuy(variant);
         if (variant) {
@@ -236,9 +259,12 @@
         if (!variant.available) {
           event.preventDefault();
           event.stopImmediatePropagation();
+          return;
         }
+        syncId(variant);
       }, true);
 
+      syncId(current());
       refreshAvailability();
       refreshBuy(current());
     }

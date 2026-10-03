@@ -15,6 +15,10 @@
   assign show_from = false
   if variant == blank and product.price_varies
     assign show_from = true
+    comment
+      „ab“ nennt den niedrigsten Preis: Die Variante, die die Angaben liefert, ist die günstigste, nicht die erste verfügbare.
+    endcomment
+    assign v = product.variants | sort: 'price' | first
   endif
 -%}
 

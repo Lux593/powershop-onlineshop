@@ -20,6 +20,7 @@
   assign show_from = false
   if product.selected_variant == blank and product.price_varies
     assign show_from = true
+    assign v = product.variants | sort: 'price' | first
   endif
 -%}
 <div class="sticky-buy on-dark" data-sticky-buy>
