@@ -165,7 +165,7 @@
               {{ block.shopify_attributes }}
             >
               <h2 class="hero__poster" data-split="words">{{ block.settings.headline | default: block.settings.label }}</h2>
-              <div class="hero__sub" data-stagger="90" data-reveal-delay="380">
+              <div class="hero__sub" data-stagger="90" data-reveal-delay="220">
                 {%- if block.settings.blurb != blank -%}
                   <p class="hero__blurb">{{ block.settings.blurb }}</p>
                 {%- endif -%}
@@ -228,7 +228,7 @@
       "default": "both"
     },
     { "type": "range", "id": "autoplay_seconds", "label": "Bildwechsel nach", "info": "Die Modelle wechseln von selbst. Ein Klick auf einen Tab beendet den Wechsel, die Pause-Taste hält ihn an.", "min": 5, "max": 12, "step": 1, "unit": " s", "default": 8 },
-    { "type": "text", "id": "scroll_target", "label": "Ziel des „Weiter“-Pfeils ohne JavaScript (ID)", "default": "nach-hero", "info": "Mit JavaScript scrollt der Pfeil automatisch zur nächsten Section. Die ID gilt nur als Rückfall." }
+    { "type": "text", "id": "scroll_target", "label": "Ziel des „Weiter“-Pfeils ohne JavaScript (ID)", "default": "nach-hero", "info": "Mit JavaScript scrollt der Pfeil automatisch zum nächsten Abschnitt. Die ID gilt nur als Rückfall." }
   ],
   "max_blocks": 5,
   "blocks": [
@@ -241,7 +241,7 @@
         { "type": "text", "id": "blurb", "label": "Kurztext", "default": "Die feste Verkleidung für lange Strecken." },
         { "type": "header", "content": "Foto" },
         { "type": "image_picker", "id": "image", "label": "Bild", "info": "Empfohlen 16:9, mindestens 1920 Pixel breit. Beim ersten Slide nur ohne Film." },
-        { "type": "text", "id": "image_asset", "label": "Standard-Bilddatei im Theme", "info": "Wird benutzt, solange kein Bild gewählt ist.", "default": "hero-ride-road.png" },
+        { "type": "text", "id": "image_asset", "label": "Standard-Bilddatei im Theme", "info": "Wird benutzt, solange kein Bild gewählt ist.", "default": "hero-ride-road.jpg" },
         { "type": "text", "id": "image_alt", "label": "Bildbeschreibung" },
         { "type": "header", "content": "Film (nur erster Slide)" },
         { "type": "video", "id": "video", "label": "Film", "info": "Ohne Auswahl läuft die Standarddatei. Kurzer Loop, 16:9, ohne Ton. Gilt nur für den ersten Slide." },
@@ -268,7 +268,7 @@
           "settings": {
             "label": "Street Glide",
             "blurb": "Die tiefe Scheibe für die offene Straße.",
-            "image_asset": "hero-ride-street.png"
+            "image_asset": "hero-ride-street.jpg"
           }
         },
         {
@@ -276,7 +276,7 @@
           "settings": {
             "label": "CVO",
             "blurb": "Die CVO-Ausstattung für die große Tour.",
-            "image_asset": "hero-ride-cvo.png"
+            "image_asset": "hero-ride-cvo.jpg"
           }
         }
       ]

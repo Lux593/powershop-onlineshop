@@ -2,13 +2,13 @@
 
 Alles hier sind **Aussagen, Zahlen und Texte des Händlers**. Das Theme-Team ändert sie nicht, sie stehen aber live im Shop,
 sobald das Theme veröffentlicht ist. Jede Zeile braucht vor dem Livegang ein Ja vom Händler (bei Rechtstexten zusätzlich vom
-Rechtstexte-Anbieter). Fundstellen sind Datei:Zeile im Stand dieses Laufs, die Zeilen verschieben sich bei Änderungen.
+Rechtstexte-Anbieter). Fundstellen sind Datei:Zeile im Stand dieses Laufs, die Zeilen verschieben sich bei Änderungen (Prüfung: jede Fundstelle gegen den Text abgleichen, nicht nur gegen die Zeilenzahl).
 
 Status: **offen** = noch nicht freigegeben. Trage Freigabe und Datum in die letzten beiden Spalten ein.
 
 ## 1. Zahlen und Zusagen aus den Theme-Einstellungen
 
-Diese Werte sind Beispiele aus dem Mockup (`config/settings_data.json` ist leer, es gelten die Schema-Vorgaben). Sie erscheinen in
+Diese Werte sind Beispielwerte (`config/settings_data.json` ist leer, es gelten die Schema-Vorgaben). Sie erscheinen in
 Ankündigungsleiste, Produktseiten, Warenkorb, Newsletter-Band und Bike-Seite. **Im Theme-Editor unter Theme-Einstellungen >
 Versand, Rückgabe, Reservierung prüfen oder leeren.** Ein leerer oder 0-Wert erzeugt im Shop keine Aussage (siehe unten).
 
@@ -35,28 +35,27 @@ Versand, Rückgabe, Reservierung prüfen oder leeren.** Ein leerer oder 0-Wert e
 | Fundstelle | Aussage | Status | Freigabe |
 |---|---|---|---|
 | Shopify-Menüs `footer`, `customer-service`, `legal` (Handles aus `sections/footer-group.json:8-10`) | Impressum, Datenschutz, AGB, Widerruf kommen ausschließlich aus diesen Menüs. **Im Admin anlegen und prüfen.** Zusätzlich verlinkt der Footer Richtlinien aus Einstellungen > Richtlinien, die in keinem Menü stehen (Schalter im Footer-Abschnitt, Standard an). | offen | |
-| `sections/footer.liquid:146` | Fußnote „* Alle Preise inkl. MwSt., zzgl. Versandkosten“. Gilt nicht für Differenzbesteuerung (Gebrauchte, § 25a UStG, `snippets/bike-card.liquid:66`). Der Stern der Ankündigungsleiste wird nirgends einzeln erklärt. Wortlaut „Versand“ und „Versandkosten“ ist uneinheitlich (`snippets/pdp-sticky-buy.liquid:32`, `sections/cart.liquid:32`, `sections/cart-drawer.liquid:51`: „zzgl. Versand (kostenlos)“ widerspricht sich). | offen | |
+| `sections/footer.liquid:146` | Fußnote „* Alle Preise inkl. MwSt., zzgl. Versandkosten“. Gilt nicht für Differenzbesteuerung (Gebrauchte, § 25a UStG, `snippets/bike-card.liquid:68`). Der Stern der Ankündigungsleiste wird nirgends einzeln erklärt. Wortlaut „Versand“ und „Versandkosten“ ist uneinheitlich (`snippets/pdp-sticky-buy.liquid:32`, `sections/cart.liquid:32`, `sections/cart-drawer.liquid:51`: „zzgl. Versand (kostenlos)“ widerspricht sich). | offen | |
 | `sections/footer-group.json:18` | Text der Händlerkarte „Harley-Davidson Neufahrzeuge, Original-Teile, MotorClothes und Werkstatt-Service.“ | offen | |
-| `config/settings_schema.json:15-21` | Firmenname, Adresse, Telefon, WhatsApp, E-Mail, Ansprechperson: bewusst ohne Beispielwerte, bleiben unsichtbar, solange leer. | offen | |
-| `assets/theme.js:99-105`, `sections/footer-group.json:10` | Link „Cookie-Einstellungen“ tut nur etwas, wenn in Shopify ein Cookie-Banner mit gleichwertigem „Ablehnen“ aktiv ist (Customer Privacy API). Ohne Banner erscheint beim Klick ein Hinweis. Banner im Admin aktivieren und testen. | offen | |
-| `docs/briefing.md:230-233` | Barrierefreiheitserklärung (BFSG) und Kontakt für Rückmeldungen: Text vom Rechtstexte-Anbieter, im Rechtsmenü verlinken. Aussagen erst nach echtem Test (Preview-Theme, Tastatur, Screenreader). Das Theme hat keinen Platz dafür, solange das Menü `legal` keinen Eintrag hat. | offen | |
+| `config/settings_schema.json:15-21, 40-42` | Firmenname, Adresse, Telefon, WhatsApp, E-Mail, Ansprechperson: bewusst ohne Beispielwerte, bleiben unsichtbar, solange leer. | offen | |
+| `assets/theme.js:114-120`, `sections/footer-group.json:10` | Link „Cookie-Einstellungen“ tut nur etwas, wenn in Shopify ein Cookie-Banner mit gleichwertigem „Ablehnen“ aktiv ist (Customer Privacy API). Ohne Banner erscheint beim Klick ein Hinweis. Banner im Admin aktivieren und testen. | offen | |
+| `docs/briefing.md:250-253` | Barrierefreiheitserklärung (BFSG) und Kontakt für Rückmeldungen: Text vom Rechtstexte-Anbieter, im Rechtsmenü verlinken. Aussagen erst nach echtem Test (Preview-Theme, Tastatur, Screenreader). Das Theme hat keinen Platz dafür, solange das Menü `legal` keinen Eintrag hat. | offen | |
 | Datenschutzerklärung | Erwähnung von WhatsApp-Kontakt und Google-Maps-Link (siehe `docs/briefing.md`). | offen | |
 
 ## 4. Marken- und Marketingtexte
 
 | Fundstelle | Aussage | Status | Freigabe |
 |---|---|---|---|
-| `templates/index.json:138-140` | Kennzahlen: 25+ Jahre Erfahrung, 300+ Bikes pro Jahr, 1 Meisterwerkstatt | offen | |
-| `templates/index.json:141-143`, `templates/page.service.json:62-87` | Events: Titel, Datum, Ort und Uhrzeit (11.10., 24.10., 14.11.2026) | offen | |
-| `templates/index.json:10-20, 27-37, 44-54` | Hero: Modelle, Preise („ab 31.500 €“, „ab 48.300 €“), Modelljahr 2026, Farben, Beschreibungen | offen | |
-| `templates/index.json:112` | Statement „Von der Probefahrt bis zum Umbau …“ | offen | |
-| `templates/index.json:67-72` | Lauftext (Motorräder, Bekleidung, Teile & Zubehör, Accessoires, Service, Probefahrt) | offen | |
-| `templates/index.json:84-87, 104, 118-122, 150` | Texte der Service-Kacheln, Neuheiten, Kategorie-Kacheln und Story | offen | |
-| `templates/index.json:151-153` | Story-Button „Über uns“ hat **keinen Link** (`button_url` leer): der Button erscheint nie. Ziel nennen oder Label streichen. | offen | |
+| `templates/index.json:112-114` | Kennzahlen: 25+ Jahre Erfahrung, 300+ Bikes pro Jahr, 1 Meisterwerkstatt | offen | |
+| `templates/index.json:115-117`, `templates/page.service.json:62-88` | Events: Titel, Datum, Ort und Uhrzeit (11.10., 24.10., 14.11.2026) | offen | |
+| `templates/index.json:6-19, 20-33, 34-47` | Hero: Modelle, Preise („ab 31.500 €“, „ab 48.300 €“), Modelljahr 2026, Farben, Beschreibungen | offen | |
+| `templates/index.json:86` | Statement „Von der Probefahrt bis zum Umbau …“ | offen | |
+| `templates/index.json:58-61, 77-80, 92-96, 100, 122-125` | Texte der Service-Kacheln, Neuheiten, Kategorie-Kacheln und Story | offen | |
+| `templates/index.json:125` | Story-Button „Über uns“ hat **keinen Link** (`button_url` leer): der Button erscheint nie. Ziel nennen oder Label streichen. | offen | |
 | `templates/page.service.json` | Service-Texte (Probefahrt, Finanzierung, Werkstatt, Inzahlungnahme) | offen | |
 | `sections/header-group.json:22, 29-36, 53` | Megamenü-Text, Teaser-Beschriftungen, Suchbegriffe | offen | |
 | `sections/product.liquid:204, 208-210` | Zusicherungen bei Fahrzeugen: Neufahrzeug „mit voller Herstellergarantie“; Gebrauchte „Scheckheftgepflegt bei Harley-Davidson Vertragspartnern“, „Unfallfrei laut Vorbesitzer“, „Frische Inspektion vor Übergabe“ | offen | |
-| `sections/product.liquid:538` | Pflichthinweis „Geprüfte Bewertungen“ (UWG): stimmt nur mit einer Bewertungs-App, die den Kauf prüft | offen | |
+| `sections/product.liquid:530` | Pflichthinweis „Geprüfte Bewertungen“ (UWG): stimmt nur mit einer Bewertungs-App, die den Kauf prüft | offen | |
 | `snippets/size-guide.liquid:23-90` | Größentabellen (Werte in cm) | offen | |
 
 ## 5. Bildrechte

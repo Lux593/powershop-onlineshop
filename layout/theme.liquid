@@ -9,6 +9,8 @@
       Bewegung: has-motion nur mit Setting, ohne prefers-reduced-motion/saveData und nicht im Theme-Editor
       (Shopify.designMode gibt es im Head noch nicht, daher request.design_mode). Failsafe: meldet motion.js
       nicht binnen 3,5 s PS.motionReady, fällt die Seite auf statisch zurück. Details: assets/motion.js.
+      Weiches Scrollen: Lenis gibt es nur für Maus und Trackpad. Das Head-Skript lädt es dann vor und nennt motion.js die
+      Adresse (PS.lenisSrc); auf Touch-Geräten lädt es nie.
     {%- endcomment -%}
     {%- unless request.design_mode -%}
       {%- if settings.motion_enabled -%}
@@ -19,6 +21,16 @@
             d.classList.add('has-motion');
             {%- if settings.motion_smooth_scroll %}
             d.classList.add('has-smooth');
+            {%- if template.name == 'index' or template.name == 'collection' or template.name == 'product' %}
+            if (matchMedia('(pointer: fine) and (hover: hover)').matches) {
+              var l = document.createElement('link');
+              l.href = {{ 'lenis.min.js' | asset_url | json }};
+              l.as = 'script';
+              l.rel = 'preload';
+              document.head.appendChild(l);
+              (window.PS = window.PS || {}).lenisSrc = l.href;
+            }
+            {%- endif %}
             {%- endif %}
             setTimeout(function () {
               if (!(window.PS && PS.motionReady)) d.classList.remove('has-motion', 'has-smooth');
@@ -29,7 +41,7 @@
     {%- endunless -%}
 
     {% render 'fonts' %}
-    {%- comment -%} Stile: die Reihenfolge ist die Kaskade (Basis, geteilte Reste, Theme-Ergänzungen, Bewegung, dann die Bereiche: Header, Hero, Startseite, Footer, Shop). {%- endcomment -%}
+    {%- comment -%} Stile: die Reihenfolge ist die Kaskade (Basis, geteilte Reste, Theme-Ergänzungen, Bewegung, dann die Bereiche: Header, Hero, Startseite, Footer, Shop). hero.css nur auf der Startseite: der Hero ist per enabled_on darauf beschränkt. {%- endcomment -%}
     {{ 'tokens.css' | asset_url | stylesheet_tag }}
     {{ 'base.css' | asset_url | stylesheet_tag }}
     {{ 'components.css' | asset_url | stylesheet_tag }}
@@ -37,7 +49,9 @@
     {{ 'theme.css' | asset_url | stylesheet_tag }}
     {{ 'motion.css' | asset_url | stylesheet_tag }}
     {{ 'header.css' | asset_url | stylesheet_tag }}
+    {%- if template.name == 'index' %}
     {{ 'hero.css' | asset_url | stylesheet_tag }}
+    {%- endif %}
     {{ 'home.css' | asset_url | stylesheet_tag }}
     {{ 'footer.css' | asset_url | stylesheet_tag }}
     {{ 'shop.css' | asset_url | stylesheet_tag }}
@@ -75,7 +89,7 @@
   </head>
 
   <body data-template="{{ template.name }}"{% if template.name == 'index' and settings.header_overlay_home %} data-header-overlay{% endif %}>
-    <a class="skip-link" href="#main">Zum Inhalt springen</a>
+    <a class="skip-link" href="#main">{{ 'general.skip_to_content' | t }}</a>
 
     {% sections 'header-group' %}
 
@@ -112,35 +126,36 @@
       };
     </script>
     {%- comment -%}
-      Skripte: Reihenfolge ist Ausführungsreihenfolge. motion.js steht vor header.js (PS.on startet sofort).
-      GSAP und ScrollTrigger laden nur mit Setting „Animationen aktivieren“, nicht im Theme-Editor und nur auf
-      index/collection/product, Lenis zusätzlich nur mit „Weiches Scrollen“. Ohne sie läuft motion.js im Fallback.
-      Restkosten (clientseitig erkennbar, serverseitig nicht): Nutzer mit prefers-reduced-motion oder saveData
-      laden die Libs trotzdem (ca. 53 KB br), und auf Touch-Geräten lädt Lenis (ca. 5 KB br), ohne je gestartet zu
-      werden. Sie per Head-Skript nachzuladen würde den Normalfall verlangsamen (kein Preload-Scan, keine feste
-      defer-Reihenfolge vor motion.js), daher bewusst nicht gemacht.
-      hero.js/home.js laden nur auf index. Der Hero ist für die Startseite gedacht: wird er im Theme-Editor auf ein
-      anderes Template gesetzt, läuft dort der Bildwechsel per Tab nicht (hero.css/home.css laden überall).
+      Skripte: Die Reihenfolge ist die Ausführungsreihenfolge (defer). Erst der Kern theme.js (PS.on), dann die Bibliotheken,
+      dann motion.js vor header.js, weil PS.on dort sofort startet.
+      GSAP und ScrollTrigger laden nur mit Setting „Animationen aktivieren“, nicht im Theme-Editor und nur auf der
+      Startseite: nur dort gibt es Scrub und Parallax (hero.js, home.js, data-parallax). Ohne sie läuft motion.js im Fallback.
+      Lenis (Setting „Weiches Scrollen“, nur index/collection/product) lädt das Head-Skript nach, nur für Maus und Trackpad
+      (siehe oben); auf Kollektion und Produkt treibt es sich selbst per requestAnimationFrame, ohne GSAP.
+      Restkosten (clientseitig erkennbar, serverseitig nicht): Nutzer mit prefers-reduced-motion oder saveData laden die
+      Libs der Startseite trotzdem (ca. 42 KB br). Sie per Head-Skript nachzuladen würde den Normalfall verlangsamen
+      (kein Preload-Scan, keine feste defer-Reihenfolge vor motion.js), daher bewusst nicht gemacht.
+      Nur wo sie gebraucht werden: collection.js (Kollektion, Suche), product.js (Produkt), hero.js und home.js (index; der
+      Hero ist per enabled_on auf die Startseite beschränkt, Startseiten-Sections auf anderen Templates bleiben ohne home.js
+      statisch, home.css lädt überall) und contact.js (Kontakt-Box: Produkt und Seiten; im Theme-Editor immer, damit eine
+      neu eingefügte Section sofort funktioniert). search.js lädt erst beim ersten Öffnen des Such-Dialogs nach
+      (data-lazy-script, assets/theme.js).
       Showroom und Quick-Toggle bleiben bewusst in sections.js und laufen auf allen Seiten.
     {%- endcomment -%}
     <script src="{{ 'theme.js' | asset_url }}" defer></script>
     {%- unless request.design_mode -%}
-      {%- if settings.motion_enabled -%}
-        {%- if template.name == 'index' or template.name == 'collection' or template.name == 'product' -%}
-          <script src="{{ 'gsap.min.js' | asset_url }}" defer></script>
-          <script src="{{ 'ScrollTrigger.min.js' | asset_url }}" defer></script>
-          {%- if settings.motion_smooth_scroll -%}
-            <script src="{{ 'lenis.min.js' | asset_url }}" defer></script>
-          {%- endif -%}
-        {%- endif -%}
+      {%- if settings.motion_enabled and template.name == 'index' -%}
+        <script src="{{ 'gsap.min.js' | asset_url }}" defer></script>
+        <script src="{{ 'ScrollTrigger.min.js' | asset_url }}" defer></script>
       {%- endif -%}
     {%- endunless -%}
     <script src="{{ 'motion.js' | asset_url }}" defer onerror="document.documentElement.classList.remove('has-motion', 'has-smooth')"></script>
     <script src="{{ 'header.js' | asset_url }}" defer></script>
     <script src="{{ 'cart.js' | asset_url }}" defer></script>
-    <script src="{{ 'search.js' | asset_url }}" defer></script>
     <script src="{{ 'sections.js' | asset_url }}" defer></script>
-    <script src="{{ 'contact.js' | asset_url }}" defer></script>
+    {%- if template.name == 'product' or template.name == 'page' or request.design_mode -%}
+      <script src="{{ 'contact.js' | asset_url }}" defer></script>
+    {%- endif -%}
     {%- if template.name == 'collection' or template.name == 'search' -%}
       <script src="{{ 'collection.js' | asset_url }}" defer></script>
     {%- endif -%}

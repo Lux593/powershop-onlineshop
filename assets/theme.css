@@ -1,7 +1,6 @@
 /* ==========================================================================
-   Power Shop – Ergänzungen fürs Shopify-Theme.
-   tokens/base/components/sections.css sind 1:1 das Mockup. Hier steht nur, was
-   es im Mockup nicht gab (Shopify-Wrapper, serverseitig gerenderte Zustände).
+   Power Shop – Ergänzungen fürs Shopify-Theme: Shopify-Wrapper und serverseitig gerenderte Zustände
+   (Showroom-Umschalter, Seitenzahlen als Links, Warenkorb-Seite) sowie der Kontrastmodus am Ende.
    ========================================================================== */
 
 /* Showroom: Umschalter Neu / Gebraucht blendet Karten über ein Zustand-Attribut aus */
@@ -17,7 +16,7 @@
 /* Filterleiste: das Formular darf das Flex-Layout der Leiste nicht brechen */
 .filterbar__form { display: contents; }
 
-/* Seitenzahlen als Links (Mockup nutzte Buttons) */
+/* Seitenzahlen sind Links (kein JavaScript nötig) */
 .pagination a, .pagination span {
   min-width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%;
   font-weight: 600; font-size: var(--fs-small);
@@ -47,7 +46,8 @@
 .page-content th, .page-content td { padding: 8px 6px; border-bottom: 1px solid var(--c-line); text-align: left; }
 
 /* Warenkorb-Seite */
-.cart-page__title { margin-block: var(--s-3) var(--s-5); }
+.cart-page__title { margin-block: var(--s-3); }
+@media (min-width: 1024px) { .cart-page__title { margin-block-end: 40px; } }
 .cart-page__grid { display: grid; gap: 32px; padding-bottom: var(--s-8); }
 @media (min-width: 1024px) { .cart-page__grid { grid-template-columns: 7fr 4fr; gap: 56px; align-items: start; } }
 .cart-page__lines { display: grid; gap: 0; }

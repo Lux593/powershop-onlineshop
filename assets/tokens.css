@@ -1,33 +1,53 @@
 /* ==========================================================================
-   Power Shop – Design-Tokens (Phase 2)
-   Eine Quelle für Farben, Typo, Abstände. Im Shopify-Theme als
-   Theme-Einstellungen / CSS-Variablen übernehmen.
+   Power Shop – Design-Tokens
+   Eine Quelle für Farben, Typo, Abstände. Keine Hex-Werte in den übrigen Stylesheets: hier ein Token anlegen.
    ========================================================================== */
 :root {
   /* Farben – dunkel */
   --c-black: #0a0a0a;
   --c-anthracite: #1a1a1a;
+  --c-black-soft: #111111;   /* dunkle Produktbild-Kachel */
+  --c-pure-black: #000000;   /* Grund hinter Bildern */
   --c-steel: #2b2b2b;
   --c-white: #ffffff;
 
   /* Farben – hell */
   --c-offwhite: #f5f3ef;
   --c-stone: #edebe7;
+  --c-stone-deep: #e6e3dd;   /* Streifen der Karten-Platzhalter */
   --c-line: #ddd9d2;
 
   /* Akzent – Orange nur gezielt (ca. 5–10 % der Fläche).
      Orange-Flächen immer mit schwarzer Schrift; Orange als Textfarbe nur auf dunklem Grund. */
   --c-orange: #f26722;
   --c-orange-dark: #d9571a;
+  --c-stock-order: #b26a00;  /* „Auf Bestellung“ */
+  --c-mark: #ffe1cf;         /* Trefferfarbe in der Suche */
 
   /* Text */
   --c-text: var(--c-black);
   --c-muted: #5f5f5f;       /* Sekundärtext auf hell (≥ 5:1 auch auf stone) */
   --c-muted-dark: #a8a8a8;  /* Sekundärtext auf dunkel */
+  --c-text-soft: #333333;   /* Fließtext in Akkordeons und Fakten (12,6 : 1 auf weiß) */
+  --c-on-dark: #d6d2cb;     /* Fließtext auf dunkel (13,1 : 1 auf schwarz) */
+  --c-on-dark-strong: #e9e6e1; /* Menülinks auf dunkel */
+
+  /* Rahmen von Formularfeldern: Nicht-Text-Kontrast >= 3 : 1 (WCAG 1.4.11).
+     Hell auf weiß 3,7 : 1, auf offwhite 3,3 : 1, auf stone 3,1 : 1. Dunkel auf schwarz 4,4 : 1, auf anthrazit 3,9 : 1, auf steel 3,2 : 1. */
+  --c-border-input: #8a857d;
+  --c-border-input-dark: #777777;
+  /* Zurückhaltende Rahmen ohne Bedienfunktion (Hinweisfläche, Chips auf dunkel) */
+  --c-border-soft: #bdb8b0;
+  --c-border-dark: #555555;
 
   /* Feedback */
   --c-error: #c62828;
+  --c-error-on-dark: #ff8a80; /* Fehlertext auf dunklem Grund (Passwortseite) */
   --c-success: #2e7d32;
+  /* Zulassungs-Badges (Teile): Fläche, Schrift, Rahmenlinie */
+  --c-badge-ok-bg: #e8f3e9;   --c-badge-ok-text: #1d5a21;   --c-badge-ok-line: #9cc7a0;
+  --c-badge-warn-bg: #fff3e0; --c-badge-warn-text: #7a3e00; --c-badge-warn-line: #f0bf85;
+  --c-badge-bad-bg: #fdecea;  --c-badge-bad-text: #8e1c1c;  --c-badge-bad-line: #eba9a5;
 
   /* Typografie */
   --f-head: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;

@@ -106,7 +106,7 @@
         "id": "header_overlay_home",
         "label": "Header auf der Startseite über dem Hero",
         "default": true,
-        "info": "Schaltet den transparenten Header über dem Hero der Startseite ein. Wirkt erst mit dem überarbeiteten Header, bis dahin ohne sichtbare Änderung."
+        "info": "Der Header der Startseite liegt transparent über dem Hero und wird nach etwa 40 px Scrollen schwarz. Ausgeschaltet bleibt er durchgehend schwarz."
       }
     ]
   }

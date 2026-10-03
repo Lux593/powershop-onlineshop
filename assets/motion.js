@@ -1,8 +1,9 @@
 /* ==========================================================================
-   Power Shop – Motion-Schicht: Reveals, Wort-Splitter, Count-up, Marquee, Parallax, Smooth-Scroll.
-   Lädt auf allen Templates (defer, nach theme.js, vor header.js). GSAP, ScrollTrigger und Lenis kommen nur auf
-   index, collection und product dazu, nur mit Setting und nie im Theme-Editor. Ohne sie läuft die Schicht im
-   Fallback (Reveals per IntersectionObserver, Count-up, Splitter, Marquee).
+   Power Shop – Motion-Schicht: Reveals, Wort-Splitter, Count-up, Parallax, Smooth-Scroll.
+   Lädt auf allen Templates (defer, nach theme.js, vor header.js). GSAP und ScrollTrigger kommen nur auf der Startseite
+   dazu (nur dort gibt es Scrub und Parallax), nur mit Setting und nie im Theme-Editor. Lenis (weiches Scrollen) lädt
+   nach, nur auf index, collection und product und nur für Maus und Trackpad. Ohne sie läuft die Schicht im
+   Fallback (Reveals per IntersectionObserver, Count-up, Splitter).
 
    Vertrag (Attribute, Zustände, Hilfs-API): docs/motion-api.md – daran bauen Hero, Startseite und Shop.
    ========================================================================== */
@@ -65,21 +66,24 @@
     try { track(el, fn(window.gsap, window.ScrollTrigger)); } catch (e) { /* Section bleibt statisch */ }
   };
   M.refresh = function () {
-    if (!M.scroll) return;
+    if (!M.scroll && !lenis) return;
     clearTimeout(timer);
     timer = setTimeout(function () {
-      try { window.ScrollTrigger.refresh(); if (lenis) lenis.resize(); } catch (e) { /* ignorieren */ }
+      try { if (M.scroll) window.ScrollTrigger.refresh(); if (lenis) lenis.resize(); } catch (e) { /* ignorieren */ }
     }, 150);
   };
 
   /* ---------------- Gesamtabbau (Laufzeitwechsel prefers-reduced-motion) ---------------- */
-  function stopScroll() {
+  function stopLenis() {
     try {
       if (tick) window.gsap.ticker.remove(tick);
-      if (lenis) { lenis.destroy(); window.gsap.ticker.lagSmoothing(500, 33); }
-      if (M.scroll) window.ScrollTrigger.getAll().forEach(function (t) { t.kill(); });
+      if (lenis) { lenis.destroy(); if (tick) window.gsap.ticker.lagSmoothing(500, 33); }
     } catch (e) { /* ignorieren */ }
     lenis = PS.lenis = tick = null;
+  }
+  function stopScroll() {
+    stopLenis();
+    try { if (M.scroll) window.ScrollTrigger.getAll().forEach(function (t) { t.kill(); }); } catch (e) { /* ignorieren */ }
     M.scroll = false;
   }
   function teardown() {
@@ -95,32 +99,55 @@
   function onRm(e) { if (e.matches) teardown(); }
   if (rm.addEventListener) rm.addEventListener('change', onRm); else if (rm.addListener) rm.addListener(onRm);
 
-  /* ---------------- GSAP + ScrollTrigger + Lenis (optional) ---------------- */
+  /* ---------------- GSAP + ScrollTrigger (optional, nur Startseite) ---------------- */
   try {
     if (window.gsap && window.ScrollTrigger) {
       window.gsap.registerPlugin(window.ScrollTrigger);
       M.scroll = true;
-      if (html.classList.contains('has-smooth') && window.Lenis && matchMedia('(pointer: fine) and (hover: hover)').matches) {
-        // Scrollbare Vorfahren und Dialoge ohne data-lenis-prevent (Cookie-Einstellungen, App-Overlays) scrollen
-        // selbst, nicht die Seite dahinter. Lenis' allowNestedScroll taugt hier nicht: body{overflow-x:hidden}
-        // macht den body zum „Scroller“ und hielte das Wheel überall an.
-        lenis = PS.lenis = new window.Lenis({
-          prevent: function (n) {
-            if (n.matches('dialog[open],[role=dialog],[aria-modal=true],[id^=shopify-pc__]')) return true;
-            return n !== doc.body && n.scrollHeight > n.clientHeight + 1 && /^(auto|scroll|overlay)$/.test(getComputedStyle(n).overflowY);
-          }
-        });
-        lenis.on('scroll', window.ScrollTrigger.update);
-        tick = function (t) { lenis.raf(t * 1000); };
-        window.gsap.ticker.add(tick);
-        window.gsap.ticker.lagSmoothing(0);
-        // Lenis ignoriert native Scrolls beim Gleiten (Tastatur, Tab-Fokus): vorher abbrechen
-        doc.addEventListener('keydown', function (e) {
-          if (lenis && !e.defaultPrevented && /^(Tab|Home|End|Page(Up|Down)| |Arrow(Up|Down))$/.test(e.key)) lenis.reset();
-        }, true);
-      }
     }
   } catch (e) { stopScroll(); }
+
+  /* ---------------- Lenis (optional, nur Maus und Trackpad) ----------------
+     Das Head-Skript (theme.liquid) setzt PS.lenisSrc nur mit Setting „Weiches Scrollen“ und feinem Zeiger und lädt die Datei vor.
+     Mit GSAP (Startseite) gibt dessen Ticker den Takt und ScrollTrigger folgt Lenis; ohne GSAP (Kollektion, Produkt) läuft Lenis allein. */
+  function smooth() {
+    if (lenis || !M.enabled || !window.Lenis) return;
+    try {
+      var gsap = M.scroll && window.gsap;
+      // Scrollbare Vorfahren und Dialoge ohne data-lenis-prevent (Cookie-Einstellungen, App-Overlays) scrollen
+      // selbst, nicht die Seite dahinter. Lenis' allowNestedScroll taugt hier nicht: body{overflow-x:hidden}
+      // macht den body zum „Scroller“ und hielte das Wheel überall an.
+      lenis = PS.lenis = new window.Lenis({
+        autoRaf: !gsap,
+        prevent: function (n) {
+          if (n.matches('dialog[open],[role=dialog],[aria-modal=true],[id^=shopify-pc__]')) return true;
+          return n !== doc.body && n.scrollHeight > n.clientHeight + 1 && /^(auto|scroll|overlay)$/.test(getComputedStyle(n).overflowY);
+        }
+      });
+      if (gsap) {
+        lenis.on('scroll', window.ScrollTrigger.update);
+        tick = function (t) { lenis.raf(t * 1000); };
+        gsap.ticker.add(tick);
+        gsap.ticker.lagSmoothing(0);
+      }
+      // Ein Dialog, der sich vor dem Start geöffnet hat, hält die Seite dahinter fest
+      if (doc.body.classList.contains('is-locked')) lenis.stop();
+    } catch (e) { stopLenis(); html.classList.remove('has-smooth'); } // Scrub und Parallax laufen weiter, nur das Gleiten entfällt
+  }
+  if (html.classList.contains('has-smooth') && PS.lenisSrc) {
+    if (window.Lenis) smooth();
+    else {
+      var ls = doc.createElement('script');
+      ls.src = PS.lenisSrc;
+      ls.onload = smooth;
+      ls.onerror = function () { html.classList.remove('has-smooth'); };
+      doc.head.appendChild(ls);
+    }
+  }
+  // Lenis ignoriert native Scrolls beim Gleiten (Tastatur, Tab-Fokus): vorher abbrechen
+  doc.addEventListener('keydown', function (e) {
+    if (lenis && !e.defaultPrevented && /^(Tab|Home|End|Page(Up|Down)| |Arrow(Up|Down))$/.test(e.key)) lenis.reset();
+  }, true);
 
   // Anker per Lenis (Header-Abstand = scroll-padding-top). Fokus setzen, damit Skip-Link und Tab-Reihenfolge stimmen.
   doc.addEventListener('click', function (e) {
@@ -259,37 +286,6 @@
     doc.querySelectorAll('[data-countup]').forEach(function (el) { if (el._fin) el._fin(); });
   });
 
-  /* ---------------- Marquee ---------------- */
-  function marquee(el) {
-    // WCAG 2.2.2: Pause-Button ist Pflicht. Fehlt er im Markup, hängt motion.js einen hinter die Spur.
-    var b = slot(el).querySelector('[data-marquee-toggle]:not(.marquee-toggle)'), auto = !b;
-    if (auto) {
-      b = doc.createElement('button');
-      b.type = 'button';
-      b.className = 'marquee-toggle';
-      b.setAttribute('data-marquee-toggle', '');
-      b.setAttribute('aria-label', 'Lauftext pausieren');
-      el.after(b);
-    }
-    [].slice.call(el.children).forEach(function (c) {
-      var k = c.cloneNode(true);
-      k.setAttribute('aria-hidden', 'true');
-      k.setAttribute('inert', '');
-      k.setAttribute('data-clone', '');
-      el.appendChild(k);
-    });
-    var speed = parseInt(el.getAttribute('data-marquee'), 10) || 60;
-    function dur() { el.style.setProperty('--marquee-dur', Math.max(8, Math.round(el.scrollWidth / 2 / speed)) + 's'); }
-    var ro = window.ResizeObserver && new ResizeObserver(dur);
-    if (ro) ro.observe(el); else dur();
-    var vis = new IntersectionObserver(function (en) { el.classList.toggle('is-off', !en[0].isIntersecting); });
-    vis.observe(el);
-    b.setAttribute('aria-pressed', 'false');
-    b.addEventListener('click', function () { b.setAttribute('aria-pressed', el.classList.toggle('is-paused')); });
-    el.classList.add('is-running');
-    track(el, [vis, ro, function () { el.classList.remove('is-running'); if (auto) b.remove(); }]);
-  }
-
   /* ---------------- Parallax ---------------- */
   function parallax(el) {
     if (!M.scroll) return;
@@ -316,13 +312,12 @@
     if (has('data-split')) { split(el); watched = true; }
     if (has('data-reveal') && !(el.parentElement && el.parentElement.hasAttribute('data-stagger'))) watched = true;
     if (watched) watch(el);
-    if (has('data-marquee')) marquee(el);
     if (has('data-parallax')) parallax(el);
   }
-  var SEL = '[data-reveal],[data-stagger],[data-split],[data-countup],[data-marquee],[data-parallax]';
+  var SEL = '[data-reveal],[data-stagger],[data-split],[data-countup],[data-parallax]';
   function start(el) {
-    // Klone sind Kopien; jedes Element nur einmal (PS.on, PS.scan, Observer)
-    if (started.has(el) || el.closest('[data-clone]')) return;
+    // Jedes Element nur einmal (PS.on, PS.scan, Observer)
+    if (started.has(el)) return;
     started.add(el);
     try { init(el); } catch (e) { el.classList.add('is-in', 'is-split'); }
   }

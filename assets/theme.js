@@ -61,6 +61,20 @@
 
   /* ---------------- Dialoge (Drawer, Modal, Suche) ---------------- */
   var lastTrigger = null;
+  // data-lazy-script am Dialog: das Skript dazu lädt erst beim ersten Öffnen (Suche). Schlägt es fehl, versucht es das nächste Öffnen erneut.
+  // Ein Skript lädt nur einmal: nach einem Section-Reload im Theme-Editor startet PS.scan das schon registrierte Modul für den neuen Dialog.
+  var lazyLoaded = {};
+  function lazyScript(d) {
+    var src = d.getAttribute('data-lazy-script');
+    if (!src) return;
+    d.removeAttribute('data-lazy-script');
+    if (lazyLoaded[src]) return;
+    lazyLoaded[src] = true;
+    var s = document.createElement('script');
+    s.src = src;
+    s.onerror = function () { lazyLoaded[src] = false; d.setAttribute('data-lazy-script', src); s.remove(); };
+    document.head.appendChild(s);
+  }
   PS.openDialog = function (id, trigger) {
     var d = document.getElementById(id);
     if (!d) return;
@@ -69,6 +83,7 @@
     if (!d.open) d.showModal();
     document.body.classList.add('is-locked');
     lenis('stop');
+    lazyScript(d);
     d.dispatchEvent(new CustomEvent('ps:open'));
   };
   PS.closeDialog = function (id) {

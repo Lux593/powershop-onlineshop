@@ -3,8 +3,10 @@
   Lädt drei Schnitte vor, die im ersten Bildschirm der meisten Seiten stehen: Inter 400 (Fließtext),
   Barlow Condensed 700 (H2 bis H4, Hero-Details) und 800 (Wortmarke im Header, H1). Der Rest kommt bei Bedarf.
   font-display bleibt swap: Text erscheint sofort in der Ersatzschrift.
-  Vor dem Livegang im Preview-Theme (echtes CDN) FCP und LCP mit und ohne Barlow-800-Preload messen: Lokal kostet er ca. 100 bis 180 ms FCP
-  bei kaum weniger CLS. Bringt er dort nichts, die Zeile entfernen.
+  Die Preloads bleiben (Labormessung, Slow 4G, lokaler Harness): Ohne sie sinkt FCP um etwa 240 bis 250 ms und LCP der Startseite mobil von 3,7 auf 2,9 s,
+  aber das CLS der Startseite mobil steigt von 0 auf 0,044 bis 0,046 (Ziel unter 0,05; Hero-Caption und Wortmarke springen beim Schriftwechsel).
+  Nur Barlow 700 und 800 vorzuladen bringt kaum LCP (3,66 s) bei CLS 0, nur Inter 400 gibt CLS 0,046. Mehr LCP gäbe es erst mit
+  angepassten Ersatzschriften (size-adjust, ascent-override), die hier nicht gemessen sind. Im Preview-Theme (echtes CDN) gegenprüfen.
 {% enddoc %}
 
 {{ 'inter-latin-400-normal.woff2' | asset_url | preload_tag: as: 'font', type: 'font/woff2', crossorigin: 'anonymous' }}

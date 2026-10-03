@@ -7,7 +7,7 @@ gebaut wurde und was vor dem Livegang noch geklärt werden muss.
 
 | | |
 |---|---|
-| Startbild | `assets/hero-ride-road.png` (Road Glide, Fahrer und Beifahrerin auf einer Landstraße), 1024 × 576 |
+| Startbild | `assets/hero-ride-road.jpg` (Road Glide, Fahrer und Beifahrerin auf einer Landstraße), 1024 × 576 |
 | Datum | 2. Oktober 2026 |
 | Werkzeug | Higgsfield |
 | Schritt 1 | Hochskalieren des Startbilds auf 3840 × 2160 (`bytedance_image_upscale`) |
@@ -30,6 +30,7 @@ gebaut wurde und was vor dem Livegang noch geklärt werden muss.
 | `assets/hero-loop-720.mp4` | H.264, 960 × 540 | 0,7 MB | Mobil. Der Name ist der vereinbarte Dateiname, die Datei ist 540p. |
 | `assets/hero-loop.webm` | VP9, 1280 × 720 | 0,7 MB | Alternative für Browser mit WebM |
 | `assets/hero-poster.webp` | 1920 × 1080 | 83 KB | Standbild (Frame 0 des Loops), LCP-Bild, Fallback bei Reduced-Motion und Datensparmodus |
+| `assets/hero-poster-960.webp` | 960 × 540 | 28 KB | dasselbe Standbild für schmale Bildschirme (`srcset` in `sections/hero.liquid`). Beide Poster immer gemeinsam ersetzen, sonst zeigt Mobil weiter das alte Bild. |
 
 Die Quelle ist 720p. Auf großen Monitoren wirkt der Clip daher etwas weich. Schärfer wird er mit Kling `pro` (Plus-Plan) oder einem
 Video-Upscale bei Higgsfield.

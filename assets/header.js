@@ -55,6 +55,17 @@
       if (!e.target.closest('.mainnav')) items.forEach(function (li) { setOpen(li, false); });
     }, sig);
 
+    // Das geschlossene Menü rendert nicht (header.css): seine lazy Bilder laden nicht von selbst. Nach Load plus Idle holen, nur wo das
+    // Menü existiert (Desktop) und ohne Datensparen; ein Hover davor lädt sie ohnehin sofort.
+    function warm() {
+      var con = navigator.connection || {};
+      if (con.saveData || /(^|-)[23]g$/.test(con.effectiveType || '') || !items.length || !items[0].getClientRects().length) return;
+      header.querySelectorAll('.mega img[loading="lazy"]').forEach(function (img) { img.loading = 'eager'; });
+    }
+    function later() { (window.requestIdleCallback || function (f) { setTimeout(f, 300); })(warm, { timeout: 3000 }); }
+    if (document.readyState === 'complete') later();
+    else window.addEventListener('load', later, { once: true, signal: ctrl.signal });
+
     /* ---------------- Überlagerung (Startseite) und Ausblenden beim Scrollen ----------------
        is-solid: Header schwarz statt transparent über dem Hero (ab 40 px Scroll, bei offenem Menü); ob der Hero darunter liegt,
        entscheidet header.css. is-away: ab 400 px Tiefe beim Runterscrollen weggeschoben, --header-shown (1/0) lenkt die

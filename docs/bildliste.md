@@ -18,9 +18,9 @@ Austausch den Dateinamen aus der Liste streichen (siehe `README.md`).
 
 | Datei | Format (px) | Typ | Status | Motiv | Einsatz |
 |---|---|---|---|---|---|
-| `hero-ride-road.png` | 1024 × 576 | Lifestyle/Marke | echt | Zwei Fahrer auf einer Road Glide, unterwegs auf einer Landstraße mit gelber Doppellinie (Startbild des Hero-Clips, siehe `docs/hero-clip.md`) | Homepage · Hero, Modell Road Glide |
-| `hero-ride-street.png` | 1024 × 576 | Lifestyle/Marke | echt | Zwei Fahrer auf einer Street Glide, unterwegs auf einer Landstraße mit gelber Doppellinie | Homepage · Hero, Modell Street Glide |
-| `hero-ride-cvo.png` | 1500 × 1000 | Lifestyle/Marke | echt | Fahrer auf einer CVO Road Glide, unterwegs auf einer Landstraße | Homepage · Hero, Modell CVO |
+| `hero-ride-road.jpg` | 1024 × 576 | Lifestyle/Marke | echt | Zwei Fahrer auf einer Road Glide, unterwegs auf einer Landstraße mit gelber Doppellinie (Startbild des Hero-Clips, siehe `docs/hero-clip.md`) | Homepage · Hero, Modell Road Glide |
+| `hero-ride-street.jpg` | 1024 × 576 | Lifestyle/Marke | echt | Zwei Fahrer auf einer Street Glide, unterwegs auf einer Landstraße mit gelber Doppellinie | Homepage · Hero, Modell Street Glide |
+| `hero-ride-cvo.jpg` | 1500 × 1000 | Lifestyle/Marke | echt | Fahrer auf einer CVO Road Glide, unterwegs auf einer Landstraße | Homepage · Hero, Modell CVO |
 | `bento-motorraeder.jpg` | 1400 × 1000 | Lifestyle/Marke | echt | Fahrer auf einer CVO Road Glide in voller Fahrt auf einer Landstraße, Hügel im Hintergrund | Homepage · Kategorie-Kachel Motorräder |
 | `bento-herren.jpg` | 736 × 738 | Lifestyle/Marke | echt | Bärtiger Fahrer im Profil in schwarz-oranger H-D-Jacke, Oberkörper, Bäume unscharf im Hintergrund | Homepage · Kategorie-Kachel Herren |
 | `bento-damen.jpg` | 960 × 867 | Lifestyle/Marke | echt | Frau in ärmelloser Bluse hält eine Lederjacke, Bike im Hintergrund | Homepage · Kategorie-Kachel Damen |
@@ -37,7 +37,7 @@ Austausch den Dateinamen aus der Liste streichen (siehe `README.md`).
 | `mega-damen.jpg` | 600 × 750 | Lifestyle/Marke | Platzhalter | Neue Damen-Kollektion, Model in Jacke | Megamenü Damen · Teaser |
 | `mega-teile.jpg` | 600 × 750 | Lifestyle/Marke | Platzhalter | Custom-Umbau vorher/nachher | Megamenü Teile · Teaser Custom-Umbauten |
 | `mega-accessoires.jpg` | 600 × 750 | Lifestyle/Marke | Platzhalter | Geschenkideen: Gutschein, Tasse, Cap | Megamenü Accessoires · Teaser |
-| `powershop-team.png` | 980 × 807 | Lifestyle/Marke | echt | Das Team vom Power Shop, Porträtraster mit Namen und Funktion | Homepage · Storytelling „Über uns“ |
+| `powershop-team.webp` | 980 × 807 | Lifestyle/Marke | echt | Das Team vom Power Shop, Porträtraster mit Namen und Funktion (WebP, Qualität 90, ca. 140 KB; Quelle: `pics_to_use/powershop-team.png`) | Homepage · Storytelling „Über uns“ |
 | `event-1.jpg` | 800 × 500 | Lifestyle/Marke | Platzhalter | Gruppenausfahrt auf Landstraße | Homepage/Service · Event-Kachel 1 |
 | `event-2.jpg` | 800 × 500 | Lifestyle/Marke | Platzhalter | Bike Night im Hof, Lichterketten, Community | Homepage/Service · Event-Kachel 2 |
 | `event-3.jpg` | 800 × 500 | Lifestyle/Marke | Platzhalter | Winter-Check in der Werkstatt, Kunden mit Kaffee | Homepage/Service · Event-Kachel 3 |
@@ -58,14 +58,14 @@ ist aber derzeit in keiner Section und keinem Template eingebunden.
 
 **Offen, vor dem Livegang klären.** Für keines der Fotos in `assets/` ist die Quelle oder Lizenz dokumentiert.
 
-- `hero-ride-cvo.png` trägt in den EXIF-Daten den Vermerk „2023 Harley-Davidson Motor Company. Usage: Unlimited Worldwide“. Ob die Nutzung im
+- `hero-ride-cvo.jpg` trägt in den EXIF-Daten den Vermerk „2023 Harley-Davidson Motor Company. Usage: Unlimited Worldwide“. Ob die Nutzung im
   Onlineshop des Händlers damit gedeckt ist (Händlerportal, Lizenzbedingungen), muss der Händler bei Harley-Davidson bestätigen.
 - Der Commit „Hero und Sortiment an den Katalog 2026 anpassen“ (`bfbd9cc`) nennt harley-davidson.com/ch als Quelle für Katalogdaten und
-  Touring-Fotos. Herkunft und Rechte von `hero-ride-road.png`, `hero-ride-street.png`, `bento-herren.jpg` und `mega-herren.jpg` (ohne
+  Touring-Fotos. Herkunft und Rechte von `hero-ride-road.jpg`, `hero-ride-street.jpg`, `bento-herren.jpg` und `mega-herren.jpg` (ohne
   Metadaten) sind nicht belegt.
 - Die EXIF-Daten bleiben unverändert: ein Entfernen des Urhebervermerks wäre eine Entscheidung des Händlers, keine technische Aufräumarbeit.
 - Je Bild nach der Klärung hier Quelle, Lizenz und gegebenenfalls den geforderten Bildnachweis eintragen.
-- Die Dateien `hero-ride-*.png` sind JPEG mit falscher Endung, das Umbenennen folgt mit den Datei-Umbenennungen in M6b.
+- Die Hero-Fotos hießen früher `hero-ride-*.png`, waren aber JPEG mit falscher Endung. Sie sind jetzt bytegleich als `.jpg` abgelegt (kein Neu-Kodieren, die EXIF-Daten bleiben).
 
 Die gesamte Liste der offenen Händlerfreigaben steht in [`freigaben.md`](freigaben.md).
 
@@ -73,7 +73,7 @@ Die gesamte Liste der offenen Händlerfreigaben steht in [`freigaben.md`](freiga
 
 | Datei | Format | Einsatz |
 |---|---|---|
-| `hero-loop.mp4` · `hero-loop-720.mp4` · `hero-loop.webm` · `hero-poster.webp` | 1280 × 720 bzw. 960 × 540, 1920 × 1080 (Poster), ohne Ton | Hero-Loop der Startseite, Herkunft und Austausch: `docs/hero-clip.md` |
+| `hero-loop.mp4` · `hero-loop-720.mp4` · `hero-loop.webm` · `hero-poster.webp` · `hero-poster-960.webp` | 1280 × 720 bzw. 960 × 540, 1920 × 1080 und 960 × 540 (Poster, beide gemeinsam ersetzen), ohne Ton | Hero-Loop der Startseite, Herkunft und Austausch: `docs/hero-clip.md` |
 | `bikes-intro.mp4` · `bikes-intro-poster.jpg` | 960 × 720, ca. 17 s | Kategorieseite Motorräder · Film-Intro |
 | `clothing-herren.mp4` · `clothing-herren-poster.jpg` | 960 × 720, ca. 18 s | Kategorieseite Herren · Film-Intro |
 | `clothing-damen.mp4` · `clothing-damen-poster.jpg` | 960 × 720, ca. 6 s | Kategorieseite Damen · Film-Intro |

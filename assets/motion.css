@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Power Shop – Bewegung: Reveals, Wort-Splitter, Marquee, Lenis. Verhalten und Attribute: assets/motion.js.
+   Power Shop – Bewegung: Reveals, Wort-Splitter, Lenis. Verhalten und Attribute: assets/motion.js.
    Start- und Bewegungszustände gelten NUR unter html.has-motion. Die Klasse setzt der Head-Skript in
    theme.liquid nicht bei prefers-reduced-motion, saveData, Theme-Editor oder ausgeschaltetem Setting;
    ohne JS gibt es sie nie. Dann bleibt alles sichtbar und statisch.
@@ -10,8 +10,9 @@
 /* ---------- Lenis ---------- */
 /* html{scroll-behavior:smooth} (base.css) würde gegen Lenis arbeiten. Bewusst KEIN overflow:clip für
    .lenis-stopped aus lenis.css: es bricht body{overflow-x:hidden} und alle sticky-Elemente. Die Sperre
-   bleibt body.is-locked. */
-html.lenis { scroll-behavior: auto; }
+   bleibt body.is-locked. !important, weil ScrollTrigger scroll-behavior inline zurückschreibt: Lenis lädt nach, und
+   hat ScrollTrigger vorher „smooth“ gemerkt, bliebe sonst ein style="scroll-behavior: smooth" an html stehen. */
+html.lenis { scroll-behavior: auto !important; }
 /* contain nur in Dialogen: dort darf das Scrollen nie an die Seite dahinter kippen. In Seiten-Containern
    (Kompatibilitätstabelle, Filter-Dropdown) soll es am Ende normal an die Seite weitergehen. */
 .lenis dialog[data-lenis-prevent],
@@ -71,32 +72,6 @@ html.lenis { scroll-behavior: auto; }
 /* ---------- Count-up ---------- */
 [data-countup] { font-variant-numeric: tabular-nums; }
 
-/* ---------- Marquee ---------- */
-/* Spur = Element mit data-marquee, JS hängt einen Klon an; -50% = ein Satz Inhalt. Ohne has-motion: kein Klon.
-   Läuft nur mit Pause-Button [data-marquee-toggle] (WCAG 2.2.2): JS nimmt den im Markup oder ergänzt .marquee-toggle
-   und setzt .is-running. Der Button ist nur sinnvoll, solange die Spur läuft. */
-html:not(.has-motion) [data-marquee] > [data-clone],
-html:not(.has-motion) [data-marquee-toggle] { display: none; }
-[data-marquee-toggle] { min-width: 44px; min-height: 44px; }
-/* Ergänzter Button: Symbol aus CSS (Name steht im aria-label), Farbe und Rahmen folgen der Fläche */
-.marquee-toggle {
-  display: flex; align-items: center; justify-content: center; width: 44px; margin: 0 var(--gutter) 0 auto; padding: 0;
-  color: inherit; background: transparent; border: 1px solid currentColor; border-radius: var(--radius); cursor: pointer;
-}
-.marquee-toggle::before { content: ""; width: 12px; height: 14px; border-inline: 4px solid currentColor; }
-.marquee-toggle[aria-pressed="true"]::before { width: 0; height: 0; border-style: solid; border-width: 7px 0 7px 12px; border-color: transparent transparent transparent currentColor; }
-@keyframes ps-marquee { to { transform: translateX(-50%); } }
-@media (prefers-reduced-motion: no-preference) {
-  .has-motion [data-marquee].is-running {
-    width: max-content;
-    animation: ps-marquee var(--marquee-dur, 40s) linear infinite;
-  }
-}
-.has-motion [data-marquee].is-paused,
-.has-motion [data-marquee].is-off,
-.has-motion [data-marquee].is-running:hover,
-.has-motion [data-marquee].is-running:focus-within { animation-play-state: paused; }
-
 /* ---------- Reduced-Motion und Druck ---------- */
 /* Falls zur Laufzeit umgeschaltet wird, bevor motion.js abgebaut hat */
 @media (prefers-reduced-motion: reduce) {
@@ -105,7 +80,4 @@ html:not(.has-motion) [data-marquee-toggle] { display: none; }
 @media print {
   .has-motion [data-reveal], .has-motion [data-stagger] > *, .has-motion [data-split] { opacity: 1 !important; translate: none !important; clip-path: none !important; animation: none !important; }
   .ps-wi { translate: none !important; animation: none !important; }
-  /* Marquee: Satz einmal drucken, ohne Klon und ohne Verschiebung */
-  [data-marquee] > [data-clone], [data-marquee-toggle] { display: none !important; }
-  .has-motion [data-marquee] { animation: none !important; transform: none !important; width: auto !important; }
 }

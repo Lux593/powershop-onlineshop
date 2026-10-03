@@ -165,7 +165,10 @@
         })
         .then(function (html) {
           if (mine !== seq) return; // ein jüngerer Ladevorgang hat übernommen
-          var doc = new DOMParser().parseFromString(html, 'text/html');
+          // <template> statt DOMParser: ein geparstes Dokument mit <video> (Film-Kollektionen) bliebe in Chrome je Austausch im Speicher
+          var tpl = document.createElement('template');
+          tpl.innerHTML = html;
+          var doc = tpl.content;
           var next = doc.querySelector('[data-collection]');
           if (!next) throw new Error('Section nicht gefunden');
 
@@ -253,7 +256,9 @@
       var freshSort = $('[data-sort]', next);
       if (sort && freshSort) sort.value = freshSort.value;
 
-      if (doc.title) document.title = doc.title;
+      var title = doc.querySelector('title');
+      var text = title ? title.textContent.replace(/\s+/g, ' ').trim() : '';
+      if (text) document.title = text;
     }
 
     /* ---------- Eingaben ---------- */

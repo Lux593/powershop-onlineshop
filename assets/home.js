@@ -1,6 +1,6 @@
 /* ==========================================================================
    Power Shop – Startseite (nur index): Statement-Scrub, Tab-Indikator, Schienen-Fortschritt.
-   Reveals, Parallax, Count-up und Lauftext liefert assets/motion.js über data-Attribute (docs/motion-api.md),
+   Reveals, Parallax und Count-up liefert assets/motion.js über data-Attribute (docs/motion-api.md),
    Aufräumen übernimmt PS.motion.track/add. Jedes Modul hängt sich über PS.on ein (auch nach Section-Reload).
    ========================================================================== */
 (function () {

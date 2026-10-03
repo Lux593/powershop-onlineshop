@@ -1,6 +1,6 @@
 /* ==========================================================================
    Power Shop – Announcement-Bar, Header, Megamenü, Mobile-Menü, Suche.
-   Aus sections.css verschoben (M1b), Regeln unverändert. Bereich: Hero & Header.
+   Bereich: Hero & Header.
    ========================================================================== */
 
 /* ---------- Announcement-Bar ---------- */
@@ -95,20 +95,24 @@ html:not(:has(.announce)) { --announce-h: 0px; }
   .brand__divider, .brand__hd { display: none; }
 }
 
-/* Megamenü */
+/* Megamenü. Geschlossen rendert der Inhalt nicht (content-visibility): sonst laden die lazy Bilder der Kacheln auf jeder Seite
+   mit, obwohl das Menü unsichtbar im Bild liegt. header.js holt sie nach Load plus Idle, ein Hover davor lädt sie sofort.
+   Das Ausblenden folgt dem Fade (wie visibility); ohne transition-behavior verschwindet der Inhalt sofort. */
 .mega {
   position: absolute; left: 0; right: 0; top: 100%;
   background: var(--c-black); border-top: 1px solid var(--c-steel); box-shadow: 0 24px 48px rgba(0, 0, 0, 0.45);
   visibility: hidden; opacity: 0; transform: translateY(-6px);
+  content-visibility: hidden;
   transition: opacity var(--t-fast), transform var(--t-fast), visibility 0s linear var(--t-fast);
 }
-.mainnav__item.is-open .mega { visibility: visible; opacity: 1; transform: none; transition-delay: 0s; }
+@supports (transition-behavior: allow-discrete) {
+  .mega { transition: opacity var(--t-fast), transform var(--t-fast), visibility 0s linear var(--t-fast), content-visibility 0s linear var(--t-fast) allow-discrete; }
+}
+.mainnav__item.is-open .mega { visibility: visible; opacity: 1; transform: none; content-visibility: visible; transition-delay: 0s; }
 .mega__inner { display: grid; gap: 40px; padding-block: 36px 40px; }
-.mega__inner--bikes { grid-template-columns: 220px 1fr; }
-.mega__inner--cols { grid-template-columns: 1fr 1fr 1.2fr; }
 .mega__title { font-family: var(--f-head); font-weight: 700; font-size: 15px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--c-muted-dark); margin-bottom: 14px; }
 .mega__links { display: grid; gap: 2px; }
-.mega__links a { display: flex; align-items: center; min-height: 36px; font-size: 15px; color: #e9e6e1; }
+.mega__links a { display: flex; align-items: center; min-height: 36px; font-size: 15px; color: var(--c-on-dark-strong); }
 .mega__links a:hover { color: var(--c-orange); }
 .mega__links--2col { grid-template-columns: 1fr 1fr; column-gap: 24px; }
 .mega__links .is-strong { font-weight: 600; color: var(--c-white); }
@@ -129,7 +133,7 @@ html:not(:has(.announce)) { --announce-h: 0px; }
 .mobile-menu .drawer__head { border-color: var(--c-steel); }
 .mobile-menu .acc { border-color: var(--c-steel); }
 .mobile-menu .acc summary { padding-inline: 24px; min-height: 60px; font-size: 20px; }
-.mobile-menu .acc__body { padding: 0 24px 16px; color: #e9e6e1; }
+.mobile-menu .acc__body { padding: 0 24px 16px; color: var(--c-on-dark-strong); }
 .mobile-menu .acc__body a { display: flex; align-items: center; min-height: 44px; }
 .mobile-menu__direct { display: flex; align-items: center; justify-content: space-between; padding: 0 24px; min-height: 60px; border-top: 1px solid var(--c-steel); font-family: var(--f-head); font-weight: 700; font-size: 20px; text-transform: uppercase; }
 .mobile-menu__direct--sale { color: var(--c-orange); }
@@ -154,7 +158,7 @@ html:not(:has(.announce)) { --announce-h: 0px; }
 .search__list img { width: 48px; height: 60px; object-fit: cover; background: var(--c-stone); flex: none; }
 .search__meta { font-size: var(--fs-caption); color: var(--c-muted); }
 .search__hint { color: var(--c-muted); font-size: var(--fs-small); }
-.search mark { background: #ffe1cf; color: inherit; }
+.search mark { background: var(--c-mark); color: inherit; }
 
-/* Announcement-Bar: Zusatztext mobil ausblenden (stand in sections.css im Block Kategorieseite) */
+/* Announcement-Bar: Meldungen mit der Option „Auf dem Handy ausblenden“ (sections/announcement-bar.liquid vergibt .announce__extra) */
 @media (max-width: 639px) { .announce__extra { display: none; } }

@@ -8,8 +8,8 @@
           "settings": {
             "label": "Road Glide",
             "blurb": "Die feste Verkleidung für lange Strecken.",
-            "image_asset": "hero-ride-road.png",
-            "image_alt": "Zwei Fahrer auf einer violetten Road Glide, unterwegs auf der Autobahn",
+            "image_asset": "hero-ride-road.jpg",
+            "image_alt": "Zwei Fahrer auf einer violetten Road Glide, unterwegs auf einer Landstraße",
             "price_text": "ab 31.500 €",
             "cta_label": "Road Glide ansehen",
             "url": "/collections/motorraeder",
@@ -22,8 +22,8 @@
           "settings": {
             "label": "Street Glide",
             "blurb": "Die tiefe Scheibe für die offene Straße.",
-            "image_asset": "hero-ride-street.png",
-            "image_alt": "Zwei Fahrer auf einer Street Glide, unterwegs auf der Autobahn",
+            "image_asset": "hero-ride-street.jpg",
+            "image_alt": "Zwei Fahrer auf einer Street Glide, unterwegs auf einer Landstraße",
             "price_text": "ab 31.500 €",
             "cta_label": "Street Glide ansehen",
             "url": "/collections/motorraeder",
@@ -36,7 +36,7 @@
           "settings": {
             "label": "CVO",
             "blurb": "Die CVO-Ausstattung für die große Tour.",
-            "image_asset": "hero-ride-cvo.png",
+            "image_asset": "hero-ride-cvo.jpg",
             "image_alt": "Fahrer auf einer grauen CVO Road Glide, unterwegs auf einer Landstraße",
             "price_text": "ab 48.300 €",
             "cta_label": "CVO Road Glide ST ansehen",
@@ -62,7 +62,7 @@
       },
       "block_order": ["testdrive", "finance", "workshop", "tradein"],
       "settings": {
-        "anchor_id": "service"
+        "anchor_id": "nach-hero"
       }
     },
     "news": {
@@ -118,7 +118,7 @@
       },
       "block_order": ["years", "bikes", "shop", "event_1", "event_2", "event_3"],
       "settings": {
-        "image_asset": "powershop-team.png",
+        "image_asset": "powershop-team.webp",
         "image_alt": "Das Team vom Power Shop, acht Porträtfotos mit Name und Funktion: Gerhard Link, Ingrid Link, Richard Link, Falk Link, Franziska Link, Jürgen Scheurer, Aaron Klosterhuber und Jean-Nicolas Kibler",
         "heading": "Mehr als ein Shop",
         "text": "<p>Bei uns trifft Showroom auf Werkstatt und Community. Wir beraten dich ehrlich, schrauben mit Leidenschaft und fahren selbst – vom ersten Führerschein-Traum bis zum kompletten Custom-Umbau.</p>",

@@ -146,7 +146,12 @@
 
     /* ---------------- Start nach Load plus Idle ---------------- */
     var idle = window.requestIdleCallback || function (f) { setTimeout(f, 300); };
-    function begin() { awake = true; apply(); }
+    function begin() {
+      awake = true;
+      apply();
+      // Die Bilder der anderen Slides rendern nicht und laden daher nicht von selbst (hero.css): jetzt holen, damit der Wechsel nicht auf ein leeres Bild trifft
+      if (!slow) slides.forEach(function (s) { var img = s.querySelector('img'); if (img) img.loading = 'eager'; });
+    }
     hero.classList.add('is-ready');
     apply();
     if (document.readyState === 'complete') idle(begin, { timeout: 2000 });

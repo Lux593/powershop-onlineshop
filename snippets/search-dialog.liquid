@@ -1,13 +1,15 @@
 {% doc %}
-  Such-Dialog der Kopfzeile (<dialog id="search">, geöffnet über data-open="search"; Logik in search.js).
-  Der Bereich „Beliebte Suchen" besteht aus Chips, die aus dem Header-Setting „search_terms" kommen.
+  Such-Dialog der Kopfzeile (<dialog id="search">, geöffnet über data-open="search"). Die Logik steht in search.js, das erst
+  beim ersten Öffnen nachlädt (data-lazy-script, assets/theme.js). Ohne JavaScript bleibt es ein normales Suchformular.
+  Der Bereich „Beliebte Suchen" besteht aus Chips, die aus dem Header-Setting „search_terms" kommen. Die Chips sind Links auf die
+  Suchseite: Ohne JavaScript und vor dem Laden von search.js führen sie dorthin, danach füllt search.js stattdessen das Feld.
 
   @param {string} [search_terms] - Suchbegriffe, ein Begriff pro Zeile (section.settings.search_terms der Header-Section)
 
   @example
   {% render 'search-dialog', search_terms: section.settings.search_terms %}
-{% enddoc -%}
-<dialog class="search-dialog" id="search" aria-label="Suche" data-lenis-prevent>
+{% enddoc %}
+<dialog class="search-dialog" id="search" aria-label="Suche" data-lenis-prevent data-lazy-script="{{ 'search.js' | asset_url }}">
   <div class="container">
     <form class="search__bar" role="search" action="{{ routes.search_url }}" method="get">
       {% render 'icon', name: 'search', class: 'icon--lg' %}
@@ -33,7 +35,7 @@
             {%- for term in terms -%}
               {%- assign term_clean = term | strip | strip_newlines -%}
               {%- if term_clean != blank -%}
-                <button class="chip" type="button" data-suggest="{{ term_clean | escape }}">{{ term_clean }}</button>
+                <a class="chip" href="{{ routes.search_url }}?q={{ term_clean | url_encode }}&amp;options%5Bprefix%5D=last" data-suggest="{{ term_clean | escape }}">{{ term_clean }}</a>
               {%- endif -%}
             {%- endfor -%}
           </div>

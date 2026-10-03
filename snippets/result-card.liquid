@@ -18,7 +18,7 @@
   endif
 -%}
 {%- if is_bike -%}
-  {% render 'bike-card', product: product, sizes: sizes, reveal: reveal %}
+  {% render 'bike-card', product: product, sizes: sizes, loading: loading, reveal: reveal %}
 {%- else -%}
   {% render 'product-card', product: product, sizes: sizes, loading: loading, reveal: reveal %}
 {%- endif -%}

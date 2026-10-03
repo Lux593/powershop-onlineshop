@@ -44,9 +44,21 @@
 
     results.addEventListener('click', function (e) {
       var s = e.target.closest('[data-suggest]');
-      if (s) { input.value = s.dataset.suggest; query(); input.focus(); }
+      // Der Chip ist ein Link auf die Suchseite (Rückfall ohne Skript): mit Skript füllt er das Feld, Strg/Cmd/Mittelklick öffnen ihn normal
+      if (!s || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      e.preventDefault();
+      input.value = s.dataset.suggest;
+      query();
+      input.focus();
     });
 
     dialog.addEventListener('ps:open', function () { setTimeout(function () { input.focus(); }, 30); });
+
+    // Lädt das Skript erst beim ersten Öffnen nach (theme.js, data-lazy-script), ist ps:open schon gefeuert und eine
+    // Eingabe davor ohne Vorschläge geblieben
+    if (dialog.open) {
+      setTimeout(function () { input.focus(); }, 30);
+      if (input.value.trim()) query();
+    }
   });
 })();

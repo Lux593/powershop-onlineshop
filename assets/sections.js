@@ -1,6 +1,6 @@
 /* ==========================================================================
    Power Shop – Sections (global): Showroom und Quick-Add.
-   Der Hero steht seit M1b in hero.js (nur Startseite). Jedes Modul hängt sich über PS.on ein
+   Der Hero steht in hero.js (nur Startseite). Jedes Modul hängt sich über PS.on ein
    und funktioniert damit auch nach einem Section-Reload im Theme-Editor.
    ========================================================================== */
 (function () {

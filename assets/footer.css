@@ -1,6 +1,6 @@
 /* ==========================================================================
-   Power Shop – Footer und Cookie-Banner.
-   Aus sections.css verschoben (M1b); erweitert um die Wipe-Unterstreichung der Link-Spalten (M4).
+   Power Shop – Footer.
+   Die Link-Spalten haben eine Wipe-Unterstreichung.
    Das Einblenden des Newsletter-Bands kommt per data-stagger aus assets/motion.js.
    ========================================================================== */
 
@@ -36,16 +36,5 @@
 .footer__bottom { border-top: 1px solid var(--c-steel); padding-block: 20px; font-size: var(--fs-caption); color: var(--c-muted-dark); }
 .footer__bottom .container { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; }
 .payments { display: flex; flex-wrap: wrap; gap: 6px; }
-.payments li { padding: 5px 8px; border: 1px solid var(--c-steel); border-radius: var(--radius); font-size: 11px; font-weight: 600; letter-spacing: 0.04em; color: #d6d2cb; }
+.payments li { padding: 5px 8px; border: 1px solid var(--c-steel); border-radius: var(--radius); font-size: 11px; font-weight: 600; letter-spacing: 0.04em; color: var(--c-on-dark); }
 .footer__bottom a { text-decoration: underline; }
-
-/* Cookie-Banner (gleichwertige Buttons) */
-.cookie {
-  position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 350; max-width: 560px;
-  padding: 24px; background: var(--c-black); color: var(--c-white); border: 1px solid var(--c-steel); box-shadow: var(--shadow-lg);
-  display: grid; gap: 14px;
-}
-.cookie p { font-size: var(--fs-small); color: #d6d2cb; }
-.cookie p a { text-decoration: underline; }
-.cookie__actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.cookie__more { justify-self: start; font-size: var(--fs-small); text-decoration: underline; min-height: 32px; }

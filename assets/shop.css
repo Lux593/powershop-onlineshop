@@ -1,6 +1,6 @@
 /* ==========================================================================
    Power Shop – Kategorie, Produktseite, Warenkorb.
-   Aus sections.css verschoben (M1b), Regeln unverändert. Bereich: Kategorie, Produkt, Warenkorb, Suche.
+   Bereich: Kategorie, Produkt, Warenkorb, Suche.
    ========================================================================== */
 
 /* ---------- Kategorieseite ---------- */
@@ -45,7 +45,7 @@
 }
 .film-banner__chips::-webkit-scrollbar { display: none; }
 .film-banner__chips li { flex: none; }
-.chip--dark { background: transparent; color: var(--c-white); border-color: #555; }
+.chip--dark { background: transparent; color: var(--c-white); border-color: var(--c-border-dark); }
 .chip--dark:hover,
 .chip--dark:focus-visible { background: rgba(242, 103, 34, 0.08); border-color: var(--c-orange); }
 
@@ -136,14 +136,13 @@
 .pdp-form > [data-option-error]:not(:empty) { margin-top: 12px; }
 .pdp__row { display: grid; gap: 10px; }
 .pdp__row-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: var(--fs-small); }
-.pdp__buy { display: grid; grid-template-columns: auto 1fr auto; gap: 8px; }
-.pdp__buy .wish-btn { position: static; border: 1px solid #bdb8b0; width: 48px; height: 48px; }
+.pdp__buy { display: grid; grid-template-columns: auto 1fr; gap: 8px; }
 .usp { display: grid; gap: 10px; padding: 16px; background: var(--c-white); border: 1px solid var(--c-line); font-size: var(--fs-small); }
 .usp li { display: flex; align-items: center; gap: 10px; }
 .usp .icon { width: 18px; height: 18px; }
 .stock { display: inline-flex; align-items: center; gap: 8px; font-size: var(--fs-small); font-weight: 500; }
 .stock::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--c-success); }
-.stock--order::before { background: #b26a00; }
+.stock--order::before { background: var(--c-stock-order); }
 .partno { display: inline-flex; align-items: center; gap: 4px; font-size: var(--fs-small); }
 .partno code { font-family: var(--f-body); font-weight: 600; color: var(--c-black); }
 .partno button { width: 36px; height: 36px; display: grid; place-items: center; }
@@ -230,7 +229,7 @@
 .open-state::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--c-muted); }
 .open-state.is-open::before { background: var(--c-success); }
 .hours { font-size: var(--fs-small); color: var(--c-muted); }
-.reserve-note { display: grid; gap: 8px; padding: 16px; background: var(--c-offwhite); border: 1px dashed #bdb8b0; font-size: var(--fs-small); }
+.reserve-note { display: grid; gap: 8px; padding: 16px; background: var(--c-offwhite); border: 1px dashed var(--c-border-soft); font-size: var(--fs-small); }
 .reserve-note strong { display: flex; align-items: center; gap: 8px; font-size: var(--fs-body); }
 .reserve-note ol { list-style: decimal; padding-left: 18px; display: grid; gap: 2px; }
 .reserved-banner { display: flex; gap: 12px; align-items: center; padding: 14px 16px; background: var(--c-muted); color: var(--c-white); font-size: var(--fs-small); }
@@ -248,7 +247,6 @@
 body.has-sticky-contact { padding-bottom: 72px; }
 @media (min-width: 1024px) { body.has-sticky-contact { padding-bottom: 0; } }
 
-.pdp-more { padding-bottom: var(--s-8); }
 .pdp-sections { max-width: 860px; }
 .pdp-sections .acc summary { font-size: 20px; }
 
@@ -272,10 +270,6 @@ body.has-sticky-contact { padding-bottom: 72px; }
 .subtotal strong { font-family: var(--f-head); font-size: 26px; }
 .drawer__empty { display: grid; gap: 16px; justify-items: center; text-align: center; padding: 48px 8px; color: var(--c-muted); }
 .drawer__empty .icon { width: 40px; height: 40px; }
-.upsell { margin-top: 24px; }
-.upsell h3 { font-size: 18px; margin-bottom: 12px; }
-.upsell__item { display: grid; grid-template-columns: 56px 1fr auto; gap: 12px; align-items: center; padding: 8px 0; }
-.upsell__item img { width: 56px; aspect-ratio: 4/5; object-fit: cover; background: var(--c-stone); }
 
 /* Fortsetzung der Produktdetailseite (stand am Ende von sections.css) */
 .pdp__info > *, .pdp__buy > * { min-width: 0; }
@@ -290,12 +284,11 @@ body.has-sticky-contact { padding-bottom: 72px; }
 .approval .tip__bubble { left: 0; transform: none; width: min(340px, 100%); }
 
 /* ==========================================================================
-   Bewegung (M5): Megamenü, Karten, Kollektion, PDP, Warenkorb, Suche, Seitenübergänge.
+   Bewegung: Megamenü, Karten, Kollektion, PDP, Warenkorb, Suche, Seitenübergänge.
    Start- und Bewegungszustände gelten nur unter html.has-motion (Notaus, reduzierte Bewegung, Theme-Editor,
    ohne JS: alles sichtbar und statisch). Animiert werden nur transform/translate, opacity und clip-path.
-   Attribute und Zustände der Motion-Schicht: docs/motion-api.md. Die Verträge dieses Blocks stehen noch nicht dort (Nachtrag: M6):
-   ps:cart (Zähler) in cart.js, PS.quick (Quick-Add) in sections.js, is-vt/is-vt-results (Ergebnis-Überblendung) in collection.js,
-   data-sticky-buy (Kaufleiste) in product.js.
+   Attribute und Zustände der Motion-Schicht und die Verträge dieses Blocks (ps:cart in cart.js, PS.quick in sections.js,
+   is-vt/is-vt-results in collection.js, data-sticky-buy in product.js): docs/motion-api.md.
    ========================================================================== */
 
 /* ---------- Megamenü: Spalten laufen gestaffelt ein (40-ms-Schritte) ---------- */
@@ -484,15 +477,12 @@ html:not(.has-motion) .bcard:hover .bcard__media img { transform: none; }
 }
 
 /* ==========================================================================
-   Korrekturen aus der Gesamtreview (M5-Nachlauf)
+   Korrekturen aus der Gesamtreview
    ========================================================================== */
 
 /* Suchfeld (header.css): Der Fokus lag nur auf der orangen Unterkante, 2,81:1 auf dem Dialoggrund und damit schwächer als der
    ungefokussierte schwarze Strich. Der schwarze Ring bleibt, orange ist Akzent. */
 .search__input:focus { outline: 2px solid var(--c-black); outline-offset: 4px; }
-
-/* Warenkorb-Seite (theme.css:50 nennt das nicht definierte --s-5, die Deklaration war ungültig und der Titel klebte an der Positionsliste) */
-.cart-page__title { margin-block: var(--s-3) var(--s-6); }
 
 /* ---------- Produktkarten: kleineres Bild ---------- */
 /* Quadratisch statt 4:5: die Karten wirken kompakter, in Kollektion und Suche passen mehr Artikel auf den Bildschirm. */

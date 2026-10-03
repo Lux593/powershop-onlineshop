@@ -35,8 +35,8 @@ Quelle: `assets/tokens.css` (CSS-Variablen).
 
 | Token | Wert | Einsatz |
 |---|---|---|
-| `black` | #0A0A0A | dunkle Sektionen, Sekundär-Button, Text auf hell |
-| `anthracite` | #1A1A1A | Karten/Flächen auf dunkel, Megamenü |
+| `black` | #0A0A0A | dunkle Sektionen, Megamenü (einfarbig, ohne Körnung), Sekundär-Button, Text auf hell |
+| `anthracite` | #1A1A1A | Karten/Flächen auf dunkel |
 | `steel` | #2B2B2B | Linien auf dunkel |
 | `white` | #FFFFFF | Text auf dunkel, Karten auf hell |
 | `offwhite` | #F5F3EF | heller Seitengrund |
@@ -47,6 +47,14 @@ Quelle: `assets/tokens.css` (CSS-Variablen).
 | `muted` | #5F5F5F | Nebentext auf hell |
 | `muted-dark` | #A8A8A8 | Nebentext auf dunkel |
 | `error` / `success` | #C62828 / #2E7D32 | Formular-Feedback, Verfügbarkeit |
+| `text-soft` | #333333 | Fließtext in Akkordeons und Fakten |
+| `on-dark` / `on-dark-strong` | #D6D2CB / #E9E6E1 | Fließtext bzw. Menülinks auf dunkel |
+| `border-input` | #8A857D | Rahmen von Formularfeldern auf hell |
+| `border-input-dark` | #777777 | Rahmen von Formularfeldern auf dunkel |
+| `border-soft` / `border-dark` | #BDB8B0 / #555555 | Rahmen ohne Bedienfunktion (Hinweisfläche, Chips auf dunkel) |
+
+Weitere Tokens (Zulassungs-Badges `badge-ok/warn/bad-*`, `stock-order`, `mark`, `error-on-dark`, `black-soft`, `pure-black`, `stone-deep`) stehen mit
+Kommentar in `tokens.css`. Hex-Werte gehören nur dorthin.
 
 **Tipp:** Das Orange mit dem Orange der offiziellen Logo-Datei abgleichen, damit UI und Bar & Shield exakt übereinstimmen.
 
@@ -62,6 +70,18 @@ Quelle: `assets/tokens.css` (CSS-Variablen).
 | muted auf Stone | #5F5F5F / #EDEBE7 | 5,4 : 1 ✅ |
 | **Weiß auf Orange** | #FFFFFF / #F26722 | 3,1 : 1 ❌ nicht verwenden |
 | **Orange-Text auf Off-White** | #F26722 / #F5F3EF | 2,8 : 1 ❌ nicht verwenden |
+
+### Nicht-Text-Kontrast (WCAG 1.4.11, Rahmen von Formularfeldern ≥ 3 : 1)
+
+| Kombination | Farben | Kontrast |
+|---|---|---|
+| `border-input` auf Weiß | #8A857D / #FFFFFF | 3,7 : 1 ✅ |
+| `border-input` auf Off-White | #8A857D / #F5F3EF | 3,3 : 1 ✅ |
+| `border-input` auf Stone | #8A857D / #EDEBE7 | 3,1 : 1 ✅ |
+| `border-input-dark` auf Schwarz | #777777 / #0A0A0A | 4,4 : 1 ✅ |
+| `border-input-dark` auf Anthrazit | #777777 / #1A1A1A | 3,9 : 1 ✅ |
+| `border-input-dark` auf Steel | #777777 / #2B2B2B | 3,2 : 1 ✅ |
+| früher: #BDB8B0 auf Weiß, #555555 auf Anthrazit | | 2,0 : 1 und 2,3 : 1 ❌ |
 
 **Regeln**
 - Orange-Flächen bekommen immer **schwarze Schrift**.
@@ -108,7 +128,7 @@ Header (sticky, schwarz)
 ├─ Accessoires ─ Megamenü: Unterkategorien | Neuheiten · Sale · Gutscheine | 2 Teaser
 ├─ Service    ─ Megamenü: Probefahrt · Finanzierung · Werkstatt · Inzahlungnahme · Events · Standort | Kontakt
 └─ Sale (orangener Textlink)
-Icons: Suche (auch Teilenummer) · Konto · Merkliste · Warenkorb
+Icons: Suche (auch Teilenummer) · Konto · Warenkorb (eine Merkliste hat das Theme nicht)
 ```
 
 **Filter je Kategorie** (horizontale Filterleiste, mobil Bottom-Sheet)
@@ -169,9 +189,9 @@ Icons: Suche (auch Teilenummer) · Konto · Merkliste · Warenkorb
 | Kompatibilitäts-Box | Zusammenfassung + aufklappbare, durchsuchbare Tabelle | Daten aus Metaobjekt „Fahrzeugmodell“ |
 | Größentabelle | Tabs Oberteile · Hosen · Handschuhe · Helme · Stiefel, Messanleitung | Modal (Desktop) / Bottom-Sheet (mobil) |
 | Filter-Dropdown / Bottom-Sheet | Checkbox, Farbe, Bereich (von–bis), Einzelauswahl | Zähler am Button, Esc schließt |
-| Drawer | Warenkorb (Fortschrittsbalken Versandschwelle, Cross-Sell) · Merkliste · Mobile-Menü | natives `<dialog>`: Fokusfalle + Esc |
+| Drawer | Warenkorb (Fortschrittsbalken Versandschwelle) · Mobile-Menü | natives `<dialog>`: Fokusfalle + Esc |
 | Megamenü | Links, Bild-Kacheln, CTA-Leiste | Hover + Tastatur (Chevron-Button), Touch: 1. Tipp öffnet |
-| Akkordeon, Tabs, Breadcrumb, Pagination, Chips, Toast, Cookie-Banner | – | ARIA-konform |
+| Akkordeon, Tabs, Breadcrumb, Pagination, Chips, Toast | – | ARIA-konform (den Cookie-Banner liefert Shopify, siehe `docs/freigaben.md`) |
 
 ---
 
@@ -200,7 +220,7 @@ Icons: Suche (auch Teilenummer) · Konto · Merkliste · Warenkorb
 | Verkauft | Produkt ausblenden |
 
 ### Warenkorb
-- Drawer mit Fortschrittsbalken „Noch X € bis versandkostenfrei“, Cross-Sell und Zwischensumme
+- Drawer mit Fortschrittsbalken „Noch X € bis versandkostenfrei“ und Zwischensumme (Cross-Sell hat das Theme nicht)
 - „Zur Kasse“ führt zum Shopify-Checkout (Branding: Logo, Orange-Buttons)
 - Zahlarten: PayPal, Klarna (Rechnung/Raten), Kreditkarte, Apple/Google Pay
 - **Motorräder landen nie im Warenkorb.**
@@ -230,7 +250,7 @@ Icons: Suche (auch Teilenummer) · Konto · Merkliste · Warenkorb
 - [ ] **Rechtstexte:** Impressum, Datenschutz, AGB, Widerrufsbelehrung und Barrierefreiheitserklärung von einem Rechtstexte-Anbieter
 - [ ] **Barrierefreiheit (BFSG, seit 28.06.2025):** Ziel WCAG 2.1 AA
   - Im früheren Mockup umgesetzt, im Theme erneut zu prüfen: Skip-Link, Landmarks, Fokus-Stile, ARIA für Tabs/Dialoge/Karussell, Pause beim Autoplay, `prefers-reduced-motion`
-  - axe-Prüfung: „keine Verstöße“ galt für das Mockup. Für das Theme im Preview-Theme erneut laufen lassen, zusätzlich Kontrastmodus (Windows, `forced-colors`), Tastatur und Screenreader prüfen
+  - axe-Prüfung des Themes (axe-core 4.13, WCAG 2.1 A/AA, lokaler Render-Harness mit Beispieldaten): 0 Verstöße auf allen Standardseiten in Desktop und Mobil und in den geöffneten Zuständen (Warenkorb-Drawer, Such-Dialog, Menüs, Filter, Größentabelle), 32 Läufe. Kontrast über Bildern und Videos meldet axe als „zu prüfen“: manuell prüfen. Der Nullbefund gilt nicht für den echten Shop: im Preview-Theme erneut laufen lassen, zusätzlich Kontrastmodus (Windows, `forced-colors`), Tastatur und Screenreader prüfen
 - [ ] **Widerruf:** 14 Tage gesetzlich. Die freiwillige Rückgabefrist (z. B. 30 Tage) getrennt davon kommunizieren.
 
 ---

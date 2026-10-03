@@ -1,44 +1,9 @@
 /* ==========================================================================
-   Power Shop – Startseiten-Sections: Lauftext-Band, Statement, Service-Leiste, Produkt-Grids, Kategorie-Bento,
-   Showroom, Story. Legacy-Regeln aus sections.css (M1b) stehen hier und sind für die Bewegung (M4) erweitert.
+   Power Shop – Startseiten-Sections: Statement, Service-Leiste, Produkt-Grids, Kategorie-Bento,
+   Showroom, Story.
    Bewegungszustände gelten nur unter html.has-motion (Vertrag: docs/motion-api.md); ohne sie ist alles statisch.
    .product-grid wird auch von Kollektion und Suche genutzt (collection.liquid, search.liquid).
    ========================================================================== */
-
-/* ---------- Lauftext-Band (Section marquee) ---------- */
-/* Orange Fläche, schwarze Schrift (6,4 : 1). Ohne Bewegung: einmal zentriert, umbrechend. Mit Bewegung (has-motion,
-   Spur läuft per motion.css) steht die Spur von Anfang an einzeilig, damit beim Start nichts springt. */
-.marquee { display: flex; align-items: center; background: var(--c-orange); color: var(--c-black); }
-.marquee__viewport { flex: 1; min-width: 0; overflow: hidden; padding-block: 12px; }
-.marquee__track { display: flex; justify-content: center; }
-.marquee__set { display: flex; flex-wrap: wrap; justify-content: center; }
-.marquee__item {
-  display: inline-flex; align-items: center; padding-block: 4px;
-  font-family: var(--f-head); font-weight: 800; font-size: clamp(22px, 2.6vw, 34px); line-height: 1;
-  letter-spacing: 0.02em; text-transform: uppercase; white-space: nowrap;
-}
-/* Trenner zwischen den Begriffen: ein gedrehtes Quadrat, kein Text (nichts für Screenreader) */
-.marquee__item::after { content: ""; width: 0.26em; height: 0.26em; margin-inline: 0.8em; background: currentColor; transform: rotate(45deg); }
-html:not(.has-motion) .marquee__item--last::after { display: none; }
-/* Statisch (kein JS, Reduced-Motion, Editor): ein Begriff, der breiter als der Bildschirm ist, bricht um statt abgeschnitten zu werden */
-html:not(.has-motion) .marquee__item { white-space: normal; overflow-wrap: anywhere; text-align: center; }
-/* Wiederholungen füllen die Spur nur in Bewegung (siehe sections/marquee.liquid) */
-.marquee__item--rep { display: none; }
-.has-motion .marquee__item--rep { display: inline-flex; }
-.has-motion .marquee__track { justify-content: flex-start; }
-.has-motion .marquee__set { flex: none; flex-wrap: nowrap; justify-content: flex-start; }
-.has-motion .marquee__viewport { -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent); mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent); }
-.marquee__toggle {
-  display: grid; place-items: center; flex: none; width: 44px; height: 44px; margin-inline: var(--s-1) var(--gutter);
-  color: inherit; border: 2px solid currentColor; border-radius: var(--radius);
-  transition: background-color var(--t-fast), color var(--t-fast);
-}
-.marquee__toggle:hover { background: var(--c-black); color: var(--c-orange); }
-.marquee__icon { grid-area: 1 / 1; width: 18px; height: 18px; fill: currentColor; stroke-width: 2; }
-.marquee__toggle[aria-pressed="false"] .marquee__icon--play,
-.marquee__toggle[aria-pressed="true"] .marquee__icon--pause { display: none; }
-.marquee--empty { padding: 16px var(--gutter); }
-.marquee__hint { font-size: var(--fs-small); }
 
 /* ---------- Statement ---------- */
 /* Fließt in das Bento darunter (ebenfalls dunkel): unten wenig Abstand */
@@ -147,14 +112,19 @@ html:not(.has-motion) .marquee__item { white-space: normal; overflow-wrap: anywh
 .bento-tile__media { position: absolute; inset: 0; }
 .has-motion .bento-tile__media[data-parallax] { inset: -8% 0; }
 .bento-tile img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 700ms var(--ease); }
-.bento-tile--product { background: #111; }
-.bento-tile--product.bento-tile--light { background: #fff; }
+.bento-tile--product { background: var(--c-black-soft); }
+.bento-tile--product.bento-tile--light { background: var(--c-white); }
 .bento-tile--product img { object-fit: contain; }
 .bento-tile--light img { height: calc(100% - 78px); object-position: center top; }
 .bento-tile--teile img { object-fit: cover; object-position: center; }
 .bento-tile::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgb(10 10 10 / 0.88) 0%, rgb(10 10 10 / 0.55) 36%, transparent 64%); }
 .bento-tile__label { position: absolute; left: 20px; right: 20px; bottom: 18px; z-index: 1; display: grid; gap: 4px; }
-.bento-tile__label strong { font-family: var(--f-head); font-weight: 800; font-size: 26px; text-transform: uppercase; line-height: 1; letter-spacing: 0.01em; }
+.bento-tile__label strong { font-family: var(--f-head); font-weight: 800; font-size: 26px; text-transform: uppercase; line-height: 1; letter-spacing: 0.01em; overflow-wrap: anywhere; hyphens: auto; }
+/* Schmale Fenster (320 bis 359 px): die Kachel ist nur etwa 140 px breit, „Accessoires“ passt sonst nicht in die Zeile (WCAG 1.4.10) */
+@media (max-width: 359px) {
+  .bento-tile__label { left: 12px; right: 12px; }
+  .bento-tile__label strong { font-size: 22px; }
+}
 /* Untertitel weiß (Kontrast auf Foto), der Pfeil trägt den orangen Akzent */
 .bento-tile__label span { display: inline-flex; align-items: center; gap: 6px; color: var(--c-offwhite); font-weight: 600; font-size: var(--fs-small); }
 .bento-tile__label span .icon { width: 16px; height: 16px; color: var(--c-orange); transition: transform var(--t-fast); }
@@ -208,23 +178,18 @@ html:not(.has-motion) .marquee__item { white-space: normal; overflow-wrap: anywh
 
 /* ---------- Story & Events ---------- */
 /* Teil Story; die Event-Regeln stehen weiter in sections.css (geteilt mit Service-Seite und Blog) */
-/* Event-Raster: eine Spalte, drei erst ab 900 px (überschreibt sections.css:10, M6 räumt auf). Bei drei Spalten ab 640 px
-   blieben den Textspalten nur 110 bis 197 px, der Titel brach in bis zu sechs Zeilen. Spalten dürfen schrumpfen (Reflow
-   bei 200 % Zoom), lange Titel brechen um. */
-.event-grid { grid-template-columns: minmax(0, 1fr); }
-@media (min-width: 900px) { .event-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-/* Zwischen 640 und 899 px liegt eine Karte mit Bild als Zeile (Bild links): als Einzelspalte wäre jedes Bild über 400 px hoch */
+/* Event-Raster: siehe sections.css. Zwischen 640 und 899 px liegt eine Karte mit Bild als Zeile (Bild links): als Einzelspalte wäre jedes Bild über 400 px hoch */
 @media (min-width: 640px) and (max-width: 899px) {
   .event-card:not(.event-card--text) { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); align-items: center; }
 }
 .event-card__body :is(h2, h3) { overflow-wrap: anywhere; hyphens: auto; }
 .story { display: grid; gap: 32px; align-items: center; }
 @media (min-width: 1024px) { .story { grid-template-columns: 1fr 1fr; gap: 64px; } .story--text { grid-template-columns: minmax(0, 1fr); max-width: 760px; } }
-.story__media { position: relative; aspect-ratio: 980 / 807; overflow: hidden; background: #000; }
+.story__media { position: relative; aspect-ratio: 980 / 807; overflow: hidden; background: var(--c-pure-black); }
 .story__media img { width: 100%; height: calc(100% - 16px); object-fit: contain; object-position: top center; }
 .story__media::after { content: ""; position: absolute; left: 0; bottom: 0; width: 96px; height: 6px; background: var(--c-orange); }
 .story__text { display: grid; gap: 20px; }
-.story__text p { color: #d6d2cb; }
+.story__text p { color: var(--c-on-dark); }
 .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding-block: 8px; border-top: 1px solid var(--c-steel); border-bottom: 1px solid var(--c-steel); }
 .stats div { padding-block: 16px; }
 .stats strong { display: block; font-family: var(--f-head); font-weight: 800; font-size: 40px; line-height: 1; color: var(--c-white); }

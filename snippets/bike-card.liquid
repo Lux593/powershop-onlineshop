@@ -1,9 +1,10 @@
 {% doc %}
-  Karte für ein Motorrad (Markup wie im Mockup: .bcard). Daten aus den Metafeldern bike.*.
+  Karte für ein Motorrad (.bcard). Daten aus den Metafeldern bike.*.
   Motorräder sind nie kaufbar: Die Karte führt nur zu Details und zur Anfrage.
 
   @param {product} product - Produkt mit Metafeldern bike.*
   @param {string} [sizes] - sizes-Attribut für das Bild
+  @param {string} [loading] - "lazy" (Standard) oder "eager" (Erstblick, mögliches LCP-Element)
   @param {boolean} [reveal] - Karte blendet beim Scrollen ein (data-reveal, Stagger über die Spalte in shop.css)
 
   @example
@@ -23,6 +24,7 @@
   assign tax = product.metafields.bike.besteuerung.value
   assign from_price = product.metafields.bike.ab_preis.value
   assign img_sizes = sizes | default: '(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw'
+  assign img_loading = loading | default: 'lazy'
 
   comment
     Fehlende Angaben nicht als Tatsache zeigen: ohne Kilometerstand zeigen Neufahrzeuge 0 km, Gebrauchte „auf Anfrage“.
@@ -41,7 +43,7 @@
 <article class="bcard{% if status == 'reserviert' %} is-reserved{% endif %}" data-product-id="{{ product.id }}" data-zustand="{{ zustand }}"{% if reveal %} data-reveal{% endif %}>
   <a class="bcard__media" href="{{ product.url }}" tabindex="-1" aria-hidden="true">
     {%- if product.featured_image -%}
-      {{ product.featured_image | image_url: width: 1200 | image_tag: alt: '', loading: 'lazy', sizes: img_sizes, widths: '400, 600, 800, 1200', onload: "this.classList.add('is-loaded')" }}
+      {{ product.featured_image | image_url: width: 1200 | image_tag: alt: '', loading: img_loading, sizes: img_sizes, widths: '400, 600, 800, 1200', onload: "this.classList.add('is-loaded')" }}
     {%- endif -%}
     {%- render 'bike-badge', zustand: zustand, status: status -%}
   </a>

@@ -43,13 +43,20 @@ nur für Tests in ein separates, nicht verbundenes Theme nötig.
 
 ```
 layout/     theme.liquid · password.liquid
-templates/  index · collection (+ .motorrad) · product (+ .motorrad, .teil) · page (+ .service) · cart · search · blog · article · 404
-sections/   hero · service-tiles · product-tabs · category-bento · showroom · story-events · header · footer · collection · product · cart-drawer …
-snippets/   Karten, Preis, Galerie, Megamenü, Filter, Größentabelle, Bild-Snippet `media` …
+templates/  index · collection (+ .motorrad) · product (+ .motorrad, .teil) · page (+ .service) · cart · search · blog · article ·
+            list-collections · 404 · password · gift_card
+sections/   Startseite: hero · service-tiles · product-tabs · statement · category-bento · showroom · story-events
+            Shop: collection · collections · product · cart · cart-drawer · search · predictive-search
+            Seiten: page · service-page · blog · article · 404 · password
+            Rahmen: header · announcement-bar · footer, dazu header-group.json und footer-group.json
+snippets/   Karten (product-card, bike-card, result-card, event-card, bento-tile), Produktseite (pdp-gallery, pdp-buy, pdp-sticky-buy,
+            pdp-usp, pdp-shipping, pdp-gpsr, size-guide, swatch, rating, price), Shop-Bausteine (results-toolbar, filter-controls,
+            active-filters, pagination, cart-line, contact-box, search-dialog, mega-menu, accordion), Kleinteile (icon, icons-sprite,
+            media, is-placeholder, number-de, opening-hours, payments, bike-badge), Kopfbereich (meta-tags, fonts)
 assets/     CSS, JS, Bilder, Videos, Schriften (flach, Shopify kennt keine Unterordner in assets/), Details unten
 config/     settings_schema.json · settings_data.json
 locales/    de.default.json
-docs/       Briefing, Bildliste, Freigabeliste, Motion-API, Hero-Clip, Auftrag Motion
+docs/       Briefing, Bildliste, Freigabeliste, Händlerfragen, Motion-API, Hero-Clip, Auftrag Motion
 pics_to_use/ Quellbilder für Kategorien und Team
 ```
 
@@ -58,20 +65,24 @@ pics_to_use/ Quellbilder für Kategorien und Team
 | Datei | Inhalt |
 |---|---|
 | `tokens.css` · `base.css` · `components.css` | Design-Tokens, Reset und Typografie, wiederverwendbare Bausteine (Karten, Buttons, Tabs, Schienen) |
-| `sections.css` | geteilte Reste: Events, Service-Seite |
+| `sections.css` | geteilte Reste: Events (Raster, Karten), Service-Seite |
 | `theme.css` | Ergänzungen fürs Shopify-Theme, Kontrastmodus (`forced-colors`) für gewählte Zustände |
-| `motion.css` · `motion.js` | Motion-Schicht: Einblenden beim Scrollen, Wort-Splitter, Zahlen-Zählen, Lauftext, Parallax, weiches Scrollen |
-| `gsap.min.js` · `ScrollTrigger.min.js` · `lenis.min.js` | Bibliotheken der Motion-Schicht, self-hosted, nur auf Startseite, Kollektion und Produkt |
+| `motion.css` · `motion.js` | Motion-Schicht: Einblenden beim Scrollen, Wort-Splitter, Zahlen-Zählen, Parallax, weiches Scrollen |
+| `gsap.min.js` · `ScrollTrigger.min.js` | Bibliotheken der Motion-Schicht (Scrub, Parallax), self-hosted, nur auf der Startseite |
+| `lenis.min.js` | weiches Scrollen, self-hosted, lädt nach (Head-Skript plus `motion.js`), nur auf Startseite, Kollektion und Produkt und nur für Maus und Trackpad |
 | `header.css` · `header.js` | Ankündigungsleiste, Header, Megamenü, Mobile-Menü, Such-Dialog |
-| `hero.css` · `hero.js` | Hero mit Modell-Tabs (`hero.js` lädt nur auf der Startseite) |
+| `hero.css` · `hero.js` | Hero mit Modell-Tabs (beide laden nur auf der Startseite) |
 | `home.css` · `home.js` | Startseiten-Bereiche: Service-Leiste, Produkt-Tabs, Kategorie-Bento, Showroom, Story |
-| `footer.css` | Footer und Cookie-Banner |
+| `footer.css` | Footer |
 | `shop.css` | Kategorieseite, Produktseite, Warenkorb und Drawer |
-| `theme.js` · `cart.js` · `search.js` · `contact.js` · `sections.js` | JS-Module auf allen Seiten: Kern (Dialoge, Tabs), Warenkorb, Suche, Kontakt-Box, Showroom und Quick-Add |
+| `theme.js` · `header.js` · `cart.js` · `sections.js` | JS-Module auf allen Seiten: Kern (Dialoge, Tabs), Header, Warenkorb, Showroom und Quick-Add |
+| `search.js` | Suchvorschläge, lädt erst beim ersten Öffnen des Such-Dialogs nach |
+| `contact.js` | Kontakt-Box, lädt auf Produkt- und Seiten-Templates (im Theme-Editor immer) |
 | `collection.js` · `product.js` | JS nur auf Kollektion und Suche bzw. Produktseite |
 | `*.jpg` · `*.png` · `*.webp` · `*.mp4` · `*.webm` · `*.woff2` | Bilder, Videos und Schriften ([`docs/bildliste.md`](docs/bildliste.md), [`docs/hero-clip.md`](docs/hero-clip.md)) |
 
-Alle CSS-Dateien laden auf jeder Seite, die Reihenfolge in `layout/theme.liquid` ist die Kaskade. Welche Klasse in welcher Datei liegt
+Alle CSS-Dateien laden auf jeder Seite des Shops, die Reihenfolge in `layout/theme.liquid` ist die Kaskade (Passwortseite und Geschenkgutschein laden nur
+sechs davon). Farben stehen nur in `tokens.css`, die übrigen Stylesheets verwenden Tokens. Welche Klasse in welcher Datei liegt
 und was beim Ändern geteilter Klassen zu beachten ist, steht in [`docs/motion-api.md`](docs/motion-api.md) unter „Dateiaufteilung“.
 
 ## Bewegung
@@ -95,9 +106,23 @@ Firmenname, Adresse, Telefon, WhatsApp, E-Mail und Ansprechperson haben **keine 
 unsichtbar: Die Kontaktbox zeigt nur Kanäle, die eingetragen sind, und erscheint ohne jeden Kanal gar nicht (im Theme-Editor steht dann
 ein Hinweis). Die Öffnungszeiten erscheinen erst, wenn **„Öffnungszeiten anzeigen“** eingeschaltet ist. Ohne Firmenname steht im Footer der Shop-Name.
 
-Versandschwelle, Versandkosten, Lieferzeit, Rückgabefrist, Reservierung, Newsletter-Rabatt und Zahlarten haben noch **Beispielwerte** und
-erscheinen so im Shop (Ankündigungsleiste, Produktseiten, Warenkorb, Newsletter, Bike-Seite). Vor dem Livegang prüfen und anpassen.
-Ein leerer oder 0-Wert erzeugt im Shop keine Aussage („ab 0 €“ oder „ Tage Rückgabe“ stehen nie dort).
+Diese Einstellungen haben noch **Beispielwerte** und erscheinen so im Shop (Ankündigungsleiste, Produktseiten, Warenkorb, Newsletter, Bike-Seite).
+Vor dem Livegang prüfen und anpassen:
+
+| Einstellung | Beispielwert |
+|---|---|
+| Versandkostenfrei ab | 100 € |
+| Versandkosten darunter | 4,95 € |
+| Lieferzeit | 2–4 Werktage |
+| Freiwillige Rückgabefrist | 30 Tage |
+| Reservierungsgebühr Gebrauchtfahrzeug | 250 € |
+| Reservierung gilt | 48 Stunden |
+| Newsletter-Rabatt | 10 % |
+| Zahlarten | PayPal, Klarna, Visa, Mastercard, Apple Pay, Google Pay |
+| Öffnungszeiten (erscheinen erst mit „Öffnungszeiten anzeigen“) | Mo bis Fr 9 bis 18 Uhr, Sa 9 bis 14 Uhr |
+
+Ein leerer oder 0-Wert erzeugt im Shop keine Aussage („ab 0 €“ oder „ Tage Rückgabe“ stehen nie dort). Dazu kommen Beispieltexte in den
+Templates (Kennzahlen, Events, Hero-Modelle mit Preisen, Service-Texte): sie stehen mit Fundstelle in der Freigabeliste.
 
 Alles, was der Händler freigeben muss (diese Werte, kontakt- und rechtsrelevante Texte, Kennzahlen, Events, Zusicherungen, Bildrechte), steht mit
 Fundstelle in [`docs/freigaben.md`](docs/freigaben.md).
@@ -114,6 +139,10 @@ Motiv und Format stehen in [`docs/bildliste.md`](docs/bildliste.md).
 Dateien, die noch Platzhalter sind, stehen in den Theme-Einstellungen unter **Platzhalterbilder**. Im Shop bleiben sie unsichtbar
 (im Theme-Editor sind sie zu sehen). **Nach dem Austausch den Dateinamen aus dieser Liste streichen**, sonst bleibt das neue Foto ausgeblendet.
 Ein im Theme-Editor gewähltes Bild hat immer Vorrang und braucht keinen Eintrag.
+
+Die Hero-Fotos liegen als `assets/hero-ride-road.jpg`, `hero-ride-street.jpg` und `hero-ride-cvo.jpg`, das Teamfoto als `assets/powershop-team.webp`
+(Quelle: `pics_to_use/powershop-team.png`). Ein Ersatz darf eine andere Dateiendung haben, dann den Dateinamen in der Section (`image_asset`) und in
+`templates/index.json` anpassen.
 
 Das H-D Bar & Shield liegt als `assets/hd-bar-shield.png`: 190 × 154 px mit transparentem Hintergrund, rund das 2,75-Fache der größten
 Darstellung (Footer, ca. 69 × 56 px). Das ist scharf für 2-fache Displays und auf 3-fachen (bräuchten ca. 207 px) minimal weich.
