@@ -13,13 +13,13 @@
     {%- if collections.size > 0 or pages.size > 0 or articles.size > 0 -%}
       <div class="search__list">
         {%- for item in collections limit: 4 -%}
-          <a href="{{ item.url }}"><span class="search__name">{{ item.title }}</span></a>
+          <a href="{{ item.url }}"><span class="search__name">{{ item.title | escape }}</span></a>
         {%- endfor -%}
         {%- for item in pages limit: 3 -%}
-          <a href="{{ item.url }}"><span class="search__name">{{ item.title }}</span></a>
+          <a href="{{ item.url }}"><span class="search__name">{{ item.title | escape }}</span></a>
         {%- endfor -%}
         {%- for item in articles limit: 3 -%}
-          <a href="{{ item.url }}"><span class="search__name">{{ item.title }}</span></a>
+          <a href="{{ item.url }}"><span class="search__name">{{ item.title | escape }}</span></a>
         {%- endfor -%}
       </div>
     {%- else -%}
@@ -39,11 +39,11 @@
               <span style="width:48px;height:60px;flex:none;background:var(--c-stone)"></span>
             {%- endif -%}
             <span>
-              <span class="search__name">{{ product.title }}</span><br>
+              <span class="search__name">{{ product.title | escape }}</span><br>
               <span class="search__meta">
-                {%- if product.type != blank %}{{ product.type }} · {% endif -%}
+                {%- if product.type != blank %}{{ product.type | escape }} · {% endif -%}
                 {%- assign sku = product.selected_or_first_available_variant.sku -%}
-                {%- if sku != blank %}Art.-Nr. {{ sku }} · {% endif -%}
+                {%- if sku != blank %}Art.-Nr. {{ sku | escape }} · {% endif -%}
                 {%- if product.type == 'Motorrad' -%}
                   ab {{ product.price | money_without_trailing_zeros }}
                 {%- else -%}

@@ -2,8 +2,9 @@
   Megamenü-Inhalt für einen Hauptmenüpunkt.
   Aufbau aus der Shopify-Navigation:
   - Ebene 2 mit Unterpunkten = Spalte mit Überschrift, Ebene 3 = Links
-  - Sind alle Links einer Spalte Kollektionen mit Bild, erscheinen sie als Bild-Kacheln
-  - Ebene 2 ohne Unterpunkte = eine gemeinsame Link-Spalte
+  - Sind alle Links einer Spalte Kollektionen mit Bild, erscheinen sie als Bild-Kacheln; fehlt auch nur einem Link das Bild, bleibt es eine Textliste
+  - Ebene 2 ohne Unterpunkte, solange andere Spalten Unterpunkte haben = schmale Spalte mit dem Titel als Link
+  - Hat keine Ebene-2-Position Unterpunkte, bilden alle zusammen eine gemeinsame Link-Spalte
   Teaser, Kontaktspalte und Aufruf-Zeile kommen als Blöcke aus dem Header.
 
   @param {object} link - Hauptmenüpunkt
@@ -17,9 +18,17 @@
   for group in link.links
     if group.links.size > 0
       assign has_groups = true
-      assign first_child = group.links.first
-      if first_child.object.image != blank and tile_group_index == -1
-        assign tile_group_index = forloop.index0
+      if tile_group_index == -1
+        assign all_tiles = true
+        for child in group.links
+          if child.object.image == blank
+            assign all_tiles = false
+            break
+          endif
+        endfor
+        if all_tiles
+          assign tile_group_index = forloop.index0
+        endif
       endif
     endif
   endfor
@@ -59,7 +68,9 @@
   assign grid = ''
   if has_groups
     for group in link.links
-      if forloop.index0 == tile_group_index
+      if group.links.size == 0
+        assign grid = grid | append: ' auto'
+      elsif forloop.index0 == tile_group_index
         assign grid = grid | append: ' 1fr'
       elsif tile_group_index > -1
         assign grid = grid | append: ' 220px'
@@ -82,23 +93,32 @@
   {%- if has_groups -%}
     {%- for group in link.links -%}
       <div>
-        <p class="mega__title">{{ group.title }}</p>
-        {%- if forloop.index0 == tile_group_index -%}
-          <div class="mega__families">
+        {%- if group.links.size == 0 -%}
+          <p class="mega__title"><a href="{{ group.url }}">{{ group.title | escape }}</a></p>
+        {%- else -%}
+          <p class="mega__title">{{ group.title | escape }}</p>
+        {%- endif -%}
+        {%- if group.links.size == 0 -%}
+          {%- comment -%} Ohne Unterpunkte steht nur der Titel als Link, kein leeres Listenelement {%- endcomment -%}
+        {%- elsif forloop.index0 == tile_group_index -%}
+          {%- comment -%} Spalten nach Kachelzahl: bis drei nebeneinander, vier als 2 x 2, mehr in Dreierzeilen {%- endcomment -%}
+          {%- assign tile_cols = group.links.size | at_most: 3 -%}
+          {%- if group.links.size == 4 -%}{%- assign tile_cols = 2 -%}{%- endif -%}
+          <div class="mega__families" style="--tile-cols: {{ tile_cols }}">
             {%- for child in group.links -%}
               <a class="mega-tile" href="{{ child.url }}">
                 {%- render 'media', image: child.object.image, width: 600, height: 400, sizes: '(min-width: 1024px) 200px, 50vw' -%}
-                <span>{{ child.title }}</span>
+                <span>{{ child.title | escape }}</span>
               </a>
             {%- endfor -%}
           </div>
         {%- else -%}
           <ul class="mega__links{% if group.links.size > 7 %} mega__links--2col{% endif %}">
             {%- for child in group.links -%}
-              <li><a href="{{ child.url }}">{{ child.title }}</a></li>
+              <li><a href="{{ child.url }}">{{ child.title | escape }}</a></li>
             {%- endfor -%}
             {%- if forloop.first -%}
-              <li><a class="is-strong" href="{{ link.url }}">Alle {{ link.title }}</a></li>
+              <li><a class="is-strong" href="{{ link.url }}">Alle {{ link.title | escape }}</a></li>
             {%- endif -%}
           </ul>
         {%- endif -%}
@@ -106,10 +126,10 @@
     {%- endfor -%}
   {%- else -%}
     <div>
-      <p class="mega__title">{{ link.title }}</p>
+      <p class="mega__title">{{ link.title | escape }}</p>
       <ul class="mega__links">
         {%- for child in link.links -%}
-          <li><a href="{{ child.url }}">{{ child.title }}</a></li>
+          <li><a href="{{ child.url }}">{{ child.title | escape }}</a></li>
         {%- endfor -%}
       </ul>
     </div>
@@ -120,10 +140,10 @@
       <p class="mega__title">{{ contact_block.settings.title }}</p>
       <ul class="mega__links">
         {%- if settings.phone != blank -%}
-          <li><a href="tel:{{ settings.phone | remove: ' ' }}">{% render 'icon', name: 'phone', class: 'icon--sm' %}&nbsp;{{ settings.phone }}</a></li>
+          <li><a href="{% render 'contact-href', kind: 'tel' %}">{% render 'icon', name: 'phone', class: 'icon--sm' %}&nbsp;{{ settings.phone | escape }}</a></li>
         {%- endif -%}
         {%- if settings.email != blank -%}
-          <li><a href="mailto:{{ settings.email }}">{% render 'icon', name: 'mail', class: 'icon--sm' %}&nbsp;{{ settings.email }}</a></li>
+          <li><a href="{% render 'contact-href', kind: 'mail' %}">{% render 'icon', name: 'mail', class: 'icon--sm' %}&nbsp;{{ settings.email | escape }}</a></li>
         {%- endif -%}
         {%- render 'opening-hours', as: 'mega-links' -%}
       </ul>

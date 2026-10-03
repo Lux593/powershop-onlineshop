@@ -17,8 +17,10 @@
 
     function query() {
       var q = input.value.trim();
+      // Eine laufende Anfrage endet mit dem Begriff: Ihre Antwort käme sonst nach dem Leeren des Feldes und zeigte Treffer zu einem
+      // Begriff, der nicht mehr im Feld steht
+      if (controller) { controller.abort(); controller = null; }
       if (!q) { render(start); return; }
-      if (controller) controller.abort();
       controller = new AbortController();
       var url = PS.routes.predictiveSearch +
         '?q=' + encodeURIComponent(q) +

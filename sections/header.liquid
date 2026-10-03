@@ -36,7 +36,7 @@
               href="{{ link.url }}"
               {% if link.active or link.child_active %}aria-current="page"{% endif %}
             >
-              {{- link.title -}}
+              {{- link.title | escape -}}
             </a>
             {%- if has_children -%}
               <button
@@ -44,7 +44,7 @@
                 type="button"
                 aria-expanded="false"
                 aria-controls="mega-{{ link.handle }}"
-                aria-label="Untermenü {{ link.title }}"
+                aria-label="Untermenü {{ link.title | escape }}"
               >
                 {% render 'icon', name: 'chevron-down' %}
               </button>
@@ -82,23 +82,23 @@
     {%- for link in menu.links -%}
       {%- if link.links.size > 0 -%}
         <details class="acc">
-          <summary>{{ link.title }}{% render 'icon', name: 'plus' %}</summary>
+          <summary>{{ link.title | escape }}{% render 'icon', name: 'plus' %}</summary>
           <div class="acc__body">
             <a href="{{ link.url }}"><strong>Alle anzeigen</strong></a>
             {%- for child in link.links -%}
               {%- if child.links.size > 0 -%}
                 {%- for grandchild in child.links -%}
-                  <a href="{{ grandchild.url }}">{{ grandchild.title }}</a>
+                  <a href="{{ grandchild.url }}">{{ grandchild.title | escape }}</a>
                 {%- endfor -%}
               {%- else -%}
-                <a href="{{ child.url }}">{{ child.title }}</a>
+                <a href="{{ child.url }}">{{ child.title | escape }}</a>
               {%- endif -%}
             {%- endfor -%}
           </div>
         </details>
       {%- else -%}
         <a class="mobile-menu__direct{% if link.handle == 'sale' %} mobile-menu__direct--sale{% endif %}" href="{{ link.url }}">
-          {{- link.title }}{% render 'icon', name: 'arrow-right' -%}
+          {{- link.title | escape }}{% render 'icon', name: 'arrow-right' -%}
         </a>
       {%- endif -%}
     {%- endfor -%}
@@ -107,7 +107,7 @@
         <a href="{{ routes.account_url }}">{% render 'icon', name: 'user' %}Kundenkonto</a>
       {%- endif -%}
       {%- if settings.phone != blank -%}
-        <a href="tel:{{ settings.phone | remove: ' ' }}">{% render 'icon', name: 'phone' %}{{ settings.phone }}</a>
+        <a href="{% render 'contact-href', kind: 'tel' %}">{% render 'icon', name: 'phone' %}{{ settings.phone | escape }}</a>
       {%- endif -%}
       <div class="mobile-menu__hd">
         <img src="{{ 'hd-bar-shield.png' | asset_url }}" alt="" width="49" height="40">
