@@ -1,0 +1,20 @@
+{% doc %}
+  Linkziel eines Kontaktkanals aus den Theme-Einstellungen (Händlerdaten). Die Werte sind freie Texte: Hier werden sie für
+  das Attribut abgesichert und vereinheitlicht, damit ein Leerzeichen, ein Anführungszeichen oder ein „+“ den Link nicht
+  zerstört. Gibt nur die Adresse aus (ohne Anführungszeichen), der Aufrufer setzt sie in href="…".
+  Die gleiche Bereinigung macht assets/contact.js, wenn es die Links mit der Nachricht neu setzt.
+
+  @param {string} kind - "tel" (Telefon), "wa" (WhatsApp, ohne ?text) oder "mail" (E-Mail, ohne ?subject)
+
+  @example
+  <a href="{% render 'contact-href', kind: 'tel' %}">Anrufen</a>
+  <a href="{% render 'contact-href', kind: 'wa' %}?text={{ text | url_encode }}">WhatsApp</a>
+{% enddoc %}
+{%- case kind -%}
+  {%- when 'tel' -%}
+    tel:{{ settings.phone | remove: ' ' | remove: '-' | remove: '(' | remove: ')' | remove: '/' | remove: '.' | escape }}
+  {%- when 'wa' -%}
+    https://wa.me/{{ settings.whatsapp | remove: ' ' | remove: '+' | remove: '-' | remove: '(' | remove: ')' | remove: '/' | remove: '.' | url_encode }}
+  {%- when 'mail' -%}
+    mailto:{{ settings.email | remove: ' ' | escape }}
+{%- endcase -%}

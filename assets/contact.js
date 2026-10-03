@@ -23,8 +23,9 @@
     var ref = box.dataset.ref || window.location.href;
     var message = 'Hallo Power-Shop-Team, ' + topic.text(subject) + (ref ? '\n\n' + ref : '') + '\n\nViele Grüße';
     var subjectLine = topic.subj + (subject ? ': ' + subject : '');
-    var whatsapp = (PS.shop && PS.shop.whatsapp) || '';
-    var email = (PS.shop && PS.shop.email) || '';
+    // Händlerdaten sind freie Texte: WhatsApp nur Ziffern (wa.me erwartet die Nummer ohne +, Leerzeichen und Striche), E-Mail ohne Leerraum und kodiert
+    var whatsapp = String((PS.shop && PS.shop.whatsapp) || '').replace(/\D/g, '');
+    var email = encodeURIComponent(String((PS.shop && PS.shop.email) || '').replace(/\s/g, '')).replace('%40', '@');
 
     var wa = box.querySelector('[data-cb="wa"]');
     var mail = box.querySelector('[data-cb="mail"]');

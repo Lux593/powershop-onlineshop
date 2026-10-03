@@ -22,7 +22,6 @@
   assign box_id = anchor | default: 'kontakt'
   assign topic_list = topics | default: 'probefahrt,finanzierung,inzahlungnahme,frage' | split: ','
   assign active_topic = topic | default: topic_list.first
-  assign phone_href = settings.phone | remove: ' ' | remove: '-' | remove: '(' | remove: ')' | remove: '/'
 
   assign has_message_channel = false
   if settings.whatsapp != blank or settings.email != blank
@@ -84,15 +83,15 @@
 
     <div class="contact-box__buttons">
       {%- if settings.phone != blank -%}
-        <a class="btn btn--primary" data-cb="tel" href="tel:{{ phone_href }}">
-          {% render 'icon', name: 'phone' %}<span>Anrufen</span><span class="contact-box__phone hide-mobile">· {{ settings.phone }}</span>
+        <a class="btn btn--primary" data-cb="tel" href="{% render 'contact-href', kind: 'tel' %}">
+          {% render 'icon', name: 'phone' %}<span>Anrufen</span><span class="contact-box__phone hide-mobile">· {{ settings.phone | escape }}</span>
         </a>
       {%- endif -%}
       {%- if settings.whatsapp != blank -%}
-        <a class="btn btn--outline-dark" data-cb="wa" href="https://wa.me/{{ settings.whatsapp }}" target="_blank" rel="noopener">{% render 'icon', name: 'message-circle' %}WhatsApp</a>
+        <a class="btn btn--outline-dark" data-cb="wa" href="{% render 'contact-href', kind: 'wa' %}" target="_blank" rel="noopener">{% render 'icon', name: 'message-circle' %}WhatsApp</a>
       {%- endif -%}
       {%- if settings.email != blank -%}
-        <a class="btn btn--outline-dark" data-cb="mail" href="mailto:{{ settings.email }}">{% render 'icon', name: 'mail' %}E-Mail</a>
+        <a class="btn btn--outline-dark" data-cb="mail" href="{% render 'contact-href', kind: 'mail' %}">{% render 'icon', name: 'mail' %}E-Mail</a>
       {%- endif -%}
     </div>
     {%- if has_message_channel -%}
