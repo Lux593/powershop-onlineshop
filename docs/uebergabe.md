@@ -37,7 +37,7 @@ Im Theme-Editor kann pro Modell stattdessen ein eigener Film und ein Standbild g
 | JavaScript (Brotli) | 67,4 KiB | 62,2 KiB | 22 bis 27 KiB | 22 bis 28 KiB |
 | CLS | unter 0,004 | 0 | unter 0,004 | unter 0,004 |
 
-axe (WCAG 2.1 A/AA) in 42 Läufen ohne Verstoß; 181 Fixture-Tests, 10 Harness-Abläufe und `theme check` ohne Befund.
+axe (WCAG 2.1 A/AA) in 42 Läufen ohne Verstoß; 183 Fixture-Tests, 10 Harness-Abläufe und `theme check` ohne Befund.
 Das ursprüngliche Ziel von ca. 60 KB JavaScript auf der Startseite ist mit Maus und weichem Scrollen knapp verfehlt (GSAP, ScrollTrigger und Lenis machen ca. 46 KiB aus).
 
 ## Ladezeit mobil (Lighthouse): was gemessen wurde
