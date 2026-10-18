@@ -75,10 +75,37 @@
     PS.motion.track(film, function () { io.disconnect(); io = null; started = false; film.pause(); });
   }
 
+  /* ---------- Kategorie-Film mobil: Pause-Knopf ausblenden, sobald der Film hinter den Text rutscht (Ablauf per sticky in shop.css) ----------
+     Nur ein Schalter (.is-behind), das Ausblenden selbst ist eine CSS-Überblendung. Nicht, solange der Knopf den Fokus hat. */
+  function initBehind(text, frame, toggle) {
+    if (!PS.motion.enabled || !text || !toggle) return;
+    var mq = window.matchMedia('(max-width: 767px)');
+    var queued = false;
+    function update() {
+      queued = false;
+      var behind = mq.matches && toggle !== document.activeElement && frame.getBoundingClientRect().top < text.getBoundingClientRect().bottom;
+      toggle.classList.toggle('is-behind', behind);
+    }
+    function queue() { if (!queued) { queued = true; requestAnimationFrame(update); } }
+    window.addEventListener('scroll', queue, { passive: true });
+    window.addEventListener('resize', queue);
+    update();
+    // Bewegung zur Laufzeit abgeschaltet oder Section entfernt: Listener weg, Knopf wieder sichtbar
+    PS.motion.track(frame, function () {
+      window.removeEventListener('scroll', queue);
+      window.removeEventListener('resize', queue);
+      toggle.classList.remove('is-behind');
+    });
+  }
+
   PS.on('[data-collection]', function (root) {
     var sectionId = root.dataset.sectionId;
     var film = root.querySelector('[data-film]');
-    if (film) initFilm(film, root.querySelector('[data-film-toggle]'));
+    if (film) {
+      var toggle = root.querySelector('[data-film-toggle]');
+      initFilm(film, toggle);
+      initBehind(root.querySelector('.page-banner__text'), film.parentNode, toggle);
+    }
 
     var cols = null;
     var controller = null;
