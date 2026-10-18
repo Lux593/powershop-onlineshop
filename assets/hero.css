@@ -201,6 +201,13 @@
   .hero__actions { flex-wrap: wrap; gap: 8px; }
   .hero__actions .btn { min-height: 44px; padding: 6px 10px; font-size: 15px; letter-spacing: 0.04em; }
 }
+/* Handy hochkant: Die Modell-Tabs stehen unter dem Text statt darüber (nur optisch, im Markup bleibt die Tab-Liste vor den Panels).
+   Die Panels teilen sich weiter eine Zelle (siehe oben), nur Zeile 1 statt 2. */
+@media (scripting: enabled) and (max-width: 767px) and (min-height: 541px) {
+  .hero__content { row-gap: 18px; }
+  .hero__panel { grid-area: 1 / 1; }
+  .hero__chips { grid-area: 2 / 1; }
+}
 /* Niedrige Fenster (Handy im Querformat, Zoom): Der Text füllte mit Headline, Preis und Buttons das ganze Bild und der Hero war höher als das Fenster; die Pause-Taste
    (WCAG 2.2.2) lag unter dem Falz. Kleinere Headline und weniger Fuß, die Taste sitzt oben rechts unter dem Header und ist im ersten Bild erreichbar. */
 @media (max-height: 540px) {
