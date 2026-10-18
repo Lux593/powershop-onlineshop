@@ -13,9 +13,17 @@
   display: flex; flex-direction: column; justify-content: flex-end;
   min-height: calc(100vh - var(--hero-top));
   min-height: calc(100svh - var(--hero-top));
+  --hero-ui: 0px;
   overflow: clip;
   background: var(--c-black);
   color: var(--c-white);
+}
+/* Mobil liegen Browserleisten über dem unteren Rand (iOS 26: schwebende Leiste über dem Inhalt). Mit 100svh endete der Hero über
+   ihnen und darunter schien die helle nächste Section durch. Jetzt reicht er bis zur großen Viewport-Höhe (lvh), die Bildfläche läuft
+   unter der Leiste weiter. Text, Pfeil und Pause-Taste rücken um den Unterschied (--hero-ui = lvh − svh) nach oben und bleiben,
+   wo sie waren. Am Desktop sind lvh und svh gleich, dort ändert sich nichts. */
+@supports (height: 100lvh) {
+  .hero { --hero-ui: calc(100lvh - 100svh); min-height: calc(100lvh - var(--hero-top)); padding-bottom: var(--hero-ui); }
 }
 /* Header über dem Hero (body[data-header-overlay], nur Startseite): der Hero zieht unter den Header. header.js macht ihn oben transparent. */
 [data-header-overlay] #main > .shopify-section:first-child > .hero {
@@ -67,7 +75,7 @@
    bis über die Tabs so dunkel wie bisher dort, darüber läuft er aus und gibt den oberen Teil des Films frei. Auf kurzen Bildschirmen
    reicht der dunkle Teil wie bisher bis oben. */
 @media (max-width: 767px) and (min-height: 541px) {
-  .hero { --g-bottom: linear-gradient(0deg, rgb(10 10 10 / calc(var(--ov) * 1.6)) 0, rgb(10 10 10 / calc(var(--ov) * 1.4)) 170px, rgb(10 10 10 / calc(var(--ov) * 1.12)) 360px, rgb(10 10 10 / calc(var(--ov) * 0.55)) 440px, rgb(10 10 10 / calc(var(--ov) * 0.15)) 520px, transparent 600px); }
+  .hero { --g-bottom: linear-gradient(0deg, rgb(10 10 10 / calc(var(--ov) * 1.6)) 0, rgb(10 10 10 / calc(var(--ov) * 1.4)) calc(170px + var(--hero-ui)), rgb(10 10 10 / calc(var(--ov) * 1.12)) calc(360px + var(--hero-ui)), rgb(10 10 10 / calc(var(--ov) * 0.55)) calc(440px + var(--hero-ui)), rgb(10 10 10 / calc(var(--ov) * 0.15)) calc(520px + var(--hero-ui)), transparent calc(600px + var(--hero-ui))); }
 }
 .hero__veil { position: absolute; z-index: 3; inset: 0; background: var(--g-bottom); }
 @media (min-width: 768px) {
@@ -228,7 +236,7 @@
 .hero__pause {
   position: absolute; z-index: 6;
   right: max(var(--gutter), calc((100% - var(--container)) / 2 + var(--gutter)));
-  bottom: 24px;
+  bottom: calc(24px + var(--hero-ui));
   display: grid; place-items: center;
   width: 44px; height: 44px; padding: 0;
   color: var(--c-white); background: rgb(10 10 10 / 0.45);
@@ -241,7 +249,7 @@
 .hero__pause[aria-pressed="true"] .hero__pause-pause { display: none; }
 
 .hero__scroll {
-  position: absolute; z-index: 6; left: 50%; bottom: 16px; translate: -50% 0;
+  position: absolute; z-index: 6; left: 50%; bottom: calc(16px + var(--hero-ui)); translate: -50% 0;
   display: flex; flex-direction: column; align-items: center; gap: 8px;
   min-width: 44px; min-height: 44px; padding: 6px 12px;
   color: var(--c-offwhite);
@@ -263,6 +271,6 @@
 /* hero.js blendet den Pfeil beim Scrollen per Inline-Opacity aus: mit Tastaturfokus bleibt er sichtbar (WCAG 2.4.7). !important: schlägt das Inline-Style. */
 .hero__scroll:focus-visible { opacity: 1 !important; }
 @media (max-width: 767px), (max-height: 540px) {
-  .hero__scroll { bottom: 12px; }
+  .hero__scroll { bottom: calc(12px + var(--hero-ui)); }
   .hero__scroll-line { height: 24px; }
 }
