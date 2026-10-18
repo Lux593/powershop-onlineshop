@@ -195,5 +195,7 @@
 .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding-block: 8px; border-top: 1px solid var(--c-steel); border-bottom: 1px solid var(--c-steel); }
 .stats div { padding-block: 16px; }
 .stats strong { display: block; font-family: var(--f-head); font-weight: 800; font-size: 40px; line-height: 1; color: var(--c-white); }
+/* Ein Wort statt einer Zahl („Unzählige“) braucht in schmalen Fenstern weniger Größe, sonst liefen drei Spalten über */
+@media (max-width: 359px) { .stats strong { font-size: 32px; } }
 /* Nur die Beschriftung: die Spans im Count-up (strong > span, assets/motion.js) erben Größe und Farbe der Zahl */
 .stats div > span { font-size: var(--fs-small); color: var(--c-muted-dark); }

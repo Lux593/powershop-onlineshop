@@ -110,14 +110,14 @@
     "story": {
       "type": "story-events",
       "blocks": {
-        "years": { "type": "stat", "settings": { "value": "25+", "label": "Jahre Erfahrung" } },
-        "bikes": { "type": "stat", "settings": { "value": "300+", "label": "Bikes pro Jahr" } },
-        "shop": { "type": "stat", "settings": { "value": "1", "label": "Meisterwerkstatt" } },
+        "years": { "type": "stat", "settings": { "value": "45+", "label": "Jahre Erfahrung" } },
+        "masters": { "type": "stat", "settings": { "value": "2", "label": "Motorrad-Meister" } },
+        "friends": { "type": "stat", "settings": { "value": "Unzählige", "label": "Kunden & Freunde" } },
         "event_1": { "type": "event", "settings": { "date": "2026-10-11", "title": "Saisonabschluss-Ausfahrt", "place": "Start: Power Shop, 10:00 Uhr", "image_asset": "event-1.jpg", "url": "/pages/service#events" } },
         "event_2": { "type": "event", "settings": { "date": "2026-10-24", "title": "Bike Night & Custom Show", "place": "Power Shop Hof, ab 18:00 Uhr", "image_asset": "event-2.jpg", "url": "/pages/service#events" } },
         "event_3": { "type": "event", "settings": { "date": "2026-11-14", "title": "Winter-Check-Tag", "place": "Werkstatt, 09:00–14:00 Uhr", "image_asset": "event-3.jpg", "url": "/pages/service#events" } }
       },
-      "block_order": ["years", "bikes", "shop", "event_1", "event_2", "event_3"],
+      "block_order": ["years", "masters", "friends", "event_1", "event_2", "event_3"],
       "settings": {
         "image_asset": "powershop-team.webp",
         "image_alt": "Das Team vom Power Shop, acht Porträtfotos mit Name und Funktion: Gerhard Link, Ingrid Link, Richard Link, Falk Link, Franziska Link, Jürgen Scheurer, Aaron Klosterhuber und Jean-Nicolas Kibler",
