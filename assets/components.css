@@ -241,6 +241,8 @@
 /* ---------- Overlays: Dialog, Bottom-Sheet, Drawer ---------- */
 dialog { padding: 0; border: 0; color: var(--c-text); background: var(--c-white); max-width: none; max-height: none; }
 dialog::backdrop { background: rgba(10, 10, 10, 0.6); }
+/* Das Fenster selbst trägt den Startfokus (PS.openDialog): ohne Rahmen, die Knöpfe darin zeigen ihren Ring per Tab */
+dialog:focus, dialog:focus-visible { outline: none; }
 .modal { width: min(820px, calc(100% - 32px)); max-height: calc(100% - 64px); margin: auto; box-shadow: var(--shadow-lg); }
 .modal__inner { display: flex; flex-direction: column; max-height: inherit; }
 /* Ab 640 px ist max-height des Dialogs eine Prozentangabe (calc(100% - 64px)). Geerbt bezöge sie sich auf die automatische Höhe des Dialogs und fiele weg:

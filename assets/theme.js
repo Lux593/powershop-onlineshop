@@ -93,7 +93,16 @@
     if (!d) return;
     document.querySelectorAll('dialog[open]').forEach(function (o) { if (o !== d) o.close(); });
     lastTrigger = trigger || document.activeElement;
-    if (!d.open) d.showModal();
+    if (!d.open) {
+      d.showModal();
+      // Startfokus auf das Fenster selbst statt auf seinen ersten Knopf (meist „Schließen“): beim Öffnen kein Fokusrahmen, auch nicht
+      // nach einem Tippen in iOS. Tab führt wie gewohnt zum ersten Knopf. Ein Element mit autofocus (Lightbox) hat Vorrang, die Suche
+      // setzt ihr Feld per ps:open.
+      if (!d.querySelector('[autofocus]')) {
+        d.tabIndex = -1;
+        d.focus({ preventScroll: true });
+      }
+    }
     document.body.classList.add('is-locked');
     lenis('stop');
     lazyScript(d);
