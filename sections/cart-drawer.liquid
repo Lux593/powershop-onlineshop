@@ -45,7 +45,7 @@
       {%- endfor -%}
     </div>
 
-    <div class="drawer__foot">
+    <div class="drawer__foot on-dark">
       <div class="subtotal"><span>Zwischensumme</span><strong>{{ cart.total_price | money }}</strong></div>
       <p class="caption muted">
         inkl. MwSt., zzgl.
@@ -56,7 +56,7 @@
       <form action="{{ routes.cart_url }}" method="post">
         <button class="btn btn--primary btn--block" type="submit" name="checkout">Zur Kasse {% render 'icon', name: 'arrow-right' %}</button>
       </form>
-      <button class="btn btn--outline-dark btn--block" type="button" data-close>Weiter einkaufen</button>
+      <button class="btn btn--outline-light btn--block" type="button" data-close>Weiter einkaufen</button>
     </div>
   {%- endif -%}
 </dialog>
