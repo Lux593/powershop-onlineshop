@@ -105,16 +105,23 @@
         </a>
       {%- endif -%}
     {%- endfor -%}
-    {%- if shop.customer_accounts_enabled or settings.phone != blank -%}
-      <div class="mobile-menu__foot">
-        {%- if shop.customer_accounts_enabled -%}
-          <a class="btn btn--outline-light btn--block" href="{{ routes.account_url }}">{% render 'icon', name: 'user' %}Kundenkonto</a>
-        {%- endif -%}
-        {%- if settings.phone != blank -%}
-          <a href="{% render 'contact-href', kind: 'tel' %}">{% render 'icon', name: 'phone' %}{{ settings.phone | escape }}</a>
-        {%- endif -%}
-      </div>
-    {%- endif -%}
+    <div class="mobile-menu__foot">
+      {%- if shop.customer_accounts_enabled -%}
+        <a class="btn btn--outline-light btn--block" href="{{ routes.account_url }}">{% render 'icon', name: 'user' %}Kundenkonto</a>
+      {%- endif -%}
+      <a class="btn btn--primary btn--block" href="/pages/service#probefahrt">{% render 'icon', name: 'route' %}Probefahrt anfragen</a>
+      {%- if settings.address != blank -%}
+        {%- assign map_query = settings.address | newline_to_br | replace: '<br />', ', ' | strip_html | url_encode -%}
+        <a class="mobile-menu__place" href="https://www.google.com/maps/search/?api=1&query={{ map_query }}" target="_blank" rel="noopener">
+          {% render 'icon', name: 'map-pin' %}
+          <span>
+            <strong>Standort</strong>
+            {{ settings.address | escape | newline_to_br }}
+            <span class="mobile-menu__route">Route in Google Maps<span class="sr-only"> (neues Fenster)</span></span>
+          </span>
+        </a>
+      {%- endif -%}
+    </div>
   </div>
 </dialog>
 
