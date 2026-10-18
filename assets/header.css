@@ -157,7 +157,10 @@ html:not(:has(.announce)) { --announce-h: 0px; }
    sonst drückt das Feld den Knopf bei 360 px auf 14 px und bei 320 px ganz aus dem Dialog. Der lange Platzhalter endet mit „…“. */
 .search__bar .icon-btn { flex: none; }
 .search__input { flex: 1; min-width: 0; min-height: 56px; border: 0; border-bottom: 2px solid var(--c-black); background: transparent; font-size: 22px; padding: 0 4px; text-overflow: ellipsis; }
-@media (max-width: 479px) { .search__input { font-size: 18px; } }
+/* Mobil: 16 px ist die kleinste Größe, bei der iOS beim Antippen nicht in die Seite zoomt. Der Hinweistext passt so ab 360 px
+   ganz ins Feld, darunter mit engerem Abstand und 15 px nur für den Hinweis (das Feld selbst bleibt 16 px). */
+@media (max-width: 479px) { .search__input { font-size: 16px; } }
+@media (max-width: 359px) { .search__bar { gap: 8px; } .search__input::placeholder { font-size: 15px; } }
 .search__input:focus { outline: none; border-bottom-color: var(--c-orange); }
 .search__input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
 .search__results { display: grid; gap: 32px; padding-bottom: 32px; max-height: 70vh; overflow: auto; }
