@@ -9,7 +9,7 @@
   assign pct = pct | at_most: 100
 -%}
 
-<dialog class="drawer" id="cart-drawer" aria-labelledby="cart-title" data-cart-drawer data-lenis-prevent>
+<dialog class="drawer drawer--cart" id="cart-drawer" aria-labelledby="cart-title" data-cart-drawer data-lenis-prevent>
   <div class="drawer__head">
     <h2 class="h4 drawer__title" id="cart-title"><img class="drawer__hd" src="{{ 'hd-bar-shield.png' | asset_url }}" alt="" width="49" height="40">Warenkorb ({{ cart.item_count }})</h2>
     <button class="icon-btn" type="button" data-close aria-label="Warenkorb schließen">{% render 'icon', name: 'x' %}</button>
@@ -56,8 +56,10 @@
       <form action="{{ routes.cart_url }}" method="post">
         <button class="btn btn--primary btn--block" type="submit" name="checkout">Zur Kasse {% render 'icon', name: 'arrow-right' %}</button>
       </form>
-      <button class="btn btn--text" type="button" data-close style="justify-self:center">Weiter einkaufen</button>
-      {% render 'payments', style: 'justify-content:center', light: true %}
+      <div class="drawer__more">
+        <button class="btn btn--text" type="button" data-close>Weiter einkaufen</button>
+        {% render 'payments', light: true %}
+      </div>
     </div>
   {%- endif -%}
 </dialog>
