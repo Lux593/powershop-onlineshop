@@ -303,7 +303,6 @@ body.has-sticky-contact { padding-bottom: 72px; }
 .drawer--cart .subtotal strong { font-size: 22px; }
 .drawer--cart .drawer__foot .caption { margin-top: -6px; }
 .drawer__more { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.drawer__more .btn--text { min-height: 40px; }
 .drawer__more .payments { justify-content: flex-end; }
 .drawer__empty { display: grid; gap: 16px; justify-items: center; text-align: center; padding: 48px 8px; color: var(--c-muted); }
 .drawer__empty .icon { width: 40px; height: 40px; }
