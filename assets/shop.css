@@ -361,6 +361,10 @@ html:not(.has-motion) .bcard:hover .bcard__media img { transform: none; }
   outline: 2px solid var(--c-black); outline-offset: 2px;
   box-shadow: 0 0 0 2px var(--c-white), 0 2px 8px rgba(0, 0, 0, 0.15);
 }
+/* Nach Maus oder Finger ohne Ring (base.css, html.is-pointer): auch die gezeichneten Ringe aus box-shadow */
+html.is-pointer .pcard__plus:focus-visible, html.is-pointer .gallery__zoom:focus-visible { outline-color: transparent; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); }
+html.is-pointer .pcard:has(.pcard__title a:focus-visible) .pcard__media::after,
+html.is-pointer .gallery__main:has(.gallery__track:focus-visible)::after { box-shadow: none; }
 .pcard__plus .icon { transition: transform var(--t-med) var(--ease-out); }
 @media (hover: none), (max-width: 1023px) {
   .pcard__quick { visibility: hidden; }

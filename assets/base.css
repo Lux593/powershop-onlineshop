@@ -84,6 +84,9 @@ h4, .h4 { font-size: var(--fs-h4); letter-spacing: 0.03em; }
 /* Fokusring: schwarz auf hellem, orange auf dunklem Grund. Die Variable vererbt sich,
    so erfasst jede schwarze Fläche (Header, Menü, Lightbox, Sticky-Kontakt) den Ring. */
 :focus-visible { outline: 2px solid var(--focus-ring, var(--c-black)); outline-offset: 3px; }
+/* Nach Maus oder Finger keine Ringe (theme.js setzt html.is-pointer), per Tastatur bleiben sie. Transparent statt none:
+   im Kontrastmodus (forced-colors) zeichnet der Browser die Linie weiter in Systemfarbe. */
+html.is-pointer :focus-visible, html.is-pointer .search__input:focus { outline-color: transparent; }
 .on-dark, .site-header, .mobile-menu, .lightbox, .sticky-contact { --focus-ring: var(--c-orange); }
 
 /* Browser-Oberflächen im Markenton */

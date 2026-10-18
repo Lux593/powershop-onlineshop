@@ -5,6 +5,15 @@
 (function () {
   var PS = (window.PS = window.PS || {});
 
+  /* ---------------- Fokusring nur per Tastatur ----------------
+     Nach Maus oder Finger blendet html.is-pointer die Ringe aus, auch bei Fokus, den ein Skript danach setzt (z. B. der
+     Mengen-Knopf nach einer Warenkorb-Änderung, iOS zeigte dort einen Rahmen). Tab, Pfeile, Pos1/Ende und Bild-Tasten zeigen sie wieder. */
+  var docEl = document.documentElement;
+  document.addEventListener('pointerdown', function () { docEl.classList.add('is-pointer'); }, true);
+  document.addEventListener('keydown', function (e) {
+    if (/^(Tab|Arrow|Home|End|Page)/.test(e.key)) docEl.classList.remove('is-pointer');
+  }, true);
+
   /* ---------------- Modul-Starter ----------------
      PS.on('[data-foo]', function (el) { ... }) läuft für jedes passende Element
      beim Laden, nach jedem Section-Reload im Theme-Editor und für nachgeladenes HTML

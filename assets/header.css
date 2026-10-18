@@ -149,7 +149,7 @@ html:not(:has(.announce)) { --announce-h: 0px; }
 .mobile-menu__brand { display: flex; align-items: center; gap: 10px; }
 .mobile-menu__brand img { height: 34px; width: auto; flex: none; }
 .mobile-menu__brand .wordmark { font-size: 30px; }
-.mobile-menu .drawer__body { padding: 12px 0 0; }
+.mobile-menu .drawer__body { padding: 0; }
 .mobile-menu .drawer__body > :first-child { border-top: 0; } /* sonst zwei Linien übereinander: Kopf und erster Menüpunkt */
 
 /* Suche */
