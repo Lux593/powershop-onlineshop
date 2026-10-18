@@ -52,8 +52,7 @@
 /* Mobil, nur mit Bewegung: Beim Runterscrollen bleibt der Text unter dem Header stehen, der Film schiebt sich dahinter nach oben.
    Steht der Text 72 px über der Filmunterkante (darunter bleibt der Pause-Knopf frei), endet der Sticky-Bereich und der Film nimmt
    ihn mit: Der Rand unter dem Text zählt beim Sticky mit, Grenze ist die Unterkante des Films. Der Film rückt um 48 px hoch,
-   der Abstand Text–Film bleibt so 24 px. Ein Schleier hält den Text lesbar, sobald der Film dahinter liegt (--film-cover,
-   0 bis 1, setzt collection.js). overflow: clip statt hidden: hidden machte das Banner zum Scroll-Container, sticky griffe nicht. */
+   der Abstand Text–Film bleibt so 24 px. overflow: clip statt hidden: hidden machte das Banner zum Scroll-Container, sticky griffe nicht. */
 @media (max-width: 767px) {
   .has-motion .page-banner--film { overflow: clip; }
   .has-motion .page-banner--film .page-banner__inner { display: block; }
@@ -62,12 +61,16 @@
     margin-bottom: 72px; transition: top var(--t-med) var(--ease);
   }
   .has-motion .page-banner--film .page-banner__media { margin-top: -48px; }
-  .has-motion .film-banner__frame { z-index: 0; }
-  .has-motion .film-banner__frame::after {
-    content: ""; position: absolute; inset: 0; pointer-events: none; opacity: var(--film-cover, 0);
-    background: linear-gradient(to bottom, rgba(10, 10, 10, 0.8), rgba(10, 10, 10, 0.6) 70%, rgba(10, 10, 10, 0.35));
+  /* Schleier für die Lesbarkeit: Er hängt am Text und wandert mit ihm, der Film wird genau dort dunkel, wo er unter dem Text liegt.
+     Kein Skript, kein Zeitversatz zum Scrollen (vorher blendete collection.js je Frame einen Schleier über den ganzen Film ein,
+     beim schnellen Scrollen sprang er sichtbar in Stufen). Über dem schwarzen Banner fällt er nicht auf. Gleichmäßig dunkel ohne
+     Verlauf (keine Stufen), unten läuft er über 28 px weich aus und endet vor dem Pause-Knopf. */
+  .has-motion .page-banner--film .page-banner__text::before {
+    content: ""; position: absolute; inset: -28px 0; z-index: -1; pointer-events: none;
+    background: linear-gradient(to bottom,
+      rgba(10, 10, 10, 0.7) calc(100% - 28px), rgba(10, 10, 10, 0.55) calc(100% - 21px), rgba(10, 10, 10, 0.3) calc(100% - 12px),
+      rgba(10, 10, 10, 0.1) calc(100% - 5px), rgba(10, 10, 10, 0) 100%);
   }
-  .has-motion .film-banner__toggle { z-index: 1; }
 }
 
 @media (min-width: 768px) {

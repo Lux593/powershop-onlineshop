@@ -105,9 +105,9 @@ Kollektion und Suche (assets/collection.js, Regeln in shop.css)
                            html .is-vt-results (Root-Überblendung aus: Header und Filterleiste bleiben stehen). Beide Klassen
                            entfernt nur die jüngste Überblendung. Ohne View Transition (Browser, Reduced-Motion, Setting aus)
                            wird ohne Überblendung getauscht. Reveals im neuen HTML startet motion.js selbst (MutationObserver).
-  --film-cover             Film-Kopf mobil (bis 767 px, nur unter html.has-motion): Der Text bleibt per sticky unter dem Header stehen,
-                           der Film rutscht dahinter und nimmt ihn 72 px über seiner Unterkante mit (shop.css). collection.js setzt am
-                           Filmrahmen --film-cover (0 bis 1 über die ersten 80 px unter dem Text) für den Schleier.
+  Film-Kopf mobil         Bis 767 px, nur unter html.has-motion: Der Text bleibt per sticky unter dem Header stehen, der Film rutscht
+                           dahinter und nimmt ihn 72 px über seiner Unterkante mit. Reines CSS (shop.css), der Schleier hängt als
+                           ::before am Text und wandert mit ihm, kein Skript.
 
 Produktseite (snippets/pdp-buy.liquid, snippets/pdp-options.liquid, snippets/pdp-sticky-buy.liquid, assets/product.js)
   [data-pdp-dynamic]       Bereiche, die product.js nach einer Variantenwahl über die Section Rendering API neu holt. Motorräder
