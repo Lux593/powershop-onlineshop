@@ -144,12 +144,6 @@ html:not(:has(.announce)) { --announce-h: 0px; }
 .mobile-menu__direct { display: flex; align-items: center; justify-content: space-between; padding: 0 24px; min-height: 68px; border-top: 1px solid var(--c-steel); font-family: var(--f-head); font-weight: 700; font-size: 22px; text-transform: uppercase; }
 .mobile-menu__direct--sale { color: var(--c-orange); }
 .mobile-menu__foot { padding: 24px; display: grid; gap: 12px; border-top: 1px solid var(--c-steel); }
-/* Fuß: Kundenkonto (umrandet), Probefahrt (orange), darunter der Standort mit Link zur Route */
-.mobile-menu__foot { gap: 16px; }
-.mobile-menu__place { display: flex; align-items: flex-start; gap: 12px; padding-top: 8px; color: var(--c-on-dark-strong); line-height: 1.5; }
-.mobile-menu__place > .icon { flex: none; margin-top: 2px; color: var(--c-orange); }
-.mobile-menu__place strong { display: block; margin-bottom: 2px; font-family: var(--f-head); font-size: 18px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--c-white); }
-.mobile-menu__route { display: block; margin-top: 6px; color: var(--c-white); text-decoration: underline; text-underline-offset: 3px; }
 /* Menükopf: H-D Bar & Shield vor der Wortmarke, etwas größer als im Header, mit mehr Luft zu den Menüpunkten */
 .mobile-menu .drawer__head { padding-block: 20px; }
 .mobile-menu__brand { display: flex; align-items: center; gap: 10px; }
