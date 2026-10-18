@@ -1,5 +1,7 @@
 {% doc %}
-  Farbfeld für eine Farb-Option. Nimmt die Shopify-Swatch-Farbe, sonst eine Zuordnung nach Farbname.
+  Farbfeld für eine Farb-Option. Reihenfolge: Shopify-Swatch-Farbe der verknüpften Option, dann der Farbeintrag mit
+  gleichem Namen unter Inhalte > Metaobjekte > Farbe (Handle = Name als Handle, z. B. "vivid-black"),
+  sonst eine Zuordnung nach Farbname.
 
   @param {string} name - Farbname, z. B. "Schwarz"
   @param {object} [swatch] - Swatch des Optionswerts (value.swatch)
@@ -8,6 +10,10 @@
 
 {%- liquid
   assign hex = swatch.color
+  if hex == blank
+    assign entry_handle = name | handleize
+    assign hex = metaobjects['shopify--color-pattern'][entry_handle].color.value
+  endif
   if hex == blank
     assign key = name | downcase
     case key
