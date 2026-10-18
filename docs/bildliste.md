@@ -22,8 +22,10 @@ Austausch den Dateinamen aus der Liste streichen (siehe `README.md`).
 | `hero-ride-street.jpg` | 1024 × 576 | Lifestyle/Marke | echt | Zwei Fahrer auf einer Street Glide, unterwegs auf einer Landstraße mit gelber Doppellinie | Homepage · Hero, Modell Street Glide |
 | `hero-ride-cvo.jpg` | 1500 × 1000 | Lifestyle/Marke | echt | Fahrer auf einer CVO Road Glide, unterwegs auf einer Landstraße | Homepage · Hero, Modell CVO |
 | `bento-motorraeder.jpg` | 1400 × 1000 | Lifestyle/Marke | echt | Fahrer auf einer CVO Road Glide in voller Fahrt auf einer Landstraße, Hügel im Hintergrund | Homepage · Kategorie-Kachel Motorräder |
-| `bento-herren.jpg` | 736 × 738 | Lifestyle/Marke | echt | Bärtiger Fahrer im Profil in schwarz-oranger H-D-Jacke, Oberkörper, Bäume unscharf im Hintergrund | Megamenü · Teaser Herren (die Startseiten-Kachel zeigt seit Oktober 2026 `bento-herren-film`) |
-| `bento-damen.jpg` | 960 × 867 | Lifestyle/Marke | echt | Frau in ärmelloser Bluse hält eine Lederjacke, Bike im Hintergrund | Megamenü · Teaser Damen (die Startseiten-Kachel zeigt seit Oktober 2026 `bento-damen-film`) |
+| `bento-herren.jpg` | 736 × 738 | Lifestyle/Marke | echt | Bärtiger Fahrer im Profil in schwarz-oranger H-D-Jacke, Oberkörper, Bäume unscharf im Hintergrund | Megamenü · Teaser Herren |
+| `bento-herren-ruecken.jpg` | 864 × 720 | Lifestyle/Marke | echt | Mann in brauner Jacke mit Harley-Davidson-Schriftzug von hinten im Laden (Standbild aus `clothing-herren.mp4` bei 17,5 s, keine Gesichter) | Homepage · Kategorie-Kachel Herren |
+| `bento-damen.jpg` | 960 × 867 | Lifestyle/Marke | echt | Frau in ärmelloser Bluse hält eine Lederjacke, Bike im Hintergrund | Megamenü · Teaser Damen |
+| `bento-damen-ruecken.jpg` | 864 × 720 | Lifestyle/Marke | echt | Frau in schwarzer Lederjacke mit Bar-&-Shield-Prägung von hinten im Laden (Standbild aus `clothing-damen.mp4` bei 3,7 s, keine Gesichter) | Homepage · Kategorie-Kachel Damen |
 | `bento-accessoires.jpg` | 960 × 867 | Freisteller | echt | Handyhülle mit Bar & Shield, Freisteller auf Weiß | Homepage · Kategorie-Kachel Accessoires |
 | `bento-teile.jpg` | 1400 × 787 | Lifestyle/Marke | echt | Zubehör-Flatlay auf dunklem Grund: Helm, Kissen mit Bar & Shield, Spanngurte | Homepage · Kategorie-Kachel Teile & Zubehör |
 | `banner-motorraeder.jpg` | 1200 × 600 | Lifestyle/Marke | Platzhalter | Touring-Bike im Profil, dunkler Hintergrund | Kategorieseite · Banner Motorräder |
@@ -77,5 +79,3 @@ Die gesamte Liste der offenen Händlerfreigaben steht in [`freigaben.md`](freiga
 | `bikes-intro.mp4` · `bikes-intro-poster.jpg` | 960 × 720, ca. 17 s | Kategorieseite Motorräder · Film-Intro |
 | `clothing-herren.mp4` · `clothing-herren-poster.jpg` | 960 × 720, ca. 18 s | Kategorieseite Herren · Film-Intro |
 | `clothing-damen.mp4` · `clothing-damen-poster.jpg` | 960 × 720, ca. 6 s | Kategorieseite Damen · Film-Intro |
-| `bento-herren-film.mp4` · `bento-herren-film.jpg` | 720 × 600, ca. 6,4 s, Schleife | Homepage · Kategorie-Kachel Herren. Ausschnitt aus `clothing-herren.mp4` (14,3 bis 17,5 s, nur Rückenansicht, Mitte 6:5 zugeschnitten), vorwärts und rückwärts aneinander (nahtlose Schleife). Das JPG ist das erste Bild des Films |
-| `bento-damen-film.mp4` · `bento-damen-film.jpg` | 720 × 600, ca. 3,9 s, Schleife | Homepage · Kategorie-Kachel Damen. Ausschnitt aus `clothing-damen.mp4` (2,93 bis 3,87 s, nur Rückenansicht), Zeitlupe 0,5x per Bewegungsinterpolation, rückwärts und vorwärts aneinander. Das JPG ist das erste Bild des Films |

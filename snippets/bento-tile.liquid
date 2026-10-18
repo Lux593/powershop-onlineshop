@@ -1,11 +1,8 @@
 {% doc %}
   Kachel des Kategorie-Bento (.bento-tile).
   Ohne Link bleibt die Kachel eine reine Bildfläche (kein toter Link auf „#“).
-  Mit video_asset läuft über dem Bild ein stummer Film in Schleife (das Bild ist sein erstes Bild und bleibt ohne JavaScript,
-  bei Datensparen und reduzierter Bewegung stehen). Der Knopf zum Anhalten liegt neben dem Link in .bento-film, nicht darin
-  (kein Button in einem Link). Start und Knopf: assets/home.js.
 
-  @param {object} block - Block mit title, subtitle, url, image, image_asset, video_asset
+  @param {object} block - Block mit title, subtitle, url, image, image_asset
   @param {string} modifier - Zusätzliche Klassen, z. B. "bento-tile--moto"
   @param {number} width - Breite der Standarddatei
   @param {number} height - Höhe der Standarddatei
@@ -14,26 +11,12 @@
 
 {%- assign tile_tag = 'div' -%}
 {%- if block.settings.url != blank -%}{%- assign tile_tag = 'a' -%}{%- endif -%}
-{%- assign film = block.settings.video_asset | strip -%}
-{%- if film != blank -%}<div class="bento-film" data-bento-film>{%- endif -%}
 <{{ tile_tag }} class="bento-tile{% if modifier != blank %} {{ modifier }}{% endif %}" data-reveal="clip"{% if block.settings.url != blank %} href="{{ block.settings.url }}"{% endif %} {{ block.shopify_attributes }}>
   <span class="bento-tile__media"{% if parallax %} data-parallax="0.12"{% endif %}>
     {%- render 'media', image: block.settings.image, asset: block.settings.image_asset, width: width, height: height, sizes: '(min-width: 1024px) 50vw, 100vw' -%}
-    {%- if film != blank -%}
-      <video class="bento-tile__video" width="{{ width }}" height="{{ height }}" muted loop playsinline preload="none" aria-hidden="true">
-        <source src="{{ film | asset_url }}" type="video/mp4">
-      </video>
-    {%- endif -%}
   </span>
   <span class="bento-tile__label">
     <strong>{{ block.settings.title }}</strong>
     <span>{{ block.settings.subtitle }} {% render 'icon', name: 'arrow-right' %}</span>
   </span>
 </{{ tile_tag }}>
-{%- if film != blank -%}
-  <button class="bento-film__toggle" type="button" data-film-toggle data-name="{{ block.settings.title | escape }}" aria-label="Film abspielen: {{ block.settings.title | escape }}" hidden>
-    {% render 'icon', name: 'pause', class: 'bento-film__icon--pause' %}
-    {% render 'icon', name: 'play', class: 'bento-film__icon--play' %}
-  </button>
-</div>
-{%- endif -%}

@@ -90,8 +90,8 @@
       "type": "category-bento",
       "blocks": {
         "moto": { "type": "tile", "settings": { "title": "Motorräder", "subtitle": "Neu, gebraucht & Vorführer", "image_asset": "bento-motorraeder.jpg", "url": "/collections/motorraeder" } },
-        "men": { "type": "tile", "settings": { "title": "Herren", "subtitle": "Entdecken", "image_asset": "bento-herren-film.jpg", "video_asset": "bento-herren-film.mp4", "url": "/collections/herren" } },
-        "women": { "type": "tile", "settings": { "title": "Damen", "subtitle": "Entdecken", "image_asset": "bento-damen-film.jpg", "video_asset": "bento-damen-film.mp4", "url": "/collections/damen" } },
+        "men": { "type": "tile", "settings": { "title": "Herren", "subtitle": "Entdecken", "image_asset": "bento-herren-ruecken.jpg", "url": "/collections/herren" } },
+        "women": { "type": "tile", "settings": { "title": "Damen", "subtitle": "Entdecken", "image_asset": "bento-damen-ruecken.jpg", "url": "/collections/damen" } },
         "acc": { "type": "tile", "settings": { "title": "Accessoires", "subtitle": "Entdecken", "image_asset": "bento-accessoires.jpg", "url": "/collections/accessoires" } },
         "parts": { "type": "tile", "settings": { "title": "Teile & Zubehör", "subtitle": "Entdecken", "image_asset": "bento-teile.jpg", "url": "/collections/teile" } }
       },
