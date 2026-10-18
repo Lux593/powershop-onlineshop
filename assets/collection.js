@@ -75,10 +75,39 @@
     PS.motion.track(film, function () { io.disconnect(); io = null; started = false; film.pause(); });
   }
 
+  /* ---------- Kategorie-Film mobil: Schleier, sobald der Film hinter den Text rutscht (Ablauf per sticky in shop.css) ----------
+     --film-cover geht von 0 auf 1, während der Film die ersten 80 px unter den Text rutscht: Schon die unterste Zeile liegt dann auf
+     abgedunkeltem Film (der orange Link der Motorräder sonst auf dem orangen Schriftzug im Film). Nur bis 767 px, darüber stehen
+     Text und Film nebeneinander. */
+  function initCover(text, frame) {
+    if (!PS.motion.enabled || !text) return;
+    var mq = window.matchMedia('(max-width: 767px)');
+    var queued = false;
+    function update() {
+      queued = false;
+      if (!mq.matches) return;
+      var t = text.getBoundingClientRect(), f = frame.getBoundingClientRect();
+      frame.style.setProperty('--film-cover', Math.min(1, Math.max(0, (t.bottom - f.top) / 80)).toFixed(3));
+    }
+    function queue() { if (!queued) { queued = true; requestAnimationFrame(update); } }
+    window.addEventListener('scroll', queue, { passive: true });
+    window.addEventListener('resize', queue);
+    update();
+    // Bewegung zur Laufzeit abgeschaltet oder Section entfernt: Listener weg, Schleier aus
+    PS.motion.track(frame, function () {
+      window.removeEventListener('scroll', queue);
+      window.removeEventListener('resize', queue);
+      frame.style.removeProperty('--film-cover');
+    });
+  }
+
   PS.on('[data-collection]', function (root) {
     var sectionId = root.dataset.sectionId;
     var film = root.querySelector('[data-film]');
-    if (film) initFilm(film, root.querySelector('[data-film-toggle]'));
+    if (film) {
+      initFilm(film, root.querySelector('[data-film-toggle]'));
+      initCover(root.querySelector('.page-banner__text'), film.parentNode);
+    }
 
     var cols = null;
     var controller = null;

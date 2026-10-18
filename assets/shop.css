@@ -49,6 +49,27 @@
 .film-banner__toggle[data-state="playing"] .film-banner__icon--play,
 .film-banner__toggle[data-state="paused"] .film-banner__icon--pause { display: none; }
 
+/* Mobil, nur mit Bewegung: Beim Runterscrollen bleibt der Text unter dem Header stehen, der Film schiebt sich dahinter nach oben.
+   Steht der Text 72 px über der Filmunterkante (darunter bleibt der Pause-Knopf frei), endet der Sticky-Bereich und der Film nimmt
+   ihn mit: Der Rand unter dem Text zählt beim Sticky mit, Grenze ist die Unterkante des Films. Der Film rückt um 48 px hoch,
+   der Abstand Text–Film bleibt so 24 px. Ein Schleier hält den Text lesbar, sobald der Film dahinter liegt (--film-cover,
+   0 bis 1, setzt collection.js). overflow: clip statt hidden: hidden machte das Banner zum Scroll-Container, sticky griffe nicht. */
+@media (max-width: 767px) {
+  .has-motion .page-banner--film { overflow: clip; }
+  .has-motion .page-banner--film .page-banner__inner { display: block; }
+  .has-motion .page-banner--film .page-banner__text {
+    position: sticky; top: calc(var(--header-offset) + 28px); z-index: 1;
+    margin-bottom: 72px; transition: top var(--t-med) var(--ease);
+  }
+  .has-motion .page-banner--film .page-banner__media { margin-top: -48px; }
+  .has-motion .film-banner__frame { z-index: 0; }
+  .has-motion .film-banner__frame::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none; opacity: var(--film-cover, 0);
+    background: linear-gradient(to bottom, rgba(10, 10, 10, 0.8), rgba(10, 10, 10, 0.6) 70%, rgba(10, 10, 10, 0.35));
+  }
+  .has-motion .film-banner__toggle { z-index: 1; }
+}
+
 @media (min-width: 768px) {
   .page-banner--film .page-banner__inner {
     grid-template-columns: minmax(0, 1fr) clamp(300px, 34vw, 448px);
