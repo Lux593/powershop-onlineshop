@@ -63,6 +63,12 @@
 @media (max-width: 767px), (max-height: 540px) {
   .hero { --g-bottom: linear-gradient(0deg, rgb(10 10 10 / calc(var(--ov) * 1.6)) 0%, rgb(10 10 10 / calc(var(--ov) * 1.4)) 50%, rgb(10 10 10 / calc(var(--ov) * 1.12)) 68%, rgb(10 10 10 / calc(var(--ov) * 0.9)) 100%); }
 }
+/* Handy hochkant: Der Textblock ist kompakt und steht unten (gut 330 px ab Unterkante). Der Verlauf trägt deshalb in Pixeln ab unten:
+   bis über die Tabs so dunkel wie bisher dort, darüber läuft er aus und gibt den oberen Teil des Films frei. Auf kurzen Bildschirmen
+   reicht der dunkle Teil wie bisher bis oben. */
+@media (max-width: 767px) and (min-height: 541px) {
+  .hero { --g-bottom: linear-gradient(0deg, rgb(10 10 10 / calc(var(--ov) * 1.6)) 0, rgb(10 10 10 / calc(var(--ov) * 1.4)) 170px, rgb(10 10 10 / calc(var(--ov) * 1.12)) 360px, rgb(10 10 10 / calc(var(--ov) * 0.55)) 440px, rgb(10 10 10 / calc(var(--ov) * 0.15)) 520px, transparent 600px); }
+}
 .hero__veil { position: absolute; z-index: 3; inset: 0; background: var(--g-bottom); }
 @media (min-width: 768px) {
   .hero--left .hero__veil { background: var(--g-left), linear-gradient(0deg, rgb(10 10 10 / calc(var(--ov) * 1.1)), transparent 55%); }
@@ -181,6 +187,19 @@
   .hero__price { font-size: 36px; }
   .hero__actions { gap: 8px 10px; }
   .hero__actions .btn { min-height: 48px; padding: 8px 20px; font-size: 17px; }
+}
+/* Handy hochkant: Text kompakter, damit der Film mehr Fläche behält. Kleinere Headline, Preis und Unterzeile, beide Buttons in einer
+   Zeile (etwas weniger Innenabstand und Sperrung; passt ab 360 px, darunter brechen sie um), weniger Fuß. Buttons und Tabs bleiben mindestens 44 px hoch. */
+@media (max-width: 767px) and (min-height: 541px) {
+  .hero__caption-inner { padding-block-end: 84px; }
+  .hero__content { gap: 12px; }
+  .hero__poster { font-size: min(48px, 20svh); }
+  .hero__sub { gap: 10px; }
+  .hero__blurb { font-size: 16px; line-height: 1.35; }
+  .hero__price { font-size: 28px; }
+  .hero__offer { row-gap: 12px; }
+  .hero__actions { flex-wrap: wrap; gap: 8px; }
+  .hero__actions .btn { min-height: 44px; padding: 6px 10px; font-size: 15px; letter-spacing: 0.04em; }
 }
 /* Niedrige Fenster (Handy im Querformat, Zoom): Der Text füllte mit Headline, Preis und Buttons das ganze Bild und der Hero war höher als das Fenster; die Pause-Taste
    (WCAG 2.2.2) lag unter dem Falz. Kleinere Headline und weniger Fuß, die Taste sitzt oben rechts unter dem Header und ist im ersten Bild erreichbar. */
