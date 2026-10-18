@@ -57,7 +57,6 @@ html:not(:has(.announce)) { --announce-h: 0px; }
 @media (scripting: enabled) {
   [data-header-overlay]:has(#main > .shopify-section:first-child > .hero) .site-header:not(.is-solid) {
     --hdr-solid: 0; --hdr-veil: 1;
-    --focus-ring: var(--c-white); /* der orange Ring hielte über Film und Foto keine 3:1 */
     border-bottom-color: transparent;
   }
   /* Orange Schrift hielte über hellem Bild keine 4,5:1: oben weiß. Keine Dauer-Linie darunter: die orange Linie heißt im Header „Hover“ und „aktuelle Seite“. */

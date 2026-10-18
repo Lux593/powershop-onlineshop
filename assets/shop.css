@@ -50,7 +50,7 @@
 .film-banner__chips li { flex: none; }
 .chip--dark { background: transparent; color: var(--c-white); border-color: var(--c-border-dark); }
 .chip--dark:hover,
-.chip--dark:focus-visible { background: rgba(242, 103, 34, 0.08); border-color: var(--c-orange); }
+
 
 /* Pause: kleine Fläche unten rechts im Film (44px Trefferfläche) */
 .film-banner__toggle {
@@ -60,7 +60,6 @@
   transition: background-color var(--t-fast);
 }
 .film-banner__toggle:hover { background: var(--c-black); }
-.film-banner__toggle { --focus-ring: var(--c-white); } /* der orange Ring hielte über dem laufenden Film keine 3:1; der Knopf hat selbst dunklen Grund (wie im Hero und im Header) */
 .film-banner__toggle .icon { width: 20px; height: 20px; }
 .film-banner__toggle[data-state="playing"] .film-banner__icon--play,
 .film-banner__toggle[data-state="paused"] .film-banner__icon--pause { display: none; }
@@ -356,30 +355,14 @@ html:not(.has-motion) .bcard:hover .bcard__media img { transform: none; }
 .pcard__quick { transition: transform 460ms var(--ease-out), visibility 0s linear 460ms; }
 /* Der „+“ steht im Markup vor dem Panel (Tab-Reihenfolge), liegt aber darüber */
 .pcard__plus { z-index: 1; }
-/* Fokusring der runden Weißflächen über Fotos (auch Galerie-Zoom): weißer Innenring, schwarzer Außenring, auf dunklem wie hellem Foto sichtbar */
-.pcard__plus:focus-visible, .gallery__zoom:focus-visible {
-  outline: 2px solid var(--c-black); outline-offset: 2px;
-  box-shadow: 0 0 0 2px var(--c-white), 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-/* Nach Maus oder Finger ohne Ring (base.css, html.is-pointer): auch die gezeichneten Ringe aus box-shadow */
-html.is-pointer .pcard__plus:focus-visible, html.is-pointer .gallery__zoom:focus-visible { outline-color: transparent; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); }
-html.is-pointer .pcard:has(.pcard__title a:focus-visible) .pcard__media::after,
-html.is-pointer .gallery__main:has(.gallery__track:focus-visible)::after { box-shadow: none; }
 .pcard__plus .icon { transition: transform var(--t-med) var(--ease-out); }
 @media (hover: none), (max-width: 1023px) {
   .pcard__quick { visibility: hidden; }
   .pcard.is-quick-open .pcard__quick { visibility: visible; transition-delay: 0s; }
 }
-/* Fokus auf dem Titel: Bildfläche trägt einen zweifarbigen Ring, auf hellem wie dunklem Foto sichtbar */
-.pcard:has(.pcard__title a:focus-visible) .pcard__media::after {
-  content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none;
-  box-shadow: inset 0 0 0 3px var(--c-white), inset 0 0 0 5px var(--c-black);
-}
 
-/* Der Titel (h3, line-clamp, overflow:hidden) schneidet seinen eigenen Fokusring links, oben und unten ab, übrig bliebe ein einzelner
-   Strich rechts wie ein Textcursor. Der Ring liegt daher auf der Bildfläche (oben); am Titel zeigt Unterstreichen den Fokus,
-   die transparente Linie bleibt für den Kontrastmodus (forced-colors färbt sie in Systemfarbe). */
-.pcard__title a:focus-visible { outline-color: transparent; text-decoration: underline; text-underline-offset: 3px; }
+/* Tastaturfokus auf dem Titel: Unterstreichen statt Rahmen (Rahmen gibt es im Shop keine, base.css) */
+.pcard__title a:focus-visible { text-decoration: underline; text-underline-offset: 3px; }
 
 /* Karten-Stagger: die Spalte bestimmt die Verzögerung. Standard-Spaltenzahl: 2, ab 640 px 3, ab 1024 px 4, ab 1280 px 5 (Motorräder 1/2/3).
    Nach einer Spaltenwahl im Raster stimmt es nicht mehr genau, das Einblenden läuft nur einmal je Karte. */
@@ -428,14 +411,8 @@ html.is-pointer .gallery__main:has(.gallery__track:focus-visible)::after { box-s
 .gallery__track { position: relative; display: flex; height: 100%; overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none; }
 .gallery__track::-webkit-scrollbar { display: none; }
 .gallery__slide { flex: 0 0 100%; height: 100%; scroll-snap-align: start; scroll-snap-stop: always; }
-/* Fokus auf der Schiene (Pfeiltasten blättern): Ring innen, außen würde .gallery__main ihn abschneiden.
-   Der Ring liegt im ::after (weiß innen, schwarz außen): auf hellem wie dunklem Foto sichtbar. Die Outline bleibt als
-   transparente Linie für den Kontrastmodus (forced-colors zeichnet sie in Systemfarbe). */
-.gallery__track:focus-visible { outline: 2px solid transparent; outline-offset: -4px; }
-.gallery__main:has(.gallery__track:focus-visible)::after {
-  content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none;
-  box-shadow: inset 0 0 0 3px var(--c-white), inset 0 0 0 5px var(--c-black);
-}
+/* Fokus auf der Schiene (Pfeiltasten blättern): die transparente Linie (Kontrastmodus) liegt innen, außen schnitte .gallery__main sie ab */
+.gallery__track:focus-visible { outline-offset: -4px; }
 
 /* Lightbox: Klick oder Tippen zoomt an die Zeigerstelle, Maus oder Finger schwenken, „Zoom“ in der Kopfzeile für die Tastatur */
 .lightbox__tools { display: flex; align-items: center; gap: 4px; }
@@ -535,10 +512,6 @@ html.is-pointer .gallery__main:has(.gallery__track:focus-visible)::after { box-s
 /* ==========================================================================
    Korrekturen aus der Gesamtreview
    ========================================================================== */
-
-/* Suchfeld (header.css): Der Fokus lag nur auf der orangen Unterkante, 2,81:1 auf dem Dialoggrund und damit schwächer als der
-   ungefokussierte schwarze Strich. Der schwarze Ring bleibt, orange ist Akzent. */
-.search__input:focus { outline: 2px solid var(--c-black); outline-offset: 4px; }
 
 /* ---------- Produktkarten: kleineres Bild ---------- */
 /* Quadratisch statt 4:5: die Karten wirken kompakter, in Kollektion und Suche passen mehr Artikel auf den Bildschirm. */

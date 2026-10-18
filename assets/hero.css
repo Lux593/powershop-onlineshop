@@ -16,7 +16,6 @@
   overflow: clip;
   background: var(--c-black);
   color: var(--c-white);
-  --focus-ring: var(--c-white); /* der orange Ring hielte über Film und Foto keine 3:1 (base.css setzt ihn für .on-dark) */
 }
 /* Header über dem Hero (body[data-header-overlay], nur Startseite): der Hero zieht unter den Header. header.js macht ihn oben transparent. */
 [data-header-overlay] #main > .shopify-section:first-child > .hero {
