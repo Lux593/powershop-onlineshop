@@ -11,7 +11,7 @@
 
 <dialog class="drawer" id="cart-drawer" aria-labelledby="cart-title" data-cart-drawer data-lenis-prevent>
   <div class="drawer__head">
-    <h2 class="h4" id="cart-title">Warenkorb ({{ cart.item_count }})</h2>
+    <h2 class="h4 drawer__title" id="cart-title"><img class="drawer__hd" src="{{ 'hd-bar-shield.png' | asset_url }}" alt="" width="49" height="40">Warenkorb ({{ cart.item_count }})</h2>
     <button class="icon-btn" type="button" data-close aria-label="Warenkorb schließen">{% render 'icon', name: 'x' %}</button>
   </div>
 

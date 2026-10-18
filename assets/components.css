@@ -269,6 +269,9 @@ dialog:focus, dialog:focus-visible { outline: none; }
 @keyframes drawer-in { from { transform: translateX(40px); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes drawer-in-left { from { transform: translateX(-40px); opacity: 0; } to { transform: none; opacity: 1; } }
 .drawer__head { display: flex; align-items: center; justify-content: space-between; padding: 12px 12px 12px 24px; border-bottom: 1px solid var(--c-line); }
+/* Titel mit H-D Bar & Shield davor (Warenkorb); das Logo ist Schmuck (alt=""), der Name des Titels bleibt „Warenkorb (n)“ */
+.drawer__title { display: flex; align-items: center; gap: 10px; }
+.drawer__hd { height: 28px; width: auto; flex: none; }
 .drawer__body { flex: 1; overflow: auto; padding: 24px; }
 .drawer__foot { padding: 20px 24px 24px; border-top: 1px solid var(--c-line); display: grid; gap: 12px; }
 
