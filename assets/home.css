@@ -119,12 +119,15 @@
 .bento-tile--teile img { object-fit: cover; object-position: center; }
 .bento-tile::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgb(10 10 10 / 0.88) 0%, rgb(10 10 10 / 0.55) 36%, transparent 64%); }
 .bento-tile__label { position: absolute; left: 20px; right: 20px; bottom: 18px; z-index: 1; display: grid; gap: 4px; }
-.bento-tile__label strong { font-family: var(--f-head); font-weight: 800; font-size: 26px; text-transform: uppercase; line-height: 1; letter-spacing: 0.01em; overflow-wrap: anywhere; hyphens: auto; }
-/* Schmale Fenster (320 bis 359 px): die Kachel ist nur etwa 140 px breit, „Accessoires“ passt sonst nicht in die Zeile (WCAG 1.4.10) */
-@media (max-width: 359px) {
-  .bento-tile__label { left: 12px; right: 12px; }
-  .bento-tile__label strong { font-size: 22px; }
-}
+/* Ohne Silbentrennung: Mehrwortige Titel brechen nur an Leerzeichen („Teile &“ / „Zubehör“ statt „Zube-hör“); jedes Wort passt
+   ab 320 px in die Kachel (gemessen), overflow-wrap bleibt nur als Notbremse für längere Titel aus dem Editor */
+.bento-tile__label strong { font-family: var(--f-head); font-weight: 800; font-size: 26px; text-transform: uppercase; line-height: 1; letter-spacing: 0.01em; overflow-wrap: anywhere; hyphens: manual; }
+/* Handys: Die kleinen Kacheln sind nur 140 bis 190 px breit, „Accessoires“ passt sonst nicht in die Zeile und bräche ohne
+   Silbentrennung mitten im Wort (WCAG 1.4.10). Darum weniger Innenabstand, schmaler zusätzlich kleinere Schrift.
+   Gemessen bleiben bei jeder Breite ab 320 px mindestens 5 px Luft, ab 360 px mindestens 12 px (Ausgleich für Schriftrendering auf iOS). */
+@media (max-width: 429px) { .bento-tile__label { left: 12px; right: 12px; } }
+@media (max-width: 374px) { .bento-tile__label strong { font-size: 24px; } }
+@media (max-width: 359px) { .bento-tile__label strong { font-size: 22px; } }
 /* Untertitel weiß (Kontrast auf Foto), der Pfeil trägt den orangen Akzent */
 .bento-tile__label span { display: inline-flex; align-items: center; gap: 6px; color: var(--c-offwhite); font-weight: 600; font-size: var(--fs-small); }
 .bento-tile__label span .icon { width: 16px; height: 16px; color: var(--c-orange); transition: transform var(--t-fast); }
