@@ -113,6 +113,9 @@
 /* Filter-Fenster: keine Linie über dem ersten und unter dem letzten Filter (Kopf und Fuß trennen schon) */
 .filter-sheet .acc:first-child { border-top: 0; }
 .filter-sheet .acc:last-child { border-bottom: 0; }
+/* Kein Innenabstand oben und unten: Jede Filterzeile ist 56 px hoch, der Titel steht mittig. So liegt zwischen Kopflinie,
+   Trennlinie und Fußlinie und dem Titel überall derselbe Abstand (vorher oben und unten 24 px mehr als dazwischen) */
+.filter-sheet:not(.sort-sheet) .modal__body { padding-block: 0; }
 /* Fuß: beide Buttons in voller Breite untereinander (nebeneinander passte „24 Ergebnisse anzeigen“ mobil nicht),
    oben „… anzeigen“, darunter „Zurücksetzen“ schwarz umrandet, wie im Warenkorb */
 .filter-sheet .modal__foot { display: grid; grid-template-columns: 1fr; gap: 10px; }
