@@ -7,6 +7,61 @@
   var PS = (window.PS = window.PS || {});
   var M = PS.motion;
 
+  /* ---------------- Kachel-Filme (Herren, Damen) ----------------
+     Wie der Kategorie-Film (collection.js): kein autoplay im Markup, Start nach Load im Leerlauf und nur im Bild, nicht bei
+     Datensparen oder reduzierter Bewegung (dann bleibt das Standbild, der Knopf startet den Film von Hand). Außerhalb des Bildes
+     und im Hintergrund-Tab angehalten; fortgesetzt wird nur, was nicht von Hand angehalten wurde. Der Knopf erfüllt WCAG 2.2.2. */
+  PS.on('[data-bento-film]', function (wrap) {
+    var film = wrap.querySelector('video'), toggle = wrap.querySelector('[data-film-toggle]');
+    if (!film || !toggle) return;
+    var name = toggle.dataset.name || '';
+    var conn = navigator.connection;
+    var userPaused = false, started = false, visible = false, hiddenPaused = false, io = null;
+
+    function sync() {
+      toggle.dataset.state = film.paused ? 'paused' : 'playing';
+      toggle.setAttribute('aria-label', (film.paused ? 'Film abspielen: ' : 'Film pausieren: ') + name);
+    }
+    function play() {
+      var pending = film.play();
+      if (pending && pending.catch) pending.catch(sync); // z. B. iOS-Stromsparmodus: Standbild bleibt
+    }
+    ['play', 'pause', 'ended'].forEach(function (n) { film.addEventListener(n, sync); });
+    film.addEventListener('playing', function () { film.parentNode.classList.add('is-playing'); }, { once: true });
+    toggle.hidden = false;
+    toggle.addEventListener('click', function () {
+      userPaused = !film.paused;
+      if (film.paused) play(); else film.pause();
+    });
+    sync();
+
+    // Hintergrund-Tab: steht vor der Bewegungsprüfung, auch ein von Hand gestarteter Film soll dort nicht weiterlaufen
+    var ac = new AbortController();
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) {
+        if (!film.paused) { hiddenPaused = true; film.pause(); }
+      } else if (hiddenPaused) {
+        hiddenPaused = false;
+        if (film.paused && !userPaused && (!io || visible)) play();
+      }
+    }, { signal: ac.signal });
+    // Section-Reload im Theme-Editor: die Kachel wird ersetzt, der Listener geht mit
+    document.addEventListener('shopify:section:unload', function (e) { if (e.target.contains(wrap)) ac.abort(); }, { signal: ac.signal });
+
+    if (!M.enabled || (conn && conn.saveData) || !('IntersectionObserver' in window)) return;
+    io = new IntersectionObserver(function (entries) {
+      visible = entries[0].isIntersecting;
+      if (visible && started && !userPaused && film.paused) play();
+      else if (!visible && !film.paused) film.pause();
+    }, { threshold: 0.2 });
+    io.observe(film);
+    var idle = window.requestIdleCallback ? function (fn) { window.requestIdleCallback(fn, { timeout: 2000 }); } : function (fn) { setTimeout(fn, 300); };
+    function go() { idle(function () { started = true; if (visible && !userPaused) play(); }); }
+    if (document.readyState === 'complete') go(); else window.addEventListener('load', go, { once: true });
+    // Bewegung zur Laufzeit abgeschaltet: anhalten (das Standbild darunter bleibt)
+    M.track(film, function () { io.disconnect(); io = null; started = false; film.pause(); });
+  });
+
   /* ---------------- Statement: Wörter leuchten beim Scrollen nacheinander auf ---------------- */
   // Der Splitter (data-split) arbeitet nach document.fonts.ready: erst dann gibt es Wörter. Läuft ScrollTrigger nicht,
   // bleibt es beim Hochgleiten der Wörter aus motion.css, kein Wort bleibt gedimmt.

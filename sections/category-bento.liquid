@@ -17,10 +17,10 @@
         {%- endif -%}
         <div class="bento__pair">
           {%- if pair_a -%}
-            {%- render 'bento-tile', block: pair_a, modifier: '', width: 736, height: 738, parallax: true -%}
+            {%- render 'bento-tile', block: pair_a, modifier: '', width: 720, height: 600, parallax: true -%}
           {%- endif -%}
           {%- if pair_b -%}
-            {%- render 'bento-tile', block: pair_b, modifier: '', width: 960, height: 867, parallax: true -%}
+            {%- render 'bento-tile', block: pair_b, modifier: '', width: 720, height: 600, parallax: true -%}
           {%- endif -%}
         </div>
       </div>
@@ -53,7 +53,8 @@
         { "type": "text", "id": "subtitle", "label": "Unterzeile", "default": "Entdecken" },
         { "type": "url", "id": "url", "label": "Link" },
         { "type": "image_picker", "id": "image", "label": "Bild" },
-        { "type": "text", "id": "image_asset", "label": "Standard-Bilddatei im Theme" }
+        { "type": "text", "id": "image_asset", "label": "Standard-Bilddatei im Theme" },
+        { "type": "text", "id": "video_asset", "label": "Film im Theme (optional)", "info": "Dateiname in assets/, z. B. bento-herren-film.mp4. Läuft stumm in Schleife über dem Bild, das Bild sollte sein erstes Bild sein. Leer lassen für ein reines Bild." }
       ]
     }
   ],
@@ -62,8 +63,8 @@
       "name": "Kategorie-Bento",
       "blocks": [
         { "type": "tile", "settings": { "title": "Motorräder", "subtitle": "Neu, gebraucht & Vorführer", "image_asset": "bento-motorraeder.jpg", "url": "/collections/motorraeder" } },
-        { "type": "tile", "settings": { "title": "Herren", "subtitle": "Entdecken", "image_asset": "bento-herren.jpg", "url": "/collections/herren" } },
-        { "type": "tile", "settings": { "title": "Damen", "subtitle": "Entdecken", "image_asset": "bento-damen.jpg", "url": "/collections/damen" } },
+        { "type": "tile", "settings": { "title": "Herren", "subtitle": "Entdecken", "image_asset": "bento-herren-film.jpg", "video_asset": "bento-herren-film.mp4", "url": "/collections/herren" } },
+        { "type": "tile", "settings": { "title": "Damen", "subtitle": "Entdecken", "image_asset": "bento-damen-film.jpg", "video_asset": "bento-damen-film.mp4", "url": "/collections/damen" } },
         { "type": "tile", "settings": { "title": "Accessoires", "subtitle": "Entdecken", "image_asset": "bento-accessoires.jpg", "url": "/collections/accessoires" } },
         { "type": "tile", "settings": { "title": "Teile & Zubehör", "subtitle": "Entdecken", "image_asset": "bento-teile.jpg", "url": "/collections/teile" } }
       ]

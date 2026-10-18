@@ -132,8 +132,28 @@
 .bento-tile--light::after { display: none; }
 .bento-tile--light .bento-tile__label { color: var(--c-black); }
 .bento-tile--light .bento-tile__label span { color: var(--c-black); }
-.bento-tile:hover img { transform: scale(1.05); }
+.bento-tile:hover img, .bento-tile:hover .bento-tile__video { transform: scale(1.05); }
 .bento-tile:hover .bento-tile__label span .icon { transform: translateX(4px); }
+
+/* Kachel mit Film (Herren, Damen): Der Film liegt über dem Standbild (seinem ersten Bild) und blendet erst ein, wenn er läuft
+   (.is-playing am Bildträger, home.js). .bento-film ist das Rasterelement statt der Kachel und trägt den Knopf zum Anhalten
+   oben rechts (neben dem Link, nicht darin). */
+.bento-film { position: relative; }
+.bento-tile__video {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  opacity: 0; transition: opacity 300ms var(--ease), transform 700ms var(--ease);
+}
+.bento-tile__media.is-playing .bento-tile__video { opacity: 1; }
+.bento-film__toggle {
+  position: absolute; top: 8px; right: 8px; z-index: 2; width: 40px; height: 40px;
+  display: grid; place-items: center; color: var(--c-white);
+  background: rgba(10, 10, 10, 0.6); border-radius: var(--radius);
+  transition: background-color var(--t-fast);
+}
+.bento-film__toggle:hover { background: var(--c-black); }
+.bento-film__toggle .icon { width: 18px; height: 18px; }
+.bento-film__toggle[data-state="playing"] .bento-film__icon--play,
+.bento-film__toggle[data-state="paused"] .bento-film__icon--pause { display: none; }
 @media (min-width: 1024px) {
   .bento { grid-template-columns: 7fr 5fr; gap: 16px; }
   .bento__col { display: grid; gap: 16px; }
@@ -141,6 +161,7 @@
   .bento__col--right { grid-template-rows: 260px 440px; }
   .bento__pair { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   .bento-tile, .bento-tile--moto { aspect-ratio: auto; height: 100%; }
+  .bento-film__toggle { top: 12px; right: 12px; }
   .bento-tile__label { left: 28px; bottom: 24px; }
   .bento-tile__label strong { font-size: 32px; }
   .bento-tile--moto .bento-tile__label strong, .bento-tile--teile .bento-tile__label strong { font-size: 40px; }
@@ -151,8 +172,8 @@
 /* Einblenden (Clip-Reveal an der Kachel selbst, nicht an .bento__col/-pair: mobil display:contents). Das Bild zoomt
    von 1,15 auf 1; --rd versetzt die Kacheln und gilt für Kachel und Bild. Der Clip endet in none (motion.css). */
 @keyframes ps-bento-img { from { scale: 1.15; } }
-.has-motion .bento-tile:not(.is-in) img { scale: 1.15; }
-.has-motion .bento-tile.is-in img { animation: ps-bento-img 1200ms var(--ease-out) backwards; animation-delay: var(--rd, 0ms); }
+.has-motion .bento-tile:not(.is-in) :is(img, .bento-tile__video) { scale: 1.15; }
+.has-motion .bento-tile.is-in :is(img, .bento-tile__video) { animation: ps-bento-img 1200ms var(--ease-out) backwards; animation-delay: var(--rd, 0ms); }
 .bento__pair > :nth-child(2), .bento-tile--teile { --rd: 100ms; }
 @media (min-width: 1024px) { .bento-tile--light { --rd: 120ms; } }
 
