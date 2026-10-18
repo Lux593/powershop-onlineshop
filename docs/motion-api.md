@@ -109,6 +109,9 @@ Produktseite (snippets/pdp-buy.liquid, snippets/pdp-options.liquid, snippets/pdp
   [data-pdp-dynamic]       Bereiche, die product.js nach einer Variantenwahl über die Section Rendering API neu holt. Motorräder
                            mit Ausführungen (Farbe, Räder …) haben kein Formular: Die Optionen aus pdp-options tauschen dort Preis,
                            Fakten und technische Daten und setzen den Betreff der Kontakt-Box neu (PS.refreshContact aus contact.js).
+  Bilder je Variante       Ein Variantenbild beginnt eine Bildgruppe bis zum nächsten Variantenbild; Bilder davor gehören allen.
+                           pdp-gallery blendet beim Laden die fremden Gruppen aus (hidden), product.js tauscht sie bei jeder
+                           Auswahl, auch bei unvollständiger (Farbe gewählt, Größe noch nicht), und nummeriert die Vorschaubilder neu.
   [data-sticky-buy]        Mobile Kaufleiste (Teile, Bekleidung). product.js setzt .is-shown, sobald der Kaufbereich
                            (.pdp__buy) oben aus dem Bild ist, und nimmt es am Seitenende (Footer sichtbar) wieder weg.
   [data-sticky-contact]    Kontaktleiste der Motorräder statt der Kaufleiste; product.js setzt body.has-sticky-contact.

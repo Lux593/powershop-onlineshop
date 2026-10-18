@@ -1,6 +1,8 @@
 {% doc %}
   Bildergalerie: Slides mit Scroll-Snap (mobil wischen, am Desktop über die Vorschaubilder), Vergrößerung in einer
   Lightbox mit Zoom (.gallery). Die Steuerung übernimmt assets/product.js.
+  Bilder je Variante: Ein Variantenbild beginnt eine Gruppe, die bis zum nächsten Variantenbild reicht; Bilder vor dem
+  ersten gehören allen. Gezeigt wird nur die Gruppe der gewählten Variante (product.js tauscht sie bei jeder Auswahl).
 
   @param {product} product - Produkt
   @param {boolean} [wide] - Breites Format (Motorräder)
@@ -16,6 +18,31 @@
     assign main_width = 1600
   endif
   assign first_image = product.featured_image
+
+  assign group_starts = ','
+  for v in product.variants
+    if v.featured_image
+      assign group_starts = group_starts | append: v.featured_image.id | append: ','
+    endif
+  endfor
+  assign active_group = product.selected_or_first_available_variant.featured_image.id
+  assign hidden_ids = ','
+  assign shown_count = 0
+  assign group = ''
+  for image in product.images
+    assign key = ',' | append: image.id | append: ','
+    if group_starts contains key
+      assign group = image.id
+    endif
+    if group != blank and active_group != blank and group != active_group
+      assign hidden_ids = hidden_ids | append: image.id | append: ','
+    else
+      assign shown_count = shown_count | plus: 1
+      if shown_count == 1
+        assign first_image = image
+      endif
+    endif
+  endfor
 -%}
 
 <div class="gallery{% if wide %} gallery--wide{% endif %}" data-gallery>
@@ -31,7 +58,8 @@
         {% if product.images.size > 1 %}role="region" aria-label="Produktbilder, mit Pfeiltasten blättern" tabindex="0"{% endif %}
       >
         {%- for image in product.images -%}
-          <div class="gallery__slide" data-slide data-media-id="{{ image.id }}" data-full="{{ image | image_url: width: 2400 }}">
+          {%- assign key = ',' | append: image.id | append: ',' -%}
+          <div class="gallery__slide" data-slide data-media-id="{{ image.id }}" data-full="{{ image | image_url: width: 2400 }}"{% if hidden_ids contains key %} hidden{% endif %}>
             <img
               src="{{ image | image_url: width: main_width }}"
               srcset="{{ image | image_url: width: 600 }} 600w, {{ image | image_url: width: 900 }} 900w, {{ image | image_url: width: main_width }} {{ main_width }}w"
@@ -39,7 +67,7 @@
               alt="{% if image.alt != blank %}{{ image.alt | escape }}{% elsif product.images.size > 1 %}{{ product.title | escape }}, Bild {{ forloop.index }} von {{ product.images.size }}{% else %}{{ product.title | escape }}{% endif %}"
               width="{{ image.width }}"
               height="{{ image.height }}"
-              {% if forloop.first %}fetchpriority="high"{% else %}loading="lazy"{% endif %}
+              {% if image.id == first_image.id %}fetchpriority="high"{% else %}loading="lazy"{% endif %}
             >
           </div>
         {%- endfor -%}
@@ -54,14 +82,25 @@
   </div>
 
   {%- if product.images.size > 1 -%}
-    <div class="gallery__thumbs" role="group" aria-label="Weitere Bilder">
+    {%- assign thumb_index = 0 -%}
+    <div class="gallery__thumbs" role="group" aria-label="Weitere Bilder"{% if shown_count < 2 %} hidden{% endif %}>
       {%- for image in product.images -%}
+        {%- liquid
+          assign key = ',' | append: image.id | append: ','
+          assign is_hidden = false
+          if hidden_ids contains key
+            assign is_hidden = true
+          else
+            assign thumb_index = thumb_index | plus: 1
+          endif
+        -%}
         <button
           type="button"
           data-thumb
           data-media-id="{{ image.id }}"
-          aria-current="{% if forloop.first %}true{% else %}false{% endif %}"
-          aria-label="Bild {{ forloop.index }} von {{ product.images.size }}"
+          aria-current="{% if image.id == first_image.id %}true{% else %}false{% endif %}"
+          aria-label="Bild {{ thumb_index }} von {{ shown_count }}"
+          {% if is_hidden %}hidden{% endif %}
         >
           <img src="{{ image | image_url: width: 240 }}" alt="" width="160" height="200" loading="lazy">
         </button>

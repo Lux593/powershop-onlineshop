@@ -44,6 +44,37 @@
       if (!id) return;
       for (var i = 0; i < slides.length; i++) if (slides[i].dataset.mediaId == id) { if (i !== active) showSlide(i); return; }
     }
+
+    /* Bilder je Variante: Ein Variantenbild beginnt eine Gruppe, die bis zum nächsten Variantenbild reicht; Bilder davor
+       gehören allen (gleiche Regel wie in pdp-gallery.liquid, das beim Laden schon passend ausblendet). */
+    var groups = (function () {
+      var node = $('[data-product-json]');
+      if (!node || slides.length < 2) return null;
+      var starts = {};
+      JSON.parse(node.textContent).variants.forEach(function (v) { if (v.image) starts[v.image] = true; });
+      var group = null;
+      return slides.map(function (s) {
+        if (starts[s.dataset.mediaId]) group = s.dataset.mediaId;
+        return group;
+      });
+    })();
+    function showVariantImages(id) {
+      if (!id) return;
+      var group = String(id);
+      if (groups && groups.indexOf(group) > -1) {
+        var shown = 0;
+        slides.forEach(function (s, k) {
+          var on = groups[k] === null || groups[k] === group;
+          s.hidden = !on;
+          if (thumbs[k]) thumbs[k].hidden = !on;
+          if (on) shown++;
+        });
+        var n = 0;
+        thumbs.forEach(function (b) { if (!b.hidden) b.setAttribute('aria-label', 'Bild ' + (++n) + ' von ' + shown); });
+        if (thumbRow) thumbRow.hidden = shown < 2;
+      }
+      showImageById(id);
+    }
     if (track && slides.length > 1 && 'IntersectionObserver' in window) {
       var seen = new IntersectionObserver(function (entries) {
         if (Date.now() < holdUntil) return;
@@ -228,9 +259,11 @@
         syncId(variant);
         refreshAvailability();
         refreshBuy(variant);
+        // Bilder schon bei unvollständiger Auswahl (Farbe gewählt, Größe noch nicht): die erste passende Variante mit Bild
+        var pictured = variant && variant.image ? variant : matching(selected).filter(function (v) { return v.image; })[0];
+        if (pictured) showVariantImages(pictured.image);
         if (variant) {
           if (errorNode) errorNode.textContent = '';
-          showImageById(variant.image);
           refreshDynamic(variant);
           try {
             var url = new URL(window.location.href);
@@ -275,6 +308,9 @@
       syncId(current());
       refreshAvailability();
       refreshBuy(current());
+      // Bilder passend zur Vorauswahl (z. B. erste Farbe), falls der Server eine andere Variante zugrunde gelegt hat
+      var preset = matching(selected).filter(function (v) { return v.image; })[0];
+      if (preset) showVariantImages(preset.image);
     }
 
     /* ---------- Kompatibilitätstabelle durchsuchen ---------- */
