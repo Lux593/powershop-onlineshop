@@ -32,6 +32,8 @@
       if (pending && pending.catch) pending.catch(sync); // z. B. iOS-Stromsparmodus: Poster bleibt
     }
     ['play', 'pause', 'ended'].forEach(function (name) { film.addEventListener(name, sync); });
+    // Film erst über dem Poster einblenden, wenn er wirklich läuft (vorher bliebe die Fläche beim Laden kurz leer)
+    film.addEventListener('playing', function () { film.parentNode.classList.add('is-playing'); }, { once: true });
     if (toggle) {
       toggle.hidden = false;
       toggle.addEventListener('click', function () {
@@ -127,14 +129,38 @@
       document.removeEventListener('shopify:section:unload', gone);
     });
 
+    /* ---------- Sortierung: zwei Auswahlgruppen (Desktop-Menü, mobiles Sheet) mit einem Stand ---------- */
+    function syncSort(value) {
+      var label = '';
+      $$('[data-sort]').forEach(function (radio) {
+        radio.checked = radio.value === value;
+        if (radio.checked) label = radio.parentNode.textContent.replace(/\s+/g, ' ').trim();
+      });
+      $$('[data-sort-label]').forEach(function (el) { el.textContent = label; });
+    }
+    // Nur eine Wahl per Zeiger schließt Menü und Sheet; mit den Pfeiltasten bleibt beides offen (jede Taste wählt schon)
+    var sortByPointer = false;
+    root.addEventListener('pointerdown', function (event) { sortByPointer = !!event.target.closest('[data-sort-group]'); });
+    function closeSort(input) {
+      var drop = input.closest('.fdrop');
+      if (drop) {
+        var own = $('.fdrop__btn', drop);
+        own.setAttribute('aria-expanded', 'false');
+        own.nextElementSibling.hidden = true;
+        own.focus();
+      }
+      var sheet = input.closest('dialog');
+      if (sheet && sheet.open) sheet.close();
+    }
+
     /* ---------- URL aus einem Filterformular ---------- */
     function urlFromForm(form) {
       var params = new URLSearchParams();
       new FormData(form).forEach(function (value, key) {
         if (value !== '') params.append(key, value);
       });
-      var sort = $('[data-sort]');
-      if (sort && sort.value) params.set('sort_by', sort.value);
+      var sort = $('[data-sort]:checked');
+      if (sort) params.set('sort_by', sort.value);
       var query = params.toString();
       return form.getAttribute('action') + (query ? '?' + query : '');
     }
@@ -278,9 +304,8 @@
       var freshShow = $('[data-show-count]', next);
       if (show && freshShow) show.textContent = freshShow.textContent;
 
-      var sort = $('[data-sort]');
-      var freshSort = $('[data-sort]', next);
-      if (sort && freshSort) sort.value = freshSort.value;
+      var freshSort = $('[data-sort]:checked', next);
+      if (freshSort) syncSort(freshSort.value);
 
       var title = doc.querySelector('title');
       var text = title ? title.textContent.replace(/\s+/g, ' ').trim() : '';
@@ -298,6 +323,9 @@
         return;
       }
       if (input.matches('[data-sort]')) {
+        syncSort(input.value);
+        if (sortByPointer) closeSort(input);
+        sortByPointer = false;
         var anyForm = $('[data-filter-form]');
         var url = anyForm ? urlFromForm(anyForm) : window.location.pathname + '?sort_by=' + encodeURIComponent(input.value);
         // Ohne Filterformular: aktuelle Adresse behalten und nur die Sortierung setzen

@@ -12,8 +12,8 @@
     {%- if apparel and settings.shipping_cost_text != blank %}, darunter {{ settings.shipping_cost_text }}{% endif %}.{{ ' ' }}
   {%- endif -%}
   {%- if apparel -%}
-    {%- if settings.return_days > 0 -%}{{ settings.return_days }} Tage kostenlose Rückgabe; dein gesetzliches Widerrufsrecht (14 Tage) bleibt unberührt.
-    {%- else -%}Dein gesetzliches Widerrufsrecht (14 Tage) bleibt unberührt.{%- endif -%}
+    {%- if settings.return_days > 14 -%}{{ settings.return_days }} Tage kostenlose Rückgabe; dein gesetzliches Widerrufsrecht (14 Tage) bleibt unberührt.
+    {%- else -%}Es gilt dein gesetzliches Widerrufsrecht von 14 Tagen.{%- endif -%}
   {%- else -%}
     Sperrgut kann gesondert berechnet werden.
   {%- endif -%}

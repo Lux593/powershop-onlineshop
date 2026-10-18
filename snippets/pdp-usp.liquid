@@ -26,6 +26,6 @@
   {%- if ship_line != blank -%}
     <li>{% render 'icon', name: 'truck' %}{{ ship_line }}</li>
   {%- endif -%}
-  <li>{% render 'icon', name: 'rotate-ccw' %}{% if return_days > 0 %}{{ return_days }} Tage Rückgabe (gesetzliches Widerrufsrecht: 14 Tage){% else %}Gesetzliches Widerrufsrecht: 14 Tage{% endif %}</li>
+  <li>{% render 'icon', name: 'rotate-ccw' %}{% if return_days > 14 %}{{ return_days }} Tage Rückgabe (gesetzliches Widerrufsrecht: 14 Tage){% else %}Gesetzliches Widerrufsrecht: 14 Tage{% endif %}</li>
   <li>{% render 'icon', name: 'store' %}Abholung im Power Shop möglich</li>
 </ul>

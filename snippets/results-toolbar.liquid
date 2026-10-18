@@ -1,5 +1,6 @@
 {% doc %}
-  Filterleiste, Sortierung, Spaltenwahl und mobiler Filter-Dialog.
+  Filterleiste, Sortierung, Spaltenwahl und mobile Dialoge für Filter und Sortierung.
+  Die Sortierung folgt dem Muster der Filter: am Desktop ein Menü (.fdrop), mobil ein Knopf mit Bottom-Sheet.
   Funktioniert für Kollektionen und Suchergebnisse. Die Verarbeitung übernimmt assets/collection.js.
 
   @param {object} results - collection oder search
@@ -32,6 +33,12 @@
   endfor
 
   assign current_sort = results.sort_by | default: results.default_sort_by
+  assign current_sort_name = ''
+  for option in results.sort_options
+    if option.value == current_sort
+      assign current_sort_name = option.name
+    endif
+  endfor
   assign result_count = results.products_count | default: results.results_count
 -%}
 
@@ -76,14 +83,23 @@
 
   <div class="filterbar__right">
     {%- if results.sort_options.size > 0 -%}
-      <label class="sort">
-        <span class="hide-mobile">Sortieren:</span>
-        <select class="select" data-sort aria-label="Sortieren">
-          {%- for option in results.sort_options -%}
-            <option value="{{ option.value }}"{% if option.value == current_sort %} selected{% endif %}>{{ option.name | escape }}</option>
-          {%- endfor -%}
-        </select>
-      </label>
+      <div class="fdrop fdrop--sort">
+        <button class="fdrop__btn" type="button" aria-expanded="false" aria-controls="fp-sort">
+          <span class="fdrop__muted">Sortieren:</span> <span data-sort-label>{{ current_sort_name | escape }}</span>
+          {% render 'icon', name: 'chevron-down' %}
+        </button>
+        <div class="fdrop__panel" id="fp-sort" hidden data-lenis-prevent>
+          <fieldset class="fgroup" data-sort-group>
+            <legend class="sr-only">Sortieren</legend>
+            {%- for option in results.sort_options -%}
+              <label class="check"><input type="radio" name="sort-d" value="{{ option.value | escape }}" data-sort{% if option.value == current_sort %} checked{% endif %}>{{ option.name | escape }}</label>
+            {%- endfor -%}
+          </fieldset>
+        </div>
+      </div>
+      <button class="btn btn--outline-dark btn--sm filterbar__mobile" type="button" data-open="sort-sheet">
+        {% render 'icon', name: 'arrow-up-down' %}Sortieren
+      </button>
     {%- endif -%}
     <div class="grid-toggle" role="group" aria-label="Spalten">
       <button type="button" data-cols="2" aria-pressed="{% if default_cols == '2' %}true{% else %}false{% endif %}" aria-label="2 Spalten">
@@ -127,5 +143,24 @@
         <button class="btn btn--primary" type="submit" data-close data-show-count>{% if result_count == 1 %}1 Ergebnis anzeigen{% else %}{{ result_count }} Ergebnisse anzeigen{% endif %}</button>
       </div>
     </form>
+  </dialog>
+{%- endif -%}
+
+{%- if results.sort_options.size > 0 -%}
+  <dialog class="modal filter-sheet sort-sheet" id="sort-sheet" aria-labelledby="ss-title" data-lenis-prevent>
+    <div class="modal__inner">
+      <div class="modal__head">
+        <h2 class="h3" id="ss-title">Sortieren</h2>
+        <button class="icon-btn" type="button" data-close aria-label="Sortierung schließen">{% render 'icon', name: 'x' %}</button>
+      </div>
+      <div class="modal__body" data-lenis-prevent>
+        <fieldset class="fgroup" data-sort-group>
+          <legend class="sr-only">Sortieren</legend>
+          {%- for option in results.sort_options -%}
+            <label class="check"><input type="radio" name="sort-m" value="{{ option.value | escape }}" data-sort{% if option.value == current_sort %} checked{% endif %}>{{ option.name | escape }}</label>
+          {%- endfor -%}
+        </fieldset>
+      </div>
+    </div>
   </dialog>
 {%- endif -%}

@@ -1,17 +1,46 @@
 {% doc %}
-  Liste der Zahlarten als Pillen (Texte aus den Theme-Einstellungen).
+  Zahlarten als offizielle Shopify-Icons (payment_type_svg_tag). Quelle sind die im Checkout aktiven Zahlarten
+  (shop.enabled_payment_types). Solange dort noch keine aktiv sind, gilt die Liste aus den Theme-Einstellungen;
+  ein Name ohne bekanntes Icon erscheint dort als Text.
 
   @param {string} [style] - Optionaler Inline-Style für die Liste
-  @param {boolean} [light] - Helle Variante für den Warenkorb-Drawer
+  @param {boolean} [light] - Helle Variante für den Warenkorb-Drawer (nur Text-Einträge)
 {% enddoc %}
 
-{%- assign methods = settings.payment_methods | newline_to_br | split: '<br />' -%}
-{%- if methods.size > 0 -%}
+{%- liquid
+  assign types = shop.enabled_payment_types
+  assign from_settings = false
+  if types.size == 0
+    assign types = settings.payment_methods | newline_to_br | split: '<br />'
+    assign from_settings = true
+  endif
+-%}
+{%- if types.size > 0 -%}
   <ul class="payments" aria-label="Zahlarten"{% if style != blank %} style="{{ style }}"{% endif %}>
-    {%- for method in methods -%}
-      {%- assign method_clean = method | strip | strip_newlines -%}
-      {%- if method_clean != blank -%}
-        <li{% if light %} style="color:var(--c-muted);border-color:var(--c-line)"{% endif %}>{{ method_clean }}</li>
+    {%- for type in types -%}
+      {%- liquid
+        assign label = type | strip | strip_newlines
+        assign icon = label
+        if from_settings
+          assign key = label | downcase | replace: ' ', '_' | replace: '-', '_'
+          case key
+            when 'paypal', 'klarna', 'visa', 'maestro', 'apple_pay', 'google_pay', 'american_express', 'sofort', 'giropay', 'eps', 'ideal', 'bancontact', 'diners_club', 'discover'
+              assign icon = key
+            when 'mastercard', 'master_card'
+              assign icon = 'master'
+            when 'amex'
+              assign icon = 'american_express'
+            when 'shop_pay'
+              assign icon = 'shopify_pay'
+            else
+              assign icon = ''
+          endcase
+        endif
+      -%}
+      {%- if icon != blank -%}
+        <li class="payments__icon">{{ icon | payment_type_svg_tag }}</li>
+      {%- elsif label != blank -%}
+        <li{% if light %} style="color:var(--c-muted);border-color:var(--c-line)"{% endif %}>{{ label }}</li>
       {%- endif -%}
     {%- endfor -%}
   </ul>

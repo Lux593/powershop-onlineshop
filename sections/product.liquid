@@ -439,7 +439,7 @@
 
           <div>
             {%- if product.description != blank -%}
-              {% render 'accordion', title: 'Beschreibung', body: product.description, open: true %}
+              {% render 'accordion', title: 'Beschreibung', body: product.description %}
             {%- endif -%}
             {%- capture spec_body -%}
               <table class="spec-table"><tbody>
@@ -509,7 +509,7 @@
 
           <div>
             {%- if product.description != blank -%}
-              {% render 'accordion', title: 'Beschreibung', body: product.description, open: true %}
+              {% render 'accordion', title: 'Beschreibung', body: product.description %}
             {%- endif -%}
             {%- if product.metafields.apparel.material.value != blank -%}
               {%- capture material_body -%}

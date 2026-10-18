@@ -103,7 +103,8 @@
     "showroom": {
       "type": "showroom",
       "settings": {
-        "heading": "Bikes im Showroom"
+        "heading": "Bikes im Showroom",
+        "collection": "motorraeder"
       }
     },
     "story": {

@@ -24,7 +24,10 @@
 .page-banner--film .page-banner__media { display: block; position: static; margin: 0; }
 .page-banner--film .page-banner__media::before { content: none; }
 .film-banner__frame { position: relative; aspect-ratio: 4 / 3; overflow: hidden; background: var(--c-black); }
-.film-banner__video { width: 100%; height: 100%; object-fit: cover; }
+.film-banner__frame .film-banner__poster, .film-banner__video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+/* Film über dem Poster: erst sichtbar, wenn er läuft (der erste Frame ist das Poster, die Überblendung fällt nicht auf) */
+.film-banner__video { opacity: 0; transition: opacity 300ms var(--ease); }
+.film-banner__frame.is-playing .film-banner__video { opacity: 1; }
 .page-banner--film .page-banner__text h1 { font-size: clamp(56px, 7vw, 88px); }
 .page-banner--film .film-banner__lead { max-width: 40ch; }
 .film-banner__link {
@@ -95,8 +98,12 @@
 .frange { display: grid; grid-template-columns: 1fr auto 1fr; align-items: end; gap: 8px; min-width: 260px; }
 .frange .input { min-height: 44px; }
 .frange span { padding-bottom: 12px; color: var(--c-muted); }
-.sort { display: flex; align-items: center; gap: 8px; font-size: var(--fs-small); }
-.sort .select { min-height: 44px; width: auto; padding-right: 8px; }
+/* Sortierung wie die Filter: Menü am Desktop (rechts ausgerichtet), mobil Bottom-Sheet mit großen Zeilen */
+.fdrop--sort .fdrop__muted { font-weight: 400; color: var(--c-muted); }
+.fdrop--sort .fdrop__panel { left: auto; right: 0; }
+[data-sort-group] { border: 0; margin: 0; padding: 0; min-width: 0; }
+.sort-sheet .check { min-height: 52px; font-size: 16px; border-bottom: 1px solid var(--c-line); }
+.sort-sheet .check:last-of-type { border-bottom: 0; }
 .grid-toggle { display: flex; gap: 2px; }
 .grid-toggle button { width: 44px; height: 44px; display: grid; place-items: center; color: var(--c-muted); border: 1px solid transparent; }
 .grid-toggle button[aria-pressed="true"] { color: var(--c-black); border-color: var(--c-black); }

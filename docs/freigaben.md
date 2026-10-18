@@ -17,10 +17,10 @@ Versand, Rückgabe, Reservierung prüfen oder leeren.** Ein leerer oder 0-Wert e
 | `config/settings_schema.json:49` | Versandkostenfrei ab 100 € | Ankündigungsleiste, Produktseite (Lieferung, Versand), Warenkorb-Fortschritt | offen | |
 | `config/settings_schema.json:50` | Versandkosten darunter 4,95 € | Produktseite (Versand und Rückgabe), Warenkorb | offen | |
 | `config/settings_schema.json:51` | Lieferzeit 2–4 Werktage | Produktseite, Warenkorb | offen | |
-| `config/settings_schema.json:52` | 30 Tage freiwillige Rückgabe („kostenlose Rückgabe“) | Ankündigungsleiste, Produktseite | offen | |
+| `config/settings_schema.json:52` | Rückgabefrist 14 Tage (vom Händler festgelegt). Bis 14 Tage nennt die Produktseite nur das gesetzliche Widerrufsrecht; erst ein Wert über 14 erscheint als freiwillige, „kostenlose Rückgabe“. Die Ankündigungsleiste zeigt „14 Tage Rückgabe“. | Ankündigungsleiste, Produktseite | erledigt | |
 | `config/settings_schema.json:53-54` | Reservierung 250 € für 48 h, „wird beim Kauf angerechnet, sonst erstattet“ | Bike-Seite (Gebrauchte) | offen | |
 | `config/settings_schema.json:55` | Newsletter-Rabatt 10 % | Newsletter-Band im Footer | offen | |
-| `config/settings_schema.json:61` | Zahlarten PayPal, Klarna, Visa, Mastercard, Apple Pay, Google Pay (nur eintragen, was im Checkout aktiv ist) | Footer, Warenkorb | offen | |
+| `config/settings_schema.json:61` | Zahlarten: Footer und Warenkorb zeigen die im Checkout aktiven Zahlarten als offizielle Shopify-Icons. Die Liste PayPal, Klarna, Visa, Mastercard, Apple Pay, Google Pay gilt nur, solange dort noch keine aktiv sind. | Footer, Warenkorb | offen | |
 | `sections/header-group.json:8-9` | Texte der Ankündigungsleiste („Versandkostenfrei ab {schwelle}*“, „{tage} Tage Rückgabe“) | alle Seiten | offen | |
 
 ## 2. Newsletter

@@ -25,7 +25,7 @@ Wo noch nichts eingetragen ist, zeigt der Shop entweder nichts an oder einen **B
 
 6. **Versand**: Versandkostenfrei ab wie viel Euro (heute 100 €)? Versandkosten (heute 4,95 €)? Lieferzeit (heute 2 bis 4 Werktage; bei Teilen steht fest „5 bis 7 Werktage")?
    Liefergebiete, Ausnahmen, Sperrgut-Aufschlag? (Das Sternchen hinter „Versandkostenfrei ab 100 €*" braucht eine Fußnote.)
-7. **Rückgabe**: Rückgabefrist (heute 30 Tage)? Ist die Rückgabe wirklich kostenlos, oder wer trägt die Rücksendekosten? Der Text „kostenlose Rückgabe" steht heute auf Produktseiten.
+7. **Rückgabe**: Rückgabefrist (festgelegt: 14 Tage, also das gesetzliche Widerrufsrecht)? Ist die Rückgabe wirklich kostenlos, oder wer trägt die Rücksendekosten? Der Text „kostenlose Rückgabe" steht heute auf Produktseiten.
 8. **Zahlarten**: Welche sind im Checkout wirklich aktiv? Heute genannt: PayPal, Klarna, Visa, Mastercard, Apple Pay, Google Pay.
 9. **Abholung im Power Shop**: Ist sie möglich? Steht heute so auf den Produktseiten.
 10. **Preisangaben**: Sind alle Preise inkl. MwSt.? Gebrauchte Fahrzeuge: Differenzbesteuerung nach § 25a? Gilt „Gesamtpreis inkl. Überführung" für jedes Neufahrzeug?
