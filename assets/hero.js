@@ -18,14 +18,17 @@
     var motion = PS.motion.enabled && !PS.prefersReducedMotion();
     var rotate = motion && chips.length > 1; // endet mit dem ersten Tab-Klick
     var paused = !motion || !!slow;          // ohne Bewegung startet die Seite pausiert
-    var seen = true, awake = false, cur = 0, auto = false, t0 = performance.now();
+    var seen = true, awake = false, cur = 0, auto = false;
     var began = !paused; // Fortschrittslinie läuft erst, wenn die Seite wirklich spielt: sonst steht sie bei 0 und der aktive Tab hat keinen Marker
+    var hover = false, focus = false; // Maus über dem Text oder Tastaturfokus darin: Bildwechsel hält an, der Film läuft weiter
 
     function going() { return !paused && seen && awake && !document.hidden; }
+    function rolling() { return going() && !hover && !focus; }
 
     function apply() {
-      hero.classList.toggle('is-held', !going());
+      hero.classList.toggle('is-held', !rolling());
       hero.classList.toggle('is-rotating', rotate && began);
+      loop();
       if (btn) {
         btn.hidden = !video && !motion; // Ken-Burns und Scroll-Linie laufen auch ohne Film (2.2.2)
         btn.setAttribute('aria-pressed', paused);
@@ -50,13 +53,42 @@
       video.muted = true;
       video.addEventListener('playing', function () { hero.classList.add('is-video'); });
       // Pause von außen (System): Taste zeigt „angehalten“
+      // Nur im Bild: iOS hält den Film beim Wegscrollen selbst an, bevor der IntersectionObserver „nicht im Bild“ meldet
       video.addEventListener('pause', function () {
-        if (video && video.paused && going() && cur === 0) { paused = true; apply(); }
+        if (video && video.paused && going() && cur === 0 && inView()) { paused = true; apply(); }
       });
       video.addEventListener('error', function () { video.remove(); video = null; hero.classList.remove('is-video'); apply(); });
     }
 
-    /* ---------------- Tabs, Bildwechsel, Rotation ---------------- */
+    /* ---------------- Tabs, Bildwechsel, Rotation ----------------
+       Die Standzeit misst das Skript und zeichnet die Linie am Tab selbst (--hero-p). Sie zählt nur, solange der Bildwechsel
+       läuft (im Bild, nicht pausiert, keine Maus über dem Text, kein Tastaturfokus darin). Eine CSS-Animation mit
+       animation-play-state über eine Variable und :has(:hover) blieb in iOS Safari nach Scrollen oder Tippen stehen. */
+    var dur = (parseFloat(hero.style.getPropertyValue('--hero-dur')) || 8) * 1000;
+    var elapsed = 0, last = 0, raf = 0;
+    function bar(p) { if (chips[cur]) chips[cur].style.setProperty('--hero-p', p); }
+    function tick(now) {
+      raf = 0;
+      if (!(rotate && began && rolling())) return;
+      if (last) elapsed += Math.min(now - last, 100); // ein Ruckler oder Sprung zählt höchstens 100 ms
+      last = now;
+      if (elapsed >= dur) {
+        auto = true;
+        PS.selectTab(chips[(cur + 1) % chips.length]);
+        auto = false;
+        return;
+      }
+      bar(elapsed / dur);
+      raf = requestAnimationFrame(tick);
+    }
+    function loop() {
+      if (rotate && began && rolling()) {
+        if (!raf) { last = 0; raf = requestAnimationFrame(tick); }
+      } else if (raf) {
+        cancelAnimationFrame(raf);
+        raf = 0;
+      }
+    }
     function end() { rotate = false; apply(); }
     if (tabs) {
       tabs.addEventListener('ps:tab', function (e) {
@@ -77,16 +109,23 @@
         var p = document.getElementById(e.detail.getAttribute('aria-controls'));
         if (p) [].forEach.call(p.querySelectorAll('.is-in'), function (n) { n.classList.remove('is-in'); void n.offsetWidth; n.classList.add('is-in'); });
         cur = i;
-        t0 = performance.now();
+        elapsed = 0;
+        last = 0;
+        bar(0);
         apply();
       });
-      // Die Linie am Tab füllt sich über die Standzeit (CSS), ihr Ende wechselt den Slide. Echte Zeit muss vergangen sein,
-      // sonst wechselt jedes Werkzeug, das Animationen ans Ende springen lässt (Screenshots).
-      tabs.addEventListener('animationend', function (e) {
-        if (e.animationName !== 'hero-progress' || performance.now() - t0 < parseFloat(hero.style.getPropertyValue('--hero-dur')) * 800) return;
-        auto = true;
-        PS.selectTab(chips[(cur + 1) % chips.length]);
-        auto = false;
+    }
+    // Maus über dem Text (nicht Touch: dort bliebe :hover nach einem Tippen hängen) und Tastaturfokus halten den Bildwechsel an
+    var content = hero.querySelector('.hero__content');
+    if (content) {
+      content.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') { hover = true; apply(); } });
+      content.addEventListener('pointerleave', function () { if (hover) { hover = false; apply(); } });
+      content.addEventListener('focusin', function (e) {
+        try { focus = e.target.matches(':focus-visible'); } catch (err) { focus = true; }
+        apply();
+      });
+      content.addEventListener('focusout', function (e) {
+        if (!content.contains(e.relatedTarget)) { focus = false; apply(); }
       });
     }
     if (btn) btn.addEventListener('click', function () {
@@ -102,6 +141,11 @@
 
     /* ---------------- Im Bild, im sichtbaren Tab, Aufräumen ---------------- */
     var io = new IntersectionObserver(function (en) { seen = en[0].intersectionRatio >= 0.1; apply(); }, { threshold: [0.1] });
+    // Gleiche Grenze wie der Observer, aber sofort gemessen (seine Meldung kommt beim Scrollen erst verzögert)
+    function inView() {
+      var r = hero.getBoundingClientRect();
+      return r.height > 0 && (Math.min(r.bottom, window.innerHeight) - Math.max(r.top, 0)) / r.height >= 0.1;
+    }
     var ac = new AbortController();
     io.observe(hero);
     document.addEventListener('visibilitychange', apply, { signal: ac.signal });
@@ -110,6 +154,7 @@
       ac.abort();
       io.disconnect();
       rotate = false;
+      loop();
       hero.classList.remove('is-rotating');
       if (video) video.pause();
     }

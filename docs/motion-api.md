@@ -165,9 +165,12 @@ Hero (sections/hero.liquid, assets/hero.js; nur Startseite, PS.on('[data-hero]')
                            2G/3G; ein Tab-Klick davor lädt den gewählten Slide sofort.
   Tabs, Rotation           Die Modell-Tabs (role=tab) hören auf ps:tab: Slide wechselt über .is-active und aria-hidden, der
                            abgelöste Slide bleibt 800 ms als .is-leaving darunter. Mit Bewegung rotiert der Hero nach der
-                           Standzeit (Setting „Bildwechsel nach“, --hero-dur); die Linie am Tab füllt sich per CSS, ihr Ende
-                           (animationend hero-progress) wählt den nächsten Tab. Der erste Klick oder Tastendruck auf einen
-                           Tab beendet die Rotation.
+                           Standzeit (Setting „Bildwechsel nach“, --hero-dur). hero.js misst die Standzeit per
+                           requestAnimationFrame und zeichnet die Linie am Tab (--hero-p); gezählt wird nur, solange der
+                           Bildwechsel läuft (im Bild, nicht pausiert, keine Maus über dem Text, kein Tastaturfokus darin),
+                           ihr Ende wählt den nächsten Tab. Angehalten setzt hero.js .is-held; Ken-Burns und Pfeil-Linie
+                           pausieren daran direkt (keine Variable, kein :has(:hover): lief in iOS Safari nicht wieder an).
+                           Der erste Klick oder Tastendruck auf einen Tab beendet die Rotation.
   Pause-Taste              .hero__pause (aria-pressed) hält Film, Rotation und die laufenden Bewegungen an (WCAG 2.2.2). Ohne
                            Bewegung oder bei saveData/2G/3G startet die Seite pausiert. Im Theme-Editor wählt
                            shopify:block:select den Slide, shopify:section:unload räumt auf (auch Reduced-Motion zur
