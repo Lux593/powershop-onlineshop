@@ -108,7 +108,9 @@
 .size-chip.is-soldout { color: var(--c-muted); text-decoration: line-through; background: var(--c-offwhite); }
 
 /* ---------- Tabs ---------- */
-.tabs { display: flex; justify-content: safe center; gap: var(--s-3); border-bottom: 1px solid var(--c-line); margin-bottom: var(--s-4); overflow-x: auto; scrollbar-width: none; }
+/* overflow-x: auto macht eine Leiste auch senkrecht scrollbar, sobald etwas überragt (hier die orange Linie, margin-bottom: -1px):
+   mobil ließ sie sich nach unten ziehen. overflow-y: hidden an allen rein seitlichen Leisten (Tabs, Schienen, Vorschaubilder, Chips). */
+.tabs { display: flex; justify-content: safe center; gap: var(--s-3); border-bottom: 1px solid var(--c-line); margin-bottom: var(--s-4); overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
 .tabs::-webkit-scrollbar { display: none; }
 .tab {
   min-height: 48px; padding: 0 4px; white-space: nowrap;
@@ -280,7 +282,7 @@ dialog::backdrop { background: rgba(10, 10, 10, 0.6); }
 @keyframes toast-in { from { transform: translateY(12px); opacity: 0; } to { transform: none; opacity: 1; } }
 
 /* ---------- Karussell (horizontal, scroll-snap) ---------- */
-.rail { display: grid; grid-auto-flow: column; gap: var(--s-3); overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding-bottom: 4px; }
+.rail { display: grid; grid-auto-flow: column; gap: var(--s-3); overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scrollbar-width: none; padding-bottom: 4px; }
 .rail::-webkit-scrollbar { display: none; }
 .rail > * { scroll-snap-align: start; }
 .rail-nav { display: flex; gap: 8px; }

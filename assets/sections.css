@@ -25,7 +25,7 @@
 
 /* ---------- Service-Seite ---------- */
 .service-nav { position: sticky; top: var(--header-offset); z-index: 20; background: var(--c-offwhite); border-bottom: 1px solid var(--c-line); }
-.service-nav .chip-row { flex-wrap: nowrap; overflow-x: auto; padding-block: 12px; scrollbar-width: none; }
+.service-nav .chip-row { flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; padding-block: 12px; scrollbar-width: none; }
 .service-block { display: grid; gap: 32px; padding-block: var(--s-8); border-bottom: 1px solid var(--c-line); }
 @media (min-width: 1024px) { .service-block { grid-template-columns: 7fr 5fr; gap: 56px; align-items: start; } }
 .service-block__text { display: grid; gap: 16px; }
