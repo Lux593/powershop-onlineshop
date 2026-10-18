@@ -139,8 +139,8 @@
         {%- endfor -%}
       </div>
       <div class="modal__foot">
-        <a class="btn btn--text" href="{{ action }}{% if terms != blank %}?q={{ terms | url_encode }}{% endif %}" data-filter-link>Zurücksetzen</a>
         <button class="btn btn--primary" type="submit" data-close data-show-count>{% if result_count == 1 %}1 Ergebnis anzeigen{% else %}{{ result_count }} Ergebnisse anzeigen{% endif %}</button>
+        <a class="btn btn--outline-dark" href="{{ action }}{% if terms != blank %}?q={{ terms | url_encode }}{% endif %}" data-filter-link>Zurücksetzen</a>
       </div>
     </form>
   </dialog>
