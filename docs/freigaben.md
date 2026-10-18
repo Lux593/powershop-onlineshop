@@ -46,7 +46,7 @@ Versand, Rückgabe, Reservierung prüfen oder leeren.** Ein leerer oder 0-Wert e
 
 | Fundstelle | Aussage | Status | Freigabe |
 |---|---|---|---|
-| `templates/index.json:112-114` | Kennzahlen: 45+ Jahre Erfahrung, 2 Motorrad-Meister, Unzählige Kunden & Freunde (vom Händler vorgegeben) | erledigt | |
+| `templates/index.json:112-114` | Kennzahlen: 45+ Jahre Erfahrung, 2 Motorrad-Meister, ∞ Kunden & Freunde (vom Händler vorgegeben) | erledigt | |
 | `templates/index.json:115-117`, `templates/page.service.json:62-88` | Events: Titel, Datum, Ort und Uhrzeit (11.10., 24.10., 14.11.2026) | offen | |
 | `templates/index.json:6-19, 20-33, 34-47` | Hero: Modelle, Preise („ab 31.500 €“, „ab 48.300 €“), Modelljahr 2026, Farben, Beschreibungen | offen | |
 | `templates/index.json:86` | Statement „Von der Probefahrt bis zum Umbau …“ | offen | |

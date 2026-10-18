@@ -47,6 +47,7 @@ Attribute (Markup, alles optional)
                                     (0.2 → scale: 1.2). Belegt transform (Wrapper nutzen).
   data-countup[="1400"]             Zahl zählt hoch (ms). Reiner Text wie „25+“, „1.250 km“, „4,9“ (deutsches
                                     Zahlenformat); Original bleibt als .sr-only, im Druck gilt der Endwert.
+                                    Sonderfall „∞“: zählt beschleunigend bis 9.999 und wird am Ende zum Zeichen.
                                     NICHT data-count (Warenkorb-Zähler im Header).
   data-lenis-prevent                Am Dialog / vertikal scrollenden Container, damit Lenis dort das Wheel nicht
                                     fängt. Nicht an horizontale Schienen. Scrollbare Vorfahren, dialog[open],

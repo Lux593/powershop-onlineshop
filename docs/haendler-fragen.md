@@ -44,7 +44,7 @@ Wo noch nichts eingetragen ist, zeigt der Shop entweder nichts an oder einen **B
 
 ## D. Startseite: Zahlen, Termine, Modelle und Texte (Wichtig bis Pflicht)
 
-18. **Kennzahlen**: festgelegt: „45+ Jahre Erfahrung", „2 Motorrad-Meister", „Unzählige Kunden & Freunde".
+18. **Kennzahlen**: festgelegt: „45+ Jahre Erfahrung", „2 Motorrad-Meister", „∞ Kunden & Freunde".
 19. **Events**: Heute drei Platzhalter (11. Oktober, 24. Oktober, 14. November 2026). Echte Termine mit Titel, Datum, Ort und Uhrzeit, oder weglassen?
 20. **Hero-Modelle**: Welche Modelle sollen im Hero stehen? Heute: Road Glide ab 31.500 €, Street Glide ab 31.500 €, CVO ab 48.300 € (Modelljahr 2026, Farben und Baureihe).
     Die Preise stammen vermutlich aus einer Schweizer Mockup-Vorlage und sind nicht freigegeben. Sollen die Preise entfallen oder aus dem Produkt kommen (inkl. MwSt., zzgl. Überführung)?

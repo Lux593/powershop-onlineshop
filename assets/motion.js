@@ -250,7 +250,9 @@
   /* ---------------- Count-up ---------------- */
   function countup(el) {
     var src = el.textContent.trim();
-    var m = src.match(/^(\D*?)(\d(?:[\d.,]*\d)?)([\s\S]*)$/);
+    // „∞“: zählt immer schneller bis 9.999 hoch und wird am Ende zum Zeichen
+    var endless = src === '\u221E';
+    var m = endless ? ['', '', '9.999', ''] : src.match(/^(\D*?)(\d(?:[\d.,]*\d)?)([\s\S]*)$/);
     if (!m) return;
     var s = m[2], comma = s.indexOf(',') > -1, dot = s.indexOf('.') > -1;
     var grp = comma ? dot : dot && /^\d{1,3}(\.\d{3})+$/.test(s);
@@ -275,7 +277,7 @@
       raf = requestAnimationFrame(function step(t) {
         t0 = t0 || t;
         var p = Math.min((t - t0) / dur, 1);
-        vis.textContent = fmt(end * (1 - Math.pow(1 - p, 3)));
+        vis.textContent = fmt(end * (endless ? Math.pow(p, 3) : 1 - Math.pow(1 - p, 3))); // ∞ beschleunigt, Zahlen bremsen ab
         if (p < 1) raf = requestAnimationFrame(step); else vis.textContent = src;
       });
     };

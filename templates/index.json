@@ -112,7 +112,7 @@
       "blocks": {
         "years": { "type": "stat", "settings": { "value": "45+", "label": "Jahre Erfahrung" } },
         "masters": { "type": "stat", "settings": { "value": "2", "label": "Motorrad-Meister" } },
-        "friends": { "type": "stat", "settings": { "value": "Unzählige", "label": "Kunden & Freunde" } },
+        "friends": { "type": "stat", "settings": { "value": "∞", "label": "Kunden & Freunde" } },
         "event_1": { "type": "event", "settings": { "date": "2026-10-11", "title": "Saisonabschluss-Ausfahrt", "place": "Start: Power Shop, 10:00 Uhr", "image_asset": "event-1.jpg", "url": "/pages/service#events" } },
         "event_2": { "type": "event", "settings": { "date": "2026-10-24", "title": "Bike Night & Custom Show", "place": "Power Shop Hof, ab 18:00 Uhr", "image_asset": "event-2.jpg", "url": "/pages/service#events" } },
         "event_3": { "type": "event", "settings": { "date": "2026-11-14", "title": "Winter-Check-Tag", "place": "Werkstatt, 09:00–14:00 Uhr", "image_asset": "event-3.jpg", "url": "/pages/service#events" } }
