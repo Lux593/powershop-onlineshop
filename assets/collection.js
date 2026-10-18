@@ -80,16 +80,6 @@
     var film = root.querySelector('[data-film]');
     if (film) initFilm(film, root.querySelector('[data-film-toggle]'));
 
-    // Schnellwahl-Chips (mobil eine waagerecht scrollbare Zeile): Chrome scrollt einen nur halb sichtbaren Chip beim Fokus nicht nach,
-    // er und sein Fokusring lägen am Rand abgeschnitten. Der Chip wird ganz in die Zeile gerückt (scroll-padding-inline in shop.css lässt Platz für den Ring).
-    var chips = root.querySelector('.film-banner__chips');
-    if (chips) {
-      chips.addEventListener('focusin', function (e) {
-        if (chips.scrollWidth <= chips.clientWidth) return; // ab 768 px umbrechend, nichts zu scrollen
-        e.target.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: PS.prefersReducedMotion() ? 'auto' : 'smooth' });
-      });
-    }
-
     var cols = null;
     var controller = null;
     var timer = null;

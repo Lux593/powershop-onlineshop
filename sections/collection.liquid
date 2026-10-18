@@ -71,32 +71,6 @@
           {%- if film_link_label != blank -%}
             <a class="film-banner__link" href="{{ film_link_url }}">{{ film_link_label | escape }}</a>
           {%- endif -%}
-          {%- comment -%} Schnellwahl: Unterpunkte des passenden Hauptmenü-Eintrags {%- endcomment -%}
-          {%- assign menu_parent = '' -%}
-          {%- for top in linklists['main-menu'].links -%}
-            {%- if top.url == collection.url -%}{%- assign menu_parent = top -%}{%- endif -%}
-          {%- endfor -%}
-          {%- comment -%} Das Menü hat drei Ebenen (Hauptpunkt, Gruppe, Eintrag). Die Chips zeigen die Einträge, höchstens sechs. {%- endcomment -%}
-          {%- if menu_parent != blank and menu_parent.links.size > 0 -%}
-            {%- assign chip_count = 0 -%}
-            <nav aria-label="{{ collection.title | escape }}: Kategorien">
-              <ul class="film-banner__chips">
-                {%- for group in menu_parent.links -%}
-                  {%- if group.links.size > 0 -%}
-                    {%- for item in group.links -%}
-                      {%- if item.url != collection.url and chip_count < 6 -%}
-                        <li><a class="chip chip--dark" href="{{ item.url }}">{{ item.title | escape }}</a></li>
-                        {%- assign chip_count = chip_count | plus: 1 -%}
-                      {%- endif -%}
-                    {%- endfor -%}
-                  {%- elsif group.url != collection.url and chip_count < 6 -%}
-                    <li><a class="chip chip--dark" href="{{ group.url }}">{{ group.title | escape }}</a></li>
-                    {%- assign chip_count = chip_count | plus: 1 -%}
-                  {%- endif -%}
-                {%- endfor -%}
-              </ul>
-            </nav>
-          {%- endif -%}
         {%- elsif collection.description != blank -%}
           <p>{{ collection.description | strip_html | truncate: 240 }}</p>
         {%- endif -%}

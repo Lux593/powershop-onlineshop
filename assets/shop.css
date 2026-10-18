@@ -17,7 +17,7 @@
 }
 
 /* Film-Intro (Herren, Damen, Motorräder): schmale Bühne.
-   Text und Schnellwahl links, Filmfenster 4:3 rechts. Höhe ≈ 400px statt 600px,
+   Text links, Filmfenster 4:3 rechts. Höhe ≈ 400px statt 600px,
    damit Filter und erste Produkte im ersten Bildschirm sichtbar bleiben. */
 .page-banner--film .page-banner__inner { grid-template-columns: minmax(0, 1fr); gap: 24px; padding-block: 28px; min-height: 0; }
 .page-banner--film .page-banner__text { grid-template-columns: minmax(0, 1fr); padding-block: 0; align-content: center; gap: 12px; }
@@ -37,21 +37,6 @@
 }
 .film-banner__link:hover { color: var(--c-white); }
 
-/* Schnellwahl: die Unterkategorien aus dem Hauptmenü, auf Mobil eine scrollbare Zeile */
-.film-banner__chips {
-  display: flex; gap: 8px;
-  overflow-x: auto; overflow-y: hidden; scrollbar-width: none;
-  margin-inline: calc(-1 * var(--gutter)); padding-inline: var(--gutter);
-  /* overflow-x:auto schneidet auch vertikal: 6 px Luft oben und unten (Ring 2 px + Abstand 3 px), am Rand ausgeglichen (Netto-Abstand wie vorher: oben 4 px, unten 0) */
-  padding-block: 6px; margin-block: -2px -6px;
-  scroll-padding-inline: 12px;
-}
-.film-banner__chips::-webkit-scrollbar { display: none; }
-.film-banner__chips li { flex: none; }
-.chip--dark { background: transparent; color: var(--c-white); border-color: var(--c-border-dark); }
-.chip--dark:hover,
-
-
 /* Pause: kleine Fläche unten rechts im Film (44px Trefferfläche) */
 .film-banner__toggle {
   position: absolute; right: 12px; bottom: 12px; width: 44px; height: 44px;
@@ -69,7 +54,6 @@
     grid-template-columns: minmax(0, 1fr) clamp(300px, 34vw, 448px);
     align-items: center; gap: 48px; padding-block: 32px;
   }
-  .film-banner__chips { flex-wrap: wrap; overflow: visible; margin: 4px 0 0; padding: 0; }
 }
 
 .filterbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding-block: 20px; border-bottom: 1px solid var(--c-line); }
