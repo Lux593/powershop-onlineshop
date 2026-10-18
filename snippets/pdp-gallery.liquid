@@ -122,7 +122,7 @@
       </div>
     </div>
     {%- if first_image -%}
-      <div class="lightbox__stage" data-lightbox-stage>
+      <div class="lightbox__stage" data-lightbox-stage tabindex="-1" autofocus>
         <img src="{{ first_image | image_url: width: 1600 }}" alt="{{ product.title | escape }}" width="{{ first_image.width }}" height="{{ first_image.height }}" loading="lazy" data-lightbox-img>
       </div>
     {%- endif -%}

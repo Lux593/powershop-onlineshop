@@ -412,6 +412,15 @@ html:not(.has-motion) .bcard:hover .bcard__media img { transform: none; }
 .lightbox__stage.is-zoomed { cursor: zoom-out; touch-action: none; }
 .lightbox__stage.is-zoomed img { transform: scale(2.5); }
 .has-motion .lightbox__stage img { transition: transform 420ms var(--ease-out); }
+/* Erster Fokus beim Öffnen (autofocus, tabindex=-1): kein Ring um „Zoom“ nach einem Tippen; per Tab nie erreichbar */
+.lightbox__stage:focus { outline: none; }
+@media (max-width: 639px) {
+  /* Mobil: Vollbild statt Bottom-Sheet (.modal), Bild mittig im Platz unter der Kopfzeile, nichts unter der Browserleiste */
+  .lightbox { width: 100%; height: 100%; height: 100dvh; max-height: none; margin: 0; border-radius: 0; }
+  .lightbox .modal__inner { height: 100%; max-height: none; }
+  .lightbox__stage { flex: 1; min-height: 0; display: grid; place-items: center; }
+  .lightbox__stage img { max-height: 100%; }
+}
 
 /* ---------- Produktseite: Kaufleiste (Teile, Bekleidung) und Kontaktleiste (Motorräder) ---------- */
 .sticky-buy {
