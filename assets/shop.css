@@ -284,7 +284,7 @@ body.has-sticky-contact { padding-bottom: 72px; }
 .subtotal strong { font-family: var(--f-head); font-size: 26px; }
 
 /* Warenkorb-Drawer kompakt (mobil bildschirmbreit, am Desktop 440 px): kleinere Zeilen, Menge als schmale Pille, engerer Fußbereich
-   („Zur Kasse“ und „Weiter einkaufen“ gleich groß, Zahlarten mittig darunter). Die Warenkorb-Seite (theme.css) behält die großen Zeilen. */
+   („Zur Kasse“ und „Weiter einkaufen“ gleich groß, ohne Zahlarten). Die Warenkorb-Seite (theme.css) behält die großen Zeilen. */
 .drawer--cart .drawer__body { padding: 16px; }
 .drawer--cart .progress { padding: 10px 14px; }
 .drawer--cart .line-item { grid-template-columns: 64px minmax(0, 1fr); gap: 12px; padding-block: 12px; }
