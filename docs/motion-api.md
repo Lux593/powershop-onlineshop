@@ -106,7 +106,7 @@ Kollektion und Suche (assets/collection.js, Regeln in shop.css)
                            entfernt nur die jüngste Überblendung. Ohne View Transition (Browser, Reduced-Motion, Setting aus)
                            wird ohne Überblendung getauscht. Reveals im neuen HTML startet motion.js selbst (MutationObserver).
   Film-Kopf mobil         Bis 767 px, nur unter html.has-motion: Der Text bleibt per sticky unter dem Header stehen, der Film rutscht
-                           dahinter und nimmt ihn 72 px über seiner Unterkante mit. Reines CSS (shop.css), der Schleier hängt als
+                           ganz dahinter und nimmt ihn erst mit, wenn seine Unterkante 24 px unter dem Text angekommen ist. Reines CSS (shop.css), der Schleier hängt als
                            ::before am Text und wandert mit ihm, kein Skript.
 
 Produktseite (snippets/pdp-buy.liquid, snippets/pdp-options.liquid, snippets/pdp-sticky-buy.liquid, assets/product.js)

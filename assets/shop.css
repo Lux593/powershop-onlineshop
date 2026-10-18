@@ -49,22 +49,24 @@
 .film-banner__toggle[data-state="playing"] .film-banner__icon--play,
 .film-banner__toggle[data-state="paused"] .film-banner__icon--pause { display: none; }
 
-/* Mobil, nur mit Bewegung: Beim Runterscrollen bleibt der Text unter dem Header stehen, der Film schiebt sich dahinter nach oben.
-   Steht der Text 72 px über der Filmunterkante (darunter bleibt der Pause-Knopf frei), endet der Sticky-Bereich und der Film nimmt
-   ihn mit: Der Rand unter dem Text zählt beim Sticky mit, Grenze ist die Unterkante des Films. Der Film rückt um 48 px hoch,
-   der Abstand Text–Film bleibt so 24 px. overflow: clip statt hidden: hidden machte das Banner zum Scroll-Container, sticky griffe nicht. */
+/* Mobil, nur mit Bewegung: Beim Runterscrollen bleibt der Text unter dem Header stehen, der Film schiebt sich ganz dahinter nach oben.
+   Erst wenn die Filmunterkante 24 px unter dem Text angekommen ist, endet der Sticky-Bereich und der Film nimmt den Text mit: Der Rand
+   unter dem Text (zugleich der Abstand Text–Film vorher) zählt beim Sticky mit, Grenze ist die Unterkante des Films. Der Pause-Knopf
+   liegt dann im Textbereich: Er steht über dem Text (z-index), der Textblock lässt Klicks durch (nur seine Links fangen sie).
+   overflow: clip statt hidden: hidden machte das Banner zum Scroll-Container, sticky griffe nicht. */
 @media (max-width: 767px) {
   .has-motion .page-banner--film { overflow: clip; }
   .has-motion .page-banner--film .page-banner__inner { display: block; }
   .has-motion .page-banner--film .page-banner__text {
     position: sticky; top: calc(var(--header-offset) + 28px); z-index: 1;
-    margin-bottom: 72px; transition: top var(--t-med) var(--ease);
+    margin-bottom: 24px; transition: top var(--t-med) var(--ease); pointer-events: none;
   }
-  .has-motion .page-banner--film .page-banner__media { margin-top: -48px; }
+  .has-motion .page-banner--film .page-banner__text a { pointer-events: auto; }
+  .has-motion .film-banner__toggle { z-index: 2; }
   /* Schleier für die Lesbarkeit: Er hängt am Text und wandert mit ihm, der Film wird genau dort dunkel, wo er unter dem Text liegt.
      Kein Skript, kein Zeitversatz zum Scrollen (vorher blendete collection.js je Frame einen Schleier über den ganzen Film ein,
      beim schnellen Scrollen sprang er sichtbar in Stufen). Über dem schwarzen Banner fällt er nicht auf. Gleichmäßig dunkel ohne
-     Verlauf (keine Stufen), unten läuft er über 28 px weich aus und endet vor dem Pause-Knopf. */
+     Verlauf (keine Stufen), unten läuft er über 28 px weich aus. */
   .has-motion .page-banner--film .page-banner__text::before {
     content: ""; position: absolute; inset: -28px 0; z-index: -1; pointer-events: none;
     background: linear-gradient(to bottom,
