@@ -144,9 +144,11 @@ html:not(:has(.announce)) { --announce-h: 0px; }
 .mobile-menu__direct { display: flex; align-items: center; justify-content: space-between; padding: 0 24px; min-height: 60px; border-top: 1px solid var(--c-steel); font-family: var(--f-head); font-weight: 700; font-size: 20px; text-transform: uppercase; }
 .mobile-menu__direct--sale { color: var(--c-orange); }
 .mobile-menu__foot { padding: 24px; display: grid; gap: 12px; border-top: 1px solid var(--c-steel); }
-.mobile-menu__foot a { display: flex; align-items: center; gap: 12px; min-height: 44px; }
-.mobile-menu__hd { display: flex; align-items: center; gap: 12px; margin-top: 8px; color: var(--c-muted-dark); font-size: var(--fs-small); }
-.mobile-menu__hd img { height: 40px; width: auto; }
+/* Kundenkonto als umrandeter Button (präsent), die Telefonnummer als schlichter Link darunter */
+.mobile-menu__foot a:not(.btn) { display: flex; align-items: center; gap: 12px; min-height: 44px; }
+/* H-D Bar & Shield vor der Wortmarke, wie im Header mobil */
+.mobile-menu__brand { display: flex; align-items: center; gap: 8px; }
+.mobile-menu__brand img { height: 30px; width: auto; flex: none; }
 
 /* Suche */
 .search-dialog { width: 100%; max-width: 100%; margin: 0 0 auto; background: var(--c-offwhite); }

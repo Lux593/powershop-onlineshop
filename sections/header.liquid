@@ -75,7 +75,10 @@
 
 <dialog class="drawer drawer--left mobile-menu" id="mobile-menu" aria-label="Menü" data-lenis-prevent>
   <div class="drawer__head">
-    <span class="wordmark">Power<span>Shop</span></span>
+    <span class="mobile-menu__brand">
+      <img src="{{ 'hd-bar-shield.png' | asset_url }}" alt="" width="49" height="40">
+      <span class="wordmark">Power<span>Shop</span></span>
+    </span>
     <button class="icon-btn" type="button" data-close aria-label="Menü schließen">{% render 'icon', name: 'x' %}</button>
   </div>
   <div class="drawer__body" style="padding:0" data-lenis-prevent>
@@ -102,18 +105,16 @@
         </a>
       {%- endif -%}
     {%- endfor -%}
-    <div class="mobile-menu__foot">
-      {%- if shop.customer_accounts_enabled -%}
-        <a href="{{ routes.account_url }}">{% render 'icon', name: 'user' %}Kundenkonto</a>
-      {%- endif -%}
-      {%- if settings.phone != blank -%}
-        <a href="{% render 'contact-href', kind: 'tel' %}">{% render 'icon', name: 'phone' %}{{ settings.phone | escape }}</a>
-      {%- endif -%}
-      <div class="mobile-menu__hd">
-        <img src="{{ 'hd-bar-shield.png' | asset_url }}" alt="" width="49" height="40">
-        <span>Offizieller Harley-Davidson Vertragshändler</span>
+    {%- if shop.customer_accounts_enabled or settings.phone != blank -%}
+      <div class="mobile-menu__foot">
+        {%- if shop.customer_accounts_enabled -%}
+          <a class="btn btn--outline-light btn--block" href="{{ routes.account_url }}">{% render 'icon', name: 'user' %}Kundenkonto</a>
+        {%- endif -%}
+        {%- if settings.phone != blank -%}
+          <a href="{% render 'contact-href', kind: 'tel' %}">{% render 'icon', name: 'phone' %}{{ settings.phone | escape }}</a>
+        {%- endif -%}
       </div>
-    </div>
+    {%- endif -%}
   </div>
 </dialog>
 
