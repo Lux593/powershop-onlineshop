@@ -81,7 +81,7 @@
     </span>
     <button class="icon-btn" type="button" data-close aria-label="Menü schließen">{% render 'icon', name: 'x' %}</button>
   </div>
-  <div class="drawer__body" style="padding:0" data-lenis-prevent>
+  <div class="drawer__body" data-lenis-prevent>
     {%- for link in menu.links -%}
       {%- if link.links.size > 0 -%}
         <details class="acc">
