@@ -1,0 +1,42 @@
+{% doc %}
+  Akkordeons „Beschreibung“ und „Details“ der Produktseite. Die H-D-Beschreibungen enthalten nach dem Text eine fette
+  Zwischenzeile „Details“ (<p><strong>Details</strong></p>) mit einer Liste darunter: Diese Liste wird ein eigener Abschnitt
+  „Details“. Was nach der Liste folgt (z. B. ein Link zur Einbauanleitung), bleibt in der Beschreibung.
+  Ohne die Zwischenzeile steht die ganze Beschreibung unter „Beschreibung“. Ohne Beschreibung entsteht nichts.
+
+  @param {product} product - Produkt
+
+  @example
+  {% render 'product-description', product: product %}
+{% enddoc %}
+
+{%- liquid
+  assign html = product.description
+  assign main_html = html
+  assign details_html = ''
+  assign markers = '<p><strong>Details</strong></p>|<p><b>Details</b></p>|<h2>Details</h2>|<h3>Details</h3>|<h4>Details</h4>' | split: '|'
+  for marker in markers
+    if html contains marker
+      assign head = html | split: marker | first
+      assign tail = html | remove_first: head | remove_first: marker
+      if tail contains '</ul>'
+        assign details_html = tail | split: '</ul>' | first | append: '</ul>'
+        assign rest = tail | remove_first: details_html
+      else
+        assign details_html = tail
+        assign rest = ''
+      endif
+      assign main_html = head | append: rest
+      break
+    endif
+  endfor
+  assign main_html = main_html | strip
+  assign details_html = details_html | strip
+-%}
+
+{%- if main_html != blank -%}
+  {% render 'accordion', title: 'Beschreibung', body: main_html %}
+{%- endif -%}
+{%- if details_html != blank -%}
+  {% render 'accordion', title: 'Details', body: details_html %}
+{%- endif -%}

@@ -40,7 +40,9 @@
 .footer__dealer p { font-size: var(--fs-small); color: var(--c-muted-dark); }
 .footer__dealer strong { color: var(--c-white); display: block; font-family: var(--f-head); font-size: 18px; text-transform: uppercase; letter-spacing: 0.03em; }
 .footer__bottom { border-top: 1px solid var(--c-steel); padding-block: 20px; font-size: var(--fs-caption); color: var(--c-muted-dark); }
-.footer__bottom .container { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; }
+/* Zahlungs-Icons mittig, darunter Copyright und Rechtslinks, ebenfalls mittig */
+.footer__bottom .container { display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center; }
+.footer__bottom .payments { justify-content: center; }
 .payments { display: flex; flex-wrap: wrap; gap: 6px; }
 .payments li { padding: 4px 8px; border: 1px solid var(--c-steel); border-radius: var(--radius); font-size: var(--fs-caption); font-weight: 600; letter-spacing: 0.04em; color: var(--c-on-dark); }
 /* Offizielle Shopify-Icons (payment_type_svg_tag) bringen Rahmen und Fläche selbst mit */

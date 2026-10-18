@@ -208,7 +208,7 @@
           {%- capture equip_body -%}
             <ul class="equip">{%- for item in equipment -%}<li>{% render 'icon', name: 'check' %}{{ item | escape }}</li>{%- endfor -%}</ul>
           {%- endcapture -%}
-          {% render 'accordion', title: 'Ausstattung & Extras', body: equip_body, open: true %}
+          {% render 'accordion', title: 'Ausstattung & Extras', body: equip_body %}
         {%- endif -%}
 
         {%- capture spec_body -%}
@@ -438,9 +438,7 @@
           {% render 'pdp-usp' %}
 
           <div>
-            {%- if product.description != blank -%}
-              {% render 'accordion', title: 'Beschreibung', body: product.description %}
-            {%- endif -%}
+            {% render 'product-description', product: product %}
             {%- capture spec_body -%}
               <table class="spec-table"><tbody>
                 {%- if part_no != blank -%}<tr><th>Art.-Nr.</th><td>{{ part_no | escape }}</td></tr>{%- endif -%}
@@ -508,9 +506,7 @@
           {% render 'pdp-usp' %}
 
           <div>
-            {%- if product.description != blank -%}
-              {% render 'accordion', title: 'Beschreibung', body: product.description %}
-            {%- endif -%}
+            {% render 'product-description', product: product %}
             {%- if product.metafields.apparel.material.value != blank -%}
               {%- capture material_body -%}
                 <p>{{ product.metafields.apparel.material.value | escape }}</p>
