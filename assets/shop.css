@@ -211,6 +211,7 @@
 .bike-facts dd { font-weight: 600; }
 .bike-price strong { font-family: var(--f-head); font-weight: 800; font-size: 40px; line-height: 1; }
 .bike-price p { font-size: var(--fs-small); color: var(--c-muted); margin-top: 4px; }
+.bike-options { display: grid; gap: 20px; }
 .equip { columns: 2; column-gap: 24px; list-style: none !important; padding: 0 !important; }
 .equip li { display: flex; gap: 8px; break-inside: avoid; margin: 0 0 8px !important; }
 .equip .icon { width: 16px; height: 16px; color: var(--c-success); margin-top: 3px; }

@@ -75,6 +75,16 @@
     assign equipment = product.metafields.bike.ausstattung.value
     assign reserved_until = product.metafields.bike.reserviert_bis.value
 
+    comment
+      Ausführungen (z. B. Farbe, Räder) als Varianten: Die gewählte Farbe ersetzt das Metafeld, Preis und Anfrage folgen der Variante.
+    endcomment
+    for option in product.options_with_values
+      assign option_key = option.name | downcase
+      if option_key == 'farbe' or option_key == 'color'
+        assign color = current_variant.options[forloop.index0] | default: color
+      endif
+    endfor
+
     assign is_new_bike = false
     if zustand == 'neu'
       assign is_new_bike = true
@@ -100,21 +110,22 @@
     endif
 
     comment
-      Betreff der Anfrage: „Titel (Modelljahr …, Fzg.-Nr. …)“. Fehlende Angaben entfallen samt Trenner,
-      es bleibt nie „Modelljahr , Fzg.-Nr.“ oder „()“ stehen.
+      Betreff der Anfrage: „Titel (Ausführung, Modelljahr …, Fzg.-Nr. …)“. Fehlende Angaben entfallen samt Trenner,
+      es bleibt nie „Modelljahr , Fzg.-Nr.“ oder „()“ stehen: Jede Angabe kommt mit „, “ davor, das erste „, “ fällt am Ende weg.
     endcomment
     assign label_parts = ''
+    unless product.has_only_default_variant
+      assign label_parts = ', ' | append: current_variant.title
+    endunless
     if is_new_bike and year != blank
-      assign label_parts = 'Modelljahr ' | append: year
+      assign label_parts = label_parts | append: ', Modelljahr ' | append: year
     elsif is_new_bike == false and ez != blank
-      assign label_parts = 'EZ ' | append: ez
+      assign label_parts = label_parts | append: ', EZ ' | append: ez
     endif
     if from_price != true and fzg_nr != blank
-      if label_parts != blank
-        assign label_parts = label_parts | append: ', '
-      endif
-      assign label_parts = label_parts | append: 'Fzg.-Nr. ' | append: fzg_nr
+      assign label_parts = label_parts | append: ', Fzg.-Nr. ' | append: fzg_nr
     endif
+    assign label_parts = label_parts | remove_first: ', '
     assign bike_label = product.title
     if label_parts != blank
       assign bike_label = bike_label | append: ' (' | append: label_parts | append: ')'
@@ -144,8 +155,8 @@
               {%- if fzg_nr != blank -%}<span>{% if from_price %}Modell {{ fzg_nr | escape }}{% else %}Fzg.-Nr. {{ fzg_nr | escape }}{% endif %}</span>{%- endif -%}
             </p>
           {%- endif -%}
-          <div class="bike-price">
-            <strong>{% if from_price %}ab {% endif %}{{ product.price | money_without_trailing_zeros }}</strong>
+          <div class="bike-price" data-pdp-dynamic="bike-price">
+            <strong>{% if from_price %}ab {% endif %}{{ current_variant.price | money_without_trailing_zeros }}</strong>
             <p>
               {%- if from_price %}Ab-Preis laut Harley-Davidson · {% elsif is_new_bike %}Gesamtpreis inkl. Überführung und Nebenkosten · {% endif -%}
               {%- if tax == '25a' %}MwSt. nicht ausweisbar (Differenzbesteuerung § 25a UStG){% else %}inkl. 19 % MwSt.{% endif -%}
@@ -153,7 +164,11 @@
             </p>
           </div>
 
-          <dl class="bike-facts">
+          {%- unless product.has_only_default_variant -%}
+            <div class="bike-options">{% render 'pdp-options', product: product, variant: current_variant %}</div>
+          {%- endunless -%}
+
+          <dl class="bike-facts" data-pdp-dynamic="bike-facts">
             <div><dt>{% render 'icon', name: 'calendar' %}{% if is_new_bike %}Modelljahr{% else %}Erstzulassung{% endif %}</dt><dd>{% if is_new_bike %}{{ year | default: 'auf Anfrage' }}{% else %}{{ ez | default: 'auf Anfrage' }}{% endif %}</dd></div>
             <div><dt>{% render 'icon', name: 'gauge' %}km-Stand</dt><dd>{% if km_known %}{% render 'number-de', value: km %} km{% else %}auf Anfrage{% endif %}</dd></div>
             <div><dt>{% render 'icon', name: 'zap' %}Leistung</dt><dd>{% if kw != blank %}{{ kw }} kW ({{ ps }} PS){% else %}auf Anfrage{% endif %}</dd></div>
@@ -197,7 +212,7 @@
         {%- endif -%}
 
         {%- capture spec_body -%}
-          <table class="spec-table"><tbody>
+          <table class="spec-table" data-pdp-dynamic="bike-specs"><tbody>
             <tr><th>Modellfamilie</th><td>{{ family | default: '–' | escape }}</td></tr>
             <tr><th>Modell</th><td>{{ product.title | escape }}</td></tr>
             <tr><th>Modelljahr</th><td>{{ year | default: '–' }}</td></tr>

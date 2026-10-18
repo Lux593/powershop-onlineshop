@@ -56,6 +56,9 @@
     }
   }
 
+  // product.js ruft das nach einer Variantenwahl auf, wenn sich der Betreff (data-subject) geändert hat
+  PS.refreshContact = update;
+
   PS.on('[data-contact]', function (box) {
     update(box);
     var state = box.querySelector('[data-open-state]');

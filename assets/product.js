@@ -124,14 +124,15 @@
       }
     });
 
-    /* ---------- Varianten ---------- */
+    /* ---------- Varianten ----------
+       Bekleidung und Teile wählen im Kaufformular, Motorräder ohne Formular: dort folgen Preis, Fakten und Anfrage der Auswahl. */
     var jsonNode = $('[data-product-json]');
     var rows = $$('[data-option-row]');
     var form = $('[data-product-form]');
 
-    if (jsonNode && form) {
+    if (jsonNode) {
       var data = JSON.parse(jsonNode.textContent);
-      var idField = $('[data-variant-id]', form);
+      var idField = form && $('[data-variant-id]', form);
       var errorNode = $('[data-option-error]', form);
       // Kaufbutton und Text gibt es auch in der Sticky-Leiste (außerhalb, per form="…")
       var buyButtons = $$('[data-buy]');
@@ -190,7 +191,7 @@
       live.setAttribute('aria-atomic', 'true');
       root.appendChild(live);
       var announceVariant = function (variant) {
-        var price = $('[data-pdp-dynamic="price"] .price__now');
+        var price = $('[data-pdp-dynamic="price"] .price__now') || $('[data-pdp-dynamic="bike-price"] strong');
         var text = [variant.options.join(' / '), price && price.textContent.replace(/\s+/g, ' ').trim(), variant.available ? '' : 'ausverkauft']
           .filter(Boolean).join(', ');
         live.textContent = '';
@@ -209,6 +210,13 @@
             $$('[data-pdp-dynamic]').forEach(function (node) {
               var fresh = doc.querySelector('[data-pdp-dynamic="' + node.dataset.pdpDynamic + '"]');
               if (fresh) node.innerHTML = fresh.innerHTML;
+            });
+            // Kontakt-Box (Motorräder): Der Betreff nennt die gewählte Ausführung, Links neu setzen
+            $$('[data-contact]').forEach(function (box) {
+              var fresh = box.id && doc.getElementById(box.id);
+              if (!fresh || fresh.dataset.subject === box.dataset.subject) return;
+              box.dataset.subject = fresh.dataset.subject;
+              if (PS.refreshContact) PS.refreshContact(box);
             });
             announceVariant(variant);
           })
@@ -245,7 +253,7 @@
       });
 
       // Vor dem Warenkorb-Handler: ohne vollständige Auswahl nichts abschicken
-      form.addEventListener('submit', function (event) {
+      if (form) form.addEventListener('submit', function (event) {
         var variant = current();
         if (!variant) {
           event.preventDefault();

@@ -50,7 +50,7 @@ sections/   Startseite: hero · service-tiles · product-tabs · statement · ca
             Shop: collection · collections · product · cart · cart-drawer · search · predictive-search
             Seiten: page · service-page · blog · article · 404 · password
             Rahmen: header · announcement-bar · footer, dazu header-group.json und footer-group.json
-snippets/   Karten (product-card, bike-card, result-card, event-card, bento-tile), Produktseite (pdp-gallery, pdp-buy, pdp-sticky-buy,
+snippets/   Karten (product-card, bike-card, result-card, event-card, bento-tile), Produktseite (pdp-gallery, pdp-buy, pdp-options, pdp-sticky-buy,
             pdp-usp, pdp-shipping, pdp-gpsr, size-guide, swatch, rating, price), Shop-Bausteine (results-toolbar, filter-controls,
             active-filters, pagination, cart-line, contact-box, search-dialog, mega-menu, accordion), Kleinteile (icon, icons-sprite,
             media, is-placeholder, number-de, opening-hours, payments, bike-badge), Kopfbereich (meta-tags, fonts)
