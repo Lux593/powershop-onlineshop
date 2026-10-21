@@ -8,6 +8,7 @@
   var TOPICS = {
     probefahrt: { subj: 'Probefahrt', text: function (x) { return 'ich möchte gerne eine Probefahrt' + (x ? ' mit der ' + x : '') + ' vereinbaren. Wann passt es euch?'; } },
     finanzierung: { subj: 'Finanzierung', text: function (x) { return 'ich interessiere mich für eine Finanzierung' + (x ? ' der ' + x : '') + '. Könnt ihr mir ein Angebot machen?'; } },
+    versicherung: { subj: 'Versicherung', text: function (x) { return 'ich interessiere mich für eine Versicherung' + (x ? ' für die ' + x : ' für mein Bike') + '. Könnt ihr mich beraten?'; } },
     inzahlungnahme: { subj: 'Inzahlungnahme', text: function (x) { return 'ich möchte mein aktuelles Motorrad in Zahlung geben' + (x ? ' und interessiere mich für die ' + x : '') + '. Mein Bike: Modell …, Baujahr …, km-Stand …'; } },
     reservierung: { subj: 'Reservierungsanfrage', text: function (x) { return 'ich möchte die ' + x + ' reservieren. Bitte schickt mir den Zahlungslink für die Reservierungsgebühr.'; } },
     werkstatt: { subj: 'Werkstatt-Termin', text: function () { return 'ich hätte gerne einen Werkstatt-Termin. Mein Bike: Modell …, Baujahr …, Anliegen: …'; } },

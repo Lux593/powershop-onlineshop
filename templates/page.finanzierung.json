@@ -1,0 +1,148 @@
+{
+  "sections": {
+    "kopf": {
+      "type": "page-head",
+      "blocks": {
+        "sprung_finanzierung": {
+          "type": "jump",
+          "settings": {
+            "label": "Finanzierung",
+            "anchor": "finanzierung"
+          }
+        },
+        "sprung_versicherung": {
+          "type": "jump",
+          "settings": {
+            "label": "Versicherung",
+            "anchor": "versicherung"
+          }
+        },
+        "logo_hdfs": {
+          "type": "logo",
+          "settings": {
+            "image_asset": "logo-hd-financial-services.png",
+            "width": 423,
+            "height": 50,
+            "alt": "Harley-Davidson Finance"
+          }
+        },
+        "logo_hdis": {
+          "type": "logo",
+          "settings": {
+            "image_asset": "logo-hd-insurance-services.png",
+            "width": 386,
+            "height": 52,
+            "alt": "Harley-Davidson Insurance Services"
+          }
+        }
+      },
+      "block_order": [
+        "sprung_finanzierung",
+        "sprung_versicherung",
+        "logo_hdfs",
+        "logo_hdis"
+      ],
+      "settings": {
+        "heading": "Finanzierung & Versicherung",
+        "text": "Gerne unterstützen wir dich bei allen Fragen rund um Finanzierung und Versicherung.",
+        "image_asset": "finanzierung-breakout.jpg",
+        "image_alt": "Fahrer geht im Abendlicht von seiner Harley-Davidson Breakout weg",
+        "logos_label": "Unsere Partner"
+      }
+    },
+    "finanzierung": {
+      "type": "partner-offer",
+      "blocks": {
+        "rechner": {
+          "type": "buttons",
+          "settings": {
+            "label_1": "Finanzierungsrechner",
+            "url_1": "https://calculator.harley-davidson.com/de/finance/choose-bike/",
+            "label_2": "Mehr erfahren",
+            "url_2": "https://calculator.harley-davidson.com/de/home"
+          }
+        },
+        "beratung": {
+          "type": "text",
+          "settings": {
+            "heading": "Persönliche Beratung",
+            "text": "<p>Wir kalkulieren für dich auf Wunsch ein individuelles Angebot, passend zu deinem Bike und deinen Vorstellungen. Kontaktiere uns einfach, wir beraten dich persönlich.</p>"
+          }
+        },
+        "kontakt": {
+          "type": "contact",
+          "settings": {
+            "title": "Angebot anfragen",
+            "intro": "",
+            "topics": "finanzierung,versicherung,inzahlungnahme,frage",
+            "topic": "finanzierung"
+          }
+        }
+      },
+      "block_order": [
+        "rechner",
+        "beratung",
+        "kontakt"
+      ],
+      "settings": {
+        "anchor": "finanzierung",
+        "scheme": "light",
+        "logo_asset": "logo-hd-financial-services-dunkel.png",
+        "logo_width": 423,
+        "logo_height": 50,
+        "logo_alt": "Harley-Davidson Finance",
+        "heading": "Der Preis sollte nie ein Hindernis sein, seine Träume zu verwirklichen",
+        "text": "<p>Hole Dir Dein Traum Harley-Davidson® Motorrad für weniger als Du denkst. Hier klicken, um zu sehen, was unser Finanzrechner für Dich tun kann.</p>",
+        "footnote_term": "",
+        "footnote": ""
+      }
+    },
+    "versicherung": {
+      "type": "partner-offer",
+      "blocks": {
+        "rechner": {
+          "type": "buttons",
+          "settings": {
+            "label_1": "Prämienrechner",
+            "url_1": "https://www.ergo-hdis.de/praemienberechnung/allgemeine-daten",
+            "label_2": "Mehr erfahren",
+            "url_2": "https://www.ergo-hdis.de/"
+          }
+        },
+        "ansprechpartner": {
+          "type": "person",
+          "settings": {
+            "image_asset": "versicherung-daniel-meier.jpg",
+            "image_alt": "Daniel Meier, Versicherungsberater der ERGO für Harley-Davidson Insurance Services",
+              "name": "Daniel Meier",
+            "company": "Geschäftsstelle der ERGO Beratung und Vertrieb AG",
+            "address": "Tullastr. 89\n79108 Freiburg",
+            "phone": "0761 88664460",
+            "mobile": "0171 6579388"
+          }
+        }
+      },
+      "block_order": [
+        "rechner",
+        "ansprechpartner"
+      ],
+      "settings": {
+        "anchor": "versicherung",
+        "scheme": "dark",
+        "logo_asset": "logo-hd-insurance-services.png",
+        "logo_width": 386,
+        "logo_height": 52,
+        "logo_alt": "Harley-Davidson Insurance Services",
+        "heading": "Maßgeschnei­derter Versicherungs­schutz zu einer fairen Prämie",
+        "text": "<p>Harley-Davidson Financial Services bietet in Zusammenarbeit mit der ERGO Versicherung unter dem Namen Harley-Davidson Insurance Services allen Harley Besitzern attraktive Versicherungspakete an. Ganz gleich ob Vollkasko, Teilkasko oder Haftpflichtthemen, kontaktiere Daniel Meier. Gerne rechnet er dir die passende Prämie für dein Bike.</p>",
+        "footnote_term": "Harley-Davidson Insurance Services",
+        "footnote": ""
+      }
+    }
+  },
+  "order": [
+    "kopf",
+    "finanzierung",
+    "versicherung"
+  ]
+}

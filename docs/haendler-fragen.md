@@ -80,6 +80,20 @@ Wo noch nichts eingetragen ist, zeigt der Shop entweder nichts an oder einen **B
 34. **Suchmaschinen-Texte**: Titel und Beschreibung für die Startseite (Shopify-Admin → *Einstellungen → Preferences / Präferenzen → Titel und Meta-Beschreibung der Startseite*).
     Heute fehlt die Meta-Beschreibung; das Theme gibt sie aus, sobald sie dort steht. Ca. 150 Zeichen, ohne unbelegte Versprechen.
 
+## G. Seite „Finanzierung & Versicherung“ (Stand 21. Oktober 2026)
+
+Texte und Bilder stammen von der alten Seite powershop-weil.com/finanzierung---versicherung (Vorlage `page.finanzierung`).
+
+35. **Sternchen bei „Harley-Davidson Insurance Services“** (Pflicht): Auf der alten Seite stand ein Sternchen ohne Fußnote. Welcher Hinweis gehört dazu
+    (vermutlich die Angabe zum Versicherungsvermittler)? Im Shop erscheinen Sternchen und Fußnote erst, wenn die Fußnote im Theme-Editor eingetragen ist.
+    Auch das Logo von Harley-Davidson Finance trägt ein Sternchen („Finance*“).
+36. **Ansprechpartner Versicherung** (Pflicht): Sind Name, Foto, Anschrift und Telefonnummern von Daniel Meier (ERGO, Freiburg) aktuell, und ist er mit der
+    Veröffentlichung im Onlineshop einverstanden?
+37. **Unterzeile Finanzierung** (Wichtig): „Hier klicken, um zu sehen, was unser Finanzrechner für Dich tun kann.“ stammt aus der alten Seite, dort war die
+    Überschrift ein Link. Jetzt stehen die Buttons direkt darunter. Soll der Satz so bleiben?
+38. **Bilder und Logos** (Wichtig): Das Breakout-Foto ist Harley-Davidson-Werbematerial (Modelljahr 2026). Für den hellen Abschnitt wurde aus dem weißen
+    Finance-Logo eine Fassung mit schwarzer Schrift abgeleitet (Orange unverändert). Ist das nach den Händler-Vorgaben in Ordnung?
+
 ---
 
 **Was mit den Antworten passiert:** Die Werte werden im Theme-Editor und im Code eingetragen, Beispielwerte entfallen, sobald die echten Angaben da sind.

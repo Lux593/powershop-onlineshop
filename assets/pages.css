@@ -1,0 +1,87 @@
+/* ==========================================================================
+   Power Shop – Inhaltsseiten (Vorlagen page.*): Seitenkopf mit Bild, Partner-Angebot.
+   Lädt nur auf Seiten (layout/theme.liquid). Die Bühne des Seitenkopfs und die Tiefe beim Scrollen kommen aus dem
+   Kategorie-Kopf (.page-banner--film in shop.css); hier stehen nur die Ergänzungen.
+   Bewegungszustände gelten nur unter html.has-motion (Vertrag: docs/motion-api.md); ohne sie ist alles statisch.
+   ========================================================================== */
+
+/* ---------- Seitenkopf mit Bild ---------- */
+/* Sprunglinks als Umriss-Chips auf Schwarz (die hellen Chips aus components.css wären hier weiße Kästen) */
+.page-head__jumps { margin-top: 8px; }
+.page-head__jumps .chip { background: transparent; border-color: var(--c-border-dark); color: var(--c-white); }
+.page-head__jumps .chip:hover { border-color: var(--c-white); }
+/* Partner-Logos: weiß auf transparent, durch eine Haarlinie vom Text getrennt */
+.page-head__logos {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 12px 32px;
+  margin-top: 8px; padding-top: 16px; border-top: 1px solid var(--c-border-dark);
+}
+.page-head__logos img { display: block; width: auto; height: 20px; }
+@media (min-width: 1024px) { .page-head__logos img { height: 22px; } }
+/* Schmale Handys: lange Wörter („Versicherung“) passen in 56 px nicht in die Zeile. Kleiner setzen statt trennen
+   (hyphens:auto füllte die Zeile gierig und trennte auch dort, wo das Wort allein in die nächste Zeile passt). */
+@media (max-width: 479px) { .page-head h1 { font-size: clamp(40px, 14.5vw, 56px); } }
+
+/* ---------- Partner-Angebot ---------- */
+/* Hell: Offwhite der Seite. Dunkel: Schwarz mit Körnung (.on-dark.textured). Die Scrub-Farben hängen am Schema. */
+.offer { --scrub-dim: var(--c-dim-light); --scrub-lit: var(--c-black); }
+.offer--dark { --scrub-dim: var(--c-dim-dark); --scrub-lit: var(--c-white); }
+
+.offer__head { display: grid; gap: var(--s-3); margin-bottom: var(--s-6); }
+@media (min-width: 1024px) { .offer__head { gap: var(--s-4); margin-bottom: var(--s-8); } }
+.offer__logo img { display: block; width: auto; height: 22px; }
+@media (min-width: 1024px) { .offer__logo img { height: 26px; } }
+
+/* Aussage in Größe und Schrift der Willkommens-Aussage (home.css). Die Breite in em hält sie bei jeder Schriftgröße auf
+   drei bis vier Zeilen, solange der Container breit genug ist. */
+.offer__claim {
+  --split-pad: 0.2em; /* Luft für Umlaute in den Wortmasken */
+  max-width: 15em;
+  font-family: var(--f-head); font-weight: 800; font-size: calc(var(--fs-display) * 0.4); line-height: 0.96;
+  letter-spacing: 0.005em; text-transform: uppercase; text-wrap: balance; hyphens: manual; overflow-wrap: anywhere;
+}
+
+.offer__grid { display: grid; gap: var(--s-6); }
+@media (min-width: 1024px) { .offer__grid:not(.offer__grid--single) { grid-template-columns: 7fr 5fr; gap: 56px; align-items: start; } }
+.offer__grid > * { min-width: 0; }
+/* Ab 1024 px mit rechter Spalte (Kontakt-Box, Ansprechpartner): Der Text bleibt unter dem Header stehen, während die höhere
+   Spalte daneben vorbeizieht. Ohne rechte Spalte rückt die Beratung neben Text und Buttons (dense füllt die erste Zeile). */
+@media (min-width: 1024px) {
+  .offer__grid:not(.offer__grid--single) .offer__main { position: sticky; top: calc(var(--header-offset) + var(--s-4)); transition: top var(--t-med) var(--ease); }
+  .offer__grid--single .offer__main { max-width: none; grid-template-columns: 7fr 5fr; grid-auto-flow: dense; column-gap: 56px; }
+  .offer__grid--single .offer__main > * { grid-column: 1; max-width: 640px; }
+  .offer__grid--single .offer__advice, .offer__grid--single .offer__advice ~ * { grid-column: 2; }
+  .offer__grid--single .offer__advice { grid-row: span 2; }
+}
+.offer__main { display: grid; gap: var(--s-4); align-content: start; max-width: 640px; }
+.offer__text p { font-size: 18px; line-height: 1.6; }
+.offer__text sup { font-size: 0.7em; line-height: 0; }
+.offer__actions { display: flex; flex-wrap: wrap; gap: 12px; }
+/* Externer Link: der Pfeil weist beim Überfahren schräg aus der Seite heraus */
+.offer__actions .btn .icon { transition: transform var(--t-fast) var(--ease); }
+.offer__actions .btn:hover .icon, .offer__actions .btn:focus-visible .icon { transform: translate(2px, -2px); }
+.offer__advice { display: grid; gap: 12px; padding-top: var(--s-4); border-top: 1px solid var(--c-line); }
+.offer__footnote { color: var(--c-muted); }
+.offer--dark .offer__text p, .offer--dark .offer__advice p { color: var(--c-on-dark); }
+.offer--dark .offer__advice { border-top-color: var(--c-border-dark); }
+.offer--dark .offer__footnote { color: var(--c-muted-dark); }
+
+/* Ansprechpartner: Porträt 4:5 mit orangem Balken unten links (wie .story__media), darunter Name, Adresse, Telefon */
+.agent { display: grid; gap: var(--s-3); }
+@media (min-width: 640px) and (max-width: 1023px) { .agent { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); align-items: end; } }
+.agent__photo { position: relative; aspect-ratio: 4 / 5; overflow: hidden; background: var(--c-anthracite); }
+.agent__photo img { width: 100%; height: 100%; object-fit: cover; }
+.agent__photo::after { content: ""; position: absolute; left: 0; bottom: 0; width: 96px; height: 6px; background: var(--c-orange); }
+.agent__body { display: grid; gap: 12px; }
+.agent h3 { font-size: 32px; }
+.agent address { font-style: normal; line-height: 1.6; color: var(--c-muted); }
+.offer--dark .agent address { color: var(--c-on-dark); }
+.agent__actions { display: grid; gap: 8px; margin-top: 4px; }
+.agent__number { font-family: var(--f-body); font-weight: 600; letter-spacing: 0; text-transform: none; }
+
+/* ---------- Scrub der Aussagen (assets/pages.js setzt .is-scrub und .is-lit) ----------
+   Wie im Willkommensblock: Solange der Scrub läuft, entfällt das Hochgleiten der Wörter, nur die Farbe wechselt.
+   Gedimmt bleibt --scrub-dim (Großtext, nur im Übergang beim Scrollen), erleuchtet wird --scrub-lit. */
+[data-scrub] .ps-wi { transition: color 420ms var(--ease); }
+.has-motion [data-scrub].is-scrub .ps-wi { color: var(--scrub-dim, var(--c-dim-light)); translate: none; animation: none; }
+.has-motion [data-scrub].is-scrub .ps-wi.is-lit { color: var(--scrub-lit, var(--c-black)); }
+@media print { [data-scrub] .ps-wi { color: inherit !important; } }

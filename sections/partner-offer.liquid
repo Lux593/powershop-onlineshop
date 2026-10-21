@@ -1,0 +1,270 @@
+{%- comment -%}
+  Partner-Angebot (Finanzierung, Versicherung): Logo des Partners, Aussage in Display-Größe, darunter links Text, Rechner-Links
+  und Beratung, rechts die Kontakt-Box des Shops oder eine Ansprechpartner-Karte. Hell (Offwhite) oder dunkel mit Körnung.
+  Mit Bewegung leuchten die Wörter der Aussage beim Scrollen nacheinander auf wie im Willkommensblock der Startseite
+  (data-split aus assets/motion.js, data-scrub aus assets/pages.js). Ohne Bewegung steht die Aussage in voller Farbe da.
+  Partner-Logos gibt es in zwei Fassungen: weiße Schrift für dunkel, dunkle Schrift für hell (Orange bleibt in beiden).
+  Externe Links öffnen in einem neuen Fenster, damit der Rechner des Partners die Seite des Shops nicht ersetzt.
+{%- endcomment -%}
+{%- liquid
+  assign dark = false
+  if section.settings.scheme == 'dark'
+    assign dark = true
+  endif
+  assign anchor = section.settings.anchor | default: section.id
+  assign text = section.settings.text
+  if section.settings.footnote != blank and section.settings.footnote_term != blank
+    assign marked_term = section.settings.footnote_term | append: '<sup>*</sup>'
+    assign text = text | replace_first: section.settings.footnote_term, marked_term
+  endif
+-%}
+{%- capture offer_logo -%}
+  {%- render 'media', image: section.settings.logo, asset: section.settings.logo_asset, width: section.settings.logo_width, height: section.settings.logo_height, alt: section.settings.logo_alt -%}
+{%- endcapture -%}
+{%- assign offer_logo = offer_logo | strip -%}
+
+<section
+  class="section offer{% if dark %} offer--dark on-dark textured{% endif %}"
+  id="{{ anchor | escape }}"
+  aria-labelledby="offer-title-{{ section.id }}"
+  data-section-id="{{ section.id }}"
+>
+  <div class="container">
+    <div class="offer__head">
+      {%- if offer_logo != blank -%}
+        <div class="offer__logo" data-reveal="fade">{{ offer_logo }}</div>
+      {%- endif -%}
+      <h2 class="offer__claim" id="offer-title-{{ section.id }}" data-split="words" data-scrub>{{ section.settings.heading | escape }}</h2>
+    </div>
+
+    {%- comment -%}
+      Rechte Spalte zuerst fassen: Die Kontakt-Box erscheint nur mit gepflegten Händlerdaten (Telefon, WhatsApp oder E-Mail).
+      Fehlen sie, entfällt die Spalte, und unter dem Text steht ein Link zur Kontaktseite, damit „Kontaktiere uns“ nicht ins
+      Leere läuft.
+    {%- endcomment -%}
+    {%- assign contact_missing = false -%}
+    {%- capture offer_aside -%}
+      {%- for block in section.blocks -%}
+        {%- case block.type -%}
+          {%- when 'contact' -%}
+            {%- assign contact_anchor = anchor | append: '-kontakt' -%}
+            {%- capture contact_box -%}
+              {% render 'contact-box', anchor: contact_anchor, title: block.settings.title, intro: block.settings.intro, topics: block.settings.topics, topic: block.settings.topic %}
+            {%- endcapture -%}
+            {%- assign contact_box = contact_box | strip -%}
+            {%- if contact_box != blank -%}
+              <div data-reveal {{ block.shopify_attributes }}>{{ contact_box }}</div>
+            {%- else -%}
+              {%- assign contact_missing = true -%}
+            {%- endif -%}
+
+          {%- when 'person' -%}
+            {%- capture person_photo -%}
+              {%- render 'media', image: block.settings.image, asset: block.settings.image_asset, width: 720, height: 900, alt: block.settings.image_alt, sizes: '(min-width: 1024px) 420px, 100vw' -%}
+            {%- endcapture -%}
+            {%- assign person_photo = person_photo | strip -%}
+            {%- assign address_lines = block.settings.address | newline_to_br | split: '<br />' -%}
+            <article class="agent" aria-labelledby="agent-{{ block.id }}" {{ block.shopify_attributes }}>
+              {%- if person_photo != blank -%}
+                <div class="agent__photo" data-reveal="clip">{{ person_photo }}</div>
+              {%- endif -%}
+              <div class="agent__body" data-stagger="70">
+                <h3 id="agent-{{ block.id }}">{{ block.settings.name | escape }}</h3>
+                {%- if block.settings.company != blank or block.settings.address != blank -%}
+                  <address>
+                    {%- if block.settings.company != blank -%}{{ block.settings.company | escape }}<br>{%- endif -%}
+                    {%- for line in address_lines -%}
+                      {%- assign item = line | strip | strip_newlines -%}
+                      {%- if item != blank -%}{{ item | escape }}{% unless forloop.last %}<br>{% endunless %}{%- endif -%}
+                    {%- endfor -%}
+                  </address>
+                {%- endif -%}
+                <div class="agent__actions">
+                  {%- assign phone_keys = 'phone,mobile' | split: ',' -%}
+                  {%- for key in phone_keys -%}
+                    {%- assign number = block.settings[key] | strip -%}
+                    {%- if number != blank -%}
+                      {%- liquid
+                        # Wählbar auch aus der Schweiz und Frankreich: nationale Nummern (führende 0) bekommen +49
+                        assign dial = number | remove: ' ' | remove: '-' | remove: '(' | remove: ')' | remove: '/' | remove: '.'
+                        assign first = dial | slice: 0
+                        assign second = dial | slice: 1
+                        if first == '0' and second != '0'
+                          assign dial = dial | remove_first: '0' | prepend: '+49'
+                        elsif first == '0'
+                          assign dial = dial | remove_first: '00' | prepend: '+'
+                        endif
+                        if key == 'phone'
+                          assign kind_label = 'Telefon'
+                          assign btn_class = 'btn--primary'
+                        elsif dark
+                          assign kind_label = 'Mobil'
+                          assign btn_class = 'btn--outline-light'
+                        else
+                          assign kind_label = 'Mobil'
+                          assign btn_class = 'btn--outline-dark'
+                        endif
+                      -%}
+                      <a class="btn {{ btn_class }}" href="tel:{{ dial | escape }}">
+                        {% render 'icon', name: 'phone' %}<span>{{ kind_label }}</span><span class="agent__number">· {{ number | escape }}</span>
+                      </a>
+                    {%- endif -%}
+                  {%- endfor -%}
+                </div>
+              </div>
+            </article>
+        {%- endcase -%}
+      {%- endfor -%}
+    {%- endcapture -%}
+    {%- assign offer_aside = offer_aside | strip -%}
+
+    <div class="offer__grid{% if offer_aside == blank %} offer__grid--single{% endif %}">
+      <div class="offer__main">
+        {%- if text != blank -%}
+          <div class="offer__text" data-reveal>{{ text }}</div>
+        {%- endif -%}
+        {%- for block in section.blocks -%}
+          {%- case block.type -%}
+            {%- when 'buttons' -%}
+              <div class="offer__actions" data-stagger="80" {{ block.shopify_attributes }}>
+                {%- for i in (1..2) -%}
+                  {%- liquid
+                    assign label_key = 'label_' | append: i
+                    assign url_key = 'url_' | append: i
+                    assign label = block.settings[label_key]
+                    assign url = block.settings[url_key]
+                    assign external = false
+                    if url contains '://'
+                      assign external = true
+                    endif
+                    if i == 1
+                      assign btn_class = 'btn--primary'
+                    elsif dark
+                      assign btn_class = 'btn--outline-light'
+                    else
+                      assign btn_class = 'btn--outline-dark'
+                    endif
+                  -%}
+                  {%- if label != blank and url != blank -%}
+                    <a class="btn {{ btn_class }}" href="{{ url }}"{% if external %} target="_blank" rel="noopener"{% endif %}>
+                      {{- label | escape -}}
+                      {%- if external -%}{% render 'icon', name: 'arrow-up-right' %}<span class="sr-only"> (öffnet neues Fenster)</span>{%- endif -%}
+                    </a>
+                  {%- endif -%}
+                {%- endfor -%}
+              </div>
+
+            {%- when 'text' -%}
+              <div class="offer__advice" data-reveal {{ block.shopify_attributes }}>
+                {%- if block.settings.heading != blank -%}<h3>{{ block.settings.heading | escape }}</h3>{%- endif -%}
+                {{ block.settings.text }}
+              </div>
+          {%- endcase -%}
+        {%- endfor -%}
+        {%- if contact_missing and pages['contact'] != blank -%}
+          <div data-reveal><a class="btn {% if dark %}btn--outline-light{% else %}btn--secondary{% endif %}" href="{{ pages['contact'].url }}">{% render 'icon', name: 'mail' %}Kontakt aufnehmen</a></div>
+        {%- endif -%}
+        {%- if section.settings.footnote != blank and section.settings.footnote_term != blank -%}
+          <p class="caption offer__footnote">* {{ section.settings.footnote | escape }}</p>
+        {%- endif -%}
+      </div>
+
+      {%- if offer_aside != blank -%}
+        <div class="offer__aside">{{ offer_aside }}</div>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Partner-Angebot",
+  "settings": [
+    { "type": "text", "id": "anchor", "label": "Anker-ID", "info": "Ziel für Sprunglinks, ohne #. Darf nur einmal auf der Seite vorkommen." },
+    {
+      "type": "select",
+      "id": "scheme",
+      "label": "Farbschema",
+      "options": [
+        { "value": "light", "label": "Hell" },
+        { "value": "dark", "label": "Dunkel mit Körnung" }
+      ],
+      "default": "light"
+    },
+    { "type": "header", "content": "Partner-Logo" },
+    { "type": "image_picker", "id": "logo", "label": "Logo (transparent)", "info": "Passend zum Farbschema: auf hell die Fassung mit dunkler Schrift, auf dunkel die weiße." },
+    { "type": "text", "id": "logo_asset", "label": "Standard-Logo (Datei in assets/)" },
+    { "type": "number", "id": "logo_width", "label": "Breite der Standarddatei (px)", "default": 400 },
+    { "type": "number", "id": "logo_height", "label": "Höhe der Standarddatei (px)", "default": 50 },
+    { "type": "text", "id": "logo_alt", "label": "Alternativtext des Logos" },
+    { "type": "header", "content": "Inhalt" },
+    { "type": "text", "id": "heading", "label": "Aussage", "default": "Aussage des Abschnitts" },
+    { "type": "richtext", "id": "text", "label": "Text" },
+    { "type": "header", "content": "Fußnote" },
+    { "type": "text", "id": "footnote_term", "label": "Begriff mit Sternchen", "info": "Bekommt im Text ein Sternchen, sobald eine Fußnote eingetragen ist." },
+    { "type": "text", "id": "footnote", "label": "Fußnote" }
+  ],
+  "blocks": [
+    {
+      "type": "buttons",
+      "name": "Buttons",
+      "limit": 2,
+      "settings": [
+        { "type": "text", "id": "label_1", "label": "Button 1 (Hauptaktion)" },
+        { "type": "url", "id": "url_1", "label": "Link 1" },
+        { "type": "text", "id": "label_2", "label": "Button 2" },
+        { "type": "url", "id": "url_2", "label": "Link 2" },
+        { "type": "paragraph", "content": "Links auf andere Websites öffnen in einem neuen Fenster und bekommen einen Pfeil." }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Text mit Überschrift",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Überschrift" },
+        { "type": "richtext", "id": "text", "label": "Text" }
+      ]
+    },
+    {
+      "type": "contact",
+      "name": "Kontakt-Box (rechts)",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "title", "label": "Überschrift", "default": "Angebot anfragen" },
+        { "type": "text", "id": "intro", "label": "Kurztext" },
+        { "type": "text", "id": "topics", "label": "Themen", "default": "finanzierung,versicherung,inzahlungnahme,frage", "info": "Kommagetrennt: probefahrt, finanzierung, versicherung, inzahlungnahme, werkstatt, frage" },
+        {
+          "type": "select",
+          "id": "topic",
+          "label": "Vorgewähltes Thema",
+          "options": [
+            { "value": "finanzierung", "label": "Finanzierung" },
+            { "value": "versicherung", "label": "Versicherung" },
+            { "value": "inzahlungnahme", "label": "Inzahlungnahme" },
+            { "value": "probefahrt", "label": "Probefahrt" },
+            { "value": "werkstatt", "label": "Werkstatt" },
+            { "value": "frage", "label": "Frage" }
+          ],
+          "default": "finanzierung"
+        }
+      ]
+    },
+    {
+      "type": "person",
+      "name": "Ansprechpartner (rechts)",
+      "limit": 1,
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Porträt (4:5)" },
+        { "type": "text", "id": "image_asset", "label": "Standard-Porträt (Datei in assets/)", "info": "720 × 900 px" },
+        { "type": "text", "id": "image_alt", "label": "Alternativtext des Porträts" },
+        { "type": "text", "id": "name", "label": "Name" },
+        { "type": "text", "id": "company", "label": "Firma" },
+        { "type": "textarea", "id": "address", "label": "Adresse", "info": "Eine Zeile pro Adresszeile" },
+        { "type": "text", "id": "phone", "label": "Telefon" },
+        { "type": "text", "id": "mobile", "label": "Mobil" }
+      ]
+    }
+  ],
+  "enabled_on": { "templates": ["page"] }
+}
+{% endschema %}
