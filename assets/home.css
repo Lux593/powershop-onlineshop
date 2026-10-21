@@ -28,6 +28,12 @@
 /* Aussage etwas kleiner als die Überschrift. Die Breite in em hält sie bei jeder Schriftgröße auf drei Zeilen,
    solange der Container breit genug ist (mobil werden es mehr). */
 .statement__text { font-size: calc(var(--fs-display) * 0.4); max-width: 15em; color: var(--c-text-soft); }
+/* Handy: beide größer (bei 375 px 37,5 statt 31 und 31,5 statt 26 px), Anordnung und Abstände bleiben. Obergrenzen knapp
+   unter den Tablet-Werten ab 768 px, damit nichts beim Übergang kleiner wird. */
+@media (max-width: 767px) {
+  .statement__title { font-size: clamp(34px, 10vw, 40px); }
+  .statement__text { font-size: clamp(28px, 8.4vw, 33px); }
+}
 .statement__mark { display: inline-block; width: auto; height: 0.8em; margin-right: 0.22em; vertical-align: -0.02em; }
 .statement__brand { white-space: nowrap; }
 /* Scrub (home.js setzt .is-scrub, solange ScrollTrigger läuft): Überschrift und Aussage leuchten als eine Folge auf.
@@ -40,14 +46,13 @@
 .has-motion .statement.is-scrub .statement__text .ps-wi.is-lit { color: var(--c-text-soft); }
 @media print { .statement [data-split] .ps-wi { color: inherit !important; } }
 
-/* Gebäudezeichnung hinter der Aussage: Die SVG hat weiße Linien (für dunkle Flächen), brightness(0) macht sie auf dem
-   hellen Grund schwarz, sehr leise. Die Parallax-Drift (data-parallax) belegt transform am Bild, Lage und Maske sitzen
+/* Gebäudezeichnung hinter der Aussage: dunkle Linien direkt in der SVG (kein Filter), sehr leise. Die Parallax-Drift (data-parallax) belegt transform am Bild, Lage und Maske sitzen
    deshalb am Träger. Das Gebäude steht rechts über der Unterkante der Bühne (um die Drift angehoben), über den Kacheln. */
 .statement__drawing {
   position: absolute; z-index: -1; right: -10%; bottom: calc(var(--draw-h) * 0.08); width: var(--draw-w);
   opacity: 0.1; pointer-events: none;
 }
-.statement__drawing img { display: block; width: 100%; height: auto; filter: brightness(0); }
+.statement__drawing img { display: block; width: 100%; height: auto; }
 @media (min-width: 700px) { .statement__drawing { right: 4%; } }
 /* Scrub: die Zeichnung entsteht von links nach rechts im Takt der Wörter. home.js setzt --draw (0 bis 1) aus
    demselben ScrollTrigger. Die Maske ist 2,5-mal so breit wie die Zeichnung, ihre weiche Kante wandert hindurch. */
@@ -58,6 +63,14 @@
   -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
   -webkit-mask-position: calc((1 - var(--draw, 0)) * 100%) 0;
   mask-position: calc((1 - var(--draw, 0)) * 100%) 0;
+}
+/* Handy: Die wandernde Maske ließ die (komplexe) Zeichnung in jedem Scroll-Bild neu malen und ruckelte auf dem iPhone,
+   genau während der Hero ausblendet. Dort blendet sie im Takt der Wörter nur ein (Deckkraft, läuft auf der Grafikkarte). */
+@media (max-width: 767px) {
+  .has-motion .statement.is-scrub .statement__drawing {
+    -webkit-mask-image: none; mask-image: none;
+    opacity: calc(0.1 * var(--draw, 0)); will-change: opacity;
+  }
 }
 @media print { .statement__drawing { display: none; } }
 
