@@ -34,15 +34,16 @@
         thumbRow.scrollTo({ left: inRow - (thumbRow.clientWidth - b.offsetWidth) / 2, behavior: behavior() });
       }
     }
-    function showSlide(i) {
+    // instant: ohne Gleiten (nach einem Gruppenwechsel liefe es sonst über Bilder der neuen Gruppe, die noch laden)
+    function showSlide(i, instant) {
       if (!track || !slides[i]) return;
       holdUntil = Date.now() + 700;
       mark(i);
-      track.scrollTo({ left: slides[i].offsetLeft, behavior: behavior() });
+      track.scrollTo({ left: slides[i].offsetLeft, behavior: instant ? 'auto' : behavior() });
     }
-    function showImageById(id) {
+    function showImageById(id, instant) {
       if (!id) return;
-      for (var i = 0; i < slides.length; i++) if (slides[i].dataset.mediaId == id) { if (i !== active) showSlide(i); return; }
+      for (var i = 0; i < slides.length; i++) if (slides[i].dataset.mediaId == id) { if (i !== active || instant) showSlide(i, instant); return; }
     }
 
     /* Bilder je Variante: Ein Variantenbild beginnt eine Gruppe, die bis zum nächsten Variantenbild reicht; Bilder davor
@@ -58,22 +59,74 @@
         return group;
       });
     })();
+    var gallery = $('[data-gallery]');
+    var shownGroup = null; // Gruppe, die gerade zu sehen ist (beim Laden die vom Server gewählte)
+    if (groups) slides.some(function (s, k) { if (!s.hidden && groups[k] !== null) { shownGroup = groups[k]; return true; } return false; });
+    var switching = 0;     // Zähler der Wechsel: Ein älterer, noch ladender Wechsel greift nicht mehr
+
+    /* Vorladen, ohne alles zu laden: Die Bilder versteckter Gruppen tragen loading="lazy" und kämen sonst erst nach der Wahl
+       (leere Fläche). warm() holt das erste Bild einer Gruppe (das Variantenbild) und ihre Vorschaubilder, mit all
+       alle Bilder der Gruppe. Die Größe wählt der Browser wie sonst aus srcset. */
+    function warm(id, all) {
+      if (!groups || !id) return;
+      var g = String(id);
+      slides.forEach(function (s, k) {
+        if (groups[k] !== g) return;
+        var img = s.querySelector('img');
+        if (img && (all || s.dataset.mediaId === g)) img.loading = 'eager';
+        var t = thumbs[k] && thumbs[k].querySelector('img');
+        if (t) t.loading = 'eager';
+      });
+    }
+    var idle = window.requestIdleCallback || function (fn) { return setTimeout(fn, 1200); };
+    function slow() { var c = navigator.connection; return !!(c && (c.saveData || /2g|3g/.test(c.effectiveType || ''))); }
+    function afterLoad(fn) {
+      if (document.readyState === 'complete') idle(fn);
+      else window.addEventListener('load', function () { idle(fn); }, { once: true });
+    }
+    // Alle sichtbaren Bilder nach dem Laden holen: Safari lädt lazy Bilder rechts in der Schiene erst, wenn sie ins Bild rutschen
+    // (der Vorlauf gilt nur fürs Fenster), beim Wischen und Blättern stand sonst kurz eine leere Fläche
+    afterLoad(function () {
+      if (slow()) return;
+      slides.forEach(function (s) { var img = !s.hidden && s.querySelector('img'); if (img) img.loading = 'eager'; });
+    });
+    function swapGroup(group) {
+      var shown = 0;
+      slides.forEach(function (s, k) {
+        var on = groups[k] === null || groups[k] === group;
+        s.hidden = !on;
+        if (thumbs[k]) thumbs[k].hidden = !on;
+        if (on) shown++;
+      });
+      var n = 0;
+      thumbs.forEach(function (b) { if (!b.hidden) b.setAttribute('aria-label', 'Bild ' + (++n) + ' von ' + shown); });
+      if (thumbRow) thumbRow.hidden = shown < 2;
+      shownGroup = group;
+    }
+    // Die neue Gruppe erscheint erst, wenn ihr erstes Bild geladen ist; bis dahin bleibt das alte Bild leicht abgeblendet stehen
+    // (.gallery.is-switching), höchstens 5 s (sehr langsame Verbindung).
     function showVariantImages(id) {
       if (!id) return;
       var group = String(id);
-      if (groups && groups.indexOf(group) > -1) {
-        var shown = 0;
-        slides.forEach(function (s, k) {
-          var on = groups[k] === null || groups[k] === group;
-          s.hidden = !on;
-          if (thumbs[k]) thumbs[k].hidden = !on;
-          if (on) shown++;
-        });
-        var n = 0;
-        thumbs.forEach(function (b) { if (!b.hidden) b.setAttribute('aria-label', 'Bild ' + (++n) + ' von ' + shown); });
-        if (thumbRow) thumbRow.hidden = shown < 2;
-      }
-      showImageById(id);
+      var token = ++switching;
+      var done = function () {
+        if (token !== switching) return;
+        if (gallery) gallery.classList.remove('is-switching');
+        var swap = groups && groups.indexOf(group) > -1 && group !== shownGroup;
+        if (swap) swapGroup(group);
+        showImageById(id, swap);
+      };
+      if (!groups || groups.indexOf(group) === -1 || group === shownGroup) return done();
+      var lead = slides[groups.indexOf(group)].querySelector('img');
+      if (lead) lead.fetchPriority = 'high'; // versteckte Bilder lädt der Browser sonst nachrangig
+      warm(group, true);
+      if (!lead || (lead.complete && lead.naturalWidth)) return done();
+      if (gallery) gallery.classList.add('is-switching');
+      var ready = lead.decode ? lead.decode() : new Promise(function (r) {
+        lead.addEventListener('load', r, { once: true });
+        lead.addEventListener('error', r, { once: true });
+      });
+      Promise.race([ready.catch(function () {}), new Promise(function (r) { setTimeout(r, 5000); })]).then(done);
     }
     if (track && slides.length > 1 && 'IntersectionObserver' in window) {
       var seen = new IntersectionObserver(function (entries) {
@@ -184,6 +237,33 @@
         if (selected.some(function (v) { return v == null; })) return null;
         return matching(selected)[0] || null;
       };
+      // Bild der Variante, die ein Klick auf diesen Wert in Zeile i ergäbe
+      var imageFor = function (i, value) {
+        var probe = selected.slice();
+        probe[i] = value;
+        var v = matching(probe).filter(function (x) { return x.image; })[0];
+        return v && v.image;
+      };
+
+      /* Vorladen: für jede mit einem Klick erreichbare Variante Variantenbild und Vorschaubilder (nach dem Laden im Leerlauf und
+         nach jeder Wahl), dazu die Option unter Zeiger oder Fokus. Nicht bei Datensparmodus oder langsamer Verbindung. */
+      var reachable = function () {
+        if (slow()) return;
+        rows.forEach(function (row, i) {
+          $$('[data-option-value]', row).forEach(function (b) { warm(imageFor(i, b.dataset.optionValue)); });
+        });
+      };
+      if (groups) {
+        afterLoad(reachable);
+        var intent = function (event) {
+          var b = event.target.closest('[data-option-value]');
+          if (b) warm(imageFor(rows.indexOf(event.currentTarget), b.dataset.optionValue));
+        };
+        rows.forEach(function (row) {
+          row.addEventListener('pointerover', intent);
+          row.addEventListener('focusin', intent);
+        });
+      }
 
       // Das versteckte Feld „id“ trägt immer die gewählte Variante: auch beim Start (Farbe als einzige Option ist schon gewählt)
       // und unmittelbar vor dem Absenden, nicht nur nach einem Klick auf eine Option
@@ -262,6 +342,7 @@
         // Bilder schon bei unvollständiger Auswahl (Farbe gewählt, Größe noch nicht): die erste passende Variante mit Bild
         var pictured = variant && variant.image ? variant : matching(selected).filter(function (v) { return v.image; })[0];
         if (pictured) showVariantImages(pictured.image);
+        if (groups) idle(reachable);
         if (variant) {
           if (errorNode) errorNode.textContent = '';
           refreshDynamic(variant);

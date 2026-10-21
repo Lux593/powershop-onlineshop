@@ -196,14 +196,16 @@
 
 .gallery { display: grid; gap: 12px; }
 .gallery__main { position: relative; background: var(--c-stone); aspect-ratio: 4 / 5; overflow: hidden; }
-.gallery--wide .gallery__main { aspect-ratio: 16 / 10; background: var(--c-anthracite); }
+/* Motorräder: Grund in Weiß wie der Hintergrund der Hersteller-Fotos. Er zeigt sich nur, solange ein Bild lädt; dunkel
+   wirkte das wie ein schwarzer Ladebildschirm. */
+.gallery--wide .gallery__main { aspect-ratio: 16 / 10; background: var(--c-white); }
 .gallery__main img { width: 100%; height: 100%; object-fit: cover; }
 .gallery__zoom { position: absolute; right: 12px; bottom: 12px; width: 44px; height: 44px; display: grid; place-items: center; background: var(--c-white); border-radius: 50%; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); }
 .gallery__badges { position: absolute; top: 16px; left: 16px; display: flex; gap: 6px; }
 .gallery__thumbs { display: grid; grid-auto-flow: column; grid-auto-columns: 88px; gap: 8px; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; padding: 6px; margin: -6px; /* Platz für den Fokusring */ }
 .gallery--wide .gallery__thumbs { grid-auto-columns: 128px; }
 .gallery__thumbs button { position: relative; aspect-ratio: 4 / 5; background: var(--c-stone); overflow: hidden; border: 2px solid transparent; }
-.gallery--wide .gallery__thumbs button { aspect-ratio: 16 / 10; }
+.gallery--wide .gallery__thumbs button { aspect-ratio: 16 / 10; background: var(--c-white); }
 .gallery__thumbs button[aria-current="true"] { border-color: var(--c-black); }
 .gallery__thumbs img { width: 100%; height: 100%; object-fit: cover; }
 .lightbox { width: min(1200px, calc(100% - 32px)); background: var(--c-black); }
@@ -447,6 +449,10 @@ html:not(.has-motion) .bcard:hover .bcard__media img { transform: none; }
 .gallery__track { position: relative; display: flex; height: 100%; overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none; }
 .gallery__track::-webkit-scrollbar { display: none; }
 .gallery__slide { flex: 0 0 100%; height: 100%; scroll-snap-align: start; scroll-snap-stop: always; }
+/* Variantenwechsel, dessen erstes Bild noch lädt: das alte Bild bleibt stehen und blendet erst nach kurzer Wartezeit leicht ab,
+   damit ein schneller Wechsel nicht flackert */
+.gallery__track { transition: opacity 200ms var(--ease-out); }
+.gallery.is-switching .gallery__track { opacity: .7; transition-delay: 150ms; }
 /* Fokus auf der Schiene (Pfeiltasten blättern): die transparente Linie (Kontrastmodus) liegt innen, außen schnitte .gallery__main sie ab */
 .gallery__track:focus-visible { outline-offset: -4px; }
 
