@@ -27,15 +27,17 @@
 }
 /* Aussage etwas kleiner als die Überschrift. Die Breite in em hält sie bei jeder Schriftgröße auf drei Zeilen,
    solange der Container breit genug ist (mobil werden es mehr). */
-.statement__text { font-size: calc(var(--fs-display) * 0.4); max-width: 15em; }
+.statement__text { font-size: calc(var(--fs-display) * 0.4); max-width: 15em; color: var(--c-text-soft); }
 .statement__mark { display: inline-block; width: auto; height: 0.8em; margin-right: 0.22em; vertical-align: -0.02em; }
 .statement__brand { white-space: nowrap; }
 /* Scrub (home.js setzt .is-scrub, solange ScrollTrigger läuft): Überschrift und Aussage leuchten als eine Folge auf.
-   Gedimmt bleibt --c-dim-light (3,1 : 1 auf Offwhite, beides ist Großtext), erleuchtet wird Schwarz. Dann entfällt das
+   Noch nicht erleuchtet ist --c-dim-light (hellgrau), erleuchtet wird Schwarz. Dann entfällt das
    Hochgleiten der Wörter, nur die Farbe wechselt. */
 .statement .ps-wi { transition: color 420ms var(--ease); overflow-wrap: anywhere; }
 .has-motion .statement.is-scrub [data-split] .ps-wi { color: var(--c-dim-light); translate: none; animation: none; }
 .has-motion .statement.is-scrub [data-split] .ps-wi.is-lit { color: var(--c-black); }
+/* Die Aussage endet einen Ton heller als die schwarze Überschrift (auch ohne Bewegung) */
+.has-motion .statement.is-scrub .statement__text .ps-wi.is-lit { color: var(--c-text-soft); }
 @media print { .statement [data-split] .ps-wi { color: inherit !important; } }
 
 /* Gebäudezeichnung hinter der Aussage: Die SVG hat weiße Linien (für dunkle Flächen), brightness(0) macht sie auf dem

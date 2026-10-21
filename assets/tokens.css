@@ -28,7 +28,7 @@
   --c-text: var(--c-black);
   --c-muted: #5f5f5f;       /* Sekundärtext auf hell (≥ 5:1 auch auf stone) */
   --c-muted-dark: #a8a8a8;  /* Sekundärtext auf dunkel */
-  --c-dim-light: #8a8a8a;   /* gedimmte Wörter der Startseiten-Aussage auf hell (3,1 : 1 auf offwhite, nur Großtext) */
+  --c-dim-light: #a8a8a8;   /* noch nicht erleuchtete Wörter der Startseiten-Aussage auf hell (2,2 : 1, nur Übergang beim Scrollen) */
   --c-dim-dark: #4d4d4d;    /* dasselbe auf dunkel: Aussagen der Inhaltsseiten (2,3 : 1 auf schwarz, nur Übergang beim Scrollen) */
   --c-text-soft: #333333;   /* Fließtext in Akkordeons und Fakten (12,6 : 1 auf weiß) */
   --c-on-dark: #d6d2cb;     /* Fließtext auf dunkel (13,1 : 1 auf schwarz) */
