@@ -98,6 +98,31 @@
     });
   }
 
+  /* ---------- Kategorie-Film ab 768 px: Tiefe beim Scrollen (Regeln in shop.css) ----------
+     Setzt nur --film-depth am Banner: 0 oben, 1 wenn um die Bannerhöhe gescrollt. Darunter läuft der mobile Ablauf. */
+  function initDepth(banner) {
+    if (!PS.motion.enabled || !banner) return;
+    var mq = window.matchMedia('(min-width: 768px)');
+    var height = 1;
+    var queued = false;
+    function update() {
+      queued = false;
+      if (!mq.matches) { banner.style.removeProperty('--film-depth'); return; }
+      banner.style.setProperty('--film-depth', Math.round(Math.min(1, Math.max(0, window.scrollY / height)) * 1000) / 1000);
+    }
+    function queue() { if (!queued) { queued = true; requestAnimationFrame(update); } }
+    function measure() { height = banner.offsetHeight || 1; queue(); }
+    window.addEventListener('scroll', queue, { passive: true });
+    window.addEventListener('resize', measure);
+    measure();
+    // Bewegung zur Laufzeit abgeschaltet oder Section entfernt: Listener weg, Banner wieder ruhig
+    PS.motion.track(banner, function () {
+      window.removeEventListener('scroll', queue);
+      window.removeEventListener('resize', measure);
+      banner.style.removeProperty('--film-depth');
+    });
+  }
+
   PS.on('[data-collection]', function (root) {
     var sectionId = root.dataset.sectionId;
     var film = root.querySelector('[data-film]');
@@ -105,6 +130,7 @@
       var toggle = root.querySelector('[data-film-toggle]');
       initFilm(film, toggle);
       initBehind(root.querySelector('.page-banner__text'), film.parentNode, toggle);
+      initDepth(root.querySelector('.page-banner--film'));
     }
 
     var cols = null;

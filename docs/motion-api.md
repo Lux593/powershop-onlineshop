@@ -109,6 +109,10 @@ Kollektion und Suche (assets/collection.js, Regeln in shop.css)
                            ganz dahinter und nimmt ihn erst mit, wenn seine Unterkante 24 px unter dem Text angekommen ist. Reines CSS (shop.css), der Schleier hängt als
                            ::before am Text und wandert mit ihm. Einziges Skript: collection.js setzt .is-behind am Pause-Knopf, solange der
                            Film hinter dem Text liegt (blendet ihn aus).
+  --film-depth             Film-Kopf ab 768 px, nur unter html.has-motion: Tiefe beim Scrollen. collection.js setzt am Banner
+                           --film-depth (0 oben bis 1 nach einer Bannerhöhe Scrollweg), shop.css macht daraus nur transform und
+                           opacity: Filmfenster läuft langsamer (bis +30 % seiner Höhe) und taucht unten hinter die Bannerkante,
+                           Film darin zoomt von 1,1 auf 1 heraus, Text zieht schneller hoch (bis −40 %) und blendet aus.
 
 Produktseite (snippets/pdp-buy.liquid, snippets/pdp-options.liquid, snippets/pdp-sticky-buy.liquid, assets/product.js)
   [data-pdp-dynamic]       Bereiche, die product.js nach einer Variantenwahl über die Section Rendering API neu holt. Motorräder

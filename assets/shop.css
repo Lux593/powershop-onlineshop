@@ -86,6 +86,19 @@
   }
 }
 
+/* Ab 768 px, nur mit Bewegung: Tiefe beim Scrollen. Das Filmfenster läuft langsamer als die Seite und taucht unten hinter die Kante
+   des Banners, der Film darin zoomt dabei leicht heraus (1,1 auf 1); der Text zieht schneller nach oben und blendet aus.
+   collection.js setzt nur --film-depth (0 oben bis 1, wenn um die Bannerhöhe gescrollt ist). Der Zoom 1,1 steht schon vor dem
+   Skript (has-motion setzt das Head-Skript), damit nichts springt. Nur transform und opacity, kein Layout je Frame. */
+@media (min-width: 768px) {
+  .has-motion .page-banner--film .film-banner__frame { transform: translateY(calc(var(--film-depth, 0) * 30%)); }
+  .has-motion .page-banner--film .film-banner__frame .film-banner__poster,
+  .has-motion .page-banner--film .film-banner__video { transform: scale(calc(1.1 - 0.1 * var(--film-depth, 0))); }
+  .has-motion .page-banner--film .page-banner__text {
+    transform: translateY(calc(var(--film-depth, 0) * -40%)); opacity: calc(1 - 1.25 * var(--film-depth, 0));
+  }
+}
+
 .filterbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding-block: 20px; border-bottom: 1px solid var(--c-line); }
 .filterbar__label { font-size: var(--fs-small); color: var(--c-muted); margin-right: 4px; }
 .filterbar__right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
