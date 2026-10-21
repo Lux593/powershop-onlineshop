@@ -7,7 +7,7 @@
 
 /* ---------- Statement ---------- */
 /* Fließt in das Bento darunter (ebenfalls dunkel): unten wenig Abstand */
-.statement { padding-block: var(--section-y) var(--s-4); }
+.statement { padding-block: var(--section-y) var(--s-4); overflow: clip; }
 .statement .container::before { content: ""; display: block; width: 96px; height: 6px; margin-bottom: var(--s-4); background: var(--c-orange); }
 .statement__text {
   --split-pad: 0.2em; /* Luft für Umlaute in den Wortmasken */
@@ -20,6 +20,28 @@
 .has-motion .statement.is-scrub .statement__text .ps-wi { color: var(--c-muted-dark); translate: none; animation: none; }
 .has-motion .statement.is-scrub .statement__text .ps-wi.is-lit { color: var(--c-white); }
 @media print { .statement .statement__text .ps-wi { color: inherit !important; } }
+
+/* Gebäudezeichnung hinter der Aussage: weiße Linien, sehr leise, unter der Körnung (z-index -2 im isolierten Kontext
+   von .textured, das Korn liegt auf -1). Die Wörter bleiben gedimmt wie erleuchtet weit über 4,5 : 1.
+   Die Parallax-Drift (data-parallax) belegt transform am Bild, Lage und Maske sitzen deshalb am Träger. */
+/* Das Gebäude steht rechts auf der Unterkante, der Vorplatz läuft unten aus dem Bild. */
+.statement__drawing {
+  position: absolute; z-index: -2; right: -10%; bottom: -24px; width: 110%;
+  opacity: 0.08; pointer-events: none;
+}
+.statement__drawing img { display: block; width: 100%; height: auto; }
+@media (min-width: 700px) { .statement__drawing { right: 4%; bottom: -44px; width: clamp(360px, 54vw, 900px); } }
+/* Scrub: die Zeichnung entsteht von links nach rechts im Takt der Wörter. home.js setzt --draw (0 bis 1) aus
+   demselben ScrollTrigger. Die Maske ist 2,5-mal so breit wie die Zeichnung, ihre weiche Kante wandert hindurch. */
+.has-motion .statement.is-scrub .statement__drawing {
+  -webkit-mask-image: linear-gradient(90deg, #000 45%, transparent 55%);
+  mask-image: linear-gradient(90deg, #000 45%, transparent 55%);
+  -webkit-mask-size: 250% 100%; mask-size: 250% 100%;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: calc((1 - var(--draw, 0)) * 100%) 0;
+  mask-position: calc((1 - var(--draw, 0)) * 100%) 0;
+}
+@media print { .statement__drawing { display: none; } }
 
 /* ---------- Service-Leiste ---------- */
 /* Eine Leiste statt vier Karten: Die Felder teilen sich eine Fläche, die Haarlinien sind der Zwischenraum */

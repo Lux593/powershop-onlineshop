@@ -1,9 +1,16 @@
 {%- comment -%}
   Markenaussage. Mit Bewegung leuchten die Wörter beim Scrollen nacheinander auf (assets/home.js, data-split aus
   assets/motion.js). Ohne Bewegung steht der ganze Satz in voller Helligkeit da. Kein Link, kein Button.
+  Dahinter leise die Strichzeichnung des Gebäudes: Sie zeichnet sich im Takt der Wörter ein und driftet langsamer als
+  der Text (Parallax). Rein dekorativ, daher alt="" und aria-hidden.
 {%- endcomment -%}
 {%- if section.settings.text != blank -%}
   <section class="section statement on-dark textured" data-statement data-section-id="{{ section.id }}">
+    {%- if section.settings.show_drawing -%}
+      <div class="statement__drawing" aria-hidden="true">
+        <img src="{{ 'gebaeude-zeichnung.svg' | asset_url }}" width="744" height="465" alt="" loading="lazy" decoding="async" data-parallax="0.16">
+      </div>
+    {%- endif -%}
     <div class="container">
       <p class="statement__text" data-split="words">{{ section.settings.text | escape }}</p>
     </div>
@@ -24,6 +31,13 @@
       "label": "Aussage",
       "info": "Ein bis zwei Sätze. Die Wörter leuchten beim Scrollen nacheinander auf.",
       "default": "Von der Probefahrt bis zum Umbau: Motorrad, Ausrüstung und Werkstatt aus einer Hand."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_drawing",
+      "label": "Gebäudezeichnung im Hintergrund",
+      "info": "Leise Strichzeichnung des Power-Shop-Gebäudes hinter der Aussage. Zeichnet sich beim Scrollen mit den Wörtern ein.",
+      "default": true
     }
   ],
   "presets": [

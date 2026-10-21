@@ -10,14 +10,16 @@
   /* ---------------- Statement: Wörter leuchten beim Scrollen nacheinander auf ---------------- */
   // Der Splitter (data-split) arbeitet nach document.fonts.ready: erst dann gibt es Wörter. Läuft ScrollTrigger nicht,
   // bleibt es beim Hochgleiten der Wörter aus motion.css, kein Wort bleibt gedimmt.
+  // Die Gebäudezeichnung dahinter zeichnet sich über denselben Fortschritt ein (--draw, Maske in home.css).
   PS.on('[data-statement]', function (sec) {
-    var text = sec.querySelector('[data-split]');
+    var text = sec.querySelector('[data-split]'), drawing = sec.querySelector('.statement__drawing');
     if (!text || !M.scroll) return;
     function go() {
       var words = text.querySelectorAll('.ps-wi'), lit = -1;
       if (!words.length) return;
       M.add(text, function (gsap, ST) {
         function paint(self) {
+          if (drawing) drawing.style.setProperty('--draw', self.progress.toFixed(3));
           var n = Math.round(self.progress * words.length);
           if (n === lit) return;
           lit = n;
@@ -26,7 +28,10 @@
         // Dimmen erst nach gelungenem create (sonst bliebe der Text bei einem Fehler grau)
         var st = ST.create({ trigger: text, start: 'top 85%', end: 'bottom 45%', onUpdate: paint, onRefresh: paint });
         sec.classList.add('is-scrub');
-        return [st, function () { sec.classList.remove('is-scrub'); }];
+        return [st, function () {
+          sec.classList.remove('is-scrub');
+          if (drawing) drawing.style.removeProperty('--draw');
+        }];
       });
     }
     if (text.classList.contains('is-split')) return go();
