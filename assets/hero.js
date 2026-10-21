@@ -168,11 +168,10 @@
        Ab 30 % läuft das Bild ins Helle aus (.hero__fade) und geht in den hellen Willkommensblock darunter über.
        Die Pause-Taste bleibt stehen, der Pfeil blendet beim Scrollen aus. force3D hält Film- und Textebene dauerhaft auf der
        Grafikkarte; mit "auto" kamen sie erst beim Scroll-Beginn dorthin, das gab einen Ruck.
-       Handy (bis 767 px): Übergang wie bei den Kategorie-Filmen: Der Text bleibt stehen, der Film schiebt sich dahinter nach
-       oben und nimmt ihn an seiner Unterkante mit (position: sticky in hero.css, läuft beim Browser selbst). Per Skript
-       gesetzte Zoom- und Versatzwerte kamen auf dem iPhone ein Bild nach dem Scrollen und zitterten gegen die Seite. Hier
-       schaltet das Skript nur Pfeil und Pause-Taste aus, sobald gescrollt wird (.is-moving), sonst glitten sie über die Tabs. */
-    PS.motion.add(hero, function (gsap, ScrollTrigger) {
+       Handy (bis 767 px): kein Skript. Der Film steht als feste Ebene, der Hero ist sein Fenster und der Willkommensblock
+       schiebt sich darüber (hero.css). Per Skript gesetzte Zoom- und Versatzwerte kamen auf dem iPhone ein Bild nach dem
+       Scrollen und zitterten gegen die Seite. */
+    PS.motion.add(hero, function (gsap) {
       var m = hero.querySelector('.hero__media'), f = hero.querySelector('.hero__fade'), c = hero.querySelector('.hero__caption');
       var mm = gsap.matchMedia(); // wechselt beim Drehen oder Ändern der Fensterbreite die Variante und räumt die alte auf
       mm.add('(min-width: 768px)', function () {
@@ -185,10 +184,6 @@
           .set(c, { pointerEvents: 'none' }, 0.5)
           .fromTo(f, { opacity: 0 }, { opacity: 1, duration: 0.6 }, 0.3);
         if (link) tl.fromTo(link, { opacity: 1 }, { opacity: 0, duration: 0.15 }, 0);
-      });
-      mm.add('(max-width: 767px)', function () {
-        ScrollTrigger.create({ start: 4, end: 'max', toggleClass: { targets: hero, className: 'is-moving' } });
-        return function () { hero.classList.remove('is-moving'); };
       });
       return function () { mm.revert(); };
     });

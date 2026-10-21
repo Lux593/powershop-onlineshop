@@ -85,6 +85,16 @@
 /* Durchfahrt (hero.js, nur mit ScrollTrigger): Das Bild läuft beim Scrollen ins Helle aus und geht in den hellen
    Willkommensblock darunter über (gleiche Farbe wie dessen Grund). */
 .hero__fade { position: absolute; z-index: 4; inset: 0; background: var(--c-offwhite); opacity: 0; }
+/* Handy hochkant, nur mit Bewegung: Der Film steht, der Hero ist sein Fenster. Die Filmbilder liegen fest im Bildschirm, der
+   Hero-Kasten scrollt normal und schneidet sie zu: Text, Schleier, Pfeil und Pause-Taste wandern mit der Seite nach oben, der
+   Willkommensblock darunter schiebt sich über den stehenden Film. Der Film zeigt sich nur innerhalb des Heros und kann nie über
+   andere Abschnitte malen. Kein Skript beim Scrollen, Bewegung macht der Browser. Zugeschnitten wird doppelt: clip-path und das
+   ältere clip (wirkt nur an absolut positionierten Elementen wie .hero__media), der bewährte Weg für feste Ebenen in Safari auf
+   dem iPhone. Höhe lvh: Die Bilder füllen auch bei eingeklappter Browserleiste den Bildschirm, nichts springt. */
+@media (max-width: 767px) and (min-height: 541px) {
+  .has-motion .hero__media { clip-path: inset(0); clip: rect(0, auto, auto, 0); }
+  .has-motion .hero__slide { position: fixed; top: 0; right: 0; bottom: auto; left: 0; height: 100vh; height: 100lvh; }
+}
 
 /* Ken-Burns auf den Foto-Slides: Scale 1 auf 1.08 über die Standzeit plus Überblendung. is-leaving behält die Animation,
    sonst springt das Bild beim Ausblenden zurück. */
@@ -107,35 +117,6 @@
    :focus-within: Nach einem Mausklick auf einen Modell-Tab behält der Knopf den Fokus, die Textebene bliebe dann beim
    Scrollen stehen und schöbe sich nur nach oben hinaus. */
 .has-motion .hero__caption:has(:focus-visible) { opacity: 1 !important; transform: none !important; pointer-events: auto !important; }
-/* Handy hochkant, nur mit Bewegung: Übergang wie bei den Kategorie-Filmen (Herren, Damen). Beim Runterscrollen bleibt der Text
-   stehen, der Film schiebt sich dahinter nach oben, bis seine Unterkante 24 px unter dem Text ankommt; dann nimmt er den Text mit.
-   Alles per position: sticky, kein Skript je Scroll-Bild. Der Textblock füllt den Hero bis zum Fuß und haftet an der Oberkante des
-   Heros (--hero-top), steht also vom ersten Pixel an. Der Fuß unter dem Text (Platz für Pfeil und Pause-Taste, dazu der Rand für
-   die Browserleiste) ist ein eigenes Element im Fluss (::after): Die 24 px Rand zählen beim Sticky mit, Grenze ist die Unterkante
-   des Heros. Der Schleier hängt am Film und wandert mit ihm, sein dunkler Teil rückt dabei unter den Text (Lesbarkeit steigt). */
-@media (max-width: 767px) and (min-height: 541px) {
-  .has-motion .hero { padding-bottom: 0; }
-  .has-motion .hero::after { content: ""; flex: none; height: calc(84px - 24px + var(--hero-ui)); }
-  .has-motion .hero__caption {
-    position: sticky; top: var(--hero-top); margin-bottom: 24px;
-    flex: 1 0 auto; display: flex; flex-direction: column; justify-content: flex-end;
-  }
-  .has-motion .hero__caption-inner { padding-block-end: 0; }
-  /* Pfeil und Pause-Taste unter der Textebene (über Film und Schleier): Sie gleiten hinter den Text wie bei den Kategorie-Filmen.
-     In Ruhe liegen sie im Fuß, außerhalb des Textblocks, und bleiben klickbar. */
-  .has-motion .hero__pause, .has-motion .hero__scroll { z-index: 4; }
-}
-/* Handy: Pfeil und Pause-Taste blenden beim ersten Scrollen aus (.is-moving, hero.js), sonst glitten sie mit dem Film über die
-   Tabs; oben kommen sie zurück. Mit Tastaturfokus bleiben sie (visibility schaltet erst nach dem Ausblenden um). */
-@media (max-width: 767px) {
-  .has-motion .hero__pause { transition: background-color var(--t-fast), color var(--t-fast), opacity 150ms var(--ease-out), visibility 0s; }
-  .has-motion .hero__scroll { transition: opacity 150ms var(--ease-out), visibility 0s; }
-  .has-motion .hero.is-moving .hero__pause:not(:focus-visible),
-  .has-motion .hero.is-moving .hero__scroll:not(:focus-visible) {
-    opacity: 0; visibility: hidden; pointer-events: none;
-    transition: background-color var(--t-fast), color var(--t-fast), opacity 150ms var(--ease-out), visibility 0s 150ms;
-  }
-}
 .hero__caption-inner {
   padding-block: calc(var(--header-h) + 32px) 112px; /* unten Platz für Pfeil und Pause-Taste */
 }
