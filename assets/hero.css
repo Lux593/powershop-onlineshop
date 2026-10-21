@@ -107,6 +107,17 @@
    :focus-within: Nach einem Mausklick auf einen Modell-Tab behält der Knopf den Fokus, die Textebene bliebe dann beim
    Scrollen stehen und schöbe sich nur nach oben hinaus. */
 .has-motion .hero__caption:has(:focus-visible) { opacity: 1 !important; transform: none !important; pointer-events: auto !important; }
+/* Handy: Durchfahrt ohne Bewegung am Finger (hero.js). Nach einem Viertel der Hero-Höhe setzt hero.js is-past: Text und Pfeil
+   heben sich ab und blenden aus, als Übergang auf der Grafikkarte, unabhängig davon, wie der Finger scrollt; oben kommen sie
+   zurück. Gehen schneller als Kommen (300 zu 450 ms). Text und Hell-Ebene liegen von Anfang an auf eigenen Ebenen, damit
+   beim ersten Scrollen nichts umgebaut wird. */
+@media (max-width: 767px) {
+  .has-motion .hero__caption { transition: opacity 450ms var(--ease-out), transform 450ms var(--ease-out); will-change: opacity, transform; }
+  .has-motion .hero.is-past .hero__caption { opacity: 0; transform: translateY(-32px); pointer-events: none; transition-duration: 300ms; }
+  .has-motion .hero__scroll { transition: opacity 300ms var(--ease-out); }
+  .has-motion .hero.is-past .hero__scroll { opacity: 0; pointer-events: none; }
+  .has-motion .hero__fade { will-change: opacity; }
+}
 .hero__caption-inner {
   padding-block: calc(var(--header-h) + 32px) 112px; /* unten Platz für Pfeil und Pause-Taste */
 }

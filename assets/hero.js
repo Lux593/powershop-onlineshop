@@ -166,24 +166,37 @@
        dabei immer schon außerhalb des Bildes). Die Textebene fliegt größer werdend weg (Scale 1,45, 40 px hoch, in der
        ersten Hälfte ausgeblendet) und nimmt danach keine Klicks mehr an; Tastaturfokus darin holt sie zurück (hero.css).
        Ab 30 % läuft das Bild ins Helle aus (.hero__fade) und geht in den hellen Willkommensblock darunter über.
-       Die Pause-Taste bleibt stehen, der Pfeil blendet beim Scrollen aus.
-       Handy (bis 767 px): Text nur anheben und ausblenden, nicht vergrößern (Safari rendert skalierten Text in jedem Bild
-       neu, das ruckelte auf dem iPhone), der Film zoomt nur auf 1,2. force3D hält Film- und Textebene dauerhaft auf der
-       Grafikkarte; mit "auto" kamen sie erst beim Scroll-Beginn dorthin, das gab einen Ruck. */
-    PS.motion.add(hero, function (gsap) {
+       Die Pause-Taste bleibt stehen, der Pfeil blendet beim Scrollen aus. force3D hält Film- und Textebene dauerhaft auf der
+       Grafikkarte; mit "auto" kamen sie erst beim Scroll-Beginn dorthin, das gab einen Ruck.
+       Handy (bis 767 px): Dort hängt keine Bewegung am Finger. Das iPhone scrollt die Seite auf der Grafikkarte, per Skript
+       gesetzte Zoom- und Versatzwerte kommen ein Bild später und zitterten gegen die Seite (auch ohne Text-Skalierung). Der
+       Hero scrollt deshalb ganz normal mit, Text und Pfeil heben sich nach einem Viertel der Hero-Höhe von selbst ab und
+       blenden aus (.is-past, CSS-Übergang in hero.css, läuft unabhängig vom Finger), kurz bevor das Bild ins Helle ausläuft,
+       und kommen oben zurück. Wer nur ein Stück scrollt, behält Titel und Preis. Nur das Auslaufen ins Helle folgt dem
+       Scrollen, als reine Deckkraft. */
+    PS.motion.add(hero, function (gsap, ScrollTrigger) {
       var m = hero.querySelector('.hero__media'), f = hero.querySelector('.hero__fade'), c = hero.querySelector('.hero__caption');
-      var small = matchMedia('(max-width: 767px)');
-      function by(desk, phone) { return function () { return small.matches ? phone : desk; }; } // neu bei jedem Refresh (Resize)
-      var tl = gsap.timeline({
-        defaults: { ease: 'none', duration: 1, force3D: true },
-        scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: true, invalidateOnRefresh: true }
+      var mm = gsap.matchMedia(); // wechselt beim Drehen oder Ändern der Fensterbreite die Variante und räumt die alte auf
+      mm.add('(min-width: 768px)', function () {
+        var tl = gsap.timeline({
+          defaults: { ease: 'none', duration: 1, force3D: true },
+          scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: true }
+        });
+        tl.fromTo(m, { scale: 1, yPercent: 0 }, { scale: 1.4, yPercent: 30 }, 0)
+          .fromTo(c, { y: 0, scale: 1, opacity: 1 }, { y: -40, scale: 1.45, opacity: 0, duration: 0.5 }, 0)
+          .set(c, { pointerEvents: 'none' }, 0.5)
+          .fromTo(f, { opacity: 0 }, { opacity: 1, duration: 0.6 }, 0.3);
+        if (link) tl.fromTo(link, { opacity: 1 }, { opacity: 0, duration: 0.15 }, 0);
       });
-      tl.fromTo(m, { scale: 1, yPercent: 0 }, { scale: by(1.4, 1.2), yPercent: 30 }, 0)
-        .fromTo(c, { y: 0, scale: 1, opacity: 1 }, { y: -40, scale: by(1.45, 1), opacity: 0, duration: 0.5 }, 0)
-        .set(c, { pointerEvents: 'none' }, 0.5)
-        .fromTo(f, { opacity: 0 }, { opacity: 1, duration: 0.6 }, 0.3);
-      if (link) tl.fromTo(link, { opacity: 1 }, { opacity: 0, duration: 0.15 }, 0);
-      return [tl.scrollTrigger, tl, function () { gsap.set([m, f, c, link].filter(Boolean), { clearProps: 'all' }); }];
+      mm.add('(max-width: 767px)', function () {
+        gsap.fromTo(f, { opacity: 0 }, {
+          opacity: 1, ease: 'none',
+          scrollTrigger: { trigger: hero, start: 'top+=30% top', end: 'bottom top', scrub: true }
+        });
+        ScrollTrigger.create({ trigger: hero, start: 'top+=25% top', end: 'max', toggleClass: { targets: hero, className: 'is-past' } });
+        return function () { hero.classList.remove('is-past'); };
+      });
+      return function () { mm.revert(); };
     });
 
     /* ---------------- Pfeil: erstes Element nach dem Hero (ein Band dazwischen verschiebt es) ---------------- */
