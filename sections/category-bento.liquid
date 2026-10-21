@@ -3,7 +3,7 @@
   assign moto = blocks[0]
   assign pair_a = blocks[1]
   assign pair_b = blocks[2]
-  assign light = blocks[3]
+  assign acc = blocks[3]
   assign teile = blocks[4]
 -%}
 
@@ -25,8 +25,8 @@
         </div>
       </div>
       <div class="bento__col bento__col--right">
-        {%- if light -%}
-          {%- render 'bento-tile', block: light, modifier: 'bento-tile--product bento-tile--light', width: 960, height: 867 -%}
+        {%- if acc -%}
+          {%- render 'bento-tile', block: acc, modifier: 'bento-tile--acc', width: 1400, height: 677, parallax: true -%}
         {%- endif -%}
         {%- if teile -%}
           {%- render 'bento-tile', block: teile, modifier: 'bento-tile--teile', width: 1400, height: 787, parallax: true -%}
@@ -48,7 +48,7 @@
       "type": "tile",
       "name": "Kachel",
       "settings": [
-        { "type": "paragraph", "content": "Reihenfolge: 1 groß oben links, 2 und 3 darunter, 4 hell oben rechts, 5 breit unten rechts." },
+        { "type": "paragraph", "content": "Reihenfolge: 1 groß oben links, 2 und 3 darunter, 4 oben rechts, 5 breit unten rechts." },
         { "type": "text", "id": "title", "label": "Titel", "default": "Motorräder" },
         { "type": "text", "id": "subtitle", "label": "Unterzeile", "default": "Entdecken" },
         { "type": "url", "id": "url", "label": "Link" },
@@ -64,7 +64,7 @@
         { "type": "tile", "settings": { "title": "Motorräder", "subtitle": "Neu, gebraucht & Vorführer", "image_asset": "bento-motorraeder.jpg", "url": "/collections/motorraeder" } },
         { "type": "tile", "settings": { "title": "Herren", "subtitle": "Entdecken", "image_asset": "bento-herren-ruecken.jpg", "url": "/collections/herren" } },
         { "type": "tile", "settings": { "title": "Damen", "subtitle": "Entdecken", "image_asset": "bento-damen-ruecken.jpg", "url": "/collections/damen" } },
-        { "type": "tile", "settings": { "title": "Accessoires", "subtitle": "Entdecken", "image_asset": "bento-accessoires.jpg", "url": "/collections/accessoires" } },
+        { "type": "tile", "settings": { "title": "Accessoires", "subtitle": "Entdecken", "image_asset": "bento-accessoires-eiskuebel.jpg", "url": "/collections/accessoires" } },
         { "type": "tile", "settings": { "title": "Teile & Zubehör", "subtitle": "Entdecken", "image_asset": "bento-teile.jpg", "url": "/collections/teile" } }
       ]
     }

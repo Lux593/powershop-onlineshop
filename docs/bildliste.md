@@ -26,7 +26,8 @@ Austausch den Dateinamen aus der Liste streichen (siehe `README.md`).
 | `bento-herren-ruecken.jpg` | 864 × 720 | Lifestyle/Marke | echt | Mann in brauner Jacke mit Harley-Davidson-Schriftzug von hinten im Laden (Standbild aus `clothing-herren.mp4` bei 17,5 s, keine Gesichter) | Homepage · Kategorie-Kachel Herren |
 | `bento-damen.jpg` | 960 × 867 | Lifestyle/Marke | echt | Frau in ärmelloser Bluse hält eine Lederjacke, Bike im Hintergrund | Megamenü · Teaser Damen |
 | `bento-damen-ruecken.jpg` | 864 × 720 | Lifestyle/Marke | echt | Frau in schwarzer Lederjacke mit Bar-&-Shield-Prägung von hinten im Laden (Standbild aus `clothing-damen.mp4` bei 3,7 s, keine Gesichter) | Homepage · Kategorie-Kachel Damen |
-| `bento-accessoires.jpg` | 960 × 867 | Freisteller | echt | Handyhülle mit Bar & Shield, Freisteller auf Weiß | Homepage · Kategorie-Kachel Accessoires |
+| `bento-accessoires.jpg` | 960 × 867 | Freisteller | echt | Handyhülle mit Bar & Shield, Freisteller auf Weiß | Megamenü · Teaser Accessoires |
+| `bento-accessoires-eiskuebel.jpg` | 1400 × 677 | Lifestyle/Marke | echt | Eiskübel in Schwarz-Orange mit Harley-Davidson-Schriftzug, Zange und Eiswürfeln auf runder Holztrommel, Querformat (vom Nutzer geliefert, 21.10.2026) | Homepage · Kategorie-Kachel Accessoires |
 | `bento-teile.jpg` | 1400 × 787 | Lifestyle/Marke | echt | Zubehör-Flatlay auf dunklem Grund: Helm, Kissen mit Bar & Shield, Spanngurte | Homepage · Kategorie-Kachel Teile & Zubehör |
 | `banner-motorraeder.jpg` | 1200 × 600 | Lifestyle/Marke | Platzhalter | Touring-Bike im Profil, dunkler Hintergrund | Kategorieseite · Banner Motorräder |
 | `banner-herren.jpg` | 1200 × 600 | Lifestyle/Marke | Platzhalter | Herren-Lederjacken nebeneinander, Detail | Kategorieseite · Banner Herren |
