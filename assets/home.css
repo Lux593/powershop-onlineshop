@@ -64,14 +64,9 @@
   -webkit-mask-position: calc((1 - var(--draw, 0)) * 100%) 0;
   mask-position: calc((1 - var(--draw, 0)) * 100%) 0;
 }
-/* Handy: Die wandernde Maske ließ die (komplexe) Zeichnung in jedem Scroll-Bild neu malen und ruckelte auf dem iPhone,
-   genau während der Hero ausblendet. Dort blendet sie im Takt der Wörter nur ein (Deckkraft, läuft auf der Grafikkarte). */
-@media (max-width: 767px) {
-  .has-motion .statement.is-scrub .statement__drawing {
-    -webkit-mask-image: none; mask-image: none;
-    opacity: calc(0.1 * var(--draw, 0)); will-change: opacity;
-  }
-}
+/* Die Zeichnung liegt dauerhaft auf einer eigenen Grafikebene: Wandert die Maske, malt der Browser nur die Maske neu,
+   nicht die vielen Pfade der Zeichnung (das ruckelte auf dem iPhone). */
+.has-motion .statement.is-scrub .statement__drawing img { will-change: transform; }
 @media print { .statement__drawing { display: none; } }
 
 /* ---------- Service-Leiste ---------- */
