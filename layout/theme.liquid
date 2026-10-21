@@ -49,7 +49,7 @@
     </script>
 
     {% render 'fonts' %}
-    {%- comment -%} Stile: die Reihenfolge ist die Kaskade (Basis, geteilte Reste, Theme-Ergänzungen, Bewegung, dann die Bereiche: Header, Hero, Startseite, Footer, Shop, Inhaltsseiten). hero.css nur auf der Startseite: der Hero ist per enabled_on darauf beschränkt. pages.css nur auf Seiten: Seitenkopf und Partner-Angebot sind per enabled_on auf page.* beschränkt. {%- endcomment -%}
+    {%- comment -%} Stile: die Reihenfolge ist die Kaskade (Basis, geteilte Reste, Theme-Ergänzungen, Bewegung, dann die Bereiche: Header, Hero, Startseite, Footer, Shop, Seiten). hero.css nur auf der Startseite: der Hero ist per enabled_on darauf beschränkt. pages.css nur auf Seiten: die Partner-Abschnitte stehen in der Service-Seite. {%- endcomment -%}
     {{ 'tokens.css' | asset_url | stylesheet_tag }}
     {{ 'base.css' | asset_url | stylesheet_tag }}
     {{ 'components.css' | asset_url | stylesheet_tag }}
@@ -149,7 +149,7 @@
       Nur wo sie gebraucht werden: collection.js (Kollektion, Suche), product.js (Produkt), hero.js und home.js (index; der
       Hero ist per enabled_on auf die Startseite beschränkt, Startseiten-Sections auf anderen Templates bleiben ohne home.js
       statisch, home.css lädt überall) und contact.js (Kontakt-Box: Produkt und Seiten; im Theme-Editor immer, damit eine
-      neu eingefügte Section sofort funktioniert) und pages.js (Seiten: Tiefe im Seitenkopf, Scrub der Aussagen ohne GSAP). search.js lädt erst beim ersten Öffnen des Such-Dialogs nach
+      neu eingefügte Section sofort funktioniert) und pages.js (Seiten: Scrub der Aussagen in den Partner-Abschnitten, ohne GSAP). search.js lädt erst beim ersten Öffnen des Such-Dialogs nach
       (data-lazy-script, assets/theme.js).
       Showroom und Quick-Toggle bleiben bewusst in sections.js und laufen auf allen Seiten.
     {%- endcomment -%}

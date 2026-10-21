@@ -1,0 +1,189 @@
+{% doc %}
+  Partner-Angebot auf der Service-Seite (Finanzierung, Versicherung): Logo des Partners, Aussage in Display-Größe, darunter
+  links Bild, Text, Rechner-Links und Beratung, rechts die Kontakt-Box des Shops oder eine Ansprechpartner-Karte.
+  Hell (Offwhite) oder dunkel mit Körnung, immer über die volle Breite (eigener Container).
+  Mit Bewegung leuchten die Wörter der Aussage beim Scrollen nacheinander auf wie im Willkommensblock der Startseite
+  (data-split aus assets/motion.js, data-scrub aus assets/pages.js). Ohne Bewegung steht die Aussage in voller Farbe da.
+  Partner-Logos gibt es in zwei Fassungen: weiße Schrift für dunkel, dunkle Schrift für hell (Orange bleibt in beiden).
+  Externe Links öffnen in einem neuen Fenster, damit der Rechner des Partners die Seite des Shops nicht ersetzt.
+
+  @param {object} block - Block „partner“ der Service-Seite (sections/service-page.liquid)
+
+  @example
+  {% render 'partner-offer', block: block %}
+{% enddoc %}
+
+{%- liquid
+  assign s = block.settings
+  assign dark = false
+  if s.scheme == 'dark'
+    assign dark = true
+  endif
+  assign anchor = s.anchor | default: block.id
+  assign text = s.text
+  if s.footnote != blank and s.footnote_term != blank
+    assign marked_term = s.footnote_term | append: '<sup>*</sup>'
+    assign text = text | replace_first: s.footnote_term, marked_term
+  endif
+-%}
+{%- capture offer_logo -%}
+  {%- render 'media', image: s.logo, asset: s.logo_asset, width: s.logo_width, height: s.logo_height, alt: s.logo_alt -%}
+{%- endcapture -%}
+{%- assign offer_logo = offer_logo | strip -%}
+{%- capture offer_image -%}
+  {%- render 'media', image: s.image, asset: s.image_asset, width: 1200, height: 800, alt: s.image_alt, sizes: '(min-width: 1024px) 700px, 100vw' -%}
+{%- endcapture -%}
+{%- assign offer_image = offer_image | strip -%}
+
+{%- comment -%}
+  Rechte Spalte zuerst fassen: Die Kontakt-Box erscheint nur mit gepflegten Händlerdaten (Telefon, WhatsApp oder E-Mail).
+  Fehlen sie, entfällt die Spalte, und unter dem Text steht ein Link zur Kontaktseite, damit „Kontaktiere uns“ nicht ins
+  Leere läuft.
+{%- endcomment -%}
+{%- assign contact_missing = false -%}
+{%- capture offer_aside -%}
+  {%- case s.aside -%}
+    {%- when 'contact' -%}
+      {%- assign contact_anchor = anchor | append: '-kontakt' -%}
+      {%- capture contact_box -%}
+        {% render 'contact-box', anchor: contact_anchor, title: s.contact_title, topics: 'finanzierung,versicherung,inzahlungnahme,probefahrt,frage', topic: s.topic %}
+      {%- endcapture -%}
+      {%- assign contact_box = contact_box | strip -%}
+      {%- if contact_box != blank -%}
+        <div data-reveal>{{ contact_box }}</div>
+      {%- else -%}
+        {%- assign contact_missing = true -%}
+      {%- endif -%}
+
+    {%- when 'person' -%}
+      {%- capture person_photo -%}
+        {%- render 'media', image: s.person_image, asset: s.person_image_asset, width: 720, height: 900, alt: s.person_image_alt, sizes: '(min-width: 1024px) 420px, 100vw' -%}
+      {%- endcapture -%}
+      {%- assign person_photo = person_photo | strip -%}
+      {%- assign address_lines = s.person_address | newline_to_br | split: '<br />' -%}
+      <article class="agent" aria-labelledby="agent-{{ block.id }}">
+        {%- if person_photo != blank -%}
+          <div class="agent__photo" data-reveal="clip">{{ person_photo }}</div>
+        {%- endif -%}
+        <div class="agent__body" data-stagger="70">
+          <h3 id="agent-{{ block.id }}">{{ s.person_name | escape }}</h3>
+          {%- if s.person_company != blank or s.person_address != blank -%}
+            <address>
+              {%- if s.person_company != blank -%}{{ s.person_company | escape }}<br>{%- endif -%}
+              {%- for line in address_lines -%}
+                {%- assign item = line | strip | strip_newlines -%}
+                {%- if item != blank -%}{{ item | escape }}{% unless forloop.last %}<br>{% endunless %}{%- endif -%}
+              {%- endfor -%}
+            </address>
+          {%- endif -%}
+          <div class="agent__actions">
+            {%- assign phone_keys = 'person_phone,person_mobile' | split: ',' -%}
+            {%- for key in phone_keys -%}
+              {%- assign number = s[key] | strip -%}
+              {%- if number != blank -%}
+                {%- liquid
+                  # Wählbar auch aus der Schweiz und Frankreich: nationale Nummern (führende 0) bekommen +49
+                  assign dial = number | remove: ' ' | remove: '-' | remove: '(' | remove: ')' | remove: '/' | remove: '.'
+                  assign first = dial | slice: 0
+                  assign second = dial | slice: 1
+                  if first == '0' and second != '0'
+                    assign dial = dial | remove_first: '0' | prepend: '+49'
+                  elsif first == '0'
+                    assign dial = dial | remove_first: '00' | prepend: '+'
+                  endif
+                  if key == 'person_phone'
+                    assign kind_label = 'Telefon'
+                    assign btn_class = 'btn--primary'
+                  elsif dark
+                    assign kind_label = 'Mobil'
+                    assign btn_class = 'btn--outline-light'
+                  else
+                    assign kind_label = 'Mobil'
+                    assign btn_class = 'btn--outline-dark'
+                  endif
+                -%}
+                <a class="btn {{ btn_class }}" href="tel:{{ dial | escape }}">
+                  {% render 'icon', name: 'phone' %}<span>{{ kind_label }}</span><span class="agent__number">· {{ number | escape }}</span>
+                </a>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        </div>
+      </article>
+  {%- endcase -%}
+{%- endcapture -%}
+{%- assign offer_aside = offer_aside | strip -%}
+
+<section
+  class="section offer{% if dark %} offer--dark on-dark textured{% endif %}"
+  id="{{ anchor | escape }}"
+  aria-labelledby="offer-title-{{ block.id }}"
+  {{ block.shopify_attributes }}
+>
+  <div class="container">
+    <div class="offer__head">
+      {%- if offer_logo != blank -%}
+        <div class="offer__logo" data-reveal="fade">{{ offer_logo }}</div>
+      {%- endif -%}
+      <h2 class="offer__claim" id="offer-title-{{ block.id }}" data-split="words" data-scrub>{{ s.heading | escape }}</h2>
+    </div>
+
+    <div class="offer__grid{% if offer_aside == blank %} offer__grid--single{% endif %}">
+      <div class="offer__main">
+        {%- if offer_image != blank -%}
+          <div class="offer__media" data-reveal="clip">{{ offer_image }}</div>
+        {%- endif -%}
+        <div class="offer__body">
+        {%- if text != blank -%}
+          <div class="offer__text" data-reveal>{{ text }}</div>
+        {%- endif -%}
+        {%- if s.label_1 != blank or s.label_2 != blank -%}
+          <div class="offer__actions" data-stagger="80">
+            {%- for i in (1..2) -%}
+              {%- liquid
+                assign label_key = 'label_' | append: i
+                assign url_key = 'url_' | append: i
+                assign label = s[label_key]
+                assign url = s[url_key]
+                assign external = false
+                if url contains '://'
+                  assign external = true
+                endif
+                if i == 1
+                  assign btn_class = 'btn--primary'
+                elsif dark
+                  assign btn_class = 'btn--outline-light'
+                else
+                  assign btn_class = 'btn--outline-dark'
+                endif
+              -%}
+              {%- if label != blank and url != blank -%}
+                <a class="btn {{ btn_class }}" href="{{ url }}"{% if external %} target="_blank" rel="noopener"{% endif %}>
+                  {{- label | escape -}}
+                  {%- if external -%}{% render 'icon', name: 'arrow-up-right' %}<span class="sr-only"> (öffnet neues Fenster)</span>{%- endif -%}
+                </a>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+        {%- if s.advice_heading != blank or s.advice_text != blank -%}
+          <div class="offer__advice" data-reveal>
+            {%- if s.advice_heading != blank -%}<h3>{{ s.advice_heading | escape }}</h3>{%- endif -%}
+            {{ s.advice_text }}
+          </div>
+        {%- endif -%}
+        {%- if contact_missing and pages['contact'] != blank -%}
+          <div data-reveal><a class="btn {% if dark %}btn--outline-light{% else %}btn--secondary{% endif %}" href="{{ pages['contact'].url }}">{% render 'icon', name: 'mail' %}Kontakt aufnehmen</a></div>
+        {%- endif -%}
+        {%- if s.footnote != blank and s.footnote_term != blank -%}
+          <p class="caption offer__footnote">* {{ s.footnote | escape }}</p>
+        {%- endif -%}
+        </div>
+      </div>
+
+      {%- if offer_aside != blank -%}
+        <div class="offer__aside">{{ offer_aside }}</div>
+      {%- endif -%}
+    </div>
+  </div>
+</section>

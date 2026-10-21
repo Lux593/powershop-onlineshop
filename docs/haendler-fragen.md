@@ -80,9 +80,10 @@ Wo noch nichts eingetragen ist, zeigt der Shop entweder nichts an oder einen **B
 34. **Suchmaschinen-Texte**: Titel und Beschreibung für die Startseite (Shopify-Admin → *Einstellungen → Preferences / Präferenzen → Titel und Meta-Beschreibung der Startseite*).
     Heute fehlt die Meta-Beschreibung; das Theme gibt sie aus, sobald sie dort steht. Ca. 150 Zeichen, ohne unbelegte Versprechen.
 
-## G. Seite „Finanzierung & Versicherung“ (Stand 21. Oktober 2026)
+## G. Finanzierung & Versicherung auf der Service-Seite (Stand 21. Oktober 2026)
 
-Texte und Bilder stammen von der alten Seite powershop-weil.com/finanzierung---versicherung (Vorlage `page.finanzierung`).
+Texte und Bilder stammen von der alten Seite powershop-weil.com/finanzierung---versicherung. Sie stehen auf der Service-Seite
+unter `/pages/service#finanzierung` und `#versicherung` (Blöcke „Partner-Angebot“ in `templates/page.service.json`).
 
 35. **Sternchen bei „Harley-Davidson Insurance Services“** (Pflicht): Auf der alten Seite stand ein Sternchen ohne Fußnote. Welcher Hinweis gehört dazu
     (vermutlich die Angabe zum Versicherungsvermittler)? Im Shop erscheinen Sternchen und Fußnote erst, wenn die Fußnote im Theme-Editor eingetragen ist.

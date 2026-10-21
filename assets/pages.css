@@ -1,29 +1,14 @@
 /* ==========================================================================
-   Power Shop – Inhaltsseiten (Vorlagen page.*): Seitenkopf mit Bild, Partner-Angebot.
-   Lädt nur auf Seiten (layout/theme.liquid). Die Bühne des Seitenkopfs und die Tiefe beim Scrollen kommen aus dem
-   Kategorie-Kopf (.page-banner--film in shop.css); hier stehen nur die Ergänzungen.
+   Power Shop – Seiten (Vorlagen page.*): Partner-Abschnitte der Service-Seite (Finanzierung, Versicherung;
+   snippets/partner-offer.liquid). Lädt nur auf Seiten (layout/theme.liquid).
    Bewegungszustände gelten nur unter html.has-motion (Vertrag: docs/motion-api.md); ohne sie ist alles statisch.
    ========================================================================== */
 
-/* ---------- Seitenkopf mit Bild ---------- */
-/* Sprunglinks als Umriss-Chips auf Schwarz (die hellen Chips aus components.css wären hier weiße Kästen) */
-.page-head__jumps { margin-top: 8px; }
-.page-head__jumps .chip { background: transparent; border-color: var(--c-border-dark); color: var(--c-white); }
-.page-head__jumps .chip:hover { border-color: var(--c-white); }
-/* Partner-Logos: weiß auf transparent, durch eine Haarlinie vom Text getrennt */
-.page-head__logos {
-  display: flex; flex-wrap: wrap; align-items: center; gap: 12px 32px;
-  margin-top: 8px; padding-top: 16px; border-top: 1px solid var(--c-border-dark);
-}
-.page-head__logos img { display: block; width: auto; height: 20px; }
-@media (min-width: 1024px) { .page-head__logos img { height: 22px; } }
-/* Schmale Handys: lange Wörter („Versicherung“) passen in 56 px nicht in die Zeile. Kleiner setzen statt trennen
-   (hyphens:auto füllte die Zeile gierig und trennte auch dort, wo das Wort allein in die nächste Zeile passt). */
-@media (max-width: 479px) { .page-head h1 { font-size: clamp(40px, 14.5vw, 56px); } }
-
 /* ---------- Partner-Angebot ---------- */
-/* Hell: Offwhite der Seite. Dunkel: Schwarz mit Körnung (.on-dark.textured). Die Scrub-Farben hängen am Schema. */
-.offer { --scrub-dim: var(--c-dim-light); --scrub-lit: var(--c-black); }
+/* Hell: Offwhite der Seite. Dunkel: Schwarz mit Körnung (.on-dark.textured). Die Scrub-Farben hängen am Schema.
+   --offer-sticky: Oberkante der stehenbleibenden Textspalte; auf der Service-Seite zählt die Themenleiste (69 px) mit. */
+.offer { --scrub-dim: var(--c-dim-light); --scrub-lit: var(--c-black); --offer-sticky: calc(var(--header-offset) + var(--s-4)); }
+.service-page .offer { --offer-sticky: calc(var(--header-offset) + 69px + var(--s-4)); scroll-margin-top: 69px; } /* Sprung auf #finanzierung landet unter der Themenleiste */
 .offer--dark { --scrub-dim: var(--c-dim-dark); --scrub-lit: var(--c-white); }
 
 .offer__head { display: grid; gap: var(--s-3); margin-bottom: var(--s-6); }
@@ -44,22 +29,30 @@
 @media (min-width: 1024px) { .offer__grid:not(.offer__grid--single) { grid-template-columns: 7fr 5fr; gap: 56px; align-items: start; } }
 .offer__grid > * { min-width: 0; }
 /* Ab 1024 px mit rechter Spalte (Kontakt-Box, Ansprechpartner): Der Text bleibt unter dem Header stehen, während die höhere
-   Spalte daneben vorbeizieht. Ohne rechte Spalte rückt die Beratung neben Text und Buttons (dense füllt die erste Zeile). */
+   Spalte daneben vorbeizieht. Ohne rechte Spalte (Händlerdaten fehlen) teilt sich der Inhalt selbst auf zwei Spalten:
+   mit Bild steht es links und der Text rechts daneben, ohne Bild rückt die Beratung neben Text und Buttons
+   (dense füllt die erste Zeile). */
 @media (min-width: 1024px) {
-  .offer__grid:not(.offer__grid--single) .offer__main { position: sticky; top: calc(var(--header-offset) + var(--s-4)); transition: top var(--t-med) var(--ease); }
-  .offer__grid--single .offer__main { max-width: none; grid-template-columns: 7fr 5fr; grid-auto-flow: dense; column-gap: 56px; }
-  .offer__grid--single .offer__main > * { grid-column: 1; max-width: 640px; }
-  .offer__grid--single .offer__advice, .offer__grid--single .offer__advice ~ * { grid-column: 2; }
-  .offer__grid--single .offer__advice { grid-row: span 2; }
+  .offer__grid:not(.offer__grid--single) .offer__main { position: sticky; top: var(--offer-sticky); transition: top var(--t-med) var(--ease); }
+  .offer__grid--single .offer__main { max-width: none; }
+  .offer__grid--single .offer__main:has(> .offer__media) { grid-template-columns: 7fr 5fr; column-gap: 56px; align-items: start; }
+  .offer__grid--single .offer__main:not(:has(> .offer__media)) .offer__body { grid-template-columns: 7fr 5fr; grid-auto-flow: dense; column-gap: 56px; }
+  .offer__grid--single .offer__main:not(:has(> .offer__media)) .offer__body > * { grid-column: 1; max-width: 640px; }
+  .offer__grid--single .offer__main:not(:has(> .offer__media)) .offer__advice,
+  .offer__grid--single .offer__main:not(:has(> .offer__media)) .offer__advice ~ * { grid-column: 2; }
+  .offer__grid--single .offer__main:not(:has(> .offer__media)) .offer__advice { grid-row: span 2; }
 }
 .offer__main { display: grid; gap: var(--s-4); align-content: start; max-width: 640px; }
+.offer__body { display: grid; gap: var(--s-4); align-content: start; min-width: 0; }
+.offer__media { aspect-ratio: 3 / 2; overflow: hidden; background: var(--c-stone); }
+.offer__media img { width: 100%; height: 100%; object-fit: cover; }
 .offer__text p { font-size: 18px; line-height: 1.6; }
 .offer__text sup { font-size: 0.7em; line-height: 0; }
 .offer__actions { display: flex; flex-wrap: wrap; gap: 12px; }
 /* Externer Link: der Pfeil weist beim Überfahren schräg aus der Seite heraus */
 .offer__actions .btn .icon { transition: transform var(--t-fast) var(--ease); }
 .offer__actions .btn:hover .icon, .offer__actions .btn:focus-visible .icon { transform: translate(2px, -2px); }
-.offer__advice { display: grid; gap: 12px; padding-top: var(--s-4); border-top: 1px solid var(--c-line); }
+.offer__advice { display: grid; gap: 12px; align-content: start; padding-top: var(--s-4); border-top: 1px solid var(--c-line); }
 .offer__footnote { color: var(--c-muted); }
 .offer--dark .offer__text p, .offer--dark .offer__advice p { color: var(--c-on-dark); }
 .offer--dark .offer__advice { border-top-color: var(--c-border-dark); }
