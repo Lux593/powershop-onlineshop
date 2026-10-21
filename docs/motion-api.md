@@ -184,9 +184,11 @@ Hero (sections/hero.liquid, assets/hero.js; nur Startseite, PS.on('[data-hero]')
                            Bewegung oder bei saveData/2G/3G startet die Seite pausiert. Im Theme-Editor wählt
                            shopify:block:select den Slide, shopify:section:unload räumt auf (auch Reduced-Motion zur
                            Laufzeit über PS.motion.track).
-  Scrub                    Nur mit PS.motion.scroll (PS.motion.add): Film skaliert 1 → 1,08, Abdunkeln bis 0,55, die
-                           Textebene wandert 0,15 des Scrolls, höchstens 40 px und nur ab 768 x 541 px. Pause-Taste und
-                           Weiter-Pfeil bleiben stehen, der Pfeil blendet beim Scrollen aus.
+  Scrub „Durchfahrt“       Nur mit PS.motion.scroll (PS.motion.add), über die Hero-Höhe: Film zoomt 1 → 1,4 und läuft 30 %
+                           langsamer als die Seite; die Textebene fliegt größer werdend weg (Scale 1,45, 40 px hoch, in der
+                           ersten Hälfte ausgeblendet, danach pointer-events: none); ab 30 % läuft das Bild über .hero__fade
+                           (Offwhite) ins Helle aus und geht in den Willkommensblock über. Tastaturfokus in der Textebene
+                           holt sie per :focus-within zurück (hero.css). Pause-Taste bleibt stehen, der Pfeil blendet aus.
   Weiter-Pfeil             .hero__scroll: mit JavaScript zeigt href auf die ID des ersten sichtbaren Elements nach dem Hero,
                            ohne JavaScript auf das Setting „scroll_target“ (Standard nach-hero, in index.json die Anker-ID
                            des Willkommensblocks, sections/statement.liquid).

@@ -82,8 +82,9 @@
   .hero--left .hero__veil { background: var(--g-left), linear-gradient(0deg, rgb(10 10 10 / calc(var(--ov) * 1.1)), transparent 55%); }
   .hero--both .hero__veil { background: var(--g-bottom), var(--g-left); }
 }
-/* Dunkelt beim Scrollen nach (hero.js, nur mit ScrollTrigger) */
-.hero__dim { position: absolute; z-index: 4; inset: 0; background: var(--c-black); opacity: 0; }
+/* Durchfahrt (hero.js, nur mit ScrollTrigger): Das Bild läuft beim Scrollen ins Helle aus und geht in den hellen
+   Willkommensblock darunter über (gleiche Farbe wie dessen Grund). */
+.hero__fade { position: absolute; z-index: 4; inset: 0; background: var(--c-offwhite); opacity: 0; }
 
 /* Ken-Burns auf den Foto-Slides: Scale 1 auf 1.08 über die Standzeit plus Überblendung. is-leaving behält die Animation,
    sonst springt das Bild beim Ausblenden zurück. */
@@ -100,7 +101,10 @@
 .has-motion .hero.is-held .hero__scroll-line::after { animation-play-state: paused; }
 
 /* ---------- Text ---------- */
-.hero__caption { position: relative; z-index: 5; }
+.hero__caption { position: relative; z-index: 5; transform-origin: 0 100%; }
+/* Durchfahrt: hero.js lässt die Textebene größer werdend ausblenden (Inline-Stile). Tastaturfokus darin holt sie
+   vollständig zurück, sonst stünde der Fokus auf einem unsichtbaren Element (WCAG 2.4.7). */
+.has-motion .hero__caption:focus-within { opacity: 1 !important; transform: none !important; pointer-events: auto !important; }
 .hero__caption-inner {
   padding-block: calc(var(--header-h) + 32px) 112px; /* unten Platz für Pfeil und Pause-Taste */
 }
