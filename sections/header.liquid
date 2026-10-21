@@ -75,28 +75,55 @@
 
 <dialog class="drawer drawer--left mobile-menu" id="mobile-menu" aria-label="Menü" data-lenis-prevent>
   <div class="drawer__head">
-    <span class="mobile-menu__brand">
+    {%- comment -%} Logo und Schriftzug führen wie im Header zur Startseite {%- endcomment -%}
+    <a class="mobile-menu__brand" href="{{ routes.root_url }}" aria-label="Power Shop, Startseite">
       <img src="{{ 'hd-bar-shield.png' | asset_url }}" alt="" width="49" height="40">
       <span class="wordmark">Power<span>Shop</span></span>
-    </span>
+    </a>
     <button class="icon-btn" type="button" data-close aria-label="Menü schließen">{% render 'icon', name: 'x' %}</button>
   </div>
   <div class="drawer__body" data-lenis-prevent>
     {%- for link in menu.links -%}
       {%- if link.links.size > 0 -%}
+        {%- comment -%}
+          Gliederung wie im Megamenü (snippets/mega-menu.liquid): Ebene 2 mit Unterpunkten = Gruppe, zugeklappt wie die
+          Hauptpunkte, darin Ebene 3; Ebene 2 ohne Unterpunkte = Gruppentitel als Link. „Alle …“ steht sichtbar unter den
+          Gruppen (der Hauptpunkt selbst klappt hier nur auf). Ohne Gruppen bilden alle Ebene-2-Punkte eine Liste.
+        {%- endcomment -%}
+        {%- liquid
+          assign has_groups = false
+          for child in link.links
+            if child.links.size > 0
+              assign has_groups = true
+              break
+            endif
+          endfor
+        -%}
         <details class="acc">
           <summary>{{ link.title | escape }}{% render 'icon', name: 'plus' %}</summary>
           <div class="acc__body">
-            <a href="{{ link.url }}"><strong>Alle anzeigen</strong></a>
-            {%- for child in link.links -%}
-              {%- if child.links.size > 0 -%}
-                {%- for grandchild in child.links -%}
-                  <a href="{{ grandchild.url }}">{{ grandchild.title | escape }}</a>
-                {%- endfor -%}
-              {%- else -%}
+            {%- if has_groups -%}
+              {%- for group in link.links -%}
+                {%- if group.links.size == 0 -%}
+                  <a class="mobile-menu__group" href="{{ group.url }}">{{ group.title | escape }}</a>
+                {%- else -%}
+                  <details class="mobile-menu__sub">
+                    <summary class="mobile-menu__group">{{ group.title | escape }}{% render 'icon', name: 'plus' %}</summary>
+                    <div class="mobile-menu__links">
+                      {%- for child in group.links -%}
+                        <a href="{{ child.url }}">{{ child.title | escape }}</a>
+                      {%- endfor -%}
+                    </div>
+                  </details>
+                {%- endif -%}
+              {%- endfor -%}
+              <a href="{{ link.url }}"><strong>Alle {{ link.title | escape }}</strong></a>
+            {%- else -%}
+              {%- for child in link.links -%}
                 <a href="{{ child.url }}">{{ child.title | escape }}</a>
-              {%- endif -%}
-            {%- endfor -%}
+              {%- endfor -%}
+              <a href="{{ link.url }}"><strong>Alle {{ link.title | escape }}</strong></a>
+            {%- endif -%}
           </div>
         </details>
       {%- else -%}

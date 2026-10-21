@@ -141,9 +141,21 @@ html:not(:has(.announce)) { --announce-h: 0px; }
 .mobile-menu { background: var(--c-black); color: var(--c-white); }
 .mobile-menu .drawer__head { border-color: var(--c-steel); }
 .mobile-menu .acc { border-color: var(--c-steel); }
-.mobile-menu .acc summary { padding-inline: 24px; min-height: 68px; font-size: 22px; }
+.mobile-menu .acc > summary { padding-inline: 24px; min-height: 68px; font-size: 22px; }
 .mobile-menu .acc__body { padding: 0 24px 16px; color: var(--c-on-dark-strong); }
 .mobile-menu .acc__body a { display: flex; align-items: center; min-height: 44px; }
+.mobile-menu .acc__body strong { color: var(--c-white); }
+/* Gruppen wie die Spalten im Megamenü, aber zugeklappt wie die Hauptpunkte: Titel weiß in Barlow, größer als die Einträge,
+   ein Tipp klappt die Links darunter auf (eingerückt) */
+.mobile-menu__group {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 48px;
+  font-family: var(--f-head); font-weight: 700; font-size: 18px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--c-white);
+}
+.mobile-menu__sub > summary { list-style: none; cursor: pointer; }
+.mobile-menu__sub > summary::-webkit-details-marker { display: none; }
+.mobile-menu__sub > summary .icon { width: 18px; height: 18px; flex: none; transition: transform var(--t-fast); }
+.mobile-menu__sub[open] > summary .icon { transform: rotate(45deg); }
+.mobile-menu__links { padding: 0 0 8px 14px; }
 .mobile-menu__direct { display: flex; align-items: center; justify-content: space-between; padding: 0 24px; min-height: 68px; border-top: 1px solid var(--c-steel); font-family: var(--f-head); font-weight: 700; font-size: 22px; text-transform: uppercase; }
 .mobile-menu__direct--sale { color: var(--c-orange); }
 .mobile-menu__foot { padding: 24px; display: grid; gap: 12px; border-top: 1px solid var(--c-steel); }

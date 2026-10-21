@@ -135,13 +135,13 @@
 /* ---------- Akkordeon ---------- */
 .acc { border-top: 1px solid var(--c-line); }
 .acc:last-child { border-bottom: 1px solid var(--c-line); }
-.acc summary {
+.acc > summary {
   list-style: none; cursor: pointer; min-height: 56px; display: flex; align-items: center; justify-content: space-between; gap: 16px;
   font-family: var(--f-head); font-weight: 600; font-size: 18px; letter-spacing: 0.03em; text-transform: uppercase;
 }
-.acc summary::-webkit-details-marker { display: none; }
-.acc summary .icon { transition: transform var(--t-fast); }
-.acc[open] summary .icon { transform: rotate(45deg); }
+.acc > summary::-webkit-details-marker { display: none; }
+.acc > summary .icon { transition: transform var(--t-fast); }
+.acc[open] > summary .icon { transform: rotate(45deg); }
 .acc__body { padding-bottom: var(--s-3); color: var(--c-text-soft); font-size: 15px; }
 .acc__body p + p, .acc__body p + ul, .acc__body ul + p { margin-top: 12px; }
 .acc__body ul { list-style: disc; padding-left: 20px; }

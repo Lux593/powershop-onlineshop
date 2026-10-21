@@ -152,7 +152,7 @@
   .empty--strip { grid-template-columns: auto minmax(0, 1fr); align-content: center; gap: 24px 28px; min-height: 480px; padding-block: 120px; }
   .empty--strip .chip-row { grid-column: 2; }
 }
-.filter-sheet .acc summary { padding-inline: 0; }
+.filter-sheet .acc > summary { padding-inline: 0; }
 /* Filter-Fenster: keine Linie über dem ersten und unter dem letzten Filter (Kopf und Fuß trennen schon) */
 .filter-sheet .acc:first-child { border-top: 0; }
 .filter-sheet .acc:last-child { border-bottom: 0; }
@@ -296,7 +296,7 @@ body.has-sticky-contact { padding-bottom: 72px; }
 @media (min-width: 1024px) { body.has-sticky-contact { padding-bottom: 0; } }
 
 .pdp-sections { max-width: 860px; }
-.pdp-sections .acc summary { font-size: 20px; }
+.pdp-sections .acc > summary { font-size: 20px; }
 
 /* Warenkorb-/Merkliste-Drawer */
 .line-item { display: grid; grid-template-columns: 88px minmax(0, 1fr); gap: 14px; padding-block: 16px; border-bottom: 1px solid var(--c-line); }
