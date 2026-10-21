@@ -1,5 +1,6 @@
 {%- comment -%}
-  Hero (nur Startseite): Vollbild. Slide 1 = Poster (LCP) mit Film darüber, Slide 2 und 3 = Foto mit Ken-Burns.
+  Hero (nur Startseite): Vollbild. Jeder Slide zeigt entweder ein Foto mit Ken-Burns oder ein Standbild mit Film darüber;
+  der Film eines Slides läuft nur, solange er aktiv ist. Das Bild von Slide 1 ist das LCP-Element.
   Das Poster steht bewusst nicht in media.liquid: es braucht fetchpriority und srcset. Verhalten: assets/hero.js.
   Ohne JavaScript bleibt Slide 1 mit Poster, Text und Buttons stehen.
 {%- endcomment -%}
@@ -22,13 +23,11 @@
           assign has_video = false
           assign still = block.settings.image
           assign still_asset = block.settings.image_asset
-          if forloop.first
-            if block.settings.video != blank or block.settings.video_asset != blank
-              assign has_video = true
-              if block.settings.poster != blank or block.settings.poster_asset != blank
-                assign still = block.settings.poster
-                assign still_asset = block.settings.poster_asset
-              endif
+          if block.settings.video != blank or block.settings.video_asset != blank
+            assign has_video = true
+            if block.settings.poster != blank or block.settings.poster_asset != blank
+              assign still = block.settings.poster
+              assign still_asset = block.settings.poster_asset
             endif
           endif
         -%}
@@ -45,26 +44,30 @@
           {%- elsif still_asset != blank -%}
             {%- capture hidden_asset -%}{% render 'is-placeholder', asset: still_asset %}{%- endcapture -%}
             {%- if hidden_asset == blank -%}
-              {%- if forloop.first -%}
-                {%- if still_asset == 'hero-poster.webp' -%}
-                  <img
-                    class="hero__img"
-                    src="{{ 'hero-poster.webp' | asset_url }}"
-                    srcset="{{ 'hero-poster-960.webp' | asset_url }} 960w, {{ 'hero-poster.webp' | asset_url }} 1920w"
-                    sizes="100vw"
-                    width="1920"
-                    height="1080"
-                    alt="{{ block.settings.image_alt | escape }}"
-                    loading="eager"
-                    fetchpriority="high"
-                    decoding="async"
-                  >
-                {%- else -%}
-                  <img class="hero__img" src="{{ still_asset | asset_url }}" width="1024" height="576" alt="{{ block.settings.image_alt | escape }}" loading="eager" fetchpriority="high" decoding="async">
-                {%- endif -%}
-              {%- else -%}
-                <img class="hero__img" src="{{ still_asset | asset_url }}" width="1024" height="576" alt="{{ block.settings.image_alt | escape }}" loading="lazy" decoding="async">
-              {%- endif -%}
+              {%- comment -%}
+                Standbilder zum Film heißen …-poster.webp (1920 × 1080) und haben eine …-poster-960.webp für schmale Bildschirme.
+                Beide immer gemeinsam ersetzen, sonst zeigt Mobil weiter das alte Bild.
+              {%- endcomment -%}
+              {%- liquid
+                assign poster_960 = ''
+                assign img_w = 1024
+                assign img_h = 576
+                if still_asset contains '-poster.webp'
+                  assign poster_960 = still_asset | replace: '-poster.webp', '-poster-960.webp'
+                  assign img_w = 1920
+                  assign img_h = 1080
+                endif
+              -%}
+              <img
+                class="hero__img"
+                src="{{ still_asset | asset_url }}"
+                {% if poster_960 != blank %}srcset="{{ poster_960 | asset_url }} 960w, {{ still_asset | asset_url }} 1920w" sizes="100vw"{% endif %}
+                width="{{ img_w }}"
+                height="{{ img_h }}"
+                alt="{{ block.settings.image_alt | escape }}"
+                {% if forloop.first %}loading="eager" fetchpriority="high"{% else %}loading="lazy"{% endif %}
+                decoding="async"
+              >
             {%- endif -%}
           {%- endif -%}
 
@@ -240,14 +243,14 @@
         { "type": "text", "id": "headline", "label": "Große Überschrift", "info": "Ohne Eingabe gilt der Tab-Text." },
         { "type": "text", "id": "blurb", "label": "Kurztext", "default": "Die feste Verkleidung für lange Strecken." },
         { "type": "header", "content": "Foto" },
-        { "type": "image_picker", "id": "image", "label": "Bild", "info": "Empfohlen 16:9, mindestens 1920 Pixel breit. Beim ersten Slide nur ohne Film." },
+        { "type": "image_picker", "id": "image", "label": "Bild", "info": "Empfohlen 16:9, mindestens 1920 Pixel breit. Gilt nur ohne Film." },
         { "type": "text", "id": "image_asset", "label": "Standard-Bilddatei im Theme", "info": "Wird benutzt, solange kein Bild gewählt ist.", "default": "hero-ride-road.jpg" },
         { "type": "text", "id": "image_alt", "label": "Bildbeschreibung" },
-        { "type": "header", "content": "Film (nur erster Slide)" },
-        { "type": "video", "id": "video", "label": "Film", "info": "Ohne Auswahl läuft die Standarddatei. Kurzer Loop, 16:9, ohne Ton. Gilt nur für den ersten Slide." },
-        { "type": "text", "id": "video_asset", "label": "Standard-Filmdatei im Theme", "info": "Dateiname ohne Endung. Das Theme sucht hero-loop.mp4, hero-loop-720.mp4 (mobil) und hero-loop.webm. Leer lassen für ein reines Foto. Die Standardwerte stehen bei jedem Modell, wirken aber nur im ersten Slide: Steht ein anderes Modell vorn, hier und beim Standbild den Eintrag leeren, sonst läuft der Road-Glide-Film mit dem Text dieses Modells.", "default": "hero-loop" },
+        { "type": "header", "content": "Film" },
+        { "type": "video", "id": "video", "label": "Film", "info": "Ohne Auswahl läuft die Filmdatei im Theme (unten). 16:9, ohne Ton. Der Film läuft nur, solange sein Slide aktiv ist." },
+        { "type": "text", "id": "video_asset", "label": "Filmdatei im Theme", "info": "Dateiname ohne Endung, z. B. hero-loop: Das Theme sucht hero-loop.mp4, hero-loop-720.mp4 (mobil) und hero-loop.webm. Leer lassen für ein reines Foto." },
         { "type": "image_picker", "id": "poster", "label": "Standbild zum Film", "info": "Erstes Bild des Films, erscheint sofort und wenn der Film nicht läuft." },
-        { "type": "text", "id": "poster_asset", "label": "Standard-Standbild im Theme", "info": "Wird benutzt, solange kein Standbild gewählt ist.", "default": "hero-poster.webp" },
+        { "type": "text", "id": "poster_asset", "label": "Standbild im Theme", "info": "Wird benutzt, solange kein Standbild gewählt ist. Name auf -poster.webp (1920 × 1080) mit passender -poster-960.webp, z. B. hero-poster.webp." },
         { "type": "header", "content": "Angebot" },
         { "type": "product", "id": "product", "label": "Motorrad", "info": "Liefert Preis und Link." },
         { "type": "text", "id": "price_text", "label": "Preistext (überschreibt den Produktpreis)", "info": "Zum Beispiel: ab 31.500 €" },
@@ -262,7 +265,7 @@
     {
       "name": "Hero mit Modell-Tabs",
       "blocks": [
-        { "type": "slide" },
+        { "type": "slide", "settings": { "video_asset": "hero-loop", "poster_asset": "hero-poster.webp" } },
         {
           "type": "slide",
           "settings": {

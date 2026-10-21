@@ -35,6 +35,27 @@ KI-generierten Loop. Diese Notiz hält fest, woher er kommt, wie er gebaut wurde
 Die Filme laden erst nach dem Seitenaufbau (`preload="none"`, Start nach Load und Leerlauf), nie bei Datensparmodus oder reduzierter Bewegung.
 Wegen der Länge und der vielen schnellen Bewegungen sind sie trotzdem deutlich größer als der alte 7-s-Loop (1,9 / 0,7 / 0,7 MB).
 
+## Sportster S (zweiter Slide, seit 21. Oktober 2026)
+
+Ersetzt den Street-Glide-Slide (Foto). Jeder Slide kann seit diesem Tag einen eigenen Film haben (`video_asset` und
+`poster_asset` am Block, keine Standardwerte mehr); es läuft nur der Film des aktiven Slides (`assets/hero.js`).
+
+| | |
+|---|---|
+| Quelle | `sportster-s.mp4`, vom Nutzer geliefert. Laut Metadaten Export aus DaVinci Resolve, erstellt am 9. Oktober 2026 |
+| Rohmaterial | 1920 × 1080 (schon 16:9), HEVC Main 10, 29,97 fps, 19,75 s, mit Ton |
+| Kodierung | wie oben: ohne Ausschnitt, Lanczos, auf 8 bit, ohne Ton, Metadaten und Zeitcode; MP4 CRF 26 (`-g 48`), WebM VP9 CRF 38 |
+
+| Datei | Format | Größe |
+|---|---|---|
+| `assets/sportster-s.mp4` | H.264, 1280 × 720 | 5,3 MB |
+| `assets/sportster-s-720.mp4` | H.264, 960 × 540 | 3,6 MB |
+| `assets/sportster-s.webm` | VP9, 1280 × 720 | 4,3 MB |
+| `assets/sportster-s-poster.webp` | 1920 × 1080 | 54 KB |
+| `assets/sportster-s-poster-960.webp` | 960 × 540 | 23 KB |
+
+Der Film lädt erst, wenn sein Slide zum ersten Mal drankommt. Preis „ab 16.300 €“ als Preistext (vom Nutzer genannt, 21.10.2026; kein Sportster-Produkt im Shop).
+
 ## Vor dem Livegang klären
 
 - **Nutzungsrechte:** Rechte am Film und Einverständnis der gezeigten Person für die Nutzung im Shop klären.

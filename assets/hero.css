@@ -58,7 +58,7 @@
 }
 /* Film über dem Poster: der erste Film-Frame ist das Poster, die Überblendung fällt nicht auf */
 .hero__video { opacity: 0; transition: opacity 700ms var(--ease); }
-.hero.is-video .hero__video { opacity: 1; }
+.hero__slide.is-video .hero__video { opacity: 1; }
 
 /* Abdunklung: Stärke aus --ov (Schema, mindestens 50 %: darunter fehlt auf hellen Bildern der Kontrast), Richtung per Modifier. Der Text steht im unteren Teil, dort muss der Verlauf tragen:
    Kontrast gemessen gegen Bilder des Loops (Weiß/Offwhite auf dem hellsten Zehntel der Fläche), Normaltext 4,5:1, großer Text 3:1.
@@ -103,8 +103,10 @@
 /* ---------- Text ---------- */
 .hero__caption { position: relative; z-index: 5; transform-origin: 0 100%; }
 /* Durchfahrt: hero.js lässt die Textebene größer werdend ausblenden (Inline-Stile). Tastaturfokus darin holt sie
-   vollständig zurück, sonst stünde der Fokus auf einem unsichtbaren Element (WCAG 2.4.7). */
-.has-motion .hero__caption:focus-within { opacity: 1 !important; transform: none !important; pointer-events: auto !important; }
+   vollständig zurück, sonst stünde der Fokus auf einem unsichtbaren Element (WCAG 2.4.7). Nur :focus-visible, nicht
+   :focus-within: Nach einem Mausklick auf einen Modell-Tab behält der Knopf den Fokus, die Textebene bliebe dann beim
+   Scrollen stehen und schöbe sich nur nach oben hinaus. */
+.has-motion .hero__caption:has(:focus-visible) { opacity: 1 !important; transform: none !important; pointer-events: auto !important; }
 .hero__caption-inner {
   padding-block: calc(var(--header-h) + 32px) 112px; /* unten Platz für Pfeil und Pause-Taste */
 }

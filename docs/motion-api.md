@@ -188,7 +188,7 @@ Hero (sections/hero.liquid, assets/hero.js; nur Startseite, PS.on('[data-hero]')
                            langsamer als die Seite; die Textebene fliegt größer werdend weg (Scale 1,45, 40 px hoch, in der
                            ersten Hälfte ausgeblendet, danach pointer-events: none); ab 30 % läuft das Bild über .hero__fade
                            (Offwhite) ins Helle aus und geht in den Willkommensblock über. Tastaturfokus in der Textebene
-                           holt sie per :focus-within zurück (hero.css). Pause-Taste bleibt stehen, der Pfeil blendet aus.
+                           holt sie per :has(:focus-visible) zurück (hero.css; Mausfokus nach Tab-Klick nicht). Pause-Taste bleibt stehen, der Pfeil blendet aus.
   Weiter-Pfeil             .hero__scroll: mit JavaScript zeigt href auf die ID des ersten sichtbaren Elements nach dem Hero,
                            ohne JavaScript auf das Setting „scroll_target“ (Standard nach-hero, in index.json die Anker-ID
                            des Willkommensblocks, sections/statement.liquid).

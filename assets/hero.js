@@ -1,6 +1,7 @@
 /* ==========================================================================
    Power Shop – Hero (nur Startseite): Modell-Tabs, Film, Bildwechsel, Scroll-Effekte (Motion-API).
-   Film: nach window.load plus Idle, nur im Bild und im sichtbaren Tab. Übersprungen bei saveData, 2G/3G, Reduced-Motion,
+   Film: je Slide höchstens einer, nur der des aktiven Slides läuft (die anderen halten an ihrer Stelle an und laden erst,
+   wenn ihr Slide drankommt). Nach window.load plus Idle, nur im Bild und im sichtbaren Tab. Übersprungen bei saveData, 2G/3G, Reduced-Motion,
    im Editor und bei abgelehntem play() (iOS Low-Power): Poster plus Play-Taste. Pause-Taste = WCAG 2.2.2.
    ========================================================================== */
 (function () {
@@ -11,7 +12,7 @@
     var slides = [].slice.call(hero.querySelectorAll('.hero__slide'));
     var chips = tabs ? [].slice.call(tabs.querySelectorAll('[role="tab"]')) : [];
     var btn = hero.querySelector('.hero__pause');
-    var video = hero.querySelector('.hero__video');
+    var videos = slides.map(function (s) { return s.querySelector('.hero__video'); });
     var link = hero.querySelector('.hero__scroll');
     var con = navigator.connection || {};
     var slow = con.saveData || /(^|-)[23]g$/.test(con.effectiveType || '');
@@ -30,15 +31,14 @@
       hero.classList.toggle('is-rotating', rotate && began);
       loop();
       if (btn) {
-        btn.hidden = !video && !motion; // Ken-Burns und Scroll-Linie laufen auch ohne Film (2.2.2)
+        btn.hidden = !videos.some(Boolean) && !motion; // Ken-Burns und Scroll-Linie laufen auch ohne Film (2.2.2)
         btn.setAttribute('aria-pressed', paused);
       }
-      if (!video) return;
-      if (going() && cur === 0) play(); else video.pause();
+      videos.forEach(function (v, k) { if (v) { if (k === cur && going()) play(v); else v.pause(); } });
     }
 
     /* ---------------- Film ---------------- */
-    function play() {
+    function play(video) {
       var d = video.dataset;
       if (!video.getAttribute('src')) {
         // Mobil 540p, sonst WebM nur wenn sicher abspielbar (SSIM gegen das MP4 0,98), sonst MP4
@@ -49,16 +49,19 @@
       // iOS Low-Power und Autoplay-Sperren lehnen ab. AbortError (pause() dazwischen) ist normal.
       if (p && p.catch) p.catch(function (e) { if (e.name === 'NotAllowedError') { paused = true; began = false; apply(); } });
     }
-    if (video) {
+    videos.forEach(function (video, k) {
+      if (!video) return;
+      var slide = slides[k];
       video.muted = true;
-      video.addEventListener('playing', function () { hero.classList.add('is-video'); });
-      // Pause von außen (System): Taste zeigt „angehalten“
+      // Einmal gelaufen, bleibt der Film über dem Standbild (beim Zurückkehren steht sein letztes Bild da)
+      video.addEventListener('playing', function () { slide.classList.add('is-video'); });
+      // Pause von außen (System): Taste zeigt „angehalten“. Eigene Pausen beim Slide-Wechsel zählen nicht (cur ist dann schon weiter).
       // Nur im Bild: iOS hält den Film beim Wegscrollen selbst an, bevor der IntersectionObserver „nicht im Bild“ meldet
       video.addEventListener('pause', function () {
-        if (video && video.paused && going() && cur === 0 && inView()) { paused = true; apply(); }
+        if (videos[k] && video.paused && going() && cur === k && inView()) { paused = true; apply(); }
       });
-      video.addEventListener('error', function () { video.remove(); video = null; hero.classList.remove('is-video'); apply(); });
-    }
+      video.addEventListener('error', function () { video.remove(); videos[k] = null; slide.classList.remove('is-video'); apply(); });
+    });
 
     /* ---------------- Tabs, Bildwechsel, Rotation ----------------
        Die Standzeit misst das Skript und zeichnet die Linie am Tab selbst (--hero-p). Sie zählt nur, solange der Bildwechsel
@@ -156,7 +159,7 @@
       rotate = false;
       loop();
       hero.classList.remove('is-rotating');
-      if (video) video.pause();
+      videos.forEach(function (v) { if (v) v.pause(); });
     }
     document.addEventListener('shopify:section:unload', function (e) { if (e.target.contains(hero)) off(); }, { signal: ac.signal });
     PS.motion.track(hero, off);

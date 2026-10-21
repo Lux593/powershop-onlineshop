@@ -10,6 +10,8 @@
             "blurb": "Abenteuer erleben sah noch nie so gut aus.",
             "image_asset": "hero-ride-road.jpg",
             "image_alt": "Fahrer einer Road Glide mit Helm und Sonnenbrille in Nahaufnahme",
+            "video_asset": "hero-loop",
+            "poster_asset": "hero-poster.webp",
             "price_text": "ab 31.500 €",
             "cta_label": "Road Glide ansehen",
             "url": "/collections/motorraeder",
@@ -17,15 +19,17 @@
             "secondary_url": "/pages/service#probefahrt"
           }
         },
-        "street": {
+        "sportster": {
           "type": "slide",
           "settings": {
-            "label": "Street Glide",
-            "blurb": "Die tiefe Scheibe für die offene Straße.",
-            "image_asset": "hero-ride-street.jpg",
-            "image_alt": "Zwei Fahrer auf einer Street Glide, unterwegs auf einer Landstraße",
-            "price_text": "ab 31.500 €",
-            "cta_label": "Street Glide ansehen",
+            "label": "Sportster S",
+            "blurb": "Kraft und Stil für jede Kurve.",
+            "image_asset": "sportster-s-poster.webp",
+            "image_alt": "Schwarzer Harley-Davidson-Helm in Nahaufnahme, Bäume im Hintergrund",
+            "video_asset": "sportster-s",
+            "poster_asset": "sportster-s-poster.webp",
+            "price_text": "ab 16.300 €",
+            "cta_label": "Sportster S ansehen",
             "url": "/collections/motorraeder",
             "secondary_label": "Probefahrt anfragen",
             "secondary_url": "/pages/service#probefahrt"
@@ -46,7 +50,7 @@
           }
         }
       },
-      "block_order": ["road", "street", "cvo"],
+      "block_order": ["road", "sportster", "cvo"],
       "settings": {
         "aria_label": "Modelle 2026",
         "scroll_target": "nach-hero"

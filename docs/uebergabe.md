@@ -26,7 +26,7 @@ Die Dateien kommen aus `assets/` und lassen sich unter **demselben Namen** erset
 |---|---|
 | `hero-loop.mp4`, `hero-loop-720.mp4`, `hero-loop.webm` | Film (Desktop, mobil, Alternative); 16:9, ohne Ton, loopfähig |
 | `hero-poster.webp`, `hero-poster-960.webp` | Standbild (erstes Bild des Loops), LCP-Bild |
-| `hero-ride-road.jpg`, `hero-ride-street.jpg`, `hero-ride-cvo.jpg` | Fotos der Tabs 1 bis 3 |
+| `hero-ride-road.jpg`, `hero-ride-cvo.jpg` | Fotos der Tabs 1 und 3 (Tab 1 und 2 zeigen Filme: `hero-loop.*`, `sportster-s.*`, siehe docs/hero-clip.md) |
 
 Im Theme-Editor kann pro Modell stattdessen ein eigener Film und ein Standbild gewählt werden. Weitere Details: `docs/hero-clip.md`, `docs/bildliste.md`.
 
