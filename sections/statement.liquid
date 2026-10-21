@@ -1,30 +1,66 @@
 {%- comment -%}
-  Markenaussage. Mit Bewegung leuchten die Wörter beim Scrollen nacheinander auf (assets/home.js, data-split aus
-  assets/motion.js). Ohne Bewegung steht der ganze Satz in voller Helligkeit da. Kein Link, kein Button.
-  Dahinter leise die Strichzeichnung des Gebäudes: Sie zeichnet sich im Takt der Wörter ein und driftet langsamer als
-  der Text (Parallax). Rein dekorativ, daher alt="" und aria-hidden.
+  Willkommensblock auf hellem Grund: Überschrift mit Bar & Shield, darunter die Markenaussage und die Service-Kacheln.
+  Mit Bewegung leuchten die Wörter der Aussage beim Scrollen nacheinander auf (assets/home.js, data-split aus
+  assets/motion.js). Ohne Bewegung steht der ganze Satz in voller Farbe da.
+  Hinter der Aussage leise die Strichzeichnung des Gebäudes: Sie zeichnet sich im Takt der Wörter ein und driftet langsamer als
+  der Text (Parallax). Rein dekorativ, daher alt="" und aria-hidden. Sie sitzt mit der Aussage in .statement__stage und läuft
+  nicht unter die Kacheln.
 {%- endcomment -%}
-{%- if section.settings.text != blank -%}
-  <section class="section statement on-dark textured" data-statement data-section-id="{{ section.id }}">
-    {%- if section.settings.show_drawing -%}
-      <div class="statement__drawing" aria-hidden="true">
-        <img src="{{ 'gebaeude-zeichnung.svg' | asset_url }}" width="744" height="465" alt="" loading="lazy" decoding="async" data-parallax="0.16">
+{%- if section.settings.text != blank or section.blocks.size > 0 -%}
+  <section
+    class="section statement"
+    id="{{ section.settings.anchor_id | default: 'nach-hero' }}"
+    {% if section.settings.heading != blank %}aria-labelledby="statement-title-{{ section.id }}"{% endif %}
+    data-statement
+    data-section-id="{{ section.id }}"
+  >
+    <div class="statement__stage">
+      {%- if section.settings.show_drawing and section.settings.text != blank -%}
+        <div class="statement__drawing" aria-hidden="true">
+          <img src="{{ 'gebaeude-zeichnung.svg' | asset_url }}" width="744" height="465" alt="" loading="lazy" decoding="async" data-parallax="0.16">
+        </div>
+      {%- endif -%}
+      <div class="container">
+        {%- if section.settings.heading != blank -%}
+          <h2 class="statement__title" id="statement-title-{{ section.id }}">
+            <img class="statement__mark" src="{{ 'hd-bar-shield.png' | asset_url }}" alt="" width="49" height="40" loading="lazy" decoding="async">
+            {%- comment -%} Den Markennamen nicht am Bindestrich umbrechen {%- endcomment -%}
+            <span data-split="words">{{ section.settings.heading | escape | replace: 'Harley-Davidson', '<span class="statement__brand">Harley-Davidson</span>' }}</span>
+          </h2>
+        {%- endif -%}
+        {%- if section.settings.text != blank -%}
+          <p class="statement__text" data-split="words">{{ section.settings.text | escape }}</p>
+        {%- endif -%}
+      </div>
+    </div>
+    {%- if section.blocks.size > 0 -%}
+      <div class="container statement__tiles">
+        <div class="service-tiles">
+          {%- for block in section.blocks -%}
+            {%- render 'service-tile', block: block -%}
+          {%- endfor -%}
+        </div>
       </div>
     {%- endif -%}
-    <div class="container">
-      <p class="statement__text" data-split="words">{{ section.settings.text | escape }}</p>
-    </div>
   </section>
 {%- elsif request.design_mode -%}
-  <section class="section statement on-dark textured">
-    <div class="container"><p class="muted">Statement: Trage eine kurze Markenaussage ein.</p></div>
+  <section class="section statement">
+    <div class="container"><p class="muted">Willkommen: Trage eine kurze Markenaussage ein oder füge Kacheln hinzu.</p></div>
   </section>
 {%- endif -%}
 
 {% schema %}
 {
-  "name": "Statement",
+  "name": "Willkommen",
   "settings": [
+    { "type": "text", "id": "anchor_id", "label": "Anker-ID", "default": "nach-hero", "info": "Mit „nach-hero“ springt der Hero-Pfeil ohne JavaScript hierher (Standard des Hero-Pfeils). Die ID darf nur einmal auf der Seite vorkommen; bei einer anderen ID das Ziel im Hero anpassen." },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Überschrift",
+      "info": "Steht mit dem Bar & Shield über der Aussage. Leer lassen für keine Überschrift.",
+      "default": "Willkommen beim Harley-Davidson Power Shop"
+    },
     {
       "type": "textarea",
       "id": "text",
@@ -40,8 +76,45 @@
       "default": true
     }
   ],
+  "max_blocks": 4,
+  "blocks": [
+    {
+      "type": "tile",
+      "name": "Kachel",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "route", "label": "Route (Probefahrt)" },
+            { "value": "banknote", "label": "Geldschein (Finanzierung)" },
+            { "value": "wrench", "label": "Schraubenschlüssel (Werkstatt)" },
+            { "value": "handshake", "label": "Handschlag (Inzahlungnahme)" },
+            { "value": "calendar-check", "label": "Kalender" },
+            { "value": "map-pin", "label": "Standort" },
+            { "value": "phone", "label": "Telefon" },
+            { "value": "shield-check", "label": "Schild" }
+          ],
+          "default": "route"
+        },
+        { "type": "text", "id": "title", "label": "Titel", "default": "Probefahrt" },
+        { "type": "text", "id": "text", "label": "Text", "default": "Dein Wunsch-Bike live erleben." },
+        { "type": "text", "id": "more_label", "label": "Link-Text", "default": "Anfragen" },
+        { "type": "url", "id": "url", "label": "Link" }
+      ]
+    }
+  ],
   "presets": [
-    { "name": "Statement" }
+    {
+      "name": "Willkommen",
+      "blocks": [
+        { "type": "tile", "settings": { "icon": "route", "title": "Probefahrt", "text": "Dein Wunsch-Bike live erleben.", "more_label": "Anfragen", "url": "/pages/service#probefahrt" } },
+        { "type": "tile", "settings": { "icon": "banknote", "title": "Finanzierung", "text": "Individuell zu Laufzeit und Rate.", "more_label": "Beraten lassen", "url": "/pages/service#finanzierung" } },
+        { "type": "tile", "settings": { "icon": "wrench", "title": "Werkstatt", "text": "Service, Umbau und Eintragung.", "more_label": "Termin anfragen", "url": "/pages/service#werkstatt" } },
+        { "type": "tile", "settings": { "icon": "handshake", "title": "Inzahlungnahme", "text": "Fairer Preis für dein altes Bike.", "more_label": "Bewerten lassen", "url": "/pages/service#inzahlungnahme" } }
+      ]
+    }
   ]
 }
 {% endschema %}

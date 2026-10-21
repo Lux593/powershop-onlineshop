@@ -52,17 +52,19 @@
         "scroll_target": "nach-hero"
       }
     },
-    "service": {
-      "type": "service-tiles",
+    "statement": {
+      "type": "statement",
       "blocks": {
-        "testdrive": { "type": "tile", "settings": { "icon": "route", "title": "Probefahrt", "text": "Dein Wunsch-Bike live erleben.", "more_label": "Anfragen", "url": "/pages/service#probefahrt" } },
+        "testdrive": { "type": "tile", "settings": { "icon": "route", "title": "Probefahrt", "text": "Dein Wunsch-Bike live erleben.", "more_label": "Motorräder ansehen", "url": "/collections/motorraeder" } },
         "finance": { "type": "tile", "settings": { "icon": "banknote", "title": "Finanzierung", "text": "Individuell zu Laufzeit und Rate.", "more_label": "Beraten lassen", "url": "/pages/service#finanzierung" } },
         "workshop": { "type": "tile", "settings": { "icon": "wrench", "title": "Werkstatt", "text": "Service, Umbau und Eintragung.", "more_label": "Termin anfragen", "url": "/pages/service#werkstatt" } },
-        "tradein": { "type": "tile", "settings": { "icon": "handshake", "title": "Inzahlungnahme", "text": "Fairer Preis für dein altes Bike.", "more_label": "Bewerten lassen", "url": "/pages/service#inzahlungnahme" } }
+        "service": { "type": "tile", "settings": { "icon": "handshake", "title": "Service", "text": "Alles rund ums Bike an einem Ort.", "more_label": "Zum Service", "url": "/pages/service" } }
       },
-      "block_order": ["testdrive", "finance", "workshop", "tradein"],
+      "block_order": ["testdrive", "finance", "workshop", "service"],
       "settings": {
-        "anchor_id": "nach-hero"
+        "anchor_id": "nach-hero",
+        "heading": "Willkommen beim Harley-Davidson Power Shop",
+        "text": "Von der Probefahrt bis zum Umbau: Motorrad, Ausrüstung und Werkstatt aus einer Hand."
       }
     },
     "news": {
@@ -78,12 +80,6 @@
         "subheading": "Frisch eingetroffen im Power Shop",
         "products_count": 4,
         "button_label": "Alle ansehen"
-      }
-    },
-    "statement": {
-      "type": "statement",
-      "settings": {
-        "text": "Von der Probefahrt bis zum Umbau: Motorrad, Ausrüstung und Werkstatt aus einer Hand."
       }
     },
     "bento": {
@@ -129,5 +125,5 @@
       }
     }
   },
-  "order": ["hero", "service", "news", "statement", "bento", "showroom", "story"]
+  "order": ["hero", "statement", "news", "bento", "showroom", "story"]
 }

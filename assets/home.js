@@ -11,11 +11,14 @@
   // Der Splitter (data-split) arbeitet nach document.fonts.ready: erst dann gibt es Wörter. Läuft ScrollTrigger nicht,
   // bleibt es beim Hochgleiten der Wörter aus motion.css, kein Wort bleibt gedimmt.
   // Die Gebäudezeichnung dahinter zeichnet sich über denselben Fortschritt ein (--draw, Maske in home.css).
+  // Überschrift und Aussage (beide data-split) leuchten als eine Folge auf: erst die Überschrift, dann die Aussage.
   PS.on('[data-statement]', function (sec) {
-    var text = sec.querySelector('[data-split]'), drawing = sec.querySelector('.statement__drawing');
+    var parts = [].slice.call(sec.querySelectorAll('[data-split]')), drawing = sec.querySelector('.statement__drawing');
+    var first = parts[0], text = parts[parts.length - 1];
     if (!text || !M.scroll) return;
+    function ready() { return parts.every(function (p) { return p.classList.contains('is-split'); }); }
     function go() {
-      var words = text.querySelectorAll('.ps-wi'), lit = -1;
+      var words = sec.querySelectorAll('[data-split] .ps-wi'), lit = -1;
       if (!words.length) return;
       M.add(text, function (gsap, ST) {
         function paint(self) {
@@ -26,7 +29,7 @@
           for (var i = 0; i < words.length; i++) words[i].classList.toggle('is-lit', i < n);
         }
         // Dimmen erst nach gelungenem create (sonst bliebe der Text bei einem Fehler grau)
-        var st = ST.create({ trigger: text, start: 'top 85%', end: 'bottom 45%', onUpdate: paint, onRefresh: paint });
+        var st = ST.create({ trigger: first, endTrigger: text, start: 'top 85%', end: 'bottom 45%', onUpdate: paint, onRefresh: paint });
         sec.classList.add('is-scrub');
         return [st, function () {
           sec.classList.remove('is-scrub');
@@ -34,13 +37,13 @@
         }];
       });
     }
-    if (text.classList.contains('is-split')) return go();
+    if (ready()) return go();
     var mo = new MutationObserver(function () {
-      if (!text.classList.contains('is-split')) return;
+      if (!ready()) return;
       mo.disconnect();
       go();
     });
-    mo.observe(text, { attributes: true, attributeFilter: ['class'] });
+    parts.forEach(function (p) { mo.observe(p, { attributes: true, attributeFilter: ['class'] }); });
     M.track(text, mo);
   });
 

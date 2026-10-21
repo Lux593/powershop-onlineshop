@@ -3,17 +3,7 @@
   <div class="container">
     <div class="service-tiles">
       {%- for block in section.blocks -%}
-        {%- comment -%} Ohne Link bleibt das Feld eine reine Infofläche (kein toter Link auf „#“). {%- endcomment -%}
-        {%- assign tile_tag = 'div' -%}
-        {%- if block.settings.url != blank -%}{%- assign tile_tag = 'a' -%}{%- endif -%}
-        <{{ tile_tag }} class="service-tile" data-stagger="55"{% if block.settings.url != blank %} href="{{ block.settings.url }}"{% endif %} {{ block.shopify_attributes }}>
-          {% render 'icon', name: block.settings.icon %}
-          <h3>{{ block.settings.title }}</h3>
-          <p>{{ block.settings.text }}</p>
-          {%- if block.settings.more_label != blank and block.settings.url != blank -%}
-            <span class="more">{{ block.settings.more_label }} {% render 'icon', name: 'arrow-right' %}</span>
-          {%- endif -%}
-        </{{ tile_tag }}>
+        {%- render 'service-tile', block: block -%}
       {%- endfor -%}
     </div>
   </div>

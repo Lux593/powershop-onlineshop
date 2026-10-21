@@ -1,36 +1,52 @@
 /* ==========================================================================
-   Power Shop – Startseiten-Sections: Statement, Service-Leiste, Produkt-Grids, Kategorie-Bento,
+   Power Shop – Startseiten-Sections: Willkommen (Statement), Service-Leiste, Produkt-Grids, Kategorie-Bento,
    Showroom, Story.
    Bewegungszustände gelten nur unter html.has-motion (Vertrag: docs/motion-api.md); ohne sie ist alles statisch.
    .product-grid wird auch von Kollektion und Suche genutzt (collection.liquid, search.liquid).
    ========================================================================== */
 
-/* ---------- Statement ---------- */
-/* Fließt in das Bento darunter (ebenfalls dunkel): unten wenig Abstand */
-.statement { padding-block: var(--section-y) var(--s-4); overflow: clip; }
-.statement .container::before { content: ""; display: block; width: 96px; height: 6px; margin-bottom: var(--s-4); background: var(--c-orange); }
-.statement__text {
+/* ---------- Willkommen (Statement) ---------- */
+/* Heller Grund wie die Seite: Überschrift mit Bar & Shield, Aussage mit Gebäudezeichnung (.statement__stage), darunter
+   die Service-Kacheln. Die Bühne isoliert die Zeichnung (liegt über dem Seitengrund, unter dem Text). Sie ist mindestens
+   so hoch wie die Zeichnung plus 48 px; mit der Parallax-Drift (±8 %) ragt das Dach zeitweise darüber und läuft dann
+   in den oberen Abstand der Section, die nur seitlich überstehende Teile (mobil 110vw) abschneidet. */
+.statement { padding-block: var(--section-y); overflow: clip; }
+.statement__stage {
+  --draw-w: 110vw; --draw-h: calc(var(--draw-w) * 0.625); /* Zeichnung 744 × 465 */
+  position: relative; isolation: isolate; padding-bottom: var(--s-8); min-height: calc(var(--draw-h) + var(--s-6));
+}
+@media (min-width: 700px) { .statement__stage { --draw-w: clamp(360px, 54vw, 900px); } }
+/* Kacheln über der Bühne: driftet die Zeichnung nach unten, verschwindet sie hinter ihnen statt darüber zu liegen */
+.statement__tiles { position: relative; z-index: 1; }
+/* Überschrift in Größe und Schrift der Aussage, das Bar & Shield steht im Textfluss vor dem ersten Wort */
+.statement__title { margin-bottom: 0.6em; }
+.statement__title, .statement__text {
   --split-pad: 0.2em; /* Luft für Umlaute in den Wortmasken */
-  font-family: var(--f-head); font-weight: 800; font-size: calc(var(--fs-display) * 0.6); line-height: 0.96;
+  font-family: var(--f-head); font-weight: 800; font-size: calc(var(--fs-display) * 0.48); line-height: 0.96;
   letter-spacing: 0.005em; text-transform: uppercase; text-wrap: balance; hyphens: manual; overflow-wrap: anywhere;
 }
-/* Scrub (home.js setzt .is-scrub, solange ScrollTrigger läuft): gedimmt bleibt --c-muted-dark (8 : 1 auf Schwarz),
-   erleuchtet wird Weiß. Dann entfällt das Hochgleiten der Wörter, nur die Farbe wechselt. */
+/* Aussage etwas kleiner als die Überschrift. Die Breite in em hält sie bei jeder Schriftgröße auf drei Zeilen,
+   solange der Container breit genug ist (mobil werden es mehr). */
+.statement__text { font-size: calc(var(--fs-display) * 0.4); max-width: 15em; }
+.statement__mark { display: inline-block; width: auto; height: 0.8em; margin-right: 0.22em; vertical-align: -0.02em; }
+.statement__brand { white-space: nowrap; }
+/* Scrub (home.js setzt .is-scrub, solange ScrollTrigger läuft): Überschrift und Aussage leuchten als eine Folge auf.
+   Gedimmt bleibt --c-dim-light (3,1 : 1 auf Offwhite, beides ist Großtext), erleuchtet wird Schwarz. Dann entfällt das
+   Hochgleiten der Wörter, nur die Farbe wechselt. */
 .statement .ps-wi { transition: color 420ms var(--ease); overflow-wrap: anywhere; }
-.has-motion .statement.is-scrub .statement__text .ps-wi { color: var(--c-muted-dark); translate: none; animation: none; }
-.has-motion .statement.is-scrub .statement__text .ps-wi.is-lit { color: var(--c-white); }
-@media print { .statement .statement__text .ps-wi { color: inherit !important; } }
+.has-motion .statement.is-scrub [data-split] .ps-wi { color: var(--c-dim-light); translate: none; animation: none; }
+.has-motion .statement.is-scrub [data-split] .ps-wi.is-lit { color: var(--c-black); }
+@media print { .statement [data-split] .ps-wi { color: inherit !important; } }
 
-/* Gebäudezeichnung hinter der Aussage: weiße Linien, sehr leise, unter der Körnung (z-index -2 im isolierten Kontext
-   von .textured, das Korn liegt auf -1). Die Wörter bleiben gedimmt wie erleuchtet weit über 4,5 : 1.
-   Die Parallax-Drift (data-parallax) belegt transform am Bild, Lage und Maske sitzen deshalb am Träger. */
-/* Das Gebäude steht rechts auf der Unterkante, der Vorplatz läuft unten aus dem Bild. */
+/* Gebäudezeichnung hinter der Aussage: Die SVG hat weiße Linien (für dunkle Flächen), brightness(0) macht sie auf dem
+   hellen Grund schwarz, sehr leise. Die Parallax-Drift (data-parallax) belegt transform am Bild, Lage und Maske sitzen
+   deshalb am Träger. Das Gebäude steht rechts über der Unterkante der Bühne (um die Drift angehoben), über den Kacheln. */
 .statement__drawing {
-  position: absolute; z-index: -2; right: -10%; bottom: -24px; width: 110%;
-  opacity: 0.08; pointer-events: none;
+  position: absolute; z-index: -1; right: -10%; bottom: calc(var(--draw-h) * 0.08); width: var(--draw-w);
+  opacity: 0.1; pointer-events: none;
 }
-.statement__drawing img { display: block; width: 100%; height: auto; }
-@media (min-width: 700px) { .statement__drawing { right: 4%; bottom: -44px; width: clamp(360px, 54vw, 900px); } }
+.statement__drawing img { display: block; width: 100%; height: auto; filter: brightness(0); }
+@media (min-width: 700px) { .statement__drawing { right: 4%; } }
 /* Scrub: die Zeichnung entsteht von links nach rechts im Takt der Wörter. home.js setzt --draw (0 bis 1) aus
    demselben ScrollTrigger. Die Maske ist 2,5-mal so breit wie die Zeichnung, ihre weiche Kante wandert hindurch. */
 .has-motion .statement.is-scrub .statement__drawing {

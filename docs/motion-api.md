@@ -189,7 +189,7 @@ Hero (sections/hero.liquid, assets/hero.js; nur Startseite, PS.on('[data-hero]')
                            Weiter-Pfeil bleiben stehen, der Pfeil blendet beim Scrollen aus.
   Weiter-Pfeil             .hero__scroll: mit JavaScript zeigt href auf die ID des ersten sichtbaren Elements nach dem Hero,
                            ohne JavaScript auf das Setting „scroll_target“ (Standard nach-hero, in index.json die Anker-ID
-                           der Service-Leiste).
+                           des Willkommensblocks, sections/statement.liquid).
 ```
 
 ## Skripte
@@ -220,7 +220,7 @@ Die Regeln und Module liegen nach Bereich getrennt (früher alles in `sections.c
 |---|---|
 | `assets/header.css` | Announcement-Bar, Header, Megamenü, Mobile-Menü, Such-Dialog. Das geschlossene Megamenü rendert nicht (`content-visibility: hidden`), seine lazy Bilder holt `header.js` nach Load plus Idle (Desktop, ohne Datensparen), ein Hover lädt sie sofort |
 | `assets/hero.css`, `assets/hero.js` | Hero und Modell-Tabs (beide laden nur auf index) |
-| `assets/home.css`, `assets/home.js` | Statement, Service-Leiste, Produkt-Grids, Kategorie-Bento, Showroom, Story |
+| `assets/home.css`, `assets/home.js` | Willkommen (Statement mit Service-Kacheln), Service-Leiste, Produkt-Grids, Kategorie-Bento, Showroom, Story |
 | `assets/footer.css` | Footer |
 | `assets/shop.css` | Kategorieseite (Banner, Film-Intro, Filter), Produktseite, Warenkorb und Drawer, Bewegung der Shop-Seiten (Megamenü, Karten, View Transitions) |
 | `snippets/search-dialog.liquid` | Markup des Such-Dialogs, aus `sections/header.liquid` per `{% render %}` |
