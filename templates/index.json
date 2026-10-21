@@ -53,7 +53,8 @@
       "block_order": ["road", "sportster", "cvo"],
       "settings": {
         "aria_label": "Modelle 2026",
-        "scroll_target": "nach-hero"
+        "scroll_target": "nach-hero",
+        "autoplay_seconds": 12
       }
     },
     "statement": {

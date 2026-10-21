@@ -61,13 +61,19 @@
     var io = null;
     if (!PS.motion.enabled || (conn && conn.saveData) || !('IntersectionObserver' in window)) return;
 
-    // Außerhalb des Bildes anhalten, danach nur fortsetzen, wenn nicht von Hand angehalten
+    // Außerhalb des Bildes anhalten, danach nur fortsetzen, wenn nicht von Hand angehalten. Mehrere Stufen: Hält der Browser
+    // den Film von sich aus an (iOS beim Scrollen), läuft er bei der nächsten Stufe weiter, nicht erst nach ganz raus und rein.
     io = new IntersectionObserver(function (entries) {
       visible = entries[0].isIntersecting;
       if (visible && started && !userPaused && film.paused) play();
       else if (!visible && !film.paused) film.pause();
-    }, { threshold: 0.2 });
+    }, { threshold: [0.2, 0.5, 1] });
     io.observe(film);
+    // Zurück-Taste: Die Seite kommt aus dem Zurück-Speicher (bfcache). Hielt der Browser den Film schon vor visibilitychange an,
+    // greift hiddenPaused nicht; dann hier fortsetzen.
+    window.addEventListener('pageshow', function (e) {
+      if (e.persisted && io && started && visible && !userPaused && film.paused) play();
+    }, { signal: ac.signal });
     var idle = window.requestIdleCallback ? function (fn) { window.requestIdleCallback(fn, { timeout: 2000 }); } : function (fn) { setTimeout(fn, 300); };
     function go() { idle(function () { started = true; if (visible && !userPaused) play(); }); }
     if (document.readyState === 'complete') go(); else window.addEventListener('load', go, { once: true });

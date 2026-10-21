@@ -55,11 +55,10 @@
       video.muted = true;
       // Einmal gelaufen, bleibt der Film über dem Standbild (beim Zurückkehren steht sein letztes Bild da)
       video.addEventListener('playing', function () { slide.classList.add('is-video'); });
-      // Pause von außen (System): Taste zeigt „angehalten“. Eigene Pausen beim Slide-Wechsel zählen nicht (cur ist dann schon weiter).
-      // Nur im Bild: iOS hält den Film beim Wegscrollen selbst an, bevor der IntersectionObserver „nicht im Bild“ meldet
-      video.addEventListener('pause', function () {
-        if (videos[k] && video.paused && going() && cur === k && inView()) { paused = true; apply(); }
-      });
+      // Hält der Browser den Film von sich aus an (iOS: Stromsparen, als unsichtbar eingestufte Filme beim Scrollen, Seite aus
+      // dem Zurück-Speicher), ist das keine Pause des Besuchers: Die Taste bleibt, apply() startet ihn beim nächsten Anlass
+      // wieder (Sichtbarkeits-Stufen beim Scrollen, Tab wieder sichtbar, pageshow). Früher galt so eine Pause als „angehalten“
+      // und der Film blieb dauerhaft stehen.
       video.addEventListener('error', function () { video.remove(); videos[k] = null; slide.classList.remove('is-video'); apply(); });
     });
 
@@ -143,15 +142,13 @@
     });
 
     /* ---------------- Im Bild, im sichtbaren Tab, Aufräumen ---------------- */
-    var io = new IntersectionObserver(function (en) { seen = en[0].intersectionRatio >= 0.1; apply(); }, { threshold: [0.1] });
-    // Gleiche Grenze wie der Observer, aber sofort gemessen (seine Meldung kommt beim Scrollen erst verzögert)
-    function inView() {
-      var r = hero.getBoundingClientRect();
-      return r.height > 0 && (Math.min(r.bottom, window.innerHeight) - Math.max(r.top, 0)) / r.height >= 0.1;
-    }
+    // Grenze 10 %; die weiteren Stufen rufen apply() beim Scrollen öfter auf, damit ein vom Browser angehaltener Film weiterläuft
+    var io = new IntersectionObserver(function (en) { seen = en[0].intersectionRatio >= 0.1; apply(); }, { threshold: [0.1, 0.5, 1] });
     var ac = new AbortController();
     io.observe(hero);
     document.addEventListener('visibilitychange', apply, { signal: ac.signal });
+    // Zurück-Taste: Die Seite kommt aus dem Zurück-Speicher (bfcache), ohne neues Laden; der Film steht dann meist
+    window.addEventListener('pageshow', function (e) { if (e.persisted) apply(); }, { signal: ac.signal });
     // Section-Reload im Editor, Reduced-Motion zur Laufzeit (motion.js ruft es)
     function off() {
       ac.abort();
@@ -169,15 +166,20 @@
        dabei immer schon außerhalb des Bildes). Die Textebene fliegt größer werdend weg (Scale 1,45, 40 px hoch, in der
        ersten Hälfte ausgeblendet) und nimmt danach keine Klicks mehr an; Tastaturfokus darin holt sie zurück (hero.css).
        Ab 30 % läuft das Bild ins Helle aus (.hero__fade) und geht in den hellen Willkommensblock darunter über.
-       Die Pause-Taste bleibt stehen, der Pfeil blendet beim Scrollen aus. */
+       Die Pause-Taste bleibt stehen, der Pfeil blendet beim Scrollen aus.
+       Handy (bis 767 px): Text nur anheben und ausblenden, nicht vergrößern (Safari rendert skalierten Text in jedem Bild
+       neu, das ruckelte auf dem iPhone), der Film zoomt nur auf 1,2. force3D hält Film- und Textebene dauerhaft auf der
+       Grafikkarte; mit "auto" kamen sie erst beim Scroll-Beginn dorthin, das gab einen Ruck. */
     PS.motion.add(hero, function (gsap) {
       var m = hero.querySelector('.hero__media'), f = hero.querySelector('.hero__fade'), c = hero.querySelector('.hero__caption');
+      var small = matchMedia('(max-width: 767px)');
+      function by(desk, phone) { return function () { return small.matches ? phone : desk; }; } // neu bei jedem Refresh (Resize)
       var tl = gsap.timeline({
-        defaults: { ease: 'none', duration: 1 },
+        defaults: { ease: 'none', duration: 1, force3D: true },
         scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: true, invalidateOnRefresh: true }
       });
-      tl.fromTo(m, { scale: 1, yPercent: 0 }, { scale: 1.4, yPercent: 30 }, 0)
-        .fromTo(c, { y: 0, scale: 1, opacity: 1 }, { y: -40, scale: 1.45, opacity: 0, duration: 0.5 }, 0)
+      tl.fromTo(m, { scale: 1, yPercent: 0 }, { scale: by(1.4, 1.2), yPercent: 30 }, 0)
+        .fromTo(c, { y: 0, scale: 1, opacity: 1 }, { y: -40, scale: by(1.45, 1), opacity: 0, duration: 0.5 }, 0)
         .set(c, { pointerEvents: 'none' }, 0.5)
         .fromTo(f, { opacity: 0 }, { opacity: 1, duration: 0.6 }, 0.3);
       if (link) tl.fromTo(link, { opacity: 1 }, { opacity: 0, duration: 0.15 }, 0);
