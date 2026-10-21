@@ -70,6 +70,9 @@ h4, .h4 { font-size: var(--fs-h4); letter-spacing: 0.03em; }
   background-image: var(--texture); opacity: 0.04;
 }
 
+/* Lokale Entwicklung (layout/theme.liquid setzt .is-local-dev nur auf localhost): Cookie-Banner von Shopify ausblenden */
+.is-local-dev #shopify-pc__banner { display: none !important; }
+
 /* Barrierefreiheit */
 .skip-link {
   position: absolute; left: 16px; top: -64px; z-index: 1000;
