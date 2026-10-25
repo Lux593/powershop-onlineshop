@@ -1,6 +1,40 @@
 {%- liquid
   assign rail_id = 'showroom-rail-' | append: section.id
   assign bikes = section.settings.collection.products
+
+  comment
+    Karten und Kategorien in einem Durchgang: Jede Karte nennt in data-categories die Kategorie-Blöcke (Kollektionen wie
+    Cruiser oder CVO), in deren Kollektion das Bike liegt; ein Bike kann in mehreren stehen (CVO Street Glide: Grand
+    American Touring und CVO). Ein Chip erscheint nur für Kategorien mit mindestens einem Fahrzeug im Showroom.
+    Der Umschalter Neu / Gebraucht blendet Karten per CSS aus (assets/theme.css), die Kategorie per hidden aus
+    assets/sections.js. Alles außer „neu“ (gebraucht, Vorführer) gehört zur zweiten Gruppe, wie im Umschalter.
+    Gezeigt werden alle Fahrzeuge der Kollektion (Shopify liefert hier höchstens 50), damit jede Kategorie vollständig ist.
+  endcomment
+  assign new_count = 0
+  assign used_count = 0
+  assign used_categories = ' '
+  capture cards
+    for bike in bikes
+      assign bike_zustand = bike.metafields.bike.zustand.value | default: 'neu'
+      if bike_zustand == 'neu'
+        assign new_count = new_count | plus: 1
+      else
+        assign used_count = used_count | plus: 1
+      endif
+      assign bike_collections = bike.collections | map: 'handle'
+      assign bike_categories = ''
+      for block in section.blocks
+        if block.settings.collection != blank and bike_collections contains block.settings.collection.handle
+          assign bike_categories = bike_categories | append: ' ' | append: block.id
+          assign needle = ' ' | append: block.id | append: ' '
+          unless used_categories contains needle
+            assign used_categories = used_categories | append: block.id | append: ' '
+          endunless
+        endif
+      endfor
+      render 'bike-card', product: bike, categories: bike_categories, sizes: '(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 86vw'
+    endfor
+  endcapture
 -%}
 
 <section class="section showroom" aria-labelledby="showroom-title-{{ section.id }}" data-section-id="{{ section.id }}" data-showroom data-showroom-state="neu">
@@ -26,27 +60,25 @@
           </div>
         {%- endif -%}
       </div>
+      {%- if used_categories != ' ' -%}
+        {%- comment -%} Chips ohne Fahrzeug im gewählten Zustand blendet sections.js aus; war einer gewählt, gilt wieder „Alle“. {%- endcomment -%}
+        <div class="chip-row showroom__cats" role="group" aria-label="Kategorie" data-showroom-cats>
+          <button class="chip" type="button" data-showroom-cat="" aria-pressed="true">Alle</button>
+          {%- for block in section.blocks -%}
+            {%- assign needle = ' ' | append: block.id | append: ' ' -%}
+            {%- if used_categories contains needle -%}
+              <button class="chip" type="button" data-showroom-cat="{{ block.id }}" aria-pressed="false" {{ block.shopify_attributes }}>
+                {{- block.settings.label | default: block.settings.collection.title | escape -}}
+              </button>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
     </div>
 
     {%- if bikes.size > 0 -%}
-      {%- comment -%}
-        Der Umschalter Neu / Gebraucht blendet Karten per CSS aus (assets/theme.css). Gezählt wird deshalb je Zustand: Mit einem
-        gemeinsamen Limit könnten zwölf Neufahrzeuge die Gebrauchten verdrängen, und der Umschalter zeigte eine leere Schiene.
-        Alles außer „neu“ (gebraucht, Vorführer) gehört zur zweiten Gruppe, wie im Umschalter.
-      {%- endcomment -%}
-      {%- assign new_count = 0 -%}
-      {%- assign used_count = 0 -%}
       <div class="rail" id="{{ rail_id }}" aria-live="polite" data-stagger="80">
-        {%- for bike in bikes -%}
-          {%- assign bike_zustand = bike.metafields.bike.zustand.value | default: 'neu' -%}
-          {%- if bike_zustand == 'neu' and new_count < 12 -%}
-            {%- assign new_count = new_count | plus: 1 -%}
-            {% render 'bike-card', product: bike, sizes: '(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 86vw' %}
-          {%- elsif bike_zustand != 'neu' and used_count < 12 -%}
-            {%- assign used_count = used_count | plus: 1 -%}
-            {% render 'bike-card', product: bike, sizes: '(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 86vw' %}
-          {%- endif -%}
-        {%- endfor -%}
+        {{- cards -}}
       </div>
       {%- comment -%} Hat eine Gruppe keine Fahrzeuge, nennt der Hinweis es, statt eine leere Fläche zu lassen (CSS zeigt nur den der gewählten Gruppe). {%- endcomment -%}
       {%- if new_count == 0 -%}
@@ -103,6 +135,16 @@
       "id": "collection",
       "label": "Kollektion mit Motorrädern",
       "info": "Der Umschalter Neu / Gebraucht nutzt das Metafeld bike.zustand."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Kategorie",
+      "settings": [
+        { "type": "collection", "id": "collection", "label": "Kollektion", "info": "Zum Beispiel Cruiser oder CVO. Der Chip erscheint, sobald ein Bike des Showrooms in dieser Kollektion liegt." },
+        { "type": "text", "id": "label", "label": "Text im Chip", "info": "Leer = Titel der Kollektion." }
+      ]
     }
   ],
   "presets": [

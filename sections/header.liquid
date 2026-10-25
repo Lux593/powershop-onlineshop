@@ -49,7 +49,7 @@
                 {% render 'icon', name: 'chevron-down' %}
               </button>
               <div class="mega on-dark" id="mega-{{ link.handle }}">
-                {% render 'mega-menu', link: link, blocks: section.blocks %}
+                {% render 'mega-menu', link: link, blocks: section.blocks, keep: section.settings.keep_order %}
               </div>
             {%- endif -%}
           </li>
@@ -87,8 +87,9 @@
       {%- if link.links.size > 0 -%}
         {%- comment -%}
           Gliederung wie im Megamenü (snippets/mega-menu.liquid): Ebene 2 mit Unterpunkten = Gruppe, zugeklappt wie die
-          Hauptpunkte, darin Ebene 3; Ebene 2 ohne Unterpunkte = Gruppentitel als Link. „Alle …“ steht sichtbar unter den
-          Gruppen (der Hauptpunkt selbst klappt hier nur auf). Ohne Gruppen bilden alle Ebene-2-Punkte eine Liste.
+          Hauptpunkte, darin Ebene 3 in derselben Reihenfolge (snippets/link-order.liquid); Ebene 2 ohne Unterpunkte =
+          Gruppentitel als Link. „Alle …“ steht sichtbar unter den Gruppen (der Hauptpunkt selbst klappt hier nur auf), bei
+          einer Seite wie Service heißt der Link „Service im Überblick“. Ohne Gruppen bilden alle Ebene-2-Punkte eine Liste.
         {%- endcomment -%}
         {%- liquid
           assign has_groups = false
@@ -98,6 +99,11 @@
               break
             endif
           endfor
+          if link.type == 'collection_link' or link.type == 'catalog_link' or link.url contains '/collections'
+            assign overview_label = 'Alle ' | append: link.title
+          else
+            assign overview_label = link.title | append: ' im Überblick'
+          endif
         -%}
         <details class="acc">
           <summary>{{ link.title | escape }}{% render 'icon', name: 'plus' %}</summary>
@@ -107,22 +113,26 @@
                 {%- if group.links.size == 0 -%}
                   <a class="mobile-menu__group" href="{{ group.url }}">{{ group.title | escape }}</a>
                 {%- else -%}
+                  {%- capture order -%}{% render 'link-order', group: group, keep: section.settings.keep_order %}{%- endcapture -%}
+                  {%- assign order = order | split: ',' -%}
                   <details class="mobile-menu__sub">
                     <summary class="mobile-menu__group">{{ group.title | escape }}{% render 'icon', name: 'plus' %}</summary>
                     <div class="mobile-menu__links">
-                      {%- for child in group.links -%}
+                      {%- for position in order -%}
+                        {%- assign index = position | plus: 0 -%}
+                        {%- assign child = group.links[index] -%}
                         <a href="{{ child.url }}">{{ child.title | escape }}</a>
                       {%- endfor -%}
                     </div>
                   </details>
                 {%- endif -%}
               {%- endfor -%}
-              <a href="{{ link.url }}"><strong>Alle {{ link.title | escape }}</strong></a>
+              <a href="{{ link.url }}"><strong>{{ overview_label | escape }}</strong></a>
             {%- else -%}
               {%- for child in link.links -%}
                 <a href="{{ child.url }}">{{ child.title | escape }}</a>
               {%- endfor -%}
-              <a href="{{ link.url }}"><strong>Alle {{ link.title | escape }}</strong></a>
+              <a href="{{ link.url }}"><strong>{{ overview_label | escape }}</strong></a>
             {%- endif -%}
           </div>
         </details>
@@ -153,6 +163,13 @@
       "label": "Hauptmenü",
       "default": "main-menu",
       "info": "Ebene 1 = Hauptpunkt, Ebene 2 = Spaltenüberschrift, Ebene 3 = Links. Kollektionen mit Bild erscheinen als Kacheln."
+    },
+    {
+      "type": "text",
+      "id": "keep_order",
+      "label": "Spalten in eigener Reihenfolge",
+      "default": "Fahrzeuge, Modellfamilien, Kollektionen",
+      "info": "Die Links unter einer Spaltenüberschrift (Ebene 3) stehen alphabetisch. Spalten, deren Überschrift hier steht (kommagetrennt), behalten die Reihenfolge aus der Shopify-Navigation."
     },
     {
       "type": "textarea",

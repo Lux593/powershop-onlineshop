@@ -47,20 +47,22 @@ Versand, Rückgabe, Reservierung prüfen oder leeren.** Ein leerer oder 0-Wert e
 
 | Fundstelle | Aussage | Status | Freigabe |
 |---|---|---|---|
-| `templates/index.json:112-114` | Kennzahlen: 45+ Jahre Erfahrung, 2 Motorrad-Meister, ∞ Kunden & Freunde (vom Händler vorgegeben) | erledigt | |
-| `templates/index.json:115-117`, `templates/page.service.json:62-88` | Events: Titel, Datum, Ort und Uhrzeit (11.10., 24.10., 14.11.2026) | offen | |
+| `templates/index.json:123-125` | Kennzahlen: 45+ Jahre Erfahrung, 2 Motorrad-Meister, ∞ Kunden & Freunde (vom Händler vorgegeben) | erledigt | |
+| `templates/index.json:126-128`, `templates/page.service.json:62-88` | Events: Titel, Datum, Ort und Uhrzeit (11.10., 24.10., 14.11.2026) | offen | |
 | `templates/index.json:6-19, 20-33, 34-47` | Hero: Modelle, Preise („ab 31.500 €“, „ab 48.300 €“), Modelljahr 2026, Farben, Beschreibungen | offen | |
 | `templates/index.json:66-67` | Willkommensblock: Überschrift „Willkommen beim Harley-Davidson Power Shop“ und Statement „Von der Probefahrt bis zum Umbau …“ | offen | |
-| `templates/index.json:58-61, 77-80, 92-96, 100, 122-125` | Texte der Service-Kacheln, Neuheiten, Kategorie-Kacheln und Story | offen | |
-| `templates/index.json:125` | Story-Button „Über uns“ hat **keinen Link** (`button_url` leer): der Button erscheint nie. Ziel nennen oder Label streichen. | offen | |
+| `templates/index.json:58-61, 77-80, 92-96, 100, 133-137` | Texte der Service-Kacheln, Neuheiten, Kategorie-Kacheln und Story | offen | |
+| `templates/index.json:136` | Story-Button „Über uns“ hat **keinen Link** (`button_url` leer): der Button erscheint nie. Ziel nennen oder Label streichen. | offen | |
 | `templates/page.service.json` | Service-Texte (Probefahrt, Finanzierung, Werkstatt, Inzahlungnahme) | offen | |
-| `sections/header-group.json:22, 29-36, 53` | Megamenü-Text, Teaser-Beschriftungen, Suchbegriffe | offen | |
+| `sections/header-group.json:22, 29-36, 54` | Megamenü-Text, Teaser-Beschriftungen, Suchbegriffe | offen | |
 | `sections/product.liquid:214, 218-220` | Zusicherungen bei Fahrzeugen: Neufahrzeug „mit voller Herstellergarantie“; Gebrauchte „Scheckheftgepflegt bei Harley-Davidson Vertragspartnern“, „Unfallfrei laut Vorbesitzer“, „Frische Inspektion vor Übergabe“ | offen | |
 | `sections/product.liquid:527` | Pflichthinweis „Geprüfte Bewertungen“ (UWG): stimmt nur mit einer Bewertungs-App, die den Kauf prüft. Der Abschnitt „Bewertungen“ mit diesem Hinweis erscheint bei Bekleidung auch ohne App-Block | offen | |
 | `sections/product.liquid:456` | Überschrift „Wird oft zusammen gekauft“ (Teile): belegt eine Kaufstatistik, die das Theme nicht hat; es sind nur die ersten Produkte der Kollektion. Vorschlag neutral, z. B. „Das passt dazu“, erst nach Freigabe. | offen | |
 | `snippets/price.liquid:42` | Hinweis „Streichpreis = niedrigster Preis der letzten 30 Tage“ (PAngV): behauptet eine Eigenschaft des Vergleichspreises. Nur mit Bestätigung, dass der Streichpreis so gepflegt wird. | offen | |
 | `assets/contact.js` (`openState`) | Anzeige „Jetzt geöffnet – bis … Uhr“ / „Gerade geschlossen“: rechnet in der Zeitzone des Besuchers, kennt keine Feiertage und Betriebsferien. Eine Aussage des Händlers: Anzeige freigeben (mit Zeitzone und Feiertagen, siehe Frage 2 in `docs/haendler-fragen.md`) oder „Öffnungszeiten“ in den Theme-Einstellungen leer lassen. | offen | |
-| `sections/showroom.liquid:20, 53-56, 88` | Neue neutrale Statustexte im Showroom: „Aktuell sind keine Neufahrzeuge eingestellt.“, „Aktuell sind keine Gebrauchten oder Vorführer eingestellt.“, Links „Alle Motorräder“ / „Alle Motorräder ansehen“. Sie erscheinen, wenn eine Gruppe leer ist beziehungsweise (Handlung) wenn keine Kontaktdaten gepflegt sind. Wortlaut kurz bestätigen. | offen | |
+| `sections/showroom.liquid:54, 85-88, 120` | Neue neutrale Statustexte im Showroom: „Aktuell sind keine Neufahrzeuge eingestellt.“, „Aktuell sind keine Gebrauchten oder Vorführer eingestellt.“, Links „Alle Motorräder“ / „Alle Motorräder ansehen“. Sie erscheinen, wenn eine Gruppe leer ist beziehungsweise (Handlung) wenn keine Kontaktdaten gepflegt sind. Wortlaut kurz bestätigen. | offen | |
+| `sections/showroom.liquid:66`, `templates/index.json:107-112` | Kategorie-Chips im Showroom: „Alle“ plus Sport, Cruiser, Grand American Touring, Adventure Touring, Trike, CVO (Titel der Kollektionen, im Theme-Editor je Block änderbar). | offen | |
+| `sections/header.liquid:105` | Handy-Menü: Link zur Service-Seite heißt „Service im Überblick“ (bei Kollektionen weiter „Alle …“). | offen | |
 | `snippets/size-guide.liquid:23-90` | Größentabellen (Werte in cm) | offen | |
 
 ## 5. Bildrechte

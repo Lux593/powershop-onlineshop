@@ -50,6 +50,7 @@
       ],
       "settings": {
         "menu": "main-menu",
+        "keep_order": "Fahrzeuge, Modellfamilien, Kollektionen",
         "search_terms": "Lederjacke\nStreet Glide\nAuspuff\nHelm\nGebraucht"
       }
     }

@@ -5,10 +5,12 @@
   - Sind alle Links einer Spalte Kollektionen mit Bild, erscheinen sie als Bild-Kacheln; fehlt auch nur einem Link das Bild, bleibt es eine Textliste
   - Ebene 2 ohne Unterpunkte, solange andere Spalten Unterpunkte haben = schmale Spalte mit dem Titel als Link
   - Hat keine Ebene-2-Position Unterpunkte, bilden alle zusammen eine gemeinsame Link-Spalte
+  - Links einer Spalte stehen alphabetisch, außer die Spalte steht in keep (snippets/link-order.liquid)
   Teaser, Kontaktspalte und Aufruf-Zeile kommen als Blöcke aus dem Header.
 
   @param {object} link - Hauptmenüpunkt
   @param {object} blocks - Blöcke der Header-Section
+  @param {string} [keep] - Spaltentitel, deren Links die Reihenfolge der Shopify-Navigation behalten (kommagetrennt)
 {% enddoc %}
 
 {%- liquid
@@ -92,6 +94,8 @@
 <div class="container mega__inner" style="grid-template-columns:{{ grid }}">
   {%- if has_groups -%}
     {%- for group in link.links -%}
+      {%- capture order -%}{% render 'link-order', group: group, keep: keep %}{%- endcapture -%}
+      {%- assign order = order | split: ',' -%}
       <div>
         {%- if group.links.size == 0 -%}
           <p class="mega__title"><a href="{{ group.url }}">{{ group.title | escape }}</a></p>
@@ -105,7 +109,9 @@
           {%- assign tile_cols = 3 -%}
           {%- if group.links.size == 4 -%}{%- assign tile_cols = 4 -%}{%- endif -%}
           <div class="mega__families" style="--tile-cols: {{ tile_cols }}">
-            {%- for child in group.links -%}
+            {%- for position in order -%}
+              {%- assign index = position | plus: 0 -%}
+              {%- assign child = group.links[index] -%}
               <a class="mega-tile" href="{{ child.url }}">
                 {%- render 'media', image: child.object.image, width: 600, height: 400, sizes: '(min-width: 1024px) 200px, 50vw' -%}
                 <span>{{ child.title | escape }}</span>
@@ -114,7 +120,9 @@
           </div>
         {%- else -%}
           <ul class="mega__links{% if group.links.size > 7 %} mega__links--2col{% endif %}">
-            {%- for child in group.links -%}
+            {%- for position in order -%}
+              {%- assign index = position | plus: 0 -%}
+              {%- assign child = group.links[index] -%}
               <li><a href="{{ child.url }}">{{ child.title | escape }}</a></li>
             {%- endfor -%}
             {%- if forloop.first -%}

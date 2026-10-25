@@ -52,7 +52,7 @@ sections/   Startseite: hero · service-tiles · product-tabs · statement · ca
             Rahmen: header · announcement-bar · footer, dazu header-group.json und footer-group.json
 snippets/   Karten (product-card, bike-card, result-card, event-card, bento-tile), Produktseite (pdp-gallery, pdp-buy, pdp-options, pdp-sticky-buy,
             pdp-usp, pdp-shipping, pdp-gpsr, size-guide, swatch, rating, price), Shop-Bausteine (results-toolbar, filter-controls,
-            active-filters, pagination, cart-line, contact-box, search-dialog, mega-menu, accordion), Kleinteile (icon, icons-sprite,
+            active-filters, pagination, cart-line, contact-box, search-dialog, mega-menu, link-order, accordion), Kleinteile (icon, icons-sprite,
             media, is-placeholder, number-de, opening-hours, payments, bike-badge), Kopfbereich (meta-tags, fonts)
 assets/     CSS, JS, Bilder, Videos, Schriften (flach, Shopify kennt keine Unterordner in assets/), Details unten
 config/     settings_schema.json · settings_data.json
@@ -127,6 +127,11 @@ Templates (Kennzahlen, Events, Hero-Modelle mit Preisen, Service-Texte): sie ste
 
 Alles, was der Händler freigeben muss (diese Werte, kontakt- und rechtsrelevante Texte, Kennzahlen, Events, Zusicherungen, Bildrechte), steht mit
 Fundstelle in [`docs/freigaben.md`](docs/freigaben.md).
+
+Header und Handy-Menü kommen aus dem Shopify-Menü `main-menu` (Ebene 1 Hauptpunkt, Ebene 2 Spalte, Ebene 3 Links). Die Links einer Spalte
+stehen im Shop alphabetisch; Spalten, die ihre Reihenfolge aus dem Admin behalten sollen (heute Fahrzeuge, Modellfamilien, Kollektionen), stehen
+im Theme-Editor unter **Header → Spalten in eigener Reihenfolge**. Die Unterpunkte von Service verlinken die Anker der Service-Seite
+(`/pages/service#finanzierung` usw.). Die Kategorie-Chips im Showroom der Startseite sind Blöcke mit je einer Kollektion (Cruiser, CVO …).
 
 Die Rechtslinks im Footer kommen aus den Shopify-Menüs `footer`, `customer-service` und `legal`: **vor dem Livegang im Admin anlegen**.
 Fehlt ein Rechtstext dort, verlinkt der Footer ersatzweise die Richtlinien aus Einstellungen > Richtlinien (Schalter im Footer-Abschnitt).

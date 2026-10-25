@@ -157,8 +157,11 @@ Tooltip (.tip, assets/sections.js, components.css; WCAG 1.4.13)
   sie aus (.tip.is-dismissed), ohne dass Fokus oder Zeiger wandern; sie kommt wieder, sobald beide die Info verlassen haben.
 
 Showroom (sections/showroom.liquid, assets/theme.css, assets/sections.js)
-  Das Limit von zwölf Karten gilt je Zustand (Neu / alles andere), nicht für die ganze Kollektion. Hat die gewählte Gruppe keine Fahrzeuge,
-  zeigt .showroom__none[data-showroom-none="neu|gebraucht"] einen Hinweis; das CSS blendet nur den der gewählten Gruppe ein.
+  Die Schiene zeigt alle Fahrzeuge der Kollektion (Shopify liefert höchstens 50). Der Zustand (Neu / alles andere) läuft über
+  data-showroom-state und CSS; die Kategorie-Chips (Blöcke mit Kollektion, z. B. Cruiser, CVO) setzen hidden an Karten, deren
+  data-categories den Block nicht nennt. Ein Bike kann in mehreren Kategorien stehen. Chips ohne Fahrzeug im gewählten Zustand
+  verschwinden, war einer gewählt, gilt wieder „Alle“. Hat die gewählte Gruppe keine Fahrzeuge, zeigt
+  .showroom__none[data-showroom-none="neu|gebraucht"] einen Hinweis; das CSS blendet nur den der gewählten Gruppe ein.
 
 Kontakt (snippets/contact-href.liquid, assets/contact.js)
   Telefon, WhatsApp und E-Mail aus den Händlerdaten gehen nur über contact-href in href-Attribute (Leerzeichen, +, Klammern entfernt,

@@ -6,20 +6,54 @@
 (function () {
   var PS = (window.PS = window.PS || {});
 
-  /* ---------------- Showroom: Neu / Gebraucht ---------------- */
+  /* ---------------- Showroom: Neu / Gebraucht und Kategorie ----------------
+     Der Zustand läuft über data-showroom-state und CSS (theme.css), die Kategorie über hidden an den Karten
+     (data-categories, sections/showroom.liquid). Chips ohne Fahrzeug im gewählten Zustand verschwinden; war einer davon
+     gewählt, gilt wieder „Alle“. So zeigt die Schiene nie eine leere Auswahl. */
   PS.on('[data-showroom]', function (section) {
     var buttons = Array.prototype.slice.call(section.querySelectorAll('[data-showroom-mode]'));
+    var chips = Array.prototype.slice.call(section.querySelectorAll('[data-showroom-cat]'));
+    var group = section.querySelector('[data-showroom-cats]');
     var rail = section.querySelector('.rail');
+    var cards = rail ? Array.prototype.slice.call(rail.querySelectorAll('.bcard')) : [];
+    var category = '';
+    function inState(card) {
+      return (card.dataset.zustand === 'neu') === (section.dataset.showroomState === 'neu');
+    }
+    function inCategory(card, id) {
+      return !id || (' ' + (card.dataset.categories || '') + ' ').indexOf(' ' + id + ' ') > -1;
+    }
+    function update() {
+      var shown = 0;
+      chips.forEach(function (chip) {
+        var id = chip.dataset.showroomCat;
+        if (!id) return;
+        chip.hidden = !cards.some(function (card) { return inState(card) && inCategory(card, id); });
+        if (chip.hidden && id === category) category = '';
+        if (!chip.hidden) shown++;
+      });
+      if (group) group.hidden = shown === 0;
+      chips.forEach(function (chip) { chip.setAttribute('aria-pressed', chip.dataset.showroomCat === category ? 'true' : 'false'); });
+      cards.forEach(function (card) { card.hidden = !inCategory(card, category); });
+      if (rail) {
+        rail.scrollLeft = 0;
+        rail.dispatchEvent(new Event('scroll'));
+      }
+    }
     buttons.forEach(function (button) {
       button.addEventListener('click', function () {
         buttons.forEach(function (b) { b.setAttribute('aria-pressed', b === button ? 'true' : 'false'); });
         section.dataset.showroomState = button.dataset.showroomMode;
-        if (rail) {
-          rail.scrollLeft = 0;
-          rail.dispatchEvent(new Event('scroll'));
-        }
+        update();
       });
     });
+    chips.forEach(function (chip) {
+      chip.addEventListener('click', function () {
+        category = chip.dataset.showroomCat;
+        update();
+      });
+    });
+    if (chips.length) update();
   });
 
   /* ---------------- Produktkarte: „+“ öffnet die Größenauswahl (Touch, schmale Fenster) ----------------

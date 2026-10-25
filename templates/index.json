@@ -103,6 +103,15 @@
     },
     "showroom": {
       "type": "showroom",
+      "blocks": {
+        "sport": { "type": "category", "settings": { "collection": "motorraeder-sport", "label": "" } },
+        "cruiser": { "type": "category", "settings": { "collection": "motorraeder-cruiser", "label": "" } },
+        "touring": { "type": "category", "settings": { "collection": "motorraeder-touring", "label": "" } },
+        "adventure": { "type": "category", "settings": { "collection": "adventure-touring", "label": "" } },
+        "trike": { "type": "category", "settings": { "collection": "motorraeder-trike", "label": "" } },
+        "cvo": { "type": "category", "settings": { "collection": "motorraeder-cvo", "label": "" } }
+      },
+      "block_order": ["sport", "cruiser", "touring", "adventure", "trike", "cvo"],
       "settings": {
         "heading": "Bikes im Showroom",
         "collection": "motorraeder"

@@ -1,0 +1,58 @@
+{% doc %}
+  Reihenfolge der Unterpunkte einer Menügruppe (Ebene 3), gemeinsam für Megamenü und Handy-Menü.
+  Alphabetisch wie im Deutschen üblich: Groß- und Kleinschreibung egal, Ä, Ö, Ü zählen wie A, O, U und ß wie ss
+  (sonst stünde „Ölwechsel-Kits“ hinter Z). Gruppen aus keep behalten die Reihenfolge der Shopify-Navigation.
+  Gibt die Positionen in group.links kommagetrennt aus, z. B. 3,0,2,1, (das letzte Komma fällt beim split weg).
+
+  @param {object} group - Menüpunkt der Ebene 2 mit Unterpunkten
+  @param {string} [keep] - Gruppentitel mit eigener Reihenfolge, kommagetrennt, Groß- und Kleinschreibung egal
+
+  @example
+  {%- capture order -%}{% render 'link-order', group: group, keep: keep %}{%- endcapture -%}
+  {%- assign order = order | split: ',' -%}
+{% enddoc %}
+
+{%- liquid
+  assign keep_order = false
+  assign group_title = group.title | downcase | strip
+  assign keep_titles = keep | downcase | split: ','
+  for keep_title in keep_titles
+    assign keep_title = keep_title | strip
+    if keep_title == group_title
+      assign keep_order = true
+      break
+    endif
+  endfor
+
+  if keep_order
+    for child in group.links
+      echo forloop.index0 | append: ','
+    endfor
+  else
+    assign keys = ''
+    for child in group.links
+      assign key = child.title | replace: 'Ä', 'a' | replace: 'Ö', 'o' | replace: 'Ü', 'u' | replace: 'ä', 'a' | replace: 'ö', 'o' | replace: 'ü', 'u' | replace: 'ß', 'ss' | downcase | strip
+      assign keys = keys | append: key | append: '|~|'
+    endfor
+    assign keys = keys | split: '|~|'
+    assign sorted = keys | sort
+
+    comment
+      Zu jedem sortierten Schlüssel die erste noch freie Position mit gleichem Schlüssel; „used“ merkt vergebene
+      Positionen, damit zwei gleichnamige Punkte beide erscheinen.
+    endcomment
+    assign used = ','
+    for key in sorted
+      for candidate in keys
+        if candidate == key
+          assign needle = forloop.index0 | prepend: ',' | append: ','
+          unless used contains needle
+            assign used = used | append: forloop.index0 | append: ','
+            echo forloop.index0 | append: ','
+            break
+          endunless
+        endif
+      endfor
+    endfor
+  endif
+-%}

@@ -203,6 +203,13 @@
 @media (min-width: 640px) { .showroom .rail { grid-auto-columns: calc((100% - 24px) / 2); } }
 @media (min-width: 1024px) { .showroom .rail { grid-auto-columns: calc((100% - 48px) / 3); } }
 .showroom__tools { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; }
+/* Kategorien (Cruiser, CVO …): eigene Zeile unter Titel und Pfeilen; schmal eine wischbare Reihe bis an den Rand,
+   das Padding gibt den Fokusringen Luft (overflow schneidet sonst ab) */
+.showroom__cats { flex-basis: 100%; }
+@media (max-width: 767px) {
+  .showroom__cats { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: -4px calc(var(--gutter) * -1); padding: 4px var(--gutter); }
+  .showroom__cats::-webkit-scrollbar { display: none; }
+}
 /* Schiene bis an den Bildschirmrand: Karten sitzen per Padding/scroll-padding wie bisher, die nächste Karte schaut in den
    Randstreifen und läuft dort aus (Maske, home.js setzt .has-edge/.is-start/.is-end). Das vertikale Padding gibt
    Fokusringen Luft (die Schiene schneidet sonst ab), der negative Rand gleicht es aus. */
