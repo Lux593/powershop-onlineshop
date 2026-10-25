@@ -92,6 +92,34 @@
       }
     }
     function end() { rotate = false; apply(); }
+
+    /* Text beim Modellwechsel: Am Desktop spielt der neue Text seine Reveals neu ab (Wörter steigen auf, Zeilen folgen).
+       Am Handy schiebt er sich seitlich: der alte nach links aus dem Bild, der neue von rechts herein (hero.css, .is-exiting
+       und .is-entering). Der alte ist dabei schon hidden, bleibt per CSS sichtbar und ist inert. animationend räumt auf;
+       jeder Wechsel setzt vorher alle Panels zurück, auch wenn eine Animation nie lief (z. B. ohne has-motion). */
+    var phone = matchMedia('(max-width: 767px)');
+    var panels = chips.map(function (c) { return document.getElementById(c.getAttribute('aria-controls')); });
+    function settle(p) { p.classList.remove('is-entering', 'is-exiting'); p.inert = false; }
+    panels.forEach(function (p) {
+      if (p) p.addEventListener('animationend', function (e) { if (e.target === p) settle(p); });
+    });
+    function swap(p, old) {
+      panels.forEach(function (n) { if (n) settle(n); });
+      if (!p) return;
+      if (motion && phone.matches) {
+        if (!old || old === p) return;
+        // Der neue Text kommt fertig herein: Reveals, die noch nicht liefen, gelten als gelaufen
+        [].forEach.call(p.querySelectorAll('[data-split],[data-stagger],[data-reveal]'), function (n) { n.classList.add('is-in'); });
+        void p.offsetWidth; // ein abgebrochener Wechsel startet sauber neu
+        old.inert = true;
+        old.classList.add('is-exiting');
+        p.classList.add('is-entering');
+        return;
+      }
+      // Reveals aller Slides liefen schon beim Laden: Text der neuen Slide spielt sie neu ab
+      [].forEach.call(p.querySelectorAll('.is-in'), function (n) { n.classList.remove('is-in'); void n.offsetWidth; n.classList.add('is-in'); });
+    }
+
     if (tabs) {
       tabs.addEventListener('ps:tab', function (e) {
         var i = parseInt(e.detail.dataset.index, 10) || 0;
@@ -107,9 +135,7 @@
           s.setAttribute('aria-hidden', !on);
           if (on && img) img.loading = 'eager'; // Sicherheitsnetz: lazy hält gestapelte Bilder nicht zurück
         });
-        // Reveals aller Slides liefen schon beim Laden: Text der neuen Slide spielt sie neu ab
-        var p = document.getElementById(e.detail.getAttribute('aria-controls'));
-        if (p) [].forEach.call(p.querySelectorAll('.is-in'), function (n) { n.classList.remove('is-in'); void n.offsetWidth; n.classList.add('is-in'); });
+        swap(document.getElementById(e.detail.getAttribute('aria-controls')), panels[cur]);
         cur = i;
         elapsed = 0;
         last = 0;
