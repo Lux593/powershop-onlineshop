@@ -183,9 +183,10 @@ Hero (sections/hero.liquid, assets/hero.js; nur Startseite, PS.on('[data-hero]')
                            ihr Ende wählt den nächsten Tab. Angehalten setzt hero.js .is-held; Ken-Burns und Pfeil-Linie
                            pausieren daran direkt (keine Variable, kein :has(:hover): lief in iOS Safari nicht wieder an).
                            Der erste Klick oder Tastendruck auf einen Tab beendet die Rotation.
-                           Text beim Wechsel: am Desktop spielt das neue Panel seine Reveals neu ab. Am Handy (bis 767 px, nur
-                           mit Bewegung) schiebt sich der Text: das alte Panel läuft als .is-exiting nach links hinaus (sichtbar
-                           trotz hidden, inert), das neue kommt als .is-entering von rechts (600 ms, hero.css).
+                           Text beim Wechsel (nur mit Bewegung): Er schiebt sich seitlich, das alte Panel läuft als .is-exiting
+                           hinaus (sichtbar trotz hidden, inert), das neue kommt als .is-entering herein (600 ms, hero.css).
+                           Zu einem Tab weiter rechts nach links, zu einem weiter links (.is-back) nach rechts, auch bei der
+                           Rotation. Die Reveals des neuen Panels spielen nicht neu ab.
   Pause-Taste              .hero__pause (aria-pressed) hält Film, Rotation und die laufenden Bewegungen an (WCAG 2.2.2). Ohne
                            Bewegung oder bei saveData/2G/3G startet die Seite pausiert. Im Theme-Editor wählt
                            shopify:block:select den Slide, shopify:section:unload räumt auf (auch Reduced-Motion zur

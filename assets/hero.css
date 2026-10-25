@@ -160,16 +160,18 @@
   .hero__panel[hidden] { display: grid !important; visibility: hidden; }
 }
 .hero__panel > *, .hero__sub > * { min-width: 0; max-width: 100%; }
-/* Handy, Modellwechsel (hero.js, nur mit Bewegung): Der Text schiebt sich seitlich wie ein Band. Der alte läuft nach links aus dem
-   Bild, der neue kommt zugleich von rechts, gleiche Dauer und Kurve. Der alte ist schon hidden und bleibt für die Dauer sichtbar
-   (inert, keine Klicks). Der Weg ist eine Bildschirmbreite, so liegt der Text am Start und Ende ganz außerhalb; overflow: clip am
-   Hero schneidet ab, nichts scrollt seitlich. Desktop: unverändert, dort spielen die Reveals neu ab. */
-@media (max-width: 767px) {
-  .has-motion .hero__panel.is-exiting { visibility: visible; animation: hero-text-out 600ms var(--ease) forwards; }
-  .has-motion .hero__panel.is-entering { animation: hero-text-in 600ms var(--ease) backwards; }
-}
+/* Modellwechsel (hero.js, nur mit Bewegung): Der Text schiebt sich seitlich wie ein Band. Zu einem Tab weiter rechts läuft der alte
+   nach links aus dem Bild und der neue kommt zugleich von rechts; zu einem Tab weiter links (.is-back) umgekehrt. Gleiche Dauer und
+   Kurve für beide. Der alte ist schon hidden und bleibt für die Dauer sichtbar (inert, keine Klicks). Der Weg ist eine
+   Bildschirmbreite, so liegt der Text am Start und Ende ganz außerhalb; overflow: clip am Hero schneidet ab, nichts scrollt seitlich. */
+.has-motion .hero__panel.is-exiting { visibility: visible; animation: hero-text-out 600ms var(--ease) forwards; }
+.has-motion .hero__panel.is-entering { animation: hero-text-in 600ms var(--ease) backwards; }
+.has-motion .hero__panel.is-back.is-exiting { animation-name: hero-text-out-back; }
+.has-motion .hero__panel.is-back.is-entering { animation-name: hero-text-in-back; }
 @keyframes hero-text-out { to { translate: -100vw 0; } }
 @keyframes hero-text-in { from { translate: 100vw 0; } }
+@keyframes hero-text-out-back { to { translate: 100vw 0; } }
+@keyframes hero-text-in-back { from { translate: -100vw 0; } }
 /* Lange deutsche Wörter (Texte sind im Editor änderbar) brechen um statt aus dem Bild zu laufen (WCAG 1.4.10) */
 .hero__blurb, .hero__price { -webkit-hyphens: auto; hyphens: auto; overflow-wrap: anywhere; hyphenate-limit-chars: 8 4 4; } /* kurze Wörter („große“) nicht trennen */
 .hero__poster {
