@@ -73,7 +73,7 @@
        (der einfahrende Header verdeckte das Ziel). Ausblenden nur mit html.has-motion. */
     var wrap = header.closest('.site-header-wrap') || header;
     var over = document.body.hasAttribute('data-header-overlay');
-    var shown = true, lastY = window.scrollY, quiet = 0, queued = false;
+    var shown = true, lastY = window.scrollY, quiet = 0, queued = false, accountOpen = false;
 
     function show(on) {
       if (on === shown) return;
@@ -84,7 +84,7 @@
     function update() {
       queued = false;
       var y = window.scrollY, d = y - lastY;
-      var menu = !!header.querySelector('.mainnav__item.is-open');
+      var menu = accountOpen || !!header.querySelector('.mainnav__item.is-open');
       header.classList.toggle('is-solid', over && (y >= 40 || menu));
       if (!html.classList.contains('has-motion') || y < 400 || menu || document.body.classList.contains('is-locked') ||
           header.contains(document.activeElement)) {
@@ -122,6 +122,36 @@
     // Reduced-Motion zur Laufzeit: motion.js entfernt has-motion, ein weggeschobener Header kommt zurück
     var rm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)');
     if (rm && rm.addEventListener) rm.addEventListener('change', queue, sig);
+    /* ---------------- Konto-Fenster (shopify-account) ----------------
+       Lage des Fensters (header.css): Oberkante = Unterkante des Headers (oben liegt die Ankündigungsleiste darüber, nach dem Scrollen
+       nicht mehr), rechter Rand = rechte Inhaltskante. Gemessen vor und beim Öffnen; die Komponente hält dabei den Platz des
+       Scrollbalkens frei (scrollbar-gutter: stable), mit Scrollbalken bleibt die Inhaltskante, wo sie war. Offen zählt das Fenster wie ein offenes
+       Megamenü: Header schwarz über dem Hero, nie weggeschoben (Ereignisse open/close der Komponente). */
+    var account = header.querySelector('[data-account]');
+    if (account) {
+      var bar = header.querySelector('.header__bar');
+      var measure = function () {
+        var r = bar.getBoundingClientRect();
+        var edge = r.right - parseFloat(getComputedStyle(bar).paddingRight);
+        account.style.setProperty('--account-top', Math.round(header.getBoundingClientRect().bottom) + 'px');
+        // Breite von html statt clientWidth: mit freigehaltenem Scrollbalken-Platz meldet Chrome clientWidth samt diesem Platz
+        account.style.setProperty('--account-right', Math.max(0, Math.round(html.getBoundingClientRect().width - edge)) + 'px');
+      };
+      // Tasten und Klicks im offenen Fenster (E-Mail-Feld) laufen ebenfalls hier durch: dann nicht messen
+      account.addEventListener('pointerdown', function () { if (!accountOpen) measure(); }, sig);
+      account.addEventListener('keydown', function (e) { if (!accountOpen && (e.key === 'Enter' || e.key === ' ')) measure(); }, sig);
+      // Beim Öffnen noch einmal: auf Seiten ohne Scrollbalken kommt erst jetzt der freigehaltene Platz dazu
+      account.addEventListener('open', function () { accountOpen = true; account.classList.add('is-open'); measure(); update(); }, sig);
+      account.addEventListener('close', function () { accountOpen = false; account.classList.remove('is-open'); update(); }, sig);
+      // Zurück aus dem bfcache: Zustand am Fenster selbst ablesen, falls dabei kein close kam
+      window.addEventListener('pageshow', function (e) {
+        if (!e.persisted) return;
+        accountOpen = !!(account.shadowRoot && account.shadowRoot.querySelector('dialog[open]'));
+        account.classList.toggle('is-open', accountOpen);
+      }, sig);
+      window.addEventListener('resize', measure, { passive: true, signal: ctrl.signal });
+    }
+
     // Header im Editor entfernt
     document.addEventListener('shopify:section:unload', function (e) { if (e.target.contains(header)) ctrl.abort(); }, sig);
     update();

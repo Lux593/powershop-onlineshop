@@ -74,6 +74,63 @@ html:not(:has(.announce)) { --announce-h: 0px; }
 }
 @media (min-width: 1024px) { .header__burger { display: none; } }
 
+/* Konto-Fenster (<shopify-account>, Shopify-Komponente im Shadow DOM). Gestaltbar nur über ihre Variablen und die Parts
+   signed-out-avatar und dialog; Werte von außen schlagen die :host-Vorgaben der Komponente. Das Fenster ist dunkel wie das Megamenü.
+   Rahmen #777 statt Stahl: das E-Mail-Feld liegt auf Anthrazit und braucht 3 : 1 zum Grund (wie .on-dark .input). */
+.header__account {
+  --shopify-account-color-background: var(--c-black);
+  --shopify-account-color-background-subdued: var(--c-anthracite);
+  --shopify-account-color-text: var(--c-white);
+  --shopify-account-color-text-subdued: var(--c-muted-dark);
+  --shopify-account-color-accent: var(--c-orange);
+  --shopify-account-color-accent-hover: var(--c-orange-dark);
+  --shopify-account-color-accent-text: var(--c-black);
+  --shopify-account-color-border: var(--c-border-input-dark);
+  --shopify-account-color-card-background: var(--c-black);
+  --shopify-account-color-card-text: var(--c-white);
+  --shopify-account-color-control-background: var(--c-anthracite);
+  --shopify-account-color-control-text: var(--c-white);
+  --shopify-account-color-shadow: rgba(0, 0, 0, 0.45);
+  --shopify-account-font-heading: var(--f-head);
+  --shopify-account-font-heading-weight: 700;
+  --shopify-account-font-heading-transform: uppercase;
+  --shopify-account-font-body: var(--f-body);
+  --shopify-account-font-body-weight: 400;
+  --shopify-account-radius-base: var(--radius);
+  --shopify-account-radius-button: var(--radius);
+  --shopify-account-radius-button-small: var(--radius);
+  --shopify-account-radius-input: var(--radius);
+  --shopify-account-radius-dialog: var(--radius);
+  --shopify-account-avatar-size: 44px;
+  --shopify-account-signed-in-avatar-size: 28px;
+  --shopify-account-signed-in-avatar-color-background: var(--c-orange);
+  --shopify-account-signed-in-avatar-color-text: var(--c-black);
+  /* Oberkante des Fensters = Unterkante des Headers; header.js misst sie vor dem Öffnen (Ankündigungsleiste, Ausblenden beim Scrollen) */
+  --shopify-account-dialog-position-top: var(--account-top, calc(var(--announce-h) + var(--header-h)));
+}
+/* Bis die Komponente geladen ist, hält der Inhalt den Platz eines Symbolknopfs: kein Springen im Header */
+.header__account:not(:defined) { display: inline-grid; place-items: center; width: 44px; height: 44px; }
+.header__account-icon { display: grid; place-items: center; }
+.header__account-fallback { width: 28px; height: 28px; border-radius: 50%; background: var(--c-orange); }
+.header__account::part(signed-out-avatar) { width: 44px; height: 44px; border-radius: var(--radius); transition: background-color var(--t-fast); }
+.header__account::part(signed-out-avatar):hover { background: rgba(255, 255, 255, 0.08); }
+/* Ab 751 px (Grenze der Komponente) hängt das Fenster unter dem Header. Rechts schließt es mit dem Inhalt ab statt mit dem Bildschirmrand:
+   auf breiten Monitoren läge es sonst weit neben dem Symbol. header.js misst den Abstand vor dem Öffnen (--account-right); 100vw taugt
+   nicht, weil 100vw den Scrollbalken mitzählt und die Komponente seinen Platz beim Öffnen freihält (scrollbar-gutter: stable). */
+@media (min-width: 751px) {
+  .header__account::part(dialog) {
+    inset-inline-end: var(--account-right, var(--gutter));
+    border: 1px solid var(--c-steel);
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.45);
+  }
+}
+/* Die Komponente setzt <shopify-store> (Ladenangaben, ohne Inhalt) davor: als Flex-Element brächte es eine zweite Lücke in die Symbolreihe */
+.header__icons > shopify-store { position: absolute; }
+/* Unter 490 px passt neben dem mittigen Logo (156 px) kein drittes Symbol: dort führt der Knopf im Mobilmenü zum Konto. Auch vor dem
+   Laden ausblenden (sonst schlägt die Platzhalter-Regel oben). Ein offenes Fenster bleibt, bis es zu ist (is-open, header.js): dreht
+   jemand das Handy dabei ins Hochformat, verschwände es sonst samt Schließen-Knopf, die Seite dahinter bliebe aber gesperrt. */
+@media (max-width: 489px) { .header__account:not(.is-open), .header__account:not(:defined) { display: none; } }
+
 /* Hauptnavigation */
 .mainnav { margin-left: 24px; align-self: stretch; }
 .mainnav__list { display: flex; height: 100%; }

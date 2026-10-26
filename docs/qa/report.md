@@ -1,64 +1,67 @@
-# QA Report: Startseiten-Hero „Band“ (Scroll-Übergang ohne Skalieren)
+# QA Report – Konto-Fenster im Header
 
-Geprüft: `assets/hero.js` (Scrub „Band“) und `assets/hero.css` (will-change, Fokus-Rückholung) im Repo-Stand.
-Laufzeit: Live-Shop https://powershop-online.myshopify.com/ in Chrome (Playwright 1.64, headed). hero.js und hero.css wurden
-nur im Test-Browser per Netzwerk-Umleitung durch den Repo-Stand ersetzt; der Shop selbst ist unverändert.
-Gerät wie beim Nutzer: 3440 × 1300 Viewport, DPR 1, Intel-Grafik, Monitor 75 Hz. Lenis und ScrollTrigger aktiv.
-Scroll per Mausrad (80 px alle 40 ms) durch Hero, Willkommensblock und Bento. Ruckler = Bild länger als 20 ms.
+Stand 26.10.2026. Getestet im Entwicklungs-Theme `Development (7a3772-CH5CG4410V67)` (#200606810456) über die Store-Domain mit `?preview_theme_id=200606810456`, also mit dem echten Shopify-Skript. Live-Theme unverändert.
+Werkzeuge: Playwright 1.64 mit Chrome. Desktop im sichtbaren Chrome (echte Scrollbalken), Handy und Tablet mit Touch-Emulation. Filme im Test abgeschaltet (sonst lädt die Seite nie fertig). Keine Anmeldung durchgeführt.
 
 ## Test Evidence
 
-Live, je 3 Läufe (Mittel), Spalten fps / Ruckler / p95:
-
-| Stand | Hero | Willkommensblock | Bento |
-|---|---|---|---|
-| live heute (Durchfahrt mit Zoom) | 10–15 fps / 44–49 / 107–213 ms | 39–61 fps / 5–13 / 23–67 ms | 69–72 fps / 3–7 |
-| Repo „Band“ | 72 fps / 2 / 13 ms | 74 fps / 1 / 14 ms | 74 fps / 1 / 13 ms |
-
-Willkommensblock einzeln abgeschaltet (Band-Prototyp, live, 3 Läufe): ohne Masken-Einzeichnen 71 fps, ohne Wort-Übergang 69,
-ohne Zeichnungs-Parallax 73, ganz ohne Scrub 69, mit allem 74. Kein Effekt des Willkommensblocks bremst messbar.
-Mit 4-fach gedrosselter CPU liegen alle Varianten bei 19–34 fps (Hauptthread ausgelastet von Lenis, GSAP, ScrollTrigger und
-Rendering, in allen Bereichen gleich); eine Sparvariante des Willkommensblocks brachte in der Wiederholung keinen stabilen Gewinn.
-
-Hauptthread live mit Band (1 Lauf, ms Arbeit je Sekunde): requestAnimationFrame 91, Layerize 76, Style 74, scroll-Ereignisse 60,
-Paint 52, ScrollTrigger 49, GSAP 21; header.js 3 (ein erster Lauf mit 41 war ein Ausreißer).
-
-Screenshots (docs/qa/screenshots/): hero-band-uw-0_2/0_4/0_6 (3440 px, halbiert), hero-band-lap-0_2/0_4 (1440 px),
-hero-band-mob-0/0_4 (390 px, iPhone-Emulation). Zu jeder Ultrawide-Aufnahme protokolliert: Headline-Versatz −76 / −360 / −792 px,
-Deckkraft der Textebene 0,92 / 0,62 / 0,10.
+- QA-Lauf `validate.mjs`: **52/52 PASS** (3440×1440, 1440×900, 320, 360, 390, 489, 490, 768, 1023 px).
+- Beweislauf `proof.mjs`: Öffnen weiter unten auf der Seite per echtem Mausklick, alte gegen neue `assets/base.css`:
+  - **alt** (`overflow-x: hidden`): Header beim Öffnen bei top −1459 / −664 / −664 (Startseite / Herren / Service), also aus dem Bild.
+  - **neu** (`overflow-x: clip`): Header bei 0, Fenster bündig darunter (77 px).
+- `proof3.mjs` (Startseite, Mausrad): Sichtbare Elemente bleiben beim Öffnen stehen (419,6 → 419,5 px, 769,9 → 769,9 px). Die Hero-Überschrift in `vw` wird um etwa 1 % kleiner (die Komponente setzt `scrollbar-gutter: stable`), das Scroll-Anchoring gleicht das oberhalb des Bildausschnitts aus.
+- `regress.mjs` / `lock.mjs` für `base.css`: 7 Seiten (Start, Kollektion, Service, 2 Produkte, Suche, Warenkorb) × 320/390/1440 ohne seitliches Scrollen, Header sticky. Scroll-Sperre von Warenkorb-Schublade und Mobilmenü wie live (600 → 600).
+- Theme Check: 87 Dateien, keine Befunde.
+- Screenshots: `docs/qa/screenshots/kundenkonto-*.png`. Das Handy-Menü mit „ANMELDEN“ ist nur im Scratchpad: es ist fast reine schwarze Fläche (64 KB) und fiele unter die 100-KB-Regel des Gates.
 
 ## Test Results
 
-[pass] PASS: Hero-Übergang flüssig auf Nutzer-Hardware — 72 fps statt 10–15, p95 13 ms statt 107–213 ms (live, 3 Läufe)
-[pass] PASS: Willkommensblock flüssig — 74 fps statt 39–61; das Ruckeln dort kam vom Hero, nicht von Parallax, Maske oder Wörtern
-[pass] PASS: Drei Ebenen mit eigener Geschwindigkeit — Headline schneller als Unterzeile, Tabs am langsamsten (Screenshots 3440 und 1440 px)
-[pass] PASS: Wege auf 1440 px gedeckelt — bei 3440 px fliegt die Unterzeile nicht weiter als die Headline (−792 px Headline bei 60 %)
-[pass] PASS: Tastaturfokus mitten im Scroll (35 %) holt die Textebene zurück — opacity 1, Headline-Transform none (3440, 1440, 390 px)
-[pass] PASS: Handy unverändert — 390 px: Film steht, Willkommensblock schiebt sich darüber, kein Scrub-Skript (Screenshots mob)
-[pass] PASS: Keine Konsolenfehler und keine GSAP-Warnungen (pageerror und console beobachtet, alle drei Größen)
-[pass] PASS: Einzelnes Modell ohne Tab-Leiste — `row || []` verhindert eine GSAP-Warnung für ein fehlendes Ziel
-[warn] WARN: Nur Chrome unter Windows gemessen — Safari und Firefox nicht geprüft
-[warn] WARN: Ein erster Ultrawide-Screenshot zeigte den Text unbewegt — Aufnahmefehler (Fenster kleiner als Viewport, Resize setzte ScrollTrigger kurz zurück); mit passender Fenstergröße und protokollierten Werten bestätigt
-[warn] WARN: Kategorie-Filme der Kollektionsseiten zoomen ebenfalls einen laufenden Film beim Scrollen (shop.css, 1,1 → 1) — vermutlich dieselbe Ursache, nicht Teil dieses Auftrags
+[pass] PASS: Shopify fügt `account.js` und `#shopify-customer-account-data` selbst ein, sobald das Element im Header steht — Lauf desk-3440/desk-1440
+[pass] PASS: Knopf 44×44 zwischen Suche und Warenkorb, Name „Konto“ im Accessibility-Baum — ariaSnapshot `button "Konto"`
+[pass] PASS: Keine Layout-Verschiebung im Header beim Laden — PerformanceObserver layout-shift: 0 Einträge im Header
+[pass] PASS: Hover wie die übrigen Symbolknöpfe — `rgba(255, 255, 255, 0.08)`
+[pass] PASS: Fenster oben bündig unter dem Header, mit Ankündigungsleiste (113 px) und nach dem Scrollen (77 px)
+[pass] PASS: Rechts bündig mit der Inhaltskante auf 3440 px (2348/2349) und 1440 px (1348/1349) — vorher lag es auf 3440 px etwa 700 px rechts neben dem Symbol
+[pass] PASS: Gestaltung — Hintergrund #0a0a0a, Rahmen #2b2b2b, Ecken 2 px, Überschrift Barlow Condensed 700 versal weiß, Feld #1a1a1a mit Rahmen #777 und Inter, Schnelllinks dunkel mit 2 px
+[pass] PASS: Header über dem Hero wird schwarz, solange das Fenster offen ist, danach wieder transparent (wie beim Megamenü)
+[pass] PASS: Seite scrollt bei offenem Fenster nicht, Header wird nicht weggeschoben
+[pass] PASS: Esc schließt, Fokus zurück am Konto-Knopf; Klick daneben schließt; Enter auf dem Knopf öffnet
+[pass] PASS: Unter 490 px kein Konto-Symbol im Header, Header identisch mit live (320/360/390/489 px), Mobilmenü-Knopf „Anmelden“
+[pass] PASS: Ab 490 px Konto-Symbol im Header, Logo mittig, nichts überlappt (490/768/1023 px); unter 751 px öffnet das Fenster als Blatt von unten
+[pass] PASS: `<shopify-store>`, das die Komponente einfügt, erzeugt keine zusätzliche Lücke mehr in der Symbolreihe (Symbolreihe 90 px wie live)
+[pass] PASS: `overflow-x: clip` am body: Header bleibt beim Öffnen weiter unten sichtbar (vorher weg), keine Regression bei Überlauf, Sticky und Scroll-Sperre
+[warn] WARN: Angemeldeter Zustand (oranger Avatar, Abmelden) nicht getestet — braucht eine echte Anmeldung mit Code
+[warn] WARN: Die E-Mail-Anmeldung wechselt für den Code auf Shopifys Seite (`/customer_authentication/login`); deren Aussehen hängt an den Admin-Einstellungen in `docs/kundenkonto.md`, noch nicht umgesetzt
+[warn] WARN: „Mit Shop anmelden“ (lila) bleibt sichtbar, bis „Sign in with Shop“ im Admin aus ist; AGB-Link im Fenster ist 404, bis die Richtlinien angelegt sind
+[warn] WARN: Safari und Firefox nicht getestet (nur Chrome); `overflow-x: clip` fällt vor Safari 16 auf `hidden` zurück
+
+## Critical Analysis
+
+- **Erster Eindruck:** Das Fenster wirkt wie ein Teil des Headers (schwarz, Stahl-Linie, versale Barlow-Überschrift) und nicht wie ein fremdes Widget. Der lila Shop-Knopf bricht das, bis er abgeschaltet ist.
+- **Detail:** Ecken, Rahmen und Abstände folgen den Tokens. Innenabstände und Schriftgrößen im Fenster bestimmt Shopify; die Schnelllinks nutzen Inter statt Barlow (`--shopify-account-font-body` gilt für alles außer der Überschrift).
+- **Vollständigkeit:** Auf dem Handy bleibt es bei der Shopify-Seite (Platz im Header). Die Code-Eingabe, Bestellungen und Profil sehen erst nach Teil B nach Power Shop aus.
+- **Austausch-Test:** Ohne Logo bleibt der Stil erkennbar (versale Condensed-Überschrift, Orange/Schwarz, eckig).
 
 ## Quality Rubric
 
-CODE_QUALITY:     8/10 — kleine, gezielte Änderung im bestehenden Muster (PS.motion.add, matchMedia, invalidateOnRefresh), Fokus- und Leerfall abgesichert
-ARCHITECTURE:     8/10 — Verhalten in hero.js, Ebenen und Fokus in hero.css, Vertrag in docs/motion-api.md nachgezogen
-UX_DESIGN:        6/10 — gedeckelt, bis der Nutzer Band live gesehen hat (Lernmuster: UX erst nach Sichtung höher)
-COMPLETENESS:     8/10 — Ursache gemessen, Band eingebaut, Willkommensblock geprüft und begründet unverändert gelassen
-PRODUCTION_READY: 8/10 — live gegen echte Seite gemessen; noch nicht deployt (Push auf main nur nach Freigabe)
+CODE_QUALITY:     8/10 — kleine, kommentierte Ergänzungen im Stil der Dateien; Lage per Messung statt fester Werte; Ursache des Header-Fehlers an der Wurzel behoben
+ARCHITECTURE:     8/10 — Komponente nur über Variablen, Parts und Ereignisse angebunden; keine Kopie von Shopify-Code; Header-Logik in header.js gebündelt
+UX_DESIGN:        6/10 — gedeckelt, bis der Nutzer das Fenster live gesehen hat (Lernmuster); sichtbar stimmig, aber Shop-Knopf und Shopify-Seiten noch im Standardlook
+COMPLETENESS:     7/10 — Theme-Teil vollständig; angemeldeter Zustand ungetestet, Admin-Teil (Branding, Google, Shop aus) wartet auf den Nutzer
+PRODUCTION_READY: 8/10 — Theme Check sauber, keine Regression gemessen, Rückfall für ältere Browser, ein Commit rücknehmbar
 
-COMPOSITE: 7.6/10
-LOWEST: UX_DESIGN — Sichtung durch den Nutzer steht aus
+COMPOSITE: 7.4/10
+LOWEST: UX_DESIGN — gedeckelt bis zur Sichtung; Shopify-Seiten erst nach den Admin-Einstellungen im Markenlook
 
 ## Definition of Done Checklist
 
-- [x] Funktioniert mit Tastatur (Fokus holt Textebene zurück)
-- [x] Reduzierte Bewegung: Scrub läuft nur mit PS.motion.scroll (motion.js baut bei prefers-reduced-motion ab)
-- [x] Keine Konsolenfehler oder -warnungen
-- [x] Klare Hierarchie im Übergang (Headline führt)
-- [x] Keine Sackgassen (Pfeil und Pause-Taste unverändert)
+- [x] Ladezustand: Platzhalter 44×44 bzw. oranger Kreis, bis die Komponente geladen ist
+- [x] Fehlerzustand: Formularfehler zeigt die Komponente selbst (Shopify)
+- [x] Tastatur: Enter öffnet, Esc schließt, Fokus kehrt zurück
+- [x] Hover-Zustand am Knopf
+- [x] Schließen-Knopf und Klick daneben, keine Sackgasse
+- [x] Keine Konsolenfehler aus dem Theme (nur die im Test abgebrochenen Filme)
+- [x] Responsiv 320–3440 px ohne Überlauf
 
 CONFIDENCE: 8/10
 VERDICT: APPROVED WITH NOTES

@@ -62,9 +62,20 @@
         {% render 'icon', name: 'search' %}
       </button>
       {%- if shop.customer_accounts_enabled -%}
-        <a class="icon-btn hide-mobile" href="{{ routes.account_url }}" aria-label="Kundenkonto">
-          {% render 'icon', name: 'user' %}
-        </a>
+        {%- comment -%}
+          Konto-Fenster von Shopify: Anmeldung und Links zu Bestellungen/Profil öffnen sich auf der Seite statt auf shopify.com.
+          Das Skript fügt Shopify über content_for_header selbst ein, sobald das Element im HTML steht; der Knopf heißt von sich aus
+          „Konto“. Aussehen in header.css, Lage unter dem Header in header.js. Den Code nach einer E-Mail-Anmeldung fragt Shopify auf
+          der eigenen Seite ab (gestaltet im Admin, docs/kundenkonto.md). Abgemeldet zeigt der Knopf unser Symbol (Slot). Angemeldet
+          steht bis zum Laden ein oranger Kreis an der Stelle der Initiale; danach blendet die Komponente ihn aus (kein Slot).
+        {%- endcomment -%}
+        <shopify-account class="header__account" menu="{{ section.settings.customer_account_menu | default: 'customer-account-main-menu' }}" data-account>
+          {%- if customer -%}
+            <span class="header__account-fallback"></span>
+          {%- else -%}
+            <span class="header__account-icon" slot="signed-out-avatar">{% render 'icon', name: 'user' %}</span>
+          {%- endif -%}
+        </shopify-account>
       {%- endif -%}
       <button class="icon-btn" type="button" data-open="cart-drawer" aria-label="Warenkorb, {{ cart.item_count }} Artikel" data-cart-trigger>
         {% render 'icon', name: 'shopping-bag' %}<span class="count" data-cart-count data-count="{{ cart.item_count }}">{% if cart.item_count > 0 %}{{ cart.item_count }}{% endif %}</span>
@@ -143,8 +154,9 @@
       {%- endif -%}
     {%- endfor -%}
     {%- if shop.customer_accounts_enabled -%}
+      {%- comment -%} Unter 490 px fehlt das Konto-Fenster im Header (header.css): hier führt der Knopf zu Shopifys Anmelde- bzw. Kontoseite {%- endcomment -%}
       <div class="mobile-menu__foot">
-        <a class="btn btn--primary btn--block" href="{{ routes.account_url }}">{% render 'icon', name: 'user' %}Kundenkonto</a>
+        <a class="btn btn--primary btn--block" href="{{ routes.account_url }}">{% render 'icon', name: 'user' %}{% if customer %}Kundenkonto{% else %}Anmelden{% endif %}</a>
       </div>
     {%- endif -%}
   </div>
@@ -170,6 +182,13 @@
       "label": "Spalten in eigener Reihenfolge",
       "default": "Fahrzeuge, Modellfamilien, Kollektionen",
       "info": "Die Links unter einer Spaltenüberschrift (Ebene 3) stehen alphabetisch. Spalten, deren Überschrift hier steht (kommagetrennt), behalten die Reihenfolge aus der Shopify-Navigation."
+    },
+    {
+      "type": "link_list",
+      "id": "customer_account_menu",
+      "label": "Menü im Konto-Fenster",
+      "default": "customer-account-main-menu",
+      "info": "Links unter der Anmeldung im Konto-Fenster, z. B. Bestellungen und Profil. Voreingestellt ist das Menü der Kontoseiten."
     },
     {
       "type": "textarea",

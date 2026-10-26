@@ -12,7 +12,10 @@ body {
   color: var(--c-text);
   background: var(--c-offwhite);
   -webkit-font-smoothing: antialiased;
+  /* clip statt hidden: hidden machte overflow-y zu auto. Sperrt ein Fremd-Dialog (Konto-Fenster) html per overflow: hidden, wurde body
+     dadurch selbst zum Scroll-Container: die Seite sprang, der Sticky-Header verlor seinen Halt. hidden bleibt als Rückfall (vor Safari 16). */
   overflow-x: hidden;
+  overflow-x: clip;
 }
 body.is-locked { overflow: hidden; }
 img, svg, video { display: block; max-width: 100%; }

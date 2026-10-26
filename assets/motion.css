@@ -9,7 +9,7 @@
 
 /* ---------- Lenis ---------- */
 /* html{scroll-behavior:smooth} (base.css) würde gegen Lenis arbeiten. Bewusst KEIN overflow:clip für
-   .lenis-stopped aus lenis.css: es bricht body{overflow-x:hidden} und alle sticky-Elemente. Die Sperre
+   .lenis-stopped aus lenis.css: mit dem früheren body{overflow-x:hidden} brach das alle sticky-Elemente. Die Sperre
    bleibt body.is-locked. !important, weil ScrollTrigger scroll-behavior inline zurückschreibt: Lenis lädt nach, und
    hat ScrollTrigger vorher „smooth“ gemerkt, bliebe sonst ein style="scroll-behavior: smooth" an html stehen. */
 html.lenis { scroll-behavior: auto !important; }

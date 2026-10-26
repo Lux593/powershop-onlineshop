@@ -115,8 +115,8 @@
     try {
       var gsap = M.scroll && window.gsap;
       // Scrollbare Vorfahren und Dialoge ohne data-lenis-prevent (Cookie-Einstellungen, App-Overlays) scrollen
-      // selbst, nicht die Seite dahinter. Lenis' allowNestedScroll taugt hier nicht: body{overflow-x:hidden}
-      // macht den body zum „Scroller“ und hielte das Wheel überall an.
+      // selbst, nicht die Seite dahinter. Lenis' allowNestedScroll taugte hier nicht: das frühere body{overflow-x:hidden}
+      // machte den body zum „Scroller“ und hielt das Wheel überall an (heute clip, base.css); die eigene Prüfung bleibt.
       lenis = PS.lenis = new window.Lenis({
         autoRaf: !gsap,
         prevent: function (n) {
