@@ -21,6 +21,13 @@ Zustand
   PS.motionReady       true, sobald diese Datei fertig ist (auch im Fallback). Das Event ps:motionready feuert vor
                        header/hero/home/sections.js: dort PS.motionReady direkt prüfen.
   PS.motion.enabled    true, solange Bewegung aktiv ist (bei prefers-reduced-motion zur Laufzeit false).
+  PS.motionWanted      true, wenn das Head-Skript Bewegung erlaubt (Setting an, kein reduced-motion, kein saveData, nicht
+                       im Editor). Bleibt nach dem Failsafe stehen, has-motion und PS.motion.enabled nicht.
+  PS.filmsWanted()     Filme (Hero, Kategorie) und die Modell-Rotation fragen das statt PS.motion.enabled: true mit
+                       PS.motion.enabled oder PS.motionWanted, ohne reduced-motion. Kommen die Skripte nach einem Deploy
+                       oder auf langsamer Leitung erst nach 3,5 s, starten die Filme später statt gar nicht. Einblendungen,
+                       Scrub und Tab-Animationen bleiben an PS.motion.enabled (sonst stünde Text unsichtbar). Unabhängig
+                       davon startet der Hero bei saveData oder 2G (navigator.connection) pausiert, nicht mehr bei 3G.
   PS.motion.scroll     true, wenn GSAP + ScrollTrigger laufen (nur auf der Startseite). Nur dann Scrub/Parallax bauen.
   PS.motion.*          theme.js legt einen No-op-Stub an: Aufrufe sind immer harmlos, kein Existenztest nötig.
   PS.lenis             Lenis-Instanz oder null (Setting, pointer:fine und hover:hover, ohne reduced-motion). Lenis lädt
@@ -169,12 +176,12 @@ Kontakt (snippets/contact-href.liquid, assets/contact.js)
 
 Hero (sections/hero.liquid, assets/hero.js; nur Startseite, PS.on('[data-hero]'))
   Film                     Poster-<img> (LCP, nie versteckt) plus <video data-src ...>. Der Film startet nach window.load und
-                           Idle, nur im Bild und im sichtbaren Tab. Er entfällt bei saveData, 2G/3G, Reduced-Motion, im
+                           Idle, nur im Bild und im sichtbaren Tab. Er entfällt bei saveData, 2G, Reduced-Motion, im
                            Theme-Editor und bei abgelehntem play() (iOS Low-Power): dann bleiben Poster und Play-Taste. Mobil
                            lädt die 540p-Datei, sonst WebM (nur wenn sicher abspielbar), sonst MP4.
   Bilder der Slides        Inaktive Slides rendern nicht (hero.css: content-visibility: hidden), ihre lazy Bilder laden daher nicht
                            gegen das Poster. hero.js holt sie nach Load plus Idle (loading = eager), außer bei saveData und
-                           2G/3G; ein Tab-Klick davor lädt den gewählten Slide sofort.
+                           2G; ein Tab-Klick davor lädt den gewählten Slide sofort.
   Tabs, Rotation           Die Modell-Tabs (role=tab) hören auf ps:tab: Slide wechselt über .is-active und aria-hidden, der
                            abgelöste Slide bleibt 800 ms als .is-leaving darunter. Mit Bewegung rotiert der Hero nach der
                            Standzeit (Setting „Bildwechsel nach“, --hero-dur). hero.js misst die Standzeit per
@@ -188,7 +195,7 @@ Hero (sections/hero.liquid, assets/hero.js; nur Startseite, PS.on('[data-hero]')
                            Zu einem Tab weiter rechts nach links, zu einem weiter links (.is-back) nach rechts, auch bei der
                            Rotation. Die Reveals des neuen Panels spielen nicht neu ab.
   Pause-Taste              .hero__pause (aria-pressed) hält Film, Rotation und die laufenden Bewegungen an (WCAG 2.2.2). Ohne
-                           Bewegung oder bei saveData/2G/3G startet die Seite pausiert. Im Theme-Editor wählt
+                           Bewegung oder bei saveData/2G startet die Seite pausiert. Im Theme-Editor wählt
                            shopify:block:select den Slide, shopify:section:unload räumt auf (auch Reduced-Motion zur
                            Laufzeit über PS.motion.track).
   Scrub „Band“             Nur mit PS.motion.scroll (PS.motion.add), ab 768 px, über die Hero-Höhe: Der Text zieht nach links

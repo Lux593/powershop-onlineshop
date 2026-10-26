@@ -59,7 +59,8 @@
     document.addEventListener('shopify:section:unload', function (e) { if (e.target.contains(film)) ac.abort(); }, { signal: ac.signal });
 
     var io = null;
-    if (!PS.motion.enabled || (conn && conn.saveData) || !('IntersectionObserver' in window)) return;
+    // PS.filmsWanted statt PS.motion.enabled: Der Film läuft auch nach dem Failsafe (Skripte zu spät), dann eben später
+    if (!PS.filmsWanted() || (conn && conn.saveData) || !('IntersectionObserver' in window)) return;
 
     // Außerhalb des Bildes anhalten, danach nur fortsetzen, wenn nicht von Hand angehalten. Mehrere Stufen: Hält der Browser
     // den Film von sich aus an (iOS beim Scrollen), läuft er bei der nächsten Stufe weiter, nicht erst nach ganz raus und rein.

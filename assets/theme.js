@@ -43,6 +43,13 @@
   // Bewegung: No-op-Stub, motion.js ersetzt ihn (Vertrag dort). Fehlt es, bleiben Aufrufe harmlos.
   function noop() {}
   PS.motion = PS.motion || { enabled: false, scroll: false, add: noop, track: noop, refresh: noop };
+  // Filme (Hero, Kategorie) und Modell-Rotation: laufen, wenn Bewegung gewünscht ist (Head-Skript in theme.liquid: Setting an,
+  // keine reduzierte Bewegung, kein Datensparen, nicht im Editor). Auch nach dem Failsafe, der die Bewegungsschicht abschaltet,
+  // wenn motion.js nicht binnen 3,5 s da ist: Der Film startet dann später statt gar nicht. Einblendungen und Scroll-Effekte
+  // hängen weiter an PS.motion.enabled, sonst bliebe Text unsichtbar.
+  PS.filmsWanted = function () {
+    return !!(PS.motion.enabled || PS.motionWanted) && !PS.prefersReducedMotion();
+  };
   // Lenis lädt nach theme.js und darf den Dialog nie blockieren
   function lenis(act) { try { PS.lenis && PS.lenis[act](); } catch (e) { /* Dialog geht vor */ } }
 

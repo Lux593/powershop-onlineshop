@@ -9,6 +9,8 @@
       Bewegung: has-motion nur mit Setting, ohne prefers-reduced-motion/saveData und nicht im Theme-Editor
       (Shopify.designMode gibt es im Head noch nicht, daher request.design_mode). Failsafe: meldet motion.js
       nicht binnen 3,5 s PS.motionReady, fällt die Seite auf statisch zurück. Details: assets/motion.js.
+      PS.motionWanted bleibt dabei stehen: Filme (Hero, Kategorie) laufen auch nach dem Failsafe, nur später (PS.filmsWanted,
+      assets/theme.js). Kamen die Skripte nach einem Deploy erst nach über 20 s, blieben die Filme sonst für den ganzen Besuch aus.
       Weiches Scrollen: Lenis gibt es nur für Maus und Trackpad. Das Head-Skript lädt es dann vor und nennt motion.js die
       Adresse (PS.lenisSrc); auf Touch-Geräten lädt es nie.
     {%- endcomment -%}
@@ -18,6 +20,7 @@
           (function (d) {
             var c = navigator.connection;
             if (matchMedia('(prefers-reduced-motion: reduce)').matches || (c && c.saveData)) return;
+            (window.PS = window.PS || {}).motionWanted = true;
             d.classList.add('has-motion');
             {%- if settings.motion_smooth_scroll %}
             d.classList.add('has-smooth');

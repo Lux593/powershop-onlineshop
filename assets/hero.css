@@ -151,7 +151,7 @@
 .hero__chip[aria-selected="true"]::after { transform: scaleX(1); }
 /* Bis hero.js den Zustand kennt (is-ready) keine volle Linie, sonst blitzt sie beim Laden auf */
 .has-motion .hero:not(.is-ready) .hero__chip[aria-selected="true"]::after { transform: scaleX(0); }
-.has-motion .hero.is-rotating .hero__chip[aria-selected="true"]::after {
+.hero.is-rotating .hero__chip[aria-selected="true"]::after { /* auch nach dem Failsafe: Rotation läuft dann weiter (hero.js) */
   transform: scaleX(var(--hero-p, 0)); /* hero.js zeichnet die Standzeit, ihr Ende wechselt den Slide */
   transition: none;
 }

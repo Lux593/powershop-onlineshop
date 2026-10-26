@@ -1,7 +1,7 @@
 /* ==========================================================================
    Power Shop – Hero (nur Startseite): Modell-Tabs, Film, Bildwechsel, Scroll-Effekte (Motion-API).
    Film: je Slide höchstens einer, nur der des aktiven Slides läuft (die anderen halten an ihrer Stelle an und laden erst,
-   wenn ihr Slide drankommt). Nach window.load plus Idle, nur im Bild und im sichtbaren Tab. Übersprungen bei saveData, 2G/3G, Reduced-Motion,
+   wenn ihr Slide drankommt). Nach window.load plus Idle, nur im Bild und im sichtbaren Tab. Übersprungen bei saveData, 2G, Reduced-Motion,
    im Editor und bei abgelehntem play() (iOS Low-Power): Poster plus Play-Taste. Pause-Taste = WCAG 2.2.2.
    ========================================================================== */
 (function () {
@@ -15,10 +15,14 @@
     var videos = slides.map(function (s) { return s.querySelector('.hero__video'); });
     var link = hero.querySelector('.hero__scroll');
     var con = navigator.connection || {};
-    var slow = con.saveData || /(^|-)[23]g$/.test(con.effectiveType || '');
-    var motion = PS.motion.enabled && !PS.prefersReducedMotion();
-    var rotate = motion && chips.length > 1; // endet mit dem ersten Tab-Klick
-    var paused = !motion || !!slow;          // ohne Bewegung startet die Seite pausiert
+    // Nur Datensparen und echtes 2G halten den Film an. Chrome schätzt effectiveType aus den Antwortzeiten: Mit 3G im Muster
+    // stoppte schon ein langsames CDN (nach einem Deploy) die Filme auch an schnellen Anschlüssen.
+    var slow = con.saveData || /(^|-)2g$/.test(con.effectiveType || '');
+    var motion = PS.motion.enabled && !PS.prefersReducedMotion(); // Bewegungsschicht (CSS-Animationen beim Modellwechsel)
+    // Film und Rotation: auch nach dem Failsafe, wenn die Skripte zu spät kamen (PS.filmsWanted, theme.js), dann eben später
+    var wanted = PS.filmsWanted();
+    var rotate = wanted && chips.length > 1; // endet mit dem ersten Tab-Klick
+    var paused = !wanted || !!slow;          // ohne Bewegung startet die Seite pausiert
     var seen = true, awake = false, cur = 0, auto = false;
     var began = !paused; // Fortschrittslinie läuft erst, wenn die Seite wirklich spielt: sonst steht sie bei 0 und der aktive Tab hat keinen Marker
     var hover = false, focus = false; // Maus über dem Text oder Tastaturfokus darin: Bildwechsel hält an, der Film läuft weiter
@@ -31,7 +35,7 @@
       hero.classList.toggle('is-rotating', rotate && began);
       loop();
       if (btn) {
-        btn.hidden = !videos.some(Boolean) && !motion; // Ken-Burns und Scroll-Linie laufen auch ohne Film (2.2.2)
+        btn.hidden = !videos.some(Boolean) && !wanted; // Rotation, Ken-Burns und Scroll-Linie laufen auch ohne Film (2.2.2)
         btn.setAttribute('aria-pressed', paused);
       }
       videos.forEach(function (v, k) { if (v) { if (k === cur && going()) play(v); else v.pause(); } });
