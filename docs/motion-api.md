@@ -191,11 +191,15 @@ Hero (sections/hero.liquid, assets/hero.js; nur Startseite, PS.on('[data-hero]')
                            Bewegung oder bei saveData/2G/3G startet die Seite pausiert. Im Theme-Editor wählt
                            shopify:block:select den Slide, shopify:section:unload räumt auf (auch Reduced-Motion zur
                            Laufzeit über PS.motion.track).
-  Scrub „Durchfahrt“       Nur mit PS.motion.scroll (PS.motion.add), über die Hero-Höhe: Film zoomt 1 → 1,4 und läuft 30 %
-                           langsamer als die Seite; die Textebene fliegt größer werdend weg (Scale 1,45, 40 px hoch, in der
-                           ersten Hälfte ausgeblendet, danach pointer-events: none); ab 30 % läuft das Bild über .hero__fade
-                           (Offwhite) ins Helle aus und geht in den Willkommensblock über. Tastaturfokus in der Textebene
-                           holt sie per :has(:focus-visible) zurück (hero.css; Mausfokus nach Tab-Klick nicht). Pause-Taste bleibt stehen, der Pfeil blendet aus.
+  Scrub „Band“             Nur mit PS.motion.scroll (PS.motion.add), ab 768 px, über die Hero-Höhe: Der Text zieht nach links
+                           hinaus wie beim Modellwechsel, in drei Ebenen (Headline am schnellsten, dann Unterzeile, dann Tabs;
+                           Wege auf 1440 px gedeckelt), die Textebene blendet aus (ab der Hälfte pointer-events: none). Der Film
+                           läuft 32 % langsamer als die Seite (nur Versatz, kein Zoom) und ab 40 % über .hero__fade (Offwhite)
+                           ins Helle aus, hinüber in den Willkommensblock. Nie Film oder Text skalieren: Zoom des laufenden Films
+                           und wachsende Schrift kosteten 32 statt 74 fps (docs/research/hero-scroll-performance.md). will-change
+                           in hero.css hält die bewegten Ebenen auf der Grafikkarte. Tastaturfokus in der Textebene holt sie und
+                           ihre Ebenen per :has(:focus-visible) zurück (hero.css; Mausfokus nach Tab-Klick nicht). Pause-Taste
+                           bleibt stehen, der Pfeil blendet aus.
   Weiter-Pfeil             .hero__scroll: mit JavaScript zeigt href auf die ID des ersten sichtbaren Elements nach dem Hero,
                            ohne JavaScript auf das Setting „scroll_target“ (Standard nach-hero, in index.json die Anker-ID
                            des Willkommensblocks, sections/statement.liquid).

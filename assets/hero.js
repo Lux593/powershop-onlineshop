@@ -183,28 +183,36 @@
     document.addEventListener('shopify:section:unload', function (e) { if (e.target.contains(hero)) off(); }, { signal: ac.signal });
     PS.motion.track(hero, off);
 
-    /* ---------------- Scrub (nur mit ScrollTrigger): Durchfahrt ----------------
-       Der Film zoomt nach vorn (1 auf 1,4) und läuft langsamer als die Seite (30 % nach unten; die freie Kante oben liegt
-       dabei immer schon außerhalb des Bildes). Die Textebene fliegt größer werdend weg (Scale 1,45, 40 px hoch, in der
-       ersten Hälfte ausgeblendet) und nimmt danach keine Klicks mehr an; Tastaturfokus darin holt sie zurück (hero.css).
-       Ab 30 % läuft das Bild ins Helle aus (.hero__fade) und geht in den hellen Willkommensblock darunter über.
-       Die Pause-Taste bleibt stehen, der Pfeil blendet beim Scrollen aus. force3D hält Film- und Textebene dauerhaft auf der
-       Grafikkarte; mit "auto" kamen sie erst beim Scroll-Beginn dorthin, das gab einen Ruck.
+    /* ---------------- Scrub (nur mit ScrollTrigger): Band ----------------
+       Der Text zieht beim Scrollen nach links aus dem Bild, wie beim Modellwechsel. Drei Ebenen mit eigener Geschwindigkeit
+       geben Tiefe: vorn die Headline am schnellsten, dahinter Unterzeile mit Preis und Buttons, hinten die Tabs. Die Wege
+       sind auf 1440 px Breite gedeckelt, sonst flöge die Unterzeile auf breiten Bildschirmen weiter als die Headline. Die
+       Textebene blendet dabei aus und nimmt ab der Hälfte keine Klicks mehr an; Tastaturfokus darin holt sie zurück (hero.css).
+       Der Film läuft langsamer als die Seite (32 % nach unten) und ab 40 % ins Helle aus (.hero__fade), hinüber in den hellen
+       Willkommensblock. Die Pause-Taste bleibt stehen, der Pfeil blendet beim Scrollen aus.
+       Nur Verschieben und Ausblenden, nie Skalieren: Ein Zoom des laufenden Films ließ Bilder ausfallen, und eine wachsende
+       Schrift musste der Browser in jedem Bild neu rastern (gemessen: 32 statt 74 fps, docs/research/hero-scroll-performance.md).
+       will-change in hero.css hält alle bewegten Ebenen von Anfang an auf der Grafikkarte.
        Handy (bis 767 px): kein Skript. Der Film steht als feste Ebene, der Hero ist sein Fenster und der Willkommensblock
        schiebt sich darüber (hero.css). Per Skript gesetzte Zoom- und Versatzwerte kamen auf dem iPhone ein Bild nach dem
        Scrollen und zitterten gegen die Seite. */
     PS.motion.add(hero, function (gsap) {
       var m = hero.querySelector('.hero__media'), f = hero.querySelector('.hero__fade'), c = hero.querySelector('.hero__caption');
+      var row = hero.querySelector('.hero__chips'), heads = hero.querySelectorAll('.hero__poster'), subs = hero.querySelectorAll('.hero__sub');
+      function reach(k) { return function () { return -k * Math.min(innerWidth, 1440); }; }
       var mm = gsap.matchMedia(); // wechselt beim Drehen oder Ändern der Fensterbreite die Variante und räumt die alte auf
       mm.add('(min-width: 768px)', function () {
         var tl = gsap.timeline({
           defaults: { ease: 'none', duration: 1, force3D: true },
-          scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: true }
+          scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: true, invalidateOnRefresh: true }
         });
-        tl.fromTo(m, { scale: 1, yPercent: 0 }, { scale: 1.4, yPercent: 30 }, 0)
-          .fromTo(c, { y: 0, scale: 1, opacity: 1 }, { y: -40, scale: 1.45, opacity: 0, duration: 0.5 }, 0)
+        tl.fromTo(m, { yPercent: 0 }, { yPercent: 32 }, 0)
+          .fromTo(heads, { x: 0 }, { x: reach(0.55), ease: 'power1.in', duration: 0.55 }, 0)
+          .fromTo(subs, { x: 0 }, { x: reach(0.38), ease: 'power1.in', duration: 0.55 }, 0.04)
+          .fromTo(row || [], { x: 0 }, { x: reach(0.24), ease: 'power1.in', duration: 0.55 }, 0.08)
+          .fromTo(c, { opacity: 1 }, { opacity: 0, ease: 'power1.in', duration: 0.6 }, 0)
           .set(c, { pointerEvents: 'none' }, 0.5)
-          .fromTo(f, { opacity: 0 }, { opacity: 1, duration: 0.6 }, 0.3);
+          .fromTo(f, { opacity: 0 }, { opacity: 1, duration: 0.55 }, 0.4);
         if (link) tl.fromTo(link, { opacity: 1 }, { opacity: 0, duration: 0.15 }, 0);
       });
       return function () { mm.revert(); };
