@@ -142,8 +142,8 @@
   <div data-pdp="bike" data-section-id="{{ section.id }}">
     <div class="container">
       <div class="pdp__crumbs">{{ breadcrumb_html }}</div>
-      <div class="pdp">
-        <div>
+      <div class="pdp pdp--bike">
+        <div class="pdp__media">
           {%- capture bike_badges -%}{% render 'bike-badge', zustand: zustand, status: status %}{%- endcapture -%}
           {% render 'pdp-gallery', product: product, wide: true, badges: bike_badges %}
         </div>
@@ -183,69 +183,71 @@
               <span><strong>Reserviert{% if reserved_until != blank %} bis {{ reserved_until | escape }}{% endif %}.</strong> Du kannst uns trotzdem kontaktieren – wir melden uns, falls das Bike wieder frei wird.</span>
             </div>
           {%- endif -%}
+        </div>
 
-          {%- capture reserve_note -%}
-            {%- if can_reserve -%}
-              <div class="reserve-note">
-                <strong>{% render 'icon', name: 'clock' %}Reservierung möglich</strong>
-                {%- if settings.reservation_hours > 0 and settings.reservation_fee > 0 -%}
-                  <p>{{ settings.reservation_hours }} h Reservierung gegen {{ settings.reservation_fee | times: 100 | money_without_trailing_zeros }} Gebühr – wird beim Kauf angerechnet, sonst erstattet.</p>
-                {%- endif -%}
-                <ol>
-                  <li>Wähle oben „Reservierung“ und schreib uns per WhatsApp oder E-Mail.</li>
-                  <li>Wir prüfen die Verfügbarkeit und senden dir einen Zahlungslink.</li>
-                  <li>Nach Zahlung ist das Bike für dich reserviert.</li>
-                </ol>
-              </div>
+        <div class="pdp-sections">
+          {%- if equipment.size > 0 -%}
+            {%- capture equip_body -%}
+              <ul class="equip">{%- for item in equipment -%}<li>{% render 'icon', name: 'check' %}{{ item | escape }}</li>{%- endfor -%}</ul>
+            {%- endcapture -%}
+            {% render 'accordion', title: 'Ausstattung & Extras', body: equip_body %}
+          {%- endif -%}
+
+          {%- capture spec_body -%}
+            <table class="spec-table" data-pdp-dynamic="bike-specs"><tbody>
+              <tr><th>Modellfamilie</th><td>{{ family | default: '–' | escape }}</td></tr>
+              <tr><th>Modell</th><td>{{ product.title | escape }}</td></tr>
+              <tr><th>Modelljahr</th><td>{{ year | default: '–' }}</td></tr>
+              <tr><th>Hubraum</th><td>{% if ccm != blank %}{% render 'number-de', value: ccm %} cm³{% else %}auf Anfrage{% endif %}</td></tr>
+              <tr><th>Leistung</th><td>{% if kw != blank %}{{ kw }} kW ({{ ps }} PS){% else %}auf Anfrage{% endif %}</td></tr>
+              <tr><th>Farbe</th><td>{{ color | default: '–' | escape }}</td></tr>
+              <tr><th>{% if from_price %}Modellcode{% else %}Fahrzeugnummer{% endif %}</th><td>{{ fzg_nr | default: '–' | escape }}</td></tr>
+            </tbody></table>
+          {%- endcapture -%}
+          {% render 'accordion', title: 'Technische Daten', body: spec_body %}
+
+          {%- capture history_body -%}
+            {%- if is_new_bike -%}
+              <p>Neufahrzeug mit voller Herstellergarantie.</p>
+            {%- else -%}
+              <ul>
+                <li>{% if owners == 0 %}Vorführfahrzeug aus unserem Haus{% elsif owners != blank %}{{ owners }} Vorbesitzer{% else %}Vorbesitzer auf Anfrage{% endif %}</li>
+                <li>Scheckheftgepflegt bei Harley-Davidson Vertragspartnern</li>
+                <li>Unfallfrei laut Vorbesitzer</li>
+                <li>Frische Inspektion vor Übergabe</li>
+              </ul>
             {%- endif -%}
           {%- endcapture -%}
-          {% render 'contact-box', anchor: 'kontakt', title: 'Interesse an diesem Bike?', topics: bike_topics, subject: bike_label, primary: true, extra: reserve_note %}
-        </div>
-      </div>
+          {% render 'accordion', title: 'Fahrzeughistorie', body: history_body %}
 
-      <div class="pdp-sections">
-        {%- if equipment.size > 0 -%}
-          {%- capture equip_body -%}
-            <ul class="equip">{%- for item in equipment -%}<li>{% render 'icon', name: 'check' %}{{ item | escape }}</li>{%- endfor -%}</ul>
+          {%- capture finance_body -%}
+            <p>Wir erstellen dir ein individuelles Finanzierungs- oder Leasingangebot – passend zu Anzahlung, Laufzeit und Schlussrate. Wähle in der Kontakt-Box „Finanzierung“ und schick uns deine Anfrage.</p>        {%- endcapture -%}
+          {% render 'accordion', title: 'Finanzierung', body: finance_body %}
+
+          {%- capture place_body -%}
+            <p>Besichtigung und Probefahrt im Power Shop{% if settings.address != blank %}, {{ settings.address | escape | newline_to_br }}{% endif %}. Der Kaufvertrag wird bei uns vor Ort abgeschlossen. Zulassung und Überführung übernehmen wir auf Wunsch.</p>
           {%- endcapture -%}
-          {% render 'accordion', title: 'Ausstattung & Extras', body: equip_body %}
-        {%- endif -%}
+          {% render 'accordion', title: 'Standort & Übergabe', body: place_body %}
+        </div>
 
-        {%- capture spec_body -%}
-          <table class="spec-table" data-pdp-dynamic="bike-specs"><tbody>
-            <tr><th>Modellfamilie</th><td>{{ family | default: '–' | escape }}</td></tr>
-            <tr><th>Modell</th><td>{{ product.title | escape }}</td></tr>
-            <tr><th>Modelljahr</th><td>{{ year | default: '–' }}</td></tr>
-            <tr><th>Hubraum</th><td>{% if ccm != blank %}{% render 'number-de', value: ccm %} cm³{% else %}auf Anfrage{% endif %}</td></tr>
-            <tr><th>Leistung</th><td>{% if kw != blank %}{{ kw }} kW ({{ ps }} PS){% else %}auf Anfrage{% endif %}</td></tr>
-            <tr><th>Farbe</th><td>{{ color | default: '–' | escape }}</td></tr>
-            <tr><th>{% if from_price %}Modellcode{% else %}Fahrzeugnummer{% endif %}</th><td>{{ fzg_nr | default: '–' | escape }}</td></tr>
-          </tbody></table>
-        {%- endcapture -%}
-        {% render 'accordion', title: 'Technische Daten', body: spec_body %}
-
-        {%- capture history_body -%}
-          {%- if is_new_bike -%}
-            <p>Neufahrzeug mit voller Herstellergarantie.</p>
-          {%- else -%}
-            <ul>
-              <li>{% if owners == 0 %}Vorführfahrzeug aus unserem Haus{% elsif owners != blank %}{{ owners }} Vorbesitzer{% else %}Vorbesitzer auf Anfrage{% endif %}</li>
-              <li>Scheckheftgepflegt bei Harley-Davidson Vertragspartnern</li>
-              <li>Unfallfrei laut Vorbesitzer</li>
-              <li>Frische Inspektion vor Übergabe</li>
-            </ul>
-          {%- endif -%}
-        {%- endcapture -%}
-        {% render 'accordion', title: 'Fahrzeughistorie', body: history_body %}
-
-        {%- capture finance_body -%}
-          <p>Wir erstellen dir ein individuelles Finanzierungs- oder Leasingangebot – passend zu Anzahlung, Laufzeit und Schlussrate. Wähle in der Kontakt-Box „Finanzierung“ und schick uns deine Anfrage.</p>        {%- endcapture -%}
-        {% render 'accordion', title: 'Finanzierung', body: finance_body %}
-
-        {%- capture place_body -%}
-          <p>Besichtigung und Probefahrt im Power Shop{% if settings.address != blank %}, {{ settings.address | escape | newline_to_br }}{% endif %}. Der Kaufvertrag wird bei uns vor Ort abgeschlossen. Zulassung und Überführung übernehmen wir auf Wunsch.</p>
-        {%- endcapture -%}
-        {% render 'accordion', title: 'Standort & Übergabe', body: place_body %}
+        <div class="pdp__contact">
+            {%- capture reserve_note -%}
+              {%- if can_reserve -%}
+                <div class="reserve-note">
+                  <strong>{% render 'icon', name: 'clock' %}Reservierung möglich</strong>
+                  {%- if settings.reservation_hours > 0 and settings.reservation_fee > 0 -%}
+                    <p>{{ settings.reservation_hours }} h Reservierung gegen {{ settings.reservation_fee | times: 100 | money_without_trailing_zeros }} Gebühr – wird beim Kauf angerechnet, sonst erstattet.</p>
+                  {%- endif -%}
+                  <ol>
+                    <li>Wähle oben „Reservierung“ und schreib uns per WhatsApp oder E-Mail.</li>
+                    <li>Wir prüfen die Verfügbarkeit und senden dir einen Zahlungslink.</li>
+                    <li>Nach Zahlung ist das Bike für dich reserviert.</li>
+                  </ol>
+                </div>
+              {%- endif -%}
+            {%- endcapture -%}
+            {% render 'contact-box', anchor: 'kontakt', title: 'Interesse an diesem Bike?', topics: bike_topics, subject: bike_label, primary: true, extra: reserve_note %}
+        </div>
       </div>
 
       {%- if app_blocks_html != blank -%}
@@ -273,32 +275,6 @@
         </section>
       {%- endif -%}
     </div>
-
-    {%- liquid
-      assign sticky_count = 0
-      if settings.phone != blank
-        assign sticky_count = sticky_count | plus: 1
-      endif
-      if settings.whatsapp != blank
-        assign sticky_count = sticky_count | plus: 1
-      endif
-      if settings.email != blank
-        assign sticky_count = sticky_count | plus: 1
-      endif
-    -%}
-    {%- if sticky_count > 0 -%}
-      <div class="sticky-contact" data-sticky-contact role="group" aria-label="Schnellkontakt" style="grid-template-columns:repeat({{ sticky_count }}, minmax(0, 1fr))">
-        {%- if settings.phone != blank -%}
-          <a class="btn btn--primary" href="{% render 'contact-href', kind: 'tel' %}">{% render 'icon', name: 'phone' %}Anrufen</a>
-        {%- endif -%}
-        {%- if settings.whatsapp != blank -%}
-          <a class="btn btn--outline-light" data-sticky="wa" href="{% render 'contact-href', kind: 'wa' %}" target="_blank" rel="noopener">{% render 'icon', name: 'message-circle' %}WhatsApp</a>
-        {%- endif -%}
-        {%- if settings.email != blank -%}
-          <a class="btn btn--outline-light" data-sticky="mail" href="{% render 'contact-href', kind: 'mail' %}">{% render 'icon', name: 'mail' %}E-Mail</a>
-        {%- endif -%}
-      </div>
-    {%- endif -%}
   </div>
 
 {%- comment -%} ===================== TEIL ===================== {%- endcomment -%}

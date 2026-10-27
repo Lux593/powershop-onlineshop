@@ -292,21 +292,28 @@
 .reserve-note ol { list-style: decimal; padding-left: 18px; display: grid; gap: 2px; }
 .reserved-banner { display: flex; gap: 12px; align-items: center; padding: 14px 16px; background: var(--c-muted); color: var(--c-white); font-size: var(--fs-small); }
 
-.sticky-contact { position: fixed; left: 0; right: 0; bottom: 0; z-index: 150; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 10px 12px calc(10px + env(safe-area-inset-bottom)); background: var(--c-black); border-top: 1px solid var(--c-steel); }
-.sticky-contact .btn { padding: 0 8px; min-height: 48px; min-width: 0; }
-/* Schmale Fenster: drei Schaltflächen teilen sich bei 320 px nur 280 px (1.4.10). Erst engere Abstände (Symbol und Text passen bis
-   etwa 345 px), darunter entfallen die Symbole, der Text bleibt */
-@media (max-width: 379px) {
-  .sticky-contact { gap: 6px; padding-inline: 8px; }
-  .sticky-contact .btn { padding: 0 4px; letter-spacing: 0.5px; }
-}
-@media (max-width: 344px) { .sticky-contact .btn .icon { display: none; } }
-@media (min-width: 1024px) { .sticky-contact { display: none; } }
-body.has-sticky-contact { padding-bottom: 72px; }
-@media (min-width: 1024px) { body.has-sticky-contact { padding-bottom: 0; } }
-
 .pdp-sections { max-width: 860px; }
 .pdp-sections .acc > summary { font-size: 20px; }
+/* Motorräder am Desktop: Die Abschnitte (Technische Daten …) stehen rechts unter den Eckdaten-Kacheln, die Kontakt-Box links
+   unter der Galerie und läuft beim Lesen mit (sticky). Mobil gilt die Reihenfolge im Code: Galerie, Infos, Abschnitte,
+   Kontakt-Box direkt über „Ähnliche Bikes“. Die Galerie überspannt Zeile 1 und 2: Ist sie höher als die Infos, geht der Rest
+   in Zeile 2, die Abschnitte rücken ohne Lücke unter die Kacheln und die Kontakt-Box beginnt in Zeile 3 direkt unter der
+   Galerie. Die letzte Zeile (1fr) nimmt den Überhang der höheren Spalte auf. */
+@media (min-width: 1024px) {
+  .pdp--bike { grid-template-rows: auto auto 1fr; row-gap: 0; }
+  .pdp--bike > .pdp__media { grid-column: 1; grid-row: 1 / span 2; }
+  .pdp--bike > .pdp__info { grid-column: 2; grid-row: 1; position: static; }
+  .pdp--bike > .pdp-sections { grid-column: 2; grid-row: 2 / span 2; margin-top: 32px; }
+  .pdp--bike > .pdp__contact { grid-column: 1; grid-row: 3; margin-top: 40px; position: sticky; top: calc(var(--header-offset) + 24px); }
+}
+/* Kontakt-Box der Motorräder am Desktop: Anrufen, WhatsApp und E-Mail nebeneinander, je eine gleich breite Spalte pro
+   vorhandenem Kanal. Die Nummer passt dann nicht mehr in den Anruf-Button und entfällt dort wie am Tablet; schmalere
+   Innenabstände, damit „WhatsApp“ auch bei 1024 px in seine Spalte passt. */
+@media (min-width: 1024px) {
+  .pdp__contact .contact-box__buttons { grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
+  .pdp__contact .contact-box__buttons .btn { padding-inline: 12px; }
+  .pdp__contact .contact-box__phone { display: none; }
+}
 
 /* Warenkorb-/Merkliste-Drawer */
 .line-item { display: grid; grid-template-columns: 88px minmax(0, 1fr); gap: 14px; padding-block: 16px; border-bottom: 1px solid var(--c-line); }
@@ -501,9 +508,7 @@ html:not(.has-motion) .bcard:hover .bcard__media img { transform: none; }
 @media (max-height: 480px) { .sticky-buy { display: none; } }
 /* Die feste Leiste darf fokussierte Elemente nicht verdecken (2.4.11): Scroll-Puffer, solange sie steht */
 @media (max-width: 1023px) and (min-height: 481px) { html:has(.sticky-buy.is-shown) { scroll-padding-bottom: calc(96px + env(safe-area-inset-bottom)); } }
-@media (max-width: 1023px) { html:has(.sticky-contact) { scroll-padding-bottom: calc(96px + env(safe-area-inset-bottom)); } }
 @keyframes ps-bar-in { from { translate: 0 100%; } }
-.has-motion .sticky-contact { animation: ps-bar-in 600ms var(--ease-out) 600ms backwards; }
 
 /* Warenkorb-Button: Fortschrittsband beim Senden, kurzes Aufblitzen und Icon-Sprung nach dem Hinzufügen (cart.js setzt .is-busy / .is-added) */
 .btn[data-buy] { position: relative; overflow: hidden; }

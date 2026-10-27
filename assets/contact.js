@@ -34,12 +34,6 @@
     var mail = box.querySelector('[data-cb="mail"]');
     if (wa) wa.href = 'https://wa.me/' + whatsapp + '?text=' + encodeURIComponent(message);
     if (mail) mail.href = 'mailto:' + email + '?subject=' + encodeURIComponent(subjectLine) + '&body=' + encodeURIComponent(message);
-
-    // Mobile Kontaktleiste spiegelt die Links der Haupt-Box
-    if (box.hasAttribute('data-primary')) {
-      document.querySelectorAll('[data-sticky="wa"]').forEach(function (a) { if (wa) a.href = wa.href; });
-      document.querySelectorAll('[data-sticky="mail"]').forEach(function (a) { if (mail) a.href = mail.href; });
-    }
   }
 
   // Öffnungsstatus aus den Zeiten, die der Server als Data-Attribute liefert

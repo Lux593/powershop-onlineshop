@@ -30,7 +30,7 @@ html:not(:has(.announce)) { --announce-h: 0px; }
    (Ausnahme von „nur transform, opacity, clip-path“): eine Transition auf der Variable würde in jedem Frame den ganzen Baum neu berechnen. */
 .site-header-wrap { transition: transform var(--t-med) var(--ease); }
 .site-header-wrap.is-away { transform: translateY(calc(-100% - env(safe-area-inset-top, 0px))); }
-.pdp__info, .shopify-section:has(> .service-subnav--sticky), .cart-page__summary { transition: top var(--t-med) var(--ease); }
+.pdp__info, .pdp__contact, .shopify-section:has(> .service-subnav--sticky), .cart-page__summary { transition: top var(--t-med) var(--ease); }
 
 /* Überlagerung über dem Hero (body[data-header-overlay], nur Startseite): oben transparent mit weichem Verlauf für die Lesbarkeit,
    nach etwa 40 px Scroll schwarz mit Blur (header.js setzt is-solid). Der transparente Zustand steht im CSS: kein schwarzer Blitz

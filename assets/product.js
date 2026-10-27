@@ -431,8 +431,7 @@
       }
     }
 
-    /* ---------- Mobile Kontaktleiste (Motorräder) ---------- */
-    if ($('[data-sticky-contact]')) document.body.classList.add('has-sticky-contact');
+    /* ---------- Sprung zur Kontakt-Box (Motorräder) ---------- */
     if (window.location.hash === '#kontakt') {
       setTimeout(function () {
         var box = document.getElementById('kontakt');
