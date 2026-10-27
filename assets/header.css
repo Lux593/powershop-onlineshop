@@ -277,6 +277,36 @@ html:not(:has(.announce)) { --announce-h: 0px; }
 .mobile-menu__sub > summary .icon { width: 18px; height: 18px; flex: none; transition: transform var(--t-fast); }
 .mobile-menu__sub[open] > summary .icon { transform: rotate(45deg); }
 .mobile-menu__links { padding: 0 0 8px 14px; }
+/* Ebene 2 als Bildstreifen (Einstellung „Handy-Menü: Kacheln mit Bild“): das Foto der Megamenü-Kachel (.mega-tile__img) über die
+   volle Breite, Titel unten links auf dem Verlauf. Geschlossen gedämpft, die offene Gruppe in voller Farbe mit orangem Strich wie
+   im Megamenü; ihre Links stehen eingerückt darunter. Ohne Foto bleibt der Streifen anthrazit. */
+.mobile-menu .acc__body .mobile-tile {
+  position: relative; isolation: isolate; overflow: hidden;
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 16px;
+  min-height: 96px; margin-bottom: 8px; padding: 14px 16px;
+  background: var(--c-anthracite); color: var(--c-white);
+  font-family: var(--f-head); font-weight: 700; font-size: 20px; line-height: 1.05; letter-spacing: 0.04em; text-transform: uppercase;
+}
+.mobile-tile .mega-tile__img { filter: brightness(0.6) saturate(0.75); }
+.mobile-tile::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(to top, rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0) 75%); }
+.mobile-tile::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--c-orange);
+  transform: scaleX(0); transform-origin: left; transition: transform var(--t-med) var(--ease-out);
+}
+.mobile-tile__title { min-width: 0; text-wrap: balance; }
+.mobile-tile > .icon { flex: none; width: 18px; height: 18px; }
+.mobile-menu__sub[open] > .mobile-tile .mega-tile__img { filter: brightness(0.9) saturate(1); }
+.mobile-menu__sub[open] > .mobile-tile::after { transform: scaleX(1); }
+.mobile-menu__sub[open] > .mobile-tile .icon { transform: rotate(180deg); }
+/* Ausklappen: die Einträge blenden von leicht unten ein, gestaffelt über --i (sections/header.liquid) wie die Links im Megamenü;
+   die Streifen eines Hauptpunkts weiter auseinander als die Links einer Gruppe. Die Animation hängt an [open]: beim Zuklappen fällt
+   sie weg, beim nächsten Aufklappen läuft sie neu. Bei reduzierter Bewegung erscheinen die Einträge sofort (ohne Verzögerung). */
+@keyframes menu-item-in { from { opacity: 0; transform: translateY(8px); } }
+.mobile-menu .acc[open] > .acc__body > * { animation: menu-item-in var(--t-med) var(--ease-out) calc(var(--i, 0) * 45ms + 40ms) both; }
+.mobile-menu__sub[open] > .mobile-menu__links > a { animation: menu-item-in var(--t-med) var(--ease-out) calc(var(--i, 0) * 18ms + 40ms) both; }
+@media (prefers-reduced-motion: reduce) {
+  .mobile-menu .acc[open] > .acc__body > *, .mobile-menu__sub[open] > .mobile-menu__links > a { animation: none; }
+}
 .mobile-menu__direct { display: flex; align-items: center; justify-content: space-between; padding: 0 24px; min-height: 68px; border-top: 1px solid var(--c-steel); font-family: var(--f-head); font-weight: 700; font-size: 22px; text-transform: uppercase; }
 .mobile-menu__direct--sale { color: var(--c-orange); }
 .mobile-menu__foot { padding: 24px; display: grid; gap: 12px; border-top: 1px solid var(--c-steel); }

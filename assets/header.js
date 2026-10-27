@@ -79,13 +79,22 @@
       });
     });
 
-    // Das geschlossene Menü rendert nicht (header.css): seine lazy Bilder laden nicht von selbst. Nach Load plus Idle holen, nur wo das
-    // Menü existiert (Desktop) und ohne Datensparen; ein Hover davor lädt sie ohnehin sofort.
+    // Das geschlossene Menü rendert nicht (header.css): seine lazy Bilder laden nicht von selbst. Nach Load plus Idle holen, ohne
+    // Datensparen; ein Hover davor lädt sie ohnehin sofort. Ohne Megamenü (Handy) dieselben Fotos für die Bildstreifen im Handy-Menü:
+    // in der geschlossenen Schublade und zugeklappten Gruppen kämen sie sonst erst beim Aufklappen. Ein Tipp aufs Menü-Symbol holt
+    // sie auch bei Datensparen, bevor die erste Gruppe aufgeht.
+    var drawer = document.getElementById('mobile-menu');
+    function eager(scope) {
+      if (scope) scope.querySelectorAll('img[loading="lazy"]').forEach(function (img) { img.loading = 'eager'; });
+    }
     function warm() {
       var con = navigator.connection || {};
-      if (con.saveData || /(^|-)[23]g$/.test(con.effectiveType || '') || !items.length || !items[0].getClientRects().length) return;
-      header.querySelectorAll('.mega img[loading="lazy"]').forEach(function (img) { img.loading = 'eager'; });
+      if (con.saveData || /(^|-)[23]g$/.test(con.effectiveType || '')) return;
+      if (items.length && items[0].getClientRects().length) header.querySelectorAll('.mega').forEach(eager);
+      else eager(drawer);
     }
+    var burger = header.querySelector('[data-open="mobile-menu"]');
+    if (burger) ['pointerdown', 'click'].forEach(function (type) { burger.addEventListener(type, function () { eager(drawer); }); });
     function later() { (window.requestIdleCallback || function (f) { setTimeout(f, 300); })(warm, { timeout: 3000 }); }
     if (document.readyState === 'complete') later();
     else window.addEventListener('load', later, { once: true, signal: ctrl.signal });

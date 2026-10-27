@@ -1,5 +1,10 @@
 {%- liquid
   assign menu = linklists[section.settings.menu]
+  comment
+    Bildstreifen im Handy-Menü: so breit wie der Inhalt der Schublade (höchstens 440 px, je 24 px Rand)
+  endcomment
+  assign tiles = section.settings.mobile_tiles
+  assign tile_sizes = '(min-width: 440px) 392px, calc(100vw - 48px)'
 -%}
 
 <header class="site-header" id="top" data-header>
@@ -101,6 +106,9 @@
           Hauptpunkte, darin Ebene 3 in derselben Reihenfolge (snippets/link-order.liquid); Ebene 2 ohne Unterpunkte =
           Gruppentitel als Link. „Alle …“ steht sichtbar unter den Gruppen (der Hauptpunkt selbst klappt hier nur auf), bei
           einer Seite wie Service heißt der Link „Service im Überblick“. Ohne Gruppen bilden alle Ebene-2-Punkte eine Liste.
+          Mit „Handy-Menü: Kacheln mit Bild“ ist jeder Ebene-2-Punkt ein Bildstreifen mit dem Foto seiner Megamenü-Kachel:
+          Gruppen klappen ihre Links darunter auf, Punkte ohne Unterpunkte sind Links mit Pfeil (auch ohne Gruppen, wie das
+          Raster im Megamenü).
         {%- endcomment -%}
         {%- liquid
           assign has_groups = false
@@ -119,32 +127,59 @@
         <details class="acc">
           <summary>{{ link.title | escape }}{% render 'icon', name: 'plus' %}</summary>
           <div class="acc__body">
-            {%- if has_groups -%}
-              {%- for group in link.links -%}
-                {%- if group.links.size == 0 -%}
-                  <a class="mobile-menu__group" href="{{ group.url }}">{{ group.title | escape }}</a>
+            {%- for group in link.links -%}
+              {%- liquid
+                assign tile_block = nil
+                if tiles
+                  assign group_key = group.title | handleize
+                  for block in section.blocks
+                    if block.type == 'tile'
+                      assign parent_key = block.settings.parent | handleize
+                      assign block_group = block.settings.group | handleize
+                      if parent_key == link.handle and block_group == group_key
+                        assign tile_block = block
+                        break
+                      endif
+                    endif
+                  endfor
+                endif
+              -%}
+              {%- if group.links.size == 0 -%}
+                {%- if tiles -%}
+                  <a class="mobile-tile" href="{{ group.url }}" style="--i: {{ forloop.index0 }}">
+                    {%- render 'mega-tile-media', block: tile_block, sizes: tile_sizes -%}
+                    <span class="mobile-tile__title">{{ group.title | escape }}</span>
+                    {%- render 'icon', name: 'arrow-right' -%}
+                  </a>
+                {%- elsif has_groups -%}
+                  <a class="mobile-menu__group" href="{{ group.url }}" style="--i: {{ forloop.index0 }}">{{ group.title | escape }}</a>
                 {%- else -%}
-                  {%- capture order -%}{% render 'link-order', group: group, keep: section.settings.keep_order %}{%- endcapture -%}
-                  {%- assign order = order | split: ',' -%}
-                  <details class="mobile-menu__sub">
-                    <summary class="mobile-menu__group">{{ group.title | escape }}{% render 'icon', name: 'plus' %}</summary>
-                    <div class="mobile-menu__links">
-                      {%- for position in order -%}
-                        {%- assign index = position | plus: 0 -%}
-                        {%- assign child = group.links[index] -%}
-                        <a href="{{ child.url }}">{{ child.title | escape }}</a>
-                      {%- endfor -%}
-                    </div>
-                  </details>
+                  <a href="{{ group.url }}" style="--i: {{ forloop.index0 }}">{{ group.title | escape }}</a>
                 {%- endif -%}
-              {%- endfor -%}
-              <a href="{{ link.url }}"><strong>{{ overview_label | escape }}</strong></a>
-            {%- else -%}
-              {%- for child in link.links -%}
-                <a href="{{ child.url }}">{{ child.title | escape }}</a>
-              {%- endfor -%}
-              <a href="{{ link.url }}"><strong>{{ overview_label | escape }}</strong></a>
-            {%- endif -%}
+              {%- else -%}
+                {%- capture order -%}{% render 'link-order', group: group, keep: section.settings.keep_order %}{%- endcapture -%}
+                {%- assign order = order | split: ',' -%}
+                <details class="mobile-menu__sub" style="--i: {{ forloop.index0 }}">
+                  {%- if tiles -%}
+                    <summary class="mobile-tile">
+                      {%- render 'mega-tile-media', block: tile_block, sizes: tile_sizes -%}
+                      <span class="mobile-tile__title">{{ group.title | escape }}</span>
+                      {%- render 'icon', name: 'chevron-down' -%}
+                    </summary>
+                  {%- else -%}
+                    <summary class="mobile-menu__group">{{ group.title | escape }}{% render 'icon', name: 'plus' %}</summary>
+                  {%- endif -%}
+                  <div class="mobile-menu__links">
+                    {%- for position in order -%}
+                      {%- assign index = position | plus: 0 -%}
+                      {%- assign child = group.links[index] -%}
+                      <a href="{{ child.url }}" style="--i: {{ forloop.index0 }}">{{ child.title | escape }}</a>
+                    {%- endfor -%}
+                  </div>
+                </details>
+              {%- endif -%}
+            {%- endfor -%}
+            <a href="{{ link.url }}" style="--i: {{ link.links.size }}"><strong>{{ overview_label | escape }}</strong></a>
           </div>
         </details>
       {%- else -%}
@@ -182,6 +217,13 @@
       "label": "Gruppen in eigener Reihenfolge",
       "default": "Fahrzeuge, Modellfamilien, Kollektionen",
       "info": "Die Links einer Gruppe (Ebene 3) stehen alphabetisch. Gruppen, deren Titel hier steht (kommagetrennt), behalten die Reihenfolge aus der Shopify-Navigation."
+    },
+    {
+      "type": "checkbox",
+      "id": "mobile_tiles",
+      "label": "Handy-Menü: Kacheln mit Bild",
+      "default": true,
+      "info": "Die Gruppen (Ebene 2) erscheinen im Handy-Menü als Bildstreifen mit den Fotos aus den Blöcken „Megamenü: Kachelbild“. Aus: Gruppen als Textzeilen."
     },
     {
       "type": "link_list",
