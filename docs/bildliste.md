@@ -102,12 +102,13 @@ Die gesamte Liste der offenen Händlerfreigaben steht in [`freigaben.md`](freiga
 
 Fotos des Händlers aus `pics_to_use/custom-*` (iPhone, 26./27.10.2026). Je Foto WebP in mehreren Breiten, ohne Metadaten (GPS und Gerät
 entfernt): Querformat 720 / 1280 / 1920 px, Hochformat 720 / 1080 / 1440 px, nie größer als das Original. Name: `umbau-<umbau>-<nr>-<breite>.webp`.
-Eingesetzt in `templates/page.werkstatt.json` (Blöcke „Umbau-Bild“; `umbau-falk-2` auch im Seitenkopf und auf der Werkstatt-Tür der Service-Seite). Im Theme-Editor lässt sich jedes Foto durch ein hochgeladenes Bild ersetzen,
+Eingesetzt in `templates/page.werkstatt.json` (Blöcke „Umbau-Bild“; `umbau-falk-2` nicht mehr im Umbau, aber auf der Werkstatt-Kachel der Startseite und der Werkstatt-Tür der Service-Seite). Im Theme-Editor lässt sich jedes Foto durch ein hochgeladenes Bild ersetzen,
 dann liefert das Shopify-CDN die Größen selbst.
 
 | Umbau | Fotos (Nr.) | Größte Datei | Hinweis |
 |---|---|---|---|
-| Falk | 1–4 | 1920 bzw. 1440 px | Nr. 3 und 4 waren ungedreht gespeichert, gedreht. Nr. 3: Kennzeichen teilweise lesbar, Nr. 2: Person im Bild (Freigabe offen) |
+| Falk | 1–7 | 1920 bzw. 1440 px | Nr. 3 und 4 waren ungedreht gespeichert, gedreht. Nr. 3: Kennzeichen teilweise lesbar. Nr. 2: Person im Bild, deshalb nicht mehr im Umbau-Eintrag (nur noch Startseite, Service-Tür). Nr. 5–7: Kamera-Fotos aus ~/Downloads/custom-falk (5584 × 8368 bzw. 8368 × 5584), WebP Qualität 80 |
 | Low Rider ST | 1–4 | 1440 / 1600 / 1080 / 1080 px | Nr. 3 und 4 sind Instagram-Exporte mit 1080 px; Originale vom Handy wären schärfer |
 | Police | 1–4 | 1440 bzw. 1920 px | Nr. 1 und 4 waren ungedreht gespeichert, gedreht |
 | Breakout | 1–4 | 1920 bzw. 1440 px | |
+| Franzi | 1–6 | 1920 bzw. 1440 px | Kamera-Fotos aus `~/Downloads/custom-franzi` (7008 × 4672, Nr. 3: 5584 × 8368), WebP Qualität 80. Basis-Modell und Umbau-Tabelle aus den Fotos abgeleitet, Bestätigung durch den Händler offen |

@@ -50,16 +50,6 @@
                 "asset_height": 1440
               }
             },
-            "falk-bild-2": {
-              "type": "build-photo",
-              "settings": {
-                "alt": "Derselbe Chopper in einer Lagerhalle zwischen orange leuchtenden Lichtstäben, daneben ein Mann",
-                "asset": "umbau-falk-2-1920.webp",
-                "asset_srcset": "umbau-falk-2-720.webp 720w, umbau-falk-2-1280.webp 1280w, umbau-falk-2-1920.webp 1920w",
-                "asset_width": 1920,
-                "asset_height": 1280
-              }
-            },
             "falk-bild-3": {
               "type": "build-photo",
               "settings": {
@@ -79,13 +69,45 @@
                 "asset_width": 1440,
                 "asset_height": 1920
               }
+            },
+            "falk-bild-5": {
+              "type": "build-photo",
+              "settings": {
+                "alt": "Heck des Choppers mit verchromtem Doppelrohr-Auspuff und braunem Solo-Sitz in der Werkstatthalle",
+                "asset": "umbau-falk-5-1440.webp",
+                "asset_srcset": "umbau-falk-5-720.webp 720w, umbau-falk-5-1080.webp 1080w, umbau-falk-5-1440.webp 1440w",
+                "asset_width": 1440,
+                "asset_height": 2158
+              }
+            },
+            "falk-bild-6": {
+              "type": "build-photo",
+              "settings": {
+                "alt": "Hinterrad mit Speichen und schwarzem Kotflügel, davor die Enden der verchromten Auspuffrohre",
+                "asset": "umbau-falk-6-1440.webp",
+                "asset_srcset": "umbau-falk-6-720.webp 720w, umbau-falk-6-1080.webp 1080w, umbau-falk-6-1440.webp 1440w",
+                "asset_width": 1440,
+                "asset_height": 2158
+              }
+            },
+            "falk-bild-7": {
+              "type": "build-photo",
+              "settings": {
+                "alt": "Luftfilterdeckel mit Power-Shop-Schriftzug, dahinter die verchromten Auspuffrohre",
+                "asset": "umbau-falk-7-1920.webp",
+                "asset_srcset": "umbau-falk-7-720.webp 720w, umbau-falk-7-1280.webp 1280w, umbau-falk-7-1920.webp 1920w",
+                "asset_width": 1920,
+                "asset_height": 1282
+              }
             }
           },
           "block_order": [
             "falk-bild-1",
-            "falk-bild-2",
             "falk-bild-3",
-            "falk-bild-4"
+            "falk-bild-4",
+            "falk-bild-5",
+            "falk-bild-6",
+            "falk-bild-7"
           ]
         },
         "lowrider-st": {
@@ -361,6 +383,91 @@
             "heritage-bild-5",
             "heritage-bild-4"
           ]
+        },
+        "franzi": {
+          "type": "build",
+          "settings": {
+            "name": "Project Franzi",
+            "base": "Sportster Forty-Eight",
+            "intro": "Schwarz, kompakt und mit hohem Lenker: Die Sportster Forty-Eight bekam einen Ape-Hanger, Weißwandreifen auf den schwarzen Gussrädern und einen Luftfilterdeckel mit Power-Shop-Schriftzug. Dazu der schwarze Tank mit rotem Emblem und viel Chrom am Auspuff.",
+            "specs": "Lenker: Ape-Hanger in Schwarz\nRäder: Schwarze Gussräder mit Weißwandreifen\nLuftfilter: Deckel mit Power-Shop-Schriftzug\nLack: Schwarz mit rotem Harley-Davidson-Emblem am Tank\nAuspuff: Doppelrohr in Chrom\nSitz: Sitz mit Rückenlehne",
+            "cta_label": "Ähnlichen Umbau anfragen",
+            "cta_target": "#termin",
+            "cover_asset": "umbau-franzi-3-1080.webp",
+            "cover_position": "50% 55%",
+            "cover_mobile_asset": "umbau-franzi-1-1280.webp",
+            "cover_mobile_position": "50% 60%"
+          },
+          "blocks": {
+            "franzi-bild-1": {
+              "type": "build-photo",
+              "settings": {
+                "alt": "Schwarze Sportster mit hohem Lenker und Weißwandreifen in einer Lagerhalle, orange Lichtstäbe und Regale mit Kartons dahinter",
+                "asset": "umbau-franzi-1-1920.webp",
+                "asset_srcset": "umbau-franzi-1-720.webp 720w, umbau-franzi-1-1280.webp 1280w, umbau-franzi-1-1920.webp 1920w",
+                "asset_width": 1920,
+                "asset_height": 1280
+              }
+            },
+            "franzi-bild-2": {
+              "type": "build-photo",
+              "settings": {
+                "alt": "Die Sportster von schräg hinten: Sitz mit Rückenlehne, Luftfilterdeckel mit Power-Shop-Schriftzug und Auspuff in Chrom",
+                "asset": "umbau-franzi-2-1440.webp",
+                "asset_srcset": "umbau-franzi-2-720.webp 720w, umbau-franzi-2-1080.webp 1080w, umbau-franzi-2-1440.webp 1440w",
+                "asset_width": 1440,
+                "asset_height": 2160
+              }
+            },
+            "franzi-bild-3": {
+              "type": "build-photo",
+              "settings": {
+                "alt": "Die Sportster von vorn mit hohem schwarzem Lenker und runden Spiegeln, Regale mit Kartons dahinter",
+                "asset": "umbau-franzi-3-1440.webp",
+                "asset_srcset": "umbau-franzi-3-720.webp 720w, umbau-franzi-3-1080.webp 1080w, umbau-franzi-3-1440.webp 1440w",
+                "asset_width": 1440,
+                "asset_height": 2158
+              }
+            },
+            "franzi-bild-4": {
+              "type": "build-photo",
+              "settings": {
+                "alt": "Motor, Luftfilterdeckel und Chrom-Auspuff der Sportster von der Seite, hinten Weißwandreifen",
+                "asset": "umbau-franzi-4-1920.webp",
+                "asset_srcset": "umbau-franzi-4-720.webp 720w, umbau-franzi-4-1280.webp 1280w, umbau-franzi-4-1920.webp 1920w",
+                "asset_width": 1920,
+                "asset_height": 1280
+              }
+            },
+            "franzi-bild-5": {
+              "type": "build-photo",
+              "settings": {
+                "alt": "Gabel und leuchtender Scheinwerfer der Sportster, dahinter der schwarze Tank mit rotem Emblem",
+                "asset": "umbau-franzi-5-1440.webp",
+                "asset_srcset": "umbau-franzi-5-720.webp 720w, umbau-franzi-5-1080.webp 1080w, umbau-franzi-5-1440.webp 1440w",
+                "asset_width": 1440,
+                "asset_height": 2160
+              }
+            },
+            "franzi-bild-6": {
+              "type": "build-photo",
+              "settings": {
+                "alt": "Schwarzer Tank mit rotem Harley-Davidson-Emblem und Luftfilterdeckel mit Power-Shop-Schriftzug, orange Lichtstäbe im Hintergrund",
+                "asset": "umbau-franzi-6-1920.webp",
+                "asset_srcset": "umbau-franzi-6-720.webp 720w, umbau-franzi-6-1280.webp 1280w, umbau-franzi-6-1920.webp 1920w",
+                "asset_width": 1920,
+                "asset_height": 1280
+              }
+            }
+          },
+          "block_order": [
+            "franzi-bild-1",
+            "franzi-bild-2",
+            "franzi-bild-3",
+            "franzi-bild-4",
+            "franzi-bild-5",
+            "franzi-bild-6"
+          ]
         }
       },
       "block_order": [
@@ -368,6 +475,7 @@
         "falk",
         "lowrider-st",
         "breakout",
+        "franzi",
         "police"
       ]
     },
