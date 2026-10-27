@@ -26,7 +26,7 @@
         "tile_teile_komfort": { "type": "tile", "settings": { "parent": "Teile & Zubehör", "group": "Komfort & Touring", "image_asset": "mega-teile-komfort.webp", "focus": "center" } },
         "tile_teile_optik": { "type": "tile", "settings": { "parent": "Teile & Zubehör", "group": "Optik & Custom", "image_asset": "mega-teile-optik.webp", "focus": "center" } },
         "tile_teile_technik": { "type": "tile", "settings": { "parent": "Teile & Zubehör", "group": "Technik & Pflege", "image_asset": "mega-teile-technik.webp", "focus": "center" } },
-        "tile_acc_mode": { "type": "tile", "settings": { "parent": "Accessoires", "group": "Mode-Accessoires", "image_asset": "sportster-s-poster.webp", "focus": "center" } },
+        "tile_acc_mode": { "type": "tile", "settings": { "parent": "Accessoires", "group": "Mode-Accessoires", "image_asset": "mega-accessoires-mode.webp", "focus": "center" } },
         "tile_acc_zuhause": { "type": "tile", "settings": { "parent": "Accessoires", "group": "Zuhause & Garage", "image_asset": "bento-accessoires-eiskuebel.jpg", "focus": "center" } },
         "tile_acc_extras": { "type": "tile", "settings": { "parent": "Accessoires", "group": "Biker-Extras & Geschenke", "image_asset": "bento-teile.jpg", "focus": "center" } },
         "tile_service_werkstatt": { "type": "tile", "settings": { "parent": "Service", "group": "Werkstatt", "image_asset": "mega-service-werkstatt.webp", "focus": "center" } },
