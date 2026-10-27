@@ -1,0 +1,70 @@
+{%- comment -%}
+  Werkstatt-Leistungen: Überschrift, Einleitung, Leistungen als Info-Felder (Desktop Liste, Handy 2 × 2 Kacheln im Raster der
+  Startseiten-Kacheln, ohne Link) und die Termin-Box (snippets/contact-box, Anker #termin). Styles in assets/pages.css.
+{%- endcomment -%}
+<section class="workshop-services" aria-labelledby="ws-title-{{ section.id }}">
+  <div class="container workshop-services__grid">
+    <div>
+      <h2 id="ws-title-{{ section.id }}">{{ section.settings.heading | escape }}</h2>
+      {%- if section.settings.intro != blank -%}<p class="workshop-services__intro">{{ section.settings.intro | escape }}</p>{%- endif -%}
+      {%- if section.blocks.size > 0 -%}
+        <div class="workshop-services__list">
+          {%- for block in section.blocks -%}
+            <div class="workshop-services__item" {{ block.shopify_attributes }}>
+              {% render 'icon', name: block.settings.icon %}
+              <h3>{{ block.settings.title | escape }}</h3>
+              {%- if block.settings.text != blank -%}<p>{{ block.settings.text | escape }}</p>{%- endif -%}
+            </div>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    </div>
+    {% render 'contact-box',
+      anchor: 'termin',
+      title: section.settings.contact_title,
+      intro: section.settings.contact_intro,
+      topics: 'werkstatt,einbau,frage',
+      topic: 'werkstatt'
+    %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Werkstatt-Leistungen",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Überschrift", "default": "Was die Werkstatt für dich macht" },
+    { "type": "textarea", "id": "intro", "label": "Einleitung" },
+    { "type": "text", "id": "contact_title", "label": "Termin-Box: Überschrift", "default": "Werkstatt-Termin anfragen" },
+    { "type": "text", "id": "contact_intro", "label": "Termin-Box: Text", "default": "Schreib uns per WhatsApp oder E-Mail, oder ruf einfach an. Wir melden uns mit einem Termin." }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Leistung",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Symbol",
+          "options": [
+            { "value": "gauge", "label": "Tacho" },
+            { "value": "wrench", "label": "Schlüssel" },
+            { "value": "palette", "label": "Farbpalette" },
+            { "value": "badge-check", "label": "Siegel" },
+            { "value": "shield-check", "label": "Schild" },
+            { "value": "cog", "label": "Zahnrad" },
+            { "value": "bike", "label": "Motorrad" },
+            { "value": "calendar-check", "label": "Kalender" },
+            { "value": "clock", "label": "Uhr" }
+          ],
+          "default": "wrench"
+        },
+        { "type": "text", "id": "title", "label": "Titel", "default": "Leistung" },
+        { "type": "textarea", "id": "text", "label": "Text" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Werkstatt-Leistungen" }]
+}
+{% endschema %}

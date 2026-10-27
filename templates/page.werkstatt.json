@@ -1,0 +1,333 @@
+{
+  "sections": {
+    "subnav": {
+      "type": "service-subnav",
+      "settings": {
+        "menu": "main-menu",
+        "parent": "Service",
+        "scheme": "dark"
+      }
+    },
+    "main": {
+      "type": "build-book",
+      "settings": {
+        "heading": "Werkstatt",
+        "intro": "Custom-Umbauten aus unserer Meisterwerkstatt. Wähl einen Umbau, um alle Bilder und Details zu sehen."
+      },
+      "blocks": {
+        "falk": {
+          "type": "build",
+          "settings": {
+            "name": "Falk",
+            "base": "Softail Standard",
+            "intro": "Ein Chopper mit allem, was dazugehört: hoher Ape-Hanger, viel Chrom an der Front und ein Tank mit orangen Flammen. Aufgebaut auf einer Softail Standard und reduziert auf das, was zählt.",
+            "specs": "Lenker: Ape-Hanger\nLack: Tank mit Flammen in Orange\nAuspuff: Doppelrohr in Chrom\nRäder: Speichenräder vorn und hinten\nSitz: Solo-Sitz",
+            "cta_label": "Ähnlichen Umbau anfragen",
+            "cta_target": "#termin",
+            "cover_asset": "umbau-falk-4-1080.webp",
+            "cover_position": "50% 60%",
+            "cover_mobile_asset": "umbau-falk-1-1280.webp",
+            "cover_mobile_position": "50% 62%"
+          },
+          "blocks": {
+            "falk-bild-1": {
+              "type": "build-photo",
+              "settings": {
+                "alt": "Chopper mit orangem Flammen-Tank und hohem Lenker vor einer Backsteinwand mit Graffiti",
+                "asset": "umbau-falk-1-1920.webp",
+                "asset_srcset": "umbau-falk-1-720.webp 720w, umbau-falk-1-1280.webp 1280w, umbau-falk-1-1920.webp 1920w",
+                "asset_width": 1920,
+                "asset_height": 1440
+              }
+            },
+            "falk-bild-2": {
+              "type": "build-photo",
+              "settings": {
+                "alt": "Derselbe Chopper in einer Lagerhalle zwischen orange leuchtenden Lichtstäben, daneben ein Mann",
+                "asset": "umbau-falk-2-1920.webp",
+                "asset_srcset": "umbau-falk-2-720.webp 720w, umbau-falk-2-1280.webp 1280w, umbau-falk-2-1920.webp 1920w",
+                "asset_width": 1920,
+                "asset_height": 1280
+              }
+            },
+            "falk-bild-3": {
+              "type": "build-photo",
+              "settings": {
+                "alt": "Vorderrad und verchromte Gabel des Choppers aus der Froschperspektive",
+                "asset": "umbau-falk-3-1440.webp",
+                "asset_srcset": "umbau-falk-3-720.webp 720w, umbau-falk-3-1080.webp 1080w, umbau-falk-3-1440.webp 1440w",
+                "asset_width": 1440,
+                "asset_height": 1920
+              }
+            },
+            "falk-bild-4": {
+              "type": "build-photo",
+              "settings": {
+                "alt": "Chopper von schräg vorn, langer Lenker und Speichenrad vor dem Backsteingebäude",
+                "asset": "umbau-falk-4-1440.webp",
+                "asset_srcset": "umbau-falk-4-720.webp 720w, umbau-falk-4-1080.webp 1080w, umbau-falk-4-1440.webp 1440w",
+                "asset_width": 1440,
+                "asset_height": 1920
+              }
+            }
+          },
+          "block_order": [
+            "falk-bild-1",
+            "falk-bild-2",
+            "falk-bild-3",
+            "falk-bild-4"
+          ]
+        },
+        "lowrider-st": {
+          "type": "build",
+          "settings": {
+            "name": "Low Rider ST",
+            "base": "Low Rider ST",
+            "intro": "Schwarz und Gold, sonst nichts. Die Low Rider ST bekam eine Lackierung mit goldenen Streifen, goldene Felgen, Koffer im selben Design und den Power-Shop-Schriftzug auf der Scheibe.",
+            "specs": "Lack: Schwarz mit goldenen Streifen\nSchriftzug: Harley-Davidson in Gold\nScheibe: Power-Shop-Schriftzug\nFelgen: Gold\nKoffer: Im Lack-Design\nAuspuff: Schwarzer Endtopf",
+            "cta_label": "Ähnlichen Umbau anfragen",
+            "cta_target": "#termin",
+            "cover_asset": "umbau-lowrider-st-3-1080.webp",
+            "cover_position": "50% 62%",
+            "cover_mobile_asset": "umbau-lowrider-st-3-1080.webp",
+            "cover_mobile_position": "50% 68%"
+          },
+          "blocks": {
+            "lowrider-st-bild-3": {
+              "type": "build-photo",
+              "settings": {
+                "alt": "Die Low Rider ST von der Seite: schwarz mit goldenen Felgen und Koffer im Gold-Design, vor zwei Containern",
+                "asset": "umbau-lowrider-st-3-1080.webp",
+                "asset_srcset": "umbau-lowrider-st-3-720.webp 720w, umbau-lowrider-st-3-1080.webp 1080w",
+                "asset_width": 1080,
+                "asset_height": 1350
+              }
+            },
+            "lowrider-st-bild-2": {
+              "type": "build-photo",
+              "settings": {
+                "alt": "Schwarzer Tank mit goldenem Harley-Davidson-Schriftzug und gelben Streifen an der Verkleidung",
+                "asset": "umbau-lowrider-st-2-1600.webp",
+                "asset_srcset": "umbau-lowrider-st-2-720.webp 720w, umbau-lowrider-st-2-1280.webp 1280w, umbau-lowrider-st-2-1600.webp 1600w",
+                "asset_width": 1600,
+                "asset_height": 1200
+              }
+            },
+            "lowrider-st-bild-4": {
+              "type": "build-photo",
+              "settings": {
+                "alt": "Verkleidung mit orangen Streifen, goldenem Harley-Davidson-Schriftzug und Power-Shop-Schriftzug auf der Scheibe",
+                "asset": "umbau-lowrider-st-4-1080.webp",
+                "asset_srcset": "umbau-lowrider-st-4-720.webp 720w, umbau-lowrider-st-4-1080.webp 1080w",
+                "asset_width": 1080,
+                "asset_height": 1350
+              }
+            },
+            "lowrider-st-bild-1": {
+              "type": "build-photo",
+              "settings": {
+                "alt": "Seitendeckel in Schwarz und Gold mit Bar-&-Shield-Emblem über dem schwarzen Endtopf",
+                "asset": "umbau-lowrider-st-1-1440.webp",
+                "asset_srcset": "umbau-lowrider-st-1-720.webp 720w, umbau-lowrider-st-1-1080.webp 1080w, umbau-lowrider-st-1-1440.webp 1440w",
+                "asset_width": 1440,
+                "asset_height": 1920
+              }
+            }
+          },
+          "block_order": [
+            "lowrider-st-bild-3",
+            "lowrider-st-bild-2",
+            "lowrider-st-bild-4",
+            "lowrider-st-bild-1"
+          ]
+        },
+        "police": {
+          "type": "build",
+          "settings": {
+            "name": "Police",
+            "base": "Electra Glide",
+            "intro": "Eine Electra Glide im Look der klassischen Police-Maschinen: schwarz-weiße Lackierung und Police-Schriftzüge an Verkleidung und Koffern. Im Showroom bleibt hier jeder stehen.",
+            "specs": "Lack: Schwarz-Weiß im Police-Stil\nSchriftzüge: Police an Verkleidung und Koffern\nLicht: Blaue und rote Zusatzleuchte vorn\nKoffer: In Wagenfarbe",
+            "cta_label": "Ähnlichen Umbau anfragen",
+            "cta_target": "#termin",
+            "cover_asset": "umbau-police-1-1080.webp",
+            "cover_position": "22% 72%",
+            "cover_mobile_asset": "umbau-police-2-1280.webp",
+            "cover_mobile_position": "50% 62%"
+          },
+          "blocks": {
+            "police-bild-2": {
+              "type": "build-photo",
+              "settings": {
+                "alt": "Schwarz-weiße Electra Glide mit Police-Schriftzug im Showroom des Power Shop",
+                "asset": "umbau-police-2-1920.webp",
+                "asset_srcset": "umbau-police-2-720.webp 720w, umbau-police-2-1280.webp 1280w, umbau-police-2-1920.webp 1920w",
+                "asset_width": 1920,
+                "asset_height": 1440
+              }
+            },
+            "police-bild-3": {
+              "type": "build-photo",
+              "settings": {
+                "alt": "Frontansicht: weiße Verkleidung mit Police-Schriftzug, blaue und rote Zusatzleuchte neben dem Scheinwerfer",
+                "asset": "umbau-police-3-1440.webp",
+                "asset_srcset": "umbau-police-3-720.webp 720w, umbau-police-3-1080.webp 1080w, umbau-police-3-1440.webp 1440w",
+                "asset_width": 1440,
+                "asset_height": 1978
+              }
+            },
+            "police-bild-1": {
+              "type": "build-photo",
+              "settings": {
+                "alt": "Die Police-Maschine neben einem Polizei-Transporter unter dem Harley-Davidson-Schild",
+                "asset": "umbau-police-1-1440.webp",
+                "asset_srcset": "umbau-police-1-720.webp 720w, umbau-police-1-1080.webp 1080w, umbau-police-1-1440.webp 1440w",
+                "asset_width": 1440,
+                "asset_height": 1920
+              }
+            },
+            "police-bild-4": {
+              "type": "build-photo",
+              "settings": {
+                "alt": "Die Police-Maschine von schräg vorn vor dem Polizei-Transporter, dahinter das Harley-Davidson-Schild",
+                "asset": "umbau-police-4-1440.webp",
+                "asset_srcset": "umbau-police-4-720.webp 720w, umbau-police-4-1080.webp 1080w, umbau-police-4-1440.webp 1440w",
+                "asset_width": 1440,
+                "asset_height": 1920
+              }
+            }
+          },
+          "block_order": [
+            "police-bild-2",
+            "police-bild-3",
+            "police-bild-1",
+            "police-bild-4"
+          ]
+        },
+        "breakout": {
+          "type": "build",
+          "settings": {
+            "name": "Breakout",
+            "base": "Breakout",
+            "intro": "Lang, flach, breiter Hinterreifen: Die Breakout bekam schwarzen Lack mit orangen Flammen auf dem Tank, schwarze Felgen mit blanker Kante und einen schwarzen Auspuff. Chrom bleibt nur dort, wo er glänzen soll.",
+            "specs": "Lack: Schwarz mit orangen Flammen\nFelgen: Schwarz mit blanker Kante\nAuspuff: Schwarz\nFront: Spoiler unter dem Motor\nSpiegel: Chrom",
+            "cta_label": "Ähnlichen Umbau anfragen",
+            "cta_target": "#termin",
+            "cover_asset": "umbau-breakout-1-1280.webp",
+            "cover_position": "42% 62%",
+            "cover_mobile_asset": "umbau-breakout-2-1280.webp",
+            "cover_mobile_position": "50% 65%"
+          },
+          "blocks": {
+            "breakout-bild-2": {
+              "type": "build-photo",
+              "settings": {
+                "alt": "Die Breakout im Profil vor einer Halle: schwarz mit orangen Flammen auf dem Tank und schwarzen Felgen",
+                "asset": "umbau-breakout-2-1920.webp",
+                "asset_srcset": "umbau-breakout-2-720.webp 720w, umbau-breakout-2-1280.webp 1280w, umbau-breakout-2-1920.webp 1920w",
+                "asset_width": 1920,
+                "asset_height": 1440
+              }
+            },
+            "breakout-bild-1": {
+              "type": "build-photo",
+              "settings": {
+                "alt": "Die Breakout von schräg vorn mit breitem Vorderrad und Spoiler unter dem Motor",
+                "asset": "umbau-breakout-1-1920.webp",
+                "asset_srcset": "umbau-breakout-1-720.webp 720w, umbau-breakout-1-1280.webp 1280w, umbau-breakout-1-1920.webp 1920w",
+                "asset_width": 1920,
+                "asset_height": 1440
+              }
+            },
+            "breakout-bild-3": {
+              "type": "build-photo",
+              "settings": {
+                "alt": "Lenker mit Chromspiegel über dem Tank mit orangen Flammen",
+                "asset": "umbau-breakout-3-1440.webp",
+                "asset_srcset": "umbau-breakout-3-720.webp 720w, umbau-breakout-3-1080.webp 1080w, umbau-breakout-3-1440.webp 1440w",
+                "asset_width": 1440,
+                "asset_height": 1920
+              }
+            },
+            "breakout-bild-4": {
+              "type": "build-photo",
+              "settings": {
+                "alt": "Motor in Schwarz mit verchromtem Primärdeckel",
+                "asset": "umbau-breakout-4-1440.webp",
+                "asset_srcset": "umbau-breakout-4-720.webp 720w, umbau-breakout-4-1080.webp 1080w, umbau-breakout-4-1440.webp 1440w",
+                "asset_width": 1440,
+                "asset_height": 1920
+              }
+            }
+          },
+          "block_order": [
+            "breakout-bild-2",
+            "breakout-bild-1",
+            "breakout-bild-3",
+            "breakout-bild-4"
+          ]
+        }
+      },
+      "block_order": [
+        "falk",
+        "lowrider-st",
+        "police",
+        "breakout"
+      ]
+    },
+    "leistungen": {
+      "type": "workshop-services",
+      "settings": {
+        "heading": "Was die Werkstatt für dich macht",
+        "intro": "Inspektion nach Herstellervorgabe, Reifen, Winter-Check oder kompletter Custom-Umbau: Unsere Meisterwerkstatt kennt jede Harley. Teile aus dem Shop bauen wir dir direkt ein und kümmern uns um Abnahme und Eintragung.",
+        "contact_title": "Werkstatt-Termin anfragen",
+        "contact_intro": "Schreib uns per WhatsApp oder E-Mail, oder ruf einfach an. Wir melden uns mit einem Termin."
+      },
+      "blocks": {
+        "inspektion": {
+          "type": "item",
+          "settings": {
+            "icon": "gauge",
+            "title": "Inspektion & Wartung",
+            "text": "Nach Herstellervorgabe, mit Original-Teilen."
+          }
+        },
+        "einbau": {
+          "type": "item",
+          "settings": {
+            "icon": "wrench",
+            "title": "Einbau von Zubehör",
+            "text": "Teile aus dem Shop oder von dir, eingebaut in der Meisterwerkstatt."
+          }
+        },
+        "umbau": {
+          "type": "item",
+          "settings": {
+            "icon": "palette",
+            "title": "Custom-Umbau",
+            "text": "Vom neuen Lenker bis zum kompletten Umbau wie oben."
+          }
+        },
+        "abnahme": {
+          "type": "item",
+          "settings": {
+            "icon": "badge-check",
+            "title": "Abnahme & Eintragung",
+            "text": "TÜV/DEKRA-Abnahme und Eintragung übernehmen wir."
+          }
+        }
+      },
+      "block_order": [
+        "inspektion",
+        "einbau",
+        "umbau",
+        "abnahme"
+      ]
+    }
+  },
+  "order": [
+    "subnav",
+    "main",
+    "leistungen"
+  ]
+}

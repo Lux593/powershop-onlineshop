@@ -80,3 +80,17 @@ Die gesamte Liste der offenen Händlerfreigaben steht in [`freigaben.md`](freiga
 | `bikes-intro.mp4` · `bikes-intro-poster.jpg` | 960 × 720, ca. 17 s | Kategorieseite Motorräder · Film-Intro |
 | `clothing-herren.mp4` · `clothing-herren-poster.jpg` | 960 × 720, ca. 18 s | Kategorieseite Herren · Film-Intro |
 | `clothing-damen.mp4` · `clothing-damen-poster.jpg` | 960 × 720, ca. 6 s | Kategorieseite Damen · Film-Intro |
+
+## Custom-Umbauten (Werkstatt-Seite)
+
+Fotos des Händlers aus `pics_to_use/custom-*` (iPhone, 26./27.10.2026). Je Foto WebP in mehreren Breiten, ohne Metadaten (GPS und Gerät
+entfernt): Querformat 720 / 1280 / 1920 px, Hochformat 720 / 1080 / 1440 px, nie größer als das Original. Name: `umbau-<umbau>-<nr>-<breite>.webp`.
+Eingesetzt in `templates/page.werkstatt.json` (Blöcke „Umbau-Bild“). Im Theme-Editor lässt sich jedes Foto durch ein hochgeladenes Bild ersetzen,
+dann liefert das Shopify-CDN die Größen selbst.
+
+| Umbau | Fotos (Nr.) | Größte Datei | Hinweis |
+|---|---|---|---|
+| Falk | 1–4 | 1920 bzw. 1440 px | Nr. 3 und 4 waren ungedreht gespeichert, gedreht. Nr. 3: Kennzeichen teilweise lesbar, Nr. 2: Person im Bild (Freigabe offen) |
+| Low Rider ST | 1–4 | 1440 / 1600 / 1080 / 1080 px | Nr. 3 und 4 sind Instagram-Exporte mit 1080 px; Originale vom Handy wären schärfer |
+| Police | 1–4 | 1440 bzw. 1920 px | Nr. 1 und 4 waren ungedreht gespeichert, gedreht |
+| Breakout | 1–4 | 1920 bzw. 1440 px | |

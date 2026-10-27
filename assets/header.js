@@ -74,6 +74,8 @@
     var wrap = header.closest('.site-header-wrap') || header;
     var over = document.body.hasAttribute('data-header-overlay');
     var shown = true, lastY = window.scrollY, quiet = 0, queued = false, accountOpen = false;
+    // Gezieltes Scrollen aus anderen Modulen (z. B. Umbau-Buch am Handy): Header bleibt für ms so, wie er gerade ist
+    PS.headerQuiet = function (ms) { quiet = Math.max(quiet, Date.now() + (ms || 1600)); };
 
     function show(on) {
       if (on === shown) return;

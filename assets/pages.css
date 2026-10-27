@@ -78,3 +78,48 @@
 .has-motion [data-scrub].is-scrub .ps-wi { color: var(--scrub-dim, var(--c-dim-light)); translate: none; animation: none; }
 .has-motion [data-scrub].is-scrub .ps-wi.is-lit { color: var(--scrub-lit, var(--c-black)); }
 @media print { [data-scrub] .ps-wi { color: inherit !important; } }
+
+/* ---------- Service-Navigation (sections/service-subnav.liquid) ----------
+   Unterpunkte von „Service“ aus dem Hauptmenü. Dunkel über dunklen Bühnen (Werkstatt), hell über hellen Seiten.
+   Orange nur als Unterstreichung des aktuellen Punkts (auf hell nie als Schrift). */
+.service-subnav { background: var(--c-offwhite); border-bottom: 1px solid var(--c-line); }
+.service-subnav--dark { background: var(--c-black); border-bottom-color: var(--c-steel); }
+.service-subnav__inner { display: flex; align-items: center; gap: 24px; min-height: 56px; overflow-x: auto; scrollbar-width: none; }
+.service-subnav__inner::-webkit-scrollbar { display: none; }
+.service-subnav__crumb { flex: none; font-size: 13px; color: var(--c-muted); white-space: nowrap; }
+.service-subnav__crumb:hover { color: var(--c-black); }
+.service-subnav__links { display: flex; gap: 4px; }
+.service-subnav__links a {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0 12px; border-bottom: 2px solid transparent;
+  font-family: var(--f-head); font-weight: 600; font-size: 15px; letter-spacing: .8px; text-transform: uppercase; white-space: nowrap;
+  color: var(--c-muted); transition: color var(--t-fast), border-color var(--t-fast);
+}
+.service-subnav__links a:hover { color: var(--c-black); }
+.service-subnav__links a[aria-current] { color: var(--c-black); border-bottom-color: var(--c-orange); }
+.service-subnav--dark .service-subnav__crumb, .service-subnav--dark .service-subnav__links a { color: var(--c-muted-dark); }
+.service-subnav--dark .service-subnav__crumb:hover, .service-subnav--dark .service-subnav__links a:hover,
+.service-subnav--dark .service-subnav__links a[aria-current] { color: var(--c-white); }
+.service-subnav__hint { padding-block: 16px; font-size: 14px; color: var(--c-muted); }
+
+/* ---------- Werkstatt-Leistungen (sections/workshop-services.liquid) ----------
+   Desktop: Liste mit Haarlinien neben der Termin-Box. Bis 1023 px: 2 x 2 Info-Kacheln im Raster der Startseiten-Kacheln
+   (home.css .service-tiles), ohne Link und ohne Hover-Linie. */
+.workshop-services { padding-block: var(--section-y); background: var(--c-offwhite); color: var(--c-text); }
+.workshop-services__grid { display: grid; gap: 48px; }
+.workshop-services__grid > * { min-width: 0; }
+.workshop-services h2 { font-size: var(--fs-h2); }
+.workshop-services__intro { max-width: 60ch; margin-top: 16px; color: var(--c-text-soft); }
+.workshop-services__list { display: grid; margin-top: 32px; border-top: 1px solid var(--c-line); }
+.workshop-services__item { display: grid; align-content: start; gap: 6px; min-width: 0; padding-block: 20px; border-bottom: 1px solid var(--c-line); overflow-wrap: break-word; }
+.workshop-services__item > .icon { display: none; }
+.workshop-services__item h3 { font-size: var(--fs-h4); }
+.workshop-services__item p { max-width: 62ch; font-size: 15px; color: var(--c-muted); }
+@media (min-width: 1024px) { .workshop-services__grid { grid-template-columns: minmax(0, 1fr) 380px; align-items: start; gap: 64px; } }
+@media (max-width: 1023px) {
+  .workshop-services__list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--c-line); border: 1px solid var(--c-line); }
+  .workshop-services__item { gap: 8px; padding: 24px 20px; border-bottom: 0; background: var(--c-white); }
+  .workshop-services__item > .icon { display: block; width: 32px; height: 32px; color: var(--c-orange); }
+  .workshop-services__item h3 { margin-top: 8px; font-size: 22px; }
+  .workshop-services__item p { font-size: var(--fs-small); }
+}
+@media (max-width: 479px) { .workshop-services__item h3 { hyphens: auto; } }

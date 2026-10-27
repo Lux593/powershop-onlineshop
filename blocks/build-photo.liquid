@@ -1,0 +1,67 @@
+{% doc %}
+  Ein Foto eines Custom-Umbaus (Kind-Block von blocks/build.liquid). Entweder das im Theme-Editor gewählte Bild
+  (CDN, responsiv) oder die Standarddatei aus assets/ mit vorab skalierten Größen (srcset).
+  data-w, data-h und data-full lesen assets/build-book.js für den Bildblock und das Vollbild.
+{% enddoc %}
+
+{%- liquid
+  assign img = block.settings.image
+  assign alt = block.settings.alt
+  assign asset = block.settings.asset | strip
+  if img != blank
+    assign w = img.width
+    assign h = img.height
+    if alt == blank
+      assign alt = img.alt
+    endif
+    assign full = img | image_url: width: 2400
+  elsif asset != blank
+    assign w = block.settings.asset_width | default: 4
+    assign h = block.settings.asset_height | default: 3
+    assign full = asset | asset_url
+  endif
+-%}
+
+{%- if img != blank or asset != blank -%}
+  <button
+    class="bb-item"
+    type="button"
+    data-bb-photo
+    data-w="{{ w }}"
+    data-h="{{ h }}"
+    data-full="{{ full }}"
+    aria-label="Bild vergrößern: {{ alt | escape }}"
+    style="--ar: {{ w }} / {{ h }};"
+    {{ block.shopify_attributes }}
+  >
+    {%- render 'media',
+      image: img,
+      asset: asset,
+      width: w,
+      height: h,
+      alt: alt,
+      srcset: block.settings.asset_srcset,
+      sizes: '(min-width: 1024px) 40vw, 92vw',
+      decoding: 'async'
+    -%}
+  </button>
+{%- elsif request.design_mode -%}
+  <div class="bb-item bb-item--empty" {{ block.shopify_attributes }}>Bild wählen</div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Umbau-Bild",
+  "tag": null,
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Bild", "info": "Wird ein Bild gewählt, ersetzt es die Standarddatei." },
+    { "type": "text", "id": "alt", "label": "Bildbeschreibung", "info": "Für Screenreader und das Vollbild. Leer = Alt-Text des gewählten Bilds." },
+    { "type": "header", "content": "Standarddatei aus dem Theme" },
+    { "type": "text", "id": "asset", "label": "Datei in assets/", "info": "Größte Datei, z. B. umbau-falk-1-1920.webp" },
+    { "type": "text", "id": "asset_srcset", "label": "Größen (srcset)", "info": "Dateien mit Breite, durch Komma getrennt, z. B. umbau-falk-1-720.webp 720w, umbau-falk-1-1920.webp 1920w" },
+    { "type": "number", "id": "asset_width", "label": "Breite der größten Datei (px)" },
+    { "type": "number", "id": "asset_height", "label": "Höhe der größten Datei (px)" }
+  ],
+  "presets": [{ "name": "Umbau-Bild" }]
+}
+{% endschema %}

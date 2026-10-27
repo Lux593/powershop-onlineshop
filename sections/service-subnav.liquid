@@ -1,0 +1,63 @@
+{%- comment -%}
+  Unternavigation der Service-Seiten: die Unterpunkte des Hauptmenüpunkts „Service“ aus dem gewählten Menü.
+  Aktiv ist der Punkt, dessen Link auf die aktuelle Seite zeigt, auch als Anker der Übersicht (/pages/service#werkstatt).
+  Styles in assets/pages.css.
+{%- endcomment -%}
+{%- liquid
+  assign parent_title = section.settings.parent | default: 'Service'
+  assign parent = nil
+  for link in section.settings.menu.links
+    if link.title == parent_title
+      assign parent = link
+      break
+    endif
+  endfor
+  assign page_path = '/pages/' | append: page.handle
+  assign page_anchor = '#' | append: page.handle
+-%}
+
+{%- if parent and parent.links.size > 0 -%}
+  <nav class="service-subnav service-subnav--{{ section.settings.scheme }}" aria-label="{{ parent_title | escape }}">
+    <div class="container service-subnav__inner">
+      <a class="service-subnav__crumb" href="{{ parent.url }}">{{ parent_title | escape }} <span aria-hidden="true">›</span></a>
+      <ul class="service-subnav__links">
+        {%- for link in parent.links -%}
+          {%- liquid
+            assign is_current = false
+            if link.current
+              assign is_current = true
+            elsif page.handle != blank
+              if link.url contains page_path or link.url contains page_anchor
+                assign is_current = true
+              endif
+            endif
+          -%}
+          <li><a href="{{ link.url }}"{% if is_current %} aria-current="page"{% endif %}>{{ link.title | escape }}</a></li>
+        {%- endfor -%}
+      </ul>
+    </div>
+  </nav>
+{%- elsif request.design_mode -%}
+  <div class="container service-subnav__hint">Im gewählten Menü gibt es keinen Punkt „{{ parent_title | escape }}“ mit Unterpunkten.</div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Service-Navigation",
+  "settings": [
+    { "type": "link_list", "id": "menu", "label": "Menü", "default": "main-menu" },
+    { "type": "text", "id": "parent", "label": "Hauptmenüpunkt (Titel)", "default": "Service" },
+    {
+      "type": "select",
+      "id": "scheme",
+      "label": "Farbe",
+      "options": [
+        { "value": "dark", "label": "Dunkel" },
+        { "value": "light", "label": "Hell" }
+      ],
+      "default": "dark"
+    }
+  ],
+  "presets": [{ "name": "Service-Navigation" }]
+}
+{% endschema %}

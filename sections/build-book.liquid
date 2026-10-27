@@ -1,0 +1,48 @@
+{%- comment -%}
+  Umbau-Buch der Werkstatt: Custom-Umbauten als Boxen nebeneinander (Blöcke „Umbau“ mit Kind-Blöcken „Umbau-Bild“).
+  CSS und JS laden nur mit dieser Section. Ohne Skript stehen alle Umbauten offen untereinander.
+  Entwurf und Messungen: docs/architecture.md, docs/research/werkstatt-umbau-buch.md.
+{%- endcomment -%}
+{{ 'build-book.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'build-book.js' | asset_url }}" defer></script>
+
+<section class="build-book on-dark textured" data-build-book aria-labelledby="bb-title-{{ section.id }}">
+  <div class="container bb-head">
+    <h1 id="bb-title-{{ section.id }}">{{ section.settings.heading | default: page.title | default: 'Werkstatt' | escape }}</h1>
+    {%- if section.settings.intro != blank -%}<p>{{ section.settings.intro | escape }}</p>{%- endif -%}
+    <span class="bb-head__count" data-bb-count></span>
+  </div>
+
+  <div class="bb-bays" data-bb-bays>{% content_for 'blocks' %}</div>
+  <p class="sr-only" aria-live="polite" data-bb-live></p>
+
+  <dialog class="bb-viewer" data-bb-viewer aria-label="Bilder im Vollbild">
+    <div class="bb-viewer__bar">
+      <span class="bb-viewer__title"></span>
+      <span class="bb-viewer__count"></span>
+      <button class="bb-viewer__btn bb-viewer__close" type="button" data-bb-close-viewer aria-label="Vollbild schließen">{% render 'icon', name: 'x' %}</button>
+    </div>
+    <div class="bb-viewer__stage">
+      <img class="bb-viewer__img" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="" width="1" height="1" draggable="false">
+      <button class="bb-viewer__btn bb-viewer__prev" type="button" data-bb-prev aria-label="Vorheriges Bild">{% render 'icon', name: 'chevron-left' %}</button>
+      <button class="bb-viewer__btn bb-viewer__next" type="button" data-bb-next aria-label="Nächstes Bild">{% render 'icon', name: 'chevron-right' %}</button>
+    </div>
+    <div class="bb-viewer__foot">
+      <p class="bb-viewer__caption"></p>
+      <div class="bb-viewer__thumbs"></div>
+    </div>
+  </dialog>
+</section>
+
+{% schema %}
+{
+  "name": "Umbau-Buch",
+  "class": "section-build-book",
+  "blocks": [{ "type": "build" }],
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Überschrift", "info": "Leer = Titel der Seite." },
+    { "type": "textarea", "id": "intro", "label": "Einleitung", "default": "Custom-Umbauten aus unserer Meisterwerkstatt. Wähl einen Umbau, um alle Bilder und Details zu sehen." }
+  ],
+  "presets": [{ "name": "Umbau-Buch", "blocks": [{ "type": "build" }] }]
+}
+{% endschema %}

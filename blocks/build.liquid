@@ -1,0 +1,129 @@
+{% doc %}
+  Ein Custom-Umbau im Umbau-Buch (sections/build-book.liquid): Paneel mit Titelbild und senkrechtem Namen (geschlossen),
+  Raum mit Infos auf Creme und Bildblock (geöffnet). Die Fotos sind Kind-Blöcke (blocks/build-photo.liquid).
+  Ohne Skript steht der Raum offen, assets/build-book.js macht daraus die Box.
+{% enddoc %}
+
+{%- liquid
+  assign name = block.settings.name | default: 'Umbau'
+  assign base = block.settings.base
+  assign cover = block.settings.cover
+  assign cover_asset = block.settings.cover_asset | strip
+  assign cover_m = block.settings.cover_mobile
+  assign cover_m_asset = block.settings.cover_mobile_asset | strip
+
+  assign cover_src = ''
+  if cover != blank
+    assign cover_src = cover | image_url: width: 1080
+  elsif cover_asset != blank
+    assign cover_src = cover_asset | asset_url
+  endif
+  assign cover_m_src = ''
+  if cover_m != blank
+    assign cover_m_src = cover_m | image_url: width: 1080
+  elsif cover_m_asset != blank
+    assign cover_m_src = cover_m_asset | asset_url
+  endif
+
+  assign spec_lines = block.settings.specs | newline_to_br | split: '<br />'
+-%}
+
+<article
+  class="bb-bay"
+  id="umbau-{{ name | handleize }}"
+  data-bb-bay
+  data-base="{{ base | escape }}"
+  aria-label="{{ name | escape }}"
+  {{ block.shopify_attributes }}
+>
+  <div class="bb-cover" aria-hidden="true" style="--pos: {{ block.settings.cover_position | default: '50% 55%' }}; --pos-m: {{ block.settings.cover_mobile_position | default: '50% 55%' }};">
+    {%- if cover_src != blank or cover_m_src != blank -%}
+      <picture>
+        {%- if cover_m_src != blank -%}<source media="(max-width: 1023px)" srcset="{{ cover_m_src }}">{%- endif -%}
+        <img src="{{ cover_src | default: cover_m_src }}" alt="" width="{{ cover.width | default: 1080 }}" height="{{ cover.height | default: 1440 }}" loading="eager" decoding="async">
+      </picture>
+    {%- endif -%}
+  </div>
+
+  <button class="bb-door" type="button" aria-expanded="false" aria-controls="bb-room-{{ block.id }}">
+    <span class="bb-label bb-label--narrow" aria-hidden="true">
+      {%- if base != blank -%}<span class="bb-label__base">{{ base | escape }}</span>{%- endif -%}
+      <span class="bb-label__name">{{ name | escape }}</span>
+    </span>
+    <span class="bb-label bb-label--wide" aria-hidden="true">
+      <span class="bb-label__name">{{ name | escape }}</span>
+      {%- if base != blank -%}<span class="bb-label__base">{{ base | escape }}</span>{%- endif -%}
+    </span>
+    <span class="sr-only">Umbau {{ name | escape }} öffnen{% if base != blank %}, Basis {{ base | escape }}{% endif %}</span>
+  </button>
+
+  <div class="bb-room" id="bb-room-{{ block.id }}">
+    <div class="bb-head-box">
+      <h2 class="bb-name">{{ name | escape }}</h2>
+      <button class="bb-close" type="button" aria-label="{{ name | escape }} schließen">{% render 'icon', name: 'x' %}</button>
+    </div>
+    <div class="bb-info">
+      {%- if block.settings.intro != blank -%}
+        <p class="bb-intro">{{ block.settings.intro | escape | newline_to_br }}</p>
+      {%- endif -%}
+      <dl class="bb-specs">
+        {%- if base != blank -%}
+          <dt class="is-base">Basis-Modell</dt>
+          <dd class="is-base">{{ base | escape }}</dd>
+        {%- endif -%}
+        {%- for raw in spec_lines -%}
+          {%- liquid
+            assign line = raw | strip_newlines | strip
+            if line == blank
+              continue
+            endif
+            assign key = ''
+            assign val = line
+            if line contains ':'
+              assign key = line | split: ':' | first | strip
+              assign val = line | remove_first: key | remove_first: ':' | strip
+            endif
+          -%}
+          <dt>{{ key | escape }}</dt>
+          <dd>{{ val | escape }}</dd>
+        {%- endfor -%}
+      </dl>
+      <div class="bb-actions">
+        <button class="btn btn--outline-dark btn--block" type="button" data-bb-all>{% render 'icon', name: 'maximize-2' %}Alle Bilder ansehen</button>
+        <a class="btn btn--primary btn--block" href="{{ block.settings.cta_target | default: '#termin' }}">{{ block.settings.cta_label | default: 'Ähnlichen Umbau anfragen' | escape }}</a>
+      </div>
+    </div>
+    <div class="bb-gallery" role="group" aria-label="Bilder {{ name | escape }}">
+      <div class="bb-bento">{% content_for 'blocks' %}</div>
+    </div>
+  </div>
+</article>
+
+{% schema %}
+{
+  "name": "Umbau",
+  "tag": null,
+  "blocks": [{ "type": "build-photo" }],
+  "settings": [
+    { "type": "text", "id": "name", "label": "Name", "default": "Umbau" },
+    { "type": "text", "id": "base", "label": "Basis-Modell", "info": "Steht im Paneel und als erste Zeile der Umbau-Tabelle." },
+    { "type": "textarea", "id": "intro", "label": "Kurztext" },
+    { "type": "textarea", "id": "specs", "label": "Umbau-Tabelle", "info": "Eine Zeile pro Umbau, Bereich und Umbau mit Doppelpunkt getrennt, z. B. Lack: Schwarz mit orangen Flammen" },
+    { "type": "text", "id": "cta_label", "label": "Anfrage-Button", "default": "Ähnlichen Umbau anfragen" },
+    { "type": "text", "id": "cta_target", "label": "Ziel des Anfrage-Buttons", "default": "#termin", "info": "#termin springt zur Termin-Box der Werkstatt-Seite." },
+    { "type": "header", "content": "Bild im geschlossenen Paneel" },
+    { "type": "image_picker", "id": "cover", "label": "Titelbild (Desktop, am besten hochkant)" },
+    { "type": "text", "id": "cover_asset", "label": "Standarddatei in assets/", "info": "Gilt, wenn kein Titelbild gewählt ist." },
+    { "type": "text", "id": "cover_position", "label": "Bildausschnitt", "default": "50% 55%", "info": "Waagrecht und senkrecht in Prozent, z. B. 40% 60%." },
+    { "type": "image_picker", "id": "cover_mobile", "label": "Titelbild am Handy (am besten quer)" },
+    { "type": "text", "id": "cover_mobile_asset", "label": "Standarddatei in assets/ (Handy)" },
+    { "type": "text", "id": "cover_mobile_position", "label": "Bildausschnitt am Handy", "default": "50% 55%" }
+  ],
+  "presets": [
+    {
+      "name": "Umbau",
+      "blocks": [{ "type": "build-photo" }, { "type": "build-photo" }, { "type": "build-photo" }]
+    }
+  ]
+}
+{% endschema %}
