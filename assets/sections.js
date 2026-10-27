@@ -79,6 +79,47 @@
     if (toggle) toggle.focus();
   });
 
+  /* ---------------- Motorrad-Karte: Farben ----------------
+     Die Farbfelder (snippets/bike-card.liquid) zeigen das Bild ihrer Farbe in der Karte: mit der Maus als Vorschau, per Klick
+     oder Tippen fest. Die Wahl führt Bild, Titel, Details und Anfrage zur Variante dieser Farbe. Das Bild wechselt erst, wenn
+     es geladen ist (wie die Galerie der Motorrad-Seite), damit die Karte nie leer aufblitzt; ein späterer Wechsel gewinnt. */
+  function bikeColor(card, swatch) {
+    var img = card.querySelector('.bcard__media img');
+    var name = card.querySelector('[data-bcard-color]');
+    if (img && !card._bcardOrig) card._bcardOrig = { src: img.getAttribute('src'), srcset: img.getAttribute('srcset') };
+    if (name) name.textContent = swatch ? swatch.getAttribute('aria-label') : name.dataset.default;
+    var target = swatch && swatch.dataset.src ? { src: swatch.dataset.src, srcset: swatch.dataset.srcset } : card._bcardOrig;
+    if (!img || !target || img.getAttribute('src') === target.src) return;
+    var token = (card._bcardToken = (card._bcardToken || 0) + 1);
+    var next = new Image();
+    next.sizes = img.sizes;
+    next.srcset = target.srcset || '';
+    next.src = target.src;
+    (next.decode ? next.decode() : Promise.resolve()).then(function () {
+      if (card._bcardToken !== token) return;
+      img.srcset = target.srcset || '';
+      img.src = target.src;
+    }, function () {});
+  }
+  document.addEventListener('click', function (e) {
+    var swatch = e.target.closest && e.target.closest('[data-bcard-swatch]');
+    var card = swatch && swatch.closest('.bcard');
+    if (!card) return;
+    card.querySelectorAll('[data-bcard-swatch]').forEach(function (s) { s.setAttribute('aria-pressed', s === swatch ? 'true' : 'false'); });
+    card.querySelectorAll('[data-bcard-link]').forEach(function (a) { a.href = swatch.dataset.url + a.dataset.bcardLink; });
+    bikeColor(card, swatch);
+  });
+  document.addEventListener('pointerover', function (e) {
+    var swatch = e.pointerType === 'mouse' && e.target.closest && e.target.closest('[data-bcard-swatch]');
+    if (swatch) bikeColor(swatch.closest('.bcard'), swatch);
+  });
+  document.addEventListener('pointerout', function (e) {
+    var group = e.pointerType === 'mouse' && e.target.closest && e.target.closest('[data-bcard-swatches]');
+    if (!group || group.contains(e.relatedTarget)) return;
+    var card = group.closest('.bcard');
+    bikeColor(card, card.querySelector('[data-bcard-swatch][aria-pressed="true"]'));
+  });
+
   /* ---------------- Tooltip: Escape schließt die Blase (WCAG 1.4.13) ----------------
      Escape blendet die offene Blase aus, Fokus und Zeiger bleiben. Sie kommt wieder, sobald beide die Info verlassen haben. */
   document.addEventListener('keydown', function (e) {

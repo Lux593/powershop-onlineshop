@@ -1,57 +1,47 @@
 {% doc %}
-  Megamenü-Inhalt für einen Hauptmenüpunkt.
+  Megamenü-Inhalt für einen Hauptmenüpunkt: oben eine Reihe Foto-Kacheln, darunter die Links der geöffneten Kachel, unten eine Fußzeile.
   Aufbau aus der Shopify-Navigation:
-  - Ebene 2 mit Unterpunkten = Spalte mit Überschrift, Ebene 3 = Links
-  - Sind alle Links einer Spalte Kollektionen mit Bild, erscheinen sie als Bild-Kacheln; fehlt auch nur einem Link das Bild, bleibt es eine Textliste
-  - Ebene 2 ohne Unterpunkte, solange andere Spalten Unterpunkte haben = schmale Spalte mit dem Titel als Link
-  - Hat keine Ebene-2-Position Unterpunkte, bilden alle zusammen eine gemeinsame Link-Spalte
-  - Links einer Spalte stehen alphabetisch, außer die Spalte steht in keep (snippets/link-order.liquid)
-  Teaser, Kontaktspalte und Aufruf-Zeile kommen als Blöcke aus dem Header.
+  - Ebene 2 mit Unterpunkten = Kachel (Knopf). Ein Klick klappt ihre Links (Ebene 3) unter der Reihe auf, die offene klappt zu,
+    ein zweiter Klick auf die offene schließt sie (header.js). Beim Öffnen des Menüs sind alle Gruppen zu.
+  - Ebene 2 ohne Unterpunkte, solange andere Gruppen Unterpunkte haben = Kachel als Link (Pfeil statt Winkel),
+    z. B. Service: Werkstatt und Über uns als Link, Dienstleistungen klappt auf
+  - Hat keine Ebene-2-Position Unterpunkte, ist jeder Ebene-2-Punkt eine kleinere Kachel als Link, vier je Reihe;
+    der Kontakt-Block steht dann als letzte Kachel im Raster statt in der Fußzeile
+  - Die Links stehen direkt unter ihrer Kachel: ab drei Kacheln einspaltig, bei zwei Kacheln bis zu zwei, bei einer bis zu vier
+    Spalten, mit mindestens drei Links je Spalte.
+    Alle Gruppen liegen in derselben Zeile, die geschlossenen unsichtbar: das Menü bleibt beim Wechsel gleich hoch
+  - Links einer Gruppe stehen alphabetisch, außer die Gruppe steht in keep (snippets/link-order.liquid)
+  - Fußzeile: „Alle …“ bei Kollektionen, sonst „… im Überblick“ (gleich lautend wie im Handy-Menü, sections/header.liquid),
+    rechts Aufruf-Zeile oder Kontakt (bei Gruppen) aus den Header-Blöcken
+  Bilder der Kacheln kommen aus den Blöcken „Megamenü: Kachelbild“ (Hauptpunkt + Gruppe); ohne Bild bleibt die Kachel anthrazit.
 
   @param {object} link - Hauptmenüpunkt
   @param {object} blocks - Blöcke der Header-Section
-  @param {string} [keep] - Spaltentitel, deren Links die Reihenfolge der Shopify-Navigation behalten (kommagetrennt)
+  @param {string} [keep] - Gruppentitel, deren Links die Reihenfolge der Shopify-Navigation behalten (kommagetrennt)
 {% enddoc %}
 
 {%- liquid
   assign key = link.handle
+  if link.type == 'collection_link' or link.type == 'catalog_link' or link.url contains '/collections'
+    assign overview_label = 'Alle ' | append: link.title
+  else
+    assign overview_label = link.title | append: ' im Überblick'
+  endif
+
   assign has_groups = false
-  assign tile_group_index = -1
   for group in link.links
     if group.links.size > 0
       assign has_groups = true
-      if tile_group_index == -1
-        assign all_tiles = true
-        for child in group.links
-          if child.object.image == blank
-            assign all_tiles = false
-            break
-          endif
-        endfor
-        if all_tiles
-          assign tile_group_index = forloop.index0
-        endif
-      endif
+      break
     endif
   endfor
 
-  assign teaser_count = 0
   assign contact_block = nil
   assign cta_block = nil
   for block in blocks
     assign parent_key = block.settings.parent | handleize
     if parent_key == key
       case block.type
-        when 'teaser'
-          assign teaser_hidden = ''
-          if block.settings.image == blank
-            capture teaser_hidden
-              render 'is-placeholder', asset: block.settings.image_asset
-            endcapture
-          endif
-          if teaser_hidden == blank
-            assign teaser_count = teaser_count | plus: 1
-          endif
         when 'contact'
           assign contact_block = block
         when 'cta'
@@ -61,132 +51,163 @@
   endfor
 
   comment
-    Kontaktspalte nur, wenn sie etwas zeigt: Telefon, E-Mail oder gepflegte Öffnungszeiten.
+    Kontakt nur, wenn er etwas zeigt: Telefon, E-Mail oder gepflegte Öffnungszeiten.
   endcomment
   if contact_block and settings.phone == blank and settings.email == blank and settings.hours_enabled != true
     assign contact_block = nil
   endif
 
-  assign grid = ''
-  if has_groups
-    for group in link.links
-      if group.links.size == 0
-        assign grid = grid | append: ' auto'
-      elsif forloop.index0 == tile_group_index
-        assign grid = grid | append: ' 1fr'
-      elsif tile_group_index > -1
-        assign grid = grid | append: ' 220px'
-      else
-        assign grid = grid | append: ' 1fr'
-      endif
-    endfor
-  else
-    assign grid = ' 1fr'
-  endif
-  if contact_block
-    assign grid = grid | append: ' 1fr'
-  endif
-  if teaser_count > 0
-    assign grid = grid | append: ' 1.2fr'
-  endif
+  comment
+    --tiles = Spalten der Kachelreihe. Mit Gruppen eine Kachel je Gruppe; ohne Gruppen ein Raster aus den Ebene-2-Punkten
+    und dem Kontakt mit höchstens vier Spalten.
+  endcomment
+  assign tile_count = link.links.size
+  unless has_groups
+    if contact_block
+      assign tile_count = tile_count | plus: 1
+    endif
+    assign tile_count = tile_count | at_most: 4
+  endunless
+  comment
+    Höchstzahl der Linkspalten unter einer Kachel: ab drei Kacheln eine, bei zwei Kacheln zwei, bei einer breiten Kachel vier.
+    Je Gruppe so wenige Spalten, dass jede mindestens drei Links hat; die Links laufen spaltenweise.
+  endcomment
+  case tile_count
+    when 1
+      assign link_cols = 4
+    when 2
+      assign link_cols = 2
+    else
+      assign link_cols = 1
+  endcase
+  assign tile_sizes = 1272 | divided_by: tile_count | append: 'px'
 -%}
 
-<div class="container mega__inner" style="grid-template-columns:{{ grid }}">
-  {%- if has_groups -%}
+{%- capture contact_lines -%}
+  {%- if contact_block -%}
+    {%- if settings.phone != blank -%}
+      <a href="{% render 'contact-href', kind: 'tel' %}">{% render 'icon', name: 'phone', class: 'icon--sm' %}{{ settings.phone | escape }}</a>
+    {%- endif -%}
+    {%- if settings.email != blank -%}
+      <a href="{% render 'contact-href', kind: 'mail' %}">{% render 'icon', name: 'mail', class: 'icon--sm' %}{{ settings.email | escape }}</a>
+    {%- endif -%}
+    {%- if settings.hours_enabled -%}
+      <span>{% render 'icon', name: 'clock', class: 'icon--sm' %}{% render 'opening-hours', as: 'inline' %}</span>
+    {%- endif -%}
+  {%- endif -%}
+{%- endcapture -%}
+
+<div class="container mega__inner"{% if has_groups %} data-mega-groups{% endif %} style="--tiles: {{ tile_count }}">
+  <div class="mega__tiles{% unless has_groups %} mega__tiles--grid{% endunless %}">
     {%- for group in link.links -%}
-      {%- capture order -%}{% render 'link-order', group: group, keep: keep %}{%- endcapture -%}
-      {%- assign order = order | split: ',' -%}
-      <div>
-        {%- if group.links.size == 0 -%}
-          <p class="mega__title"><a href="{{ group.url }}">{{ group.title | escape }}</a></p>
-        {%- else -%}
-          <p class="mega__title">{{ group.title | escape }}</p>
+      {%- liquid
+        assign group_key = group.title | handleize
+        assign tile_block = nil
+        for block in blocks
+          if block.type == 'tile'
+            assign parent_key = block.settings.parent | handleize
+            assign block_group = block.settings.group | handleize
+            if parent_key == key and block_group == group_key
+              assign tile_block = block
+              break
+            endif
+          endif
+        endfor
+      -%}
+      {%- if group.links.size == 0 -%}
+        <a class="mega-tile mega-tile--link" href="{{ group.url }}" {{ tile_block.shopify_attributes }}>
+          {%- render 'mega-tile-media', block: tile_block, sizes: tile_sizes -%}
+          <span class="mega-tile__body">
+            <span class="mega-tile__title">{{ group.title | escape }}</span>
+          </span>
+          {% render 'icon', name: 'arrow-right' %}
+        </a>
+      {%- else -%}
+        {%- capture order -%}{% render 'link-order', group: group, keep: keep %}{%- endcapture -%}
+        {%- assign order = order | split: ',' -%}
+        {%- capture preview -%}
+          {%- for position in order limit: 3 -%}
+            {%- assign index = position | plus: 0 -%}
+            {{- group.links[index].title | escape -}}{%- unless forloop.last -%}, {% endunless -%}
+          {%- endfor -%}
+          {%- if group.links.size > 3 %} …{% endif -%}
+        {%- endcapture -%}
+        <button
+          class="mega-tile"
+          type="button"
+          id="mega-{{ key }}-tile-{{ forloop.index }}"
+          aria-expanded="false"
+          aria-controls="mega-{{ key }}-group-{{ forloop.index }}"
+          {{ tile_block.shopify_attributes }}
+        >
+          {%- render 'mega-tile-media', block: tile_block, sizes: tile_sizes -%}
+          <span class="mega-tile__body">
+            <span class="mega-tile__title">{{ group.title | escape }}</span>
+            <span class="mega-tile__meta">{{ preview }}</span>
+          </span>
+          {% render 'icon', name: 'chevron-down' %}
+        </button>
+      {%- endif -%}
+    {%- endfor -%}
+
+    {%- if contact_block and has_groups == false -%}
+      <div class="mega-tile mega-tile--contact" {{ contact_block.shopify_attributes }}>
+        <p class="mega-tile__title">{{ contact_block.settings.title }}</p>
+        <div class="mega__contact">{{ contact_lines }}</div>
+      </div>
+    {%- endif -%}
+  </div>
+
+  {%- if has_groups -%}
+    <div class="mega__drawer is-closed">
+      <div class="mega__stack">
+        {%- for group in link.links -%}
+          {%- if group.links.size > 0 -%}
+            {%- capture order -%}{% render 'link-order', group: group, keep: keep %}{%- endcapture -%}
+            {%- assign order = order | split: ',' -%}
+            {%- assign cols = group.links.size | plus: 2 | divided_by: 3 | at_most: link_cols -%}
+            {%- assign rows = group.links.size | plus: cols | minus: 1 | divided_by: cols -%}
+            <div
+              class="mega__group"
+              id="mega-{{ key }}-group-{{ forloop.index }}"
+              role="region"
+              aria-labelledby="mega-{{ key }}-tile-{{ forloop.index }}"
+              style="--col: {{ forloop.index }}"
+            >
+              <ul class="mega__links" style="--cols: {{ cols }}; --rows: {{ rows }}">
+                {%- for position in order -%}
+                  {%- assign index = position | plus: 0 -%}
+                  {%- assign child = group.links[index] -%}
+                  <li style="--i: {{ forloop.index0 }}"><a href="{{ child.url }}">{{ child.title | escape }}</a></li>
+                {%- endfor -%}
+              </ul>
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    </div>
+  {%- endif -%}
+
+  <div class="mega__foot">
+    <a class="mega__all" href="{{ link.url }}">{{ overview_label | escape }}{% render 'icon', name: 'arrow-right' %}</a>
+
+    {%- if contact_block and has_groups -%}
+      <div class="mega__contact" {{ contact_block.shopify_attributes }}>
+        <p class="mega__contact-title">{{ contact_block.settings.title }}</p>
+        {{- contact_lines -}}
+      </div>
+    {%- endif -%}
+
+    {%- if cta_block -%}
+      <div class="mega__cta" {{ cta_block.shopify_attributes }}>
+        <p>{{ cta_block.settings.text }}</p>
+        {%- if cta_block.settings.primary_label != blank and cta_block.settings.primary_url != blank -%}
+          <a class="btn btn--primary btn--sm" href="{{ cta_block.settings.primary_url }}">{{ cta_block.settings.primary_label }}</a>
         {%- endif -%}
-        {%- if group.links.size == 0 -%}
-          {%- comment -%} Ohne Unterpunkte steht nur der Titel als Link, kein leeres Listenelement {%- endcomment -%}
-        {%- elsif forloop.index0 == tile_group_index -%}
-          {%- comment -%} Drei Spalten wie bisher; genau vier Kacheln stehen in einer Zeile, statt drei plus einer allein in Zeile 2 {%- endcomment -%}
-          {%- assign tile_cols = 3 -%}
-          {%- if group.links.size == 4 -%}{%- assign tile_cols = 4 -%}{%- endif -%}
-          <div class="mega__families" style="--tile-cols: {{ tile_cols }}">
-            {%- for position in order -%}
-              {%- assign index = position | plus: 0 -%}
-              {%- assign child = group.links[index] -%}
-              <a class="mega-tile" href="{{ child.url }}">
-                {%- render 'media', image: child.object.image, width: 600, height: 400, sizes: '(min-width: 1024px) 200px, 50vw' -%}
-                <span>{{ child.title | escape }}</span>
-              </a>
-            {%- endfor -%}
-          </div>
-        {%- else -%}
-          <ul class="mega__links{% if group.links.size > 7 %} mega__links--2col{% endif %}">
-            {%- for position in order -%}
-              {%- assign index = position | plus: 0 -%}
-              {%- assign child = group.links[index] -%}
-              <li><a href="{{ child.url }}">{{ child.title | escape }}</a></li>
-            {%- endfor -%}
-            {%- if forloop.first -%}
-              <li><a class="is-strong" href="{{ link.url }}">Alle {{ link.title | escape }}</a></li>
-            {%- endif -%}
-          </ul>
+        {%- if cta_block.settings.secondary_label != blank and cta_block.settings.secondary_url != blank -%}
+          <a class="btn btn--outline-light btn--sm" href="{{ cta_block.settings.secondary_url }}">{{ cta_block.settings.secondary_label }}</a>
         {%- endif -%}
       </div>
-    {%- endfor -%}
-  {%- else -%}
-    <div>
-      <p class="mega__title">{{ link.title | escape }}</p>
-      <ul class="mega__links">
-        {%- for child in link.links -%}
-          <li><a href="{{ child.url }}">{{ child.title | escape }}</a></li>
-        {%- endfor -%}
-      </ul>
-    </div>
-  {%- endif -%}
-
-  {%- if contact_block -%}
-    <div {{ contact_block.shopify_attributes }}>
-      <p class="mega__title">{{ contact_block.settings.title }}</p>
-      <ul class="mega__links">
-        {%- if settings.phone != blank -%}
-          <li><a href="{% render 'contact-href', kind: 'tel' %}">{% render 'icon', name: 'phone', class: 'icon--sm' %}&nbsp;{{ settings.phone | escape }}</a></li>
-        {%- endif -%}
-        {%- if settings.email != blank -%}
-          <li><a href="{% render 'contact-href', kind: 'mail' %}">{% render 'icon', name: 'mail', class: 'icon--sm' %}&nbsp;{{ settings.email | escape }}</a></li>
-        {%- endif -%}
-        {%- render 'opening-hours', as: 'mega-links' -%}
-      </ul>
-    </div>
-  {%- endif -%}
-
-  {%- if teaser_count > 0 -%}
-    <div class="mega__teasers">
-      {%- for block in blocks -%}
-        {%- assign parent_key = block.settings.parent | handleize -%}
-        {%- if block.type == 'teaser' and parent_key == key -%}
-          {%- assign teaser_hidden = '' -%}
-          {%- if block.settings.image == blank -%}
-            {%- capture teaser_hidden -%}{% render 'is-placeholder', asset: block.settings.image_asset %}{%- endcapture -%}
-          {%- endif -%}
-          {%- if teaser_hidden == blank -%}
-            <a class="mega-tile" href="{{ block.settings.url | default: link.url }}" {{ block.shopify_attributes }}>
-              {%- render 'media', image: block.settings.image, asset: block.settings.image_asset, width: 600, height: 400, sizes: '(min-width: 1024px) 250px, 50vw' -%}
-              <span>{{ block.settings.label }}</span>
-            </a>
-          {%- endif -%}
-        {%- endif -%}
-      {%- endfor -%}
-    </div>
-  {%- endif -%}
-
-  {%- if cta_block -%}
-    <div class="mega__cta" {{ cta_block.shopify_attributes }}>
-      <p>{{ cta_block.settings.text }}</p>
-      {%- if cta_block.settings.primary_label != blank and cta_block.settings.primary_url != blank -%}
-        <a class="btn btn--primary btn--sm" href="{{ cta_block.settings.primary_url }}">{{ cta_block.settings.primary_label }}</a>
-      {%- endif -%}
-      {%- if cta_block.settings.secondary_label != blank and cta_block.settings.secondary_url != blank -%}
-        <a class="btn btn--outline-light btn--sm" href="{{ cta_block.settings.secondary_url }}">{{ cta_block.settings.secondary_label }}</a>
-      {%- endif -%}
-    </div>
-  {%- endif -%}
+    {%- endif -%}
+  </div>
 </div>

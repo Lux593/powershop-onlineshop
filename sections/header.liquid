@@ -174,14 +174,14 @@
       "id": "menu",
       "label": "Hauptmenü",
       "default": "main-menu",
-      "info": "Ebene 1 = Hauptpunkt, Ebene 2 = Spaltenüberschrift, Ebene 3 = Links. Kollektionen mit Bild erscheinen als Kacheln."
+      "info": "Ebene 1 = Hauptpunkt, Ebene 2 = Kachel im Megamenü, Ebene 3 = Links, die sich unter der Kachel aufklappen. Die Fotos der Kacheln kommen aus den Blöcken „Megamenü: Kachelbild“."
     },
     {
       "type": "text",
       "id": "keep_order",
-      "label": "Spalten in eigener Reihenfolge",
+      "label": "Gruppen in eigener Reihenfolge",
       "default": "Fahrzeuge, Modellfamilien, Kollektionen",
-      "info": "Die Links unter einer Spaltenüberschrift (Ebene 3) stehen alphabetisch. Spalten, deren Überschrift hier steht (kommagetrennt), behalten die Reihenfolge aus der Shopify-Navigation."
+      "info": "Die Links einer Gruppe (Ebene 3) stehen alphabetisch. Gruppen, deren Titel hier steht (kommagetrennt), behalten die Reihenfolge aus der Shopify-Navigation."
     },
     {
       "type": "link_list",
@@ -199,21 +199,33 @@
   ],
   "blocks": [
     {
-      "type": "teaser",
-      "name": "Megamenü: Teaser-Kachel",
+      "type": "tile",
+      "name": "Megamenü: Kachelbild",
       "settings": [
         { "type": "text", "id": "parent", "label": "Hauptmenüpunkt (Titel)", "info": "Zum Beispiel Herren oder Teile & Zubehör." },
-        { "type": "image_picker", "id": "image", "label": "Bild", "info": "Ohne Auswahl wird die Standarddatei unten benutzt." },
-        { "type": "text", "id": "image_asset", "label": "Standard-Bilddatei im Theme", "info": "Dateiname aus den Theme-Dateien, z. B. mega-herren.jpg." },
-        { "type": "text", "id": "label", "label": "Beschriftung" },
-        { "type": "url", "id": "url", "label": "Link" }
+        { "type": "text", "id": "group", "label": "Gruppe (Titel der Ebene 2)", "info": "Titel des Menüpunkts der Ebene 2, zum Beispiel Bekleidung oder Werkstatt." },
+        { "type": "image_picker", "id": "image", "label": "Bild", "info": "Ohne Auswahl wird die Standarddatei unten benutzt. Ohne Bild bleibt die Kachel anthrazit." },
+        { "type": "text", "id": "image_asset", "label": "Standard-Bilddatei im Theme", "info": "Dateiname aus den Theme-Dateien, z. B. bento-herren.jpg." },
+        {
+          "type": "select",
+          "id": "focus",
+          "label": "Bildausschnitt",
+          "info": "Die Kachel ist breiter als hoch: welcher Teil des Fotos zu sehen bleibt.",
+          "options": [
+            { "value": "top", "label": "Oben" },
+            { "value": "center", "label": "Mitte" },
+            { "value": "bottom", "label": "Unten" }
+          ],
+          "default": "center"
+        }
       ]
     },
     {
       "type": "contact",
-      "name": "Megamenü: Kontaktspalte",
+      "name": "Megamenü: Kontakt",
       "limit": 2,
       "settings": [
+        { "type": "paragraph", "content": "Telefon, E-Mail und Öffnungszeiten aus den Theme-Einstellungen. Bei einem Hauptpunkt ohne Unterpunkte der Ebene 3 (z. B. Service) steht der Kontakt als letzte Kachel im Raster, sonst in der Fußzeile." },
         { "type": "text", "id": "parent", "label": "Hauptmenüpunkt (Titel)", "default": "Service" },
         { "type": "text", "id": "title", "label": "Überschrift", "default": "Direkter Draht" }
       ]

@@ -1,0 +1,12 @@
+{% doc %}
+  Schritt-Nummer des Kaufwegs auf der Service-Seite (.step-no): zweistellige Ziffer, dahinter ein oranger Strich.
+  Steht als eigene Zeile über der Überschrift des Schritts, in Themenblöcken wie in Partner-Angeboten.
+  Orange nur als Strich, nie als Schrift (auf hellem Grund 2,8:1). Screenreader hören „Schritt 3“, nicht „null drei“.
+  Styles in assets/pages.css.
+
+  @param {number} step - Nummer des Schritts, ab 1
+
+  @example
+  {% render 'step-no', step: 2 %}
+{% enddoc %}
+<p class="step-no"><span aria-hidden="true">{{ step | prepend: '0' | slice: -2, 2 }}</span><span class="sr-only">Schritt {{ step }}</span></p>

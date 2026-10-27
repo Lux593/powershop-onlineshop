@@ -1,5 +1,5 @@
 {% doc %}
-  Kachel des Kategorie-Bento (.bento-tile).
+  Kachel des Kategorie-Bento (.bento-tile), auch als Tür zu einer Seite auf Service und in der Story der Startseite (.doors, home.css).
   Ohne Link bleibt die Kachel eine reine Bildfläche (kein toter Link auf „#“).
 
   @param {object} block - Block mit title, subtitle, url, image, image_asset
@@ -7,13 +7,23 @@
   @param {number} width - Breite der Standarddatei
   @param {number} height - Höhe der Standarddatei
   @param {boolean} [parallax] - Bild driftet beim Scrollen (nur Fotokacheln, nicht die Freisteller)
+  @param {string} [id] - ID der Kachel, z. B. als Sprungziel (/pages/service#werkstatt landet auf der Tür)
+  @param {string} [sizes] - sizes-Attribut des Bildes, Standard "(min-width: 1024px) 50vw, 100vw"
+  @param {string} [srcset] - Skalierte Fassungen der Standarddatei aus assets/ (wie in snippets/media.liquid)
+  @param {string} [position] - Bildausschnitt als object-position, z. B. "50% 70%"
 {% enddoc %}
 
-{%- assign tile_tag = 'div' -%}
-{%- if block.settings.url != blank -%}{%- assign tile_tag = 'a' -%}{%- endif -%}
-<{{ tile_tag }} class="bento-tile{% if modifier != blank %} {{ modifier }}{% endif %}" data-reveal="clip"{% if block.settings.url != blank %} href="{{ block.settings.url }}"{% endif %} {{ block.shopify_attributes }}>
+{%- liquid
+  assign tile_tag = 'div'
+  if block.settings.url != blank
+    assign tile_tag = 'a'
+  endif
+  assign tile_sizes = sizes | default: '(min-width: 1024px) 50vw, 100vw'
+  assign tile_position = position | strip
+-%}
+<{{ tile_tag }} class="bento-tile{% if modifier != blank %} {{ modifier }}{% endif %}"{% if id != blank %} id="{{ id | escape }}"{% endif %}{% if tile_position != blank %} style="--tile-pos: {{ tile_position | escape }}"{% endif %} data-reveal="clip"{% if block.settings.url != blank %} href="{{ block.settings.url }}"{% endif %} {{ block.shopify_attributes }}>
   <span class="bento-tile__media"{% if parallax %} data-parallax="0.12"{% endif %}>
-    {%- render 'media', image: block.settings.image, asset: block.settings.image_asset, width: width, height: height, sizes: '(min-width: 1024px) 50vw, 100vw' -%}
+    {%- render 'media', image: block.settings.image, asset: block.settings.image_asset, width: width, height: height, sizes: tile_sizes, srcset: srcset -%}
   </span>
   <span class="bento-tile__label">
     <strong>{{ block.settings.title }}</strong>

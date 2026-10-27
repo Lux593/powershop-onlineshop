@@ -1,6 +1,8 @@
 {% doc %}
-  Partner-Angebot auf der Service-Seite (Finanzierung, Versicherung): Logo des Partners, Aussage in Display-Größe, darunter
-  links Bild, Text, Rechner-Links und Beratung, rechts die Kontakt-Box des Shops oder eine Ansprechpartner-Karte.
+  Partner-Angebot auf der Service-Seite (Probefahrt, Finanzierung, Versicherung): Logo des Partners (optional), Aussage in
+  Display-Größe, darunter links Bild, Text, Stichpunkte, Links und Beratung, rechts die Kontakt-Box des Shops, eine
+  Ansprechpartner-Karte oder die Kontakt-Karte des Shops (gleicher Aufbau wie der Ansprechpartner: Foto, Titel, Adresse
+  des Shops, Anrufen, WhatsApp, E-Mail mit festem Thema).
   Hell (Offwhite) oder dunkel mit Körnung, immer über die volle Breite (eigener Container).
   Mit Bewegung leuchten die Wörter der Aussage beim Scrollen nacheinander auf wie im Willkommensblock der Startseite
   (data-split aus assets/motion.js, data-scrub aus assets/pages.js). Ohne Bewegung steht die Aussage in voller Farbe da.
@@ -8,9 +10,12 @@
   Externe Links öffnen in einem neuen Fenster, damit der Rechner des Partners die Seite des Shops nicht ersetzt.
 
   @param {object} block - Block „partner“ der Service-Seite (sections/service-page.liquid)
+  @param {number} [step] - Schritt im Kaufweg; steht als eigene Zeile über der Aussage (snippets/step-no.liquid), 0 = ohne
+  @param {string} [fallback_url] - Ziel von „Kontakt aufnehmen“, wenn Kontakt-Box oder Kanäle der Karte mangels Händlerdaten fehlen.
+    Standard: die Kontakt-Seite. Auf der Service-Seite „#standort“ (Adresse und Route stehen dort auch ohne Kanäle).
 
   @example
-  {% render 'partner-offer', block: block %}
+  {% render 'partner-offer', block: block, step: 3, fallback_url: '#standort' %}
 {% enddoc %}
 
 {%- liquid
@@ -20,6 +25,9 @@
     assign dark = true
   endif
   assign anchor = s.anchor | default: block.id
+  assign fallback = fallback_url | default: pages['contact'].url
+  assign bullets = s.bullets | newline_to_br | split: '<br />'
+  assign photo_pos = s.person_image_position | default: '50% 50%'
   assign text = s.text
   if s.footnote != blank and s.footnote_term != blank
     assign marked_term = s.footnote_term | append: '<sup>*</sup>'
@@ -37,8 +45,8 @@
 
 {%- comment -%}
   Rechte Spalte zuerst fassen: Die Kontakt-Box erscheint nur mit gepflegten Händlerdaten (Telefon, WhatsApp oder E-Mail).
-  Fehlen sie, entfällt die Spalte, und unter dem Text steht ein Link zur Kontaktseite, damit „Kontaktiere uns“ nicht ins
-  Leere läuft.
+  Fehlen sie, entfällt die Spalte, und unter dem Text steht ein Link „Kontakt aufnehmen“ (fallback_url), damit
+  „Kontaktiere uns“ nicht ins Leere läuft.
 {%- endcomment -%}
 {%- assign contact_missing = false -%}
 {%- capture offer_aside -%}
@@ -63,7 +71,7 @@
       {%- assign address_lines = s.person_address | newline_to_br | split: '<br />' -%}
       <article class="agent" aria-labelledby="agent-{{ block.id }}">
         {%- if person_photo != blank -%}
-          <div class="agent__photo" data-reveal="clip">{{ person_photo }}</div>
+          <div class="agent__photo" data-reveal="clip" style="--photo-pos: {{ photo_pos | escape }}">{{ person_photo }}</div>
         {%- endif -%}
         <div class="agent__body" data-stagger="70">
           <h3 id="agent-{{ block.id }}">{{ s.person_name | escape }}</h3>
@@ -110,6 +118,46 @@
           </div>
         </div>
       </article>
+
+    {%- when 'shop' -%}
+      {%- comment -%}
+        Kontakt-Karte des Shops: Aufbau wie der Ansprechpartner, aber mit Adresse und Kanälen aus den Händlerdaten. Die Knöpfe
+        tragen das feste Thema (contact-box bare, Nachricht von contact.js vorausgefüllt). Ohne Kanäle bleibt die Karte stehen,
+        statt der Knöpfe führt „Kontakt aufnehmen“ zu fallback_url (Standort, Route und Öffnungszeiten).
+      {%- endcomment -%}
+      {%- capture card_photo -%}
+        {%- render 'media', image: s.person_image, asset: s.person_image_asset, width: 1200, height: 800, alt: s.person_image_alt, sizes: '(min-width: 1320px) 520px, (min-width: 1024px) 40vw, (min-width: 640px) 40vw, 100vw' -%}
+      {%- endcapture -%}
+      {%- assign card_photo = card_photo | strip -%}
+      {%- assign card_anchor = anchor | append: '-kontakt' -%}
+      {%- capture card_buttons -%}
+        {% render 'contact-box', bare: true, dark: dark, class: 'agent__actions', topic: s.topic %}
+      {%- endcapture -%}
+      {%- assign card_buttons = card_buttons | strip -%}
+      {%- assign address_lines = settings.address | newline_to_br | split: '<br />' -%}
+      <article class="agent" id="{{ card_anchor | escape }}" aria-labelledby="agent-{{ block.id }}">
+        {%- if card_photo != blank -%}
+          <div class="agent__photo" data-reveal="clip" style="--photo-pos: {{ photo_pos | escape }}">{{ card_photo }}</div>
+        {%- endif -%}
+        <div class="agent__body" data-stagger="70">
+          <h3 id="agent-{{ block.id }}">{{ s.contact_title | default: 'Sprich mit uns' | escape }}</h3>
+          {%- if settings.address != blank -%}
+            <address>
+              {%- for line in address_lines -%}
+                {%- assign item = line | strip | strip_newlines -%}
+                {%- if item != blank -%}{{ item | escape }}{% unless forloop.last %}<br>{% endunless %}{%- endif -%}
+              {%- endfor -%}
+            </address>
+          {%- endif -%}
+          {%- if card_buttons != blank -%}
+            {{ card_buttons }}
+          {%- elsif fallback != blank -%}
+            <div class="agent__actions">
+              <a class="btn {% if dark %}btn--outline-light{% else %}btn--secondary{% endif %}" href="{{ fallback }}">{% render 'icon', name: 'map-pin' %}Kontakt aufnehmen</a>
+            </div>
+          {%- endif -%}
+        </div>
+      </article>
   {%- endcase -%}
 {%- endcapture -%}
 {%- assign offer_aside = offer_aside | strip -%}
@@ -122,6 +170,7 @@
 >
   <div class="container">
     <div class="offer__head">
+      {%- if step > 0 -%}{% render 'step-no', step: step %}{%- endif -%}
       {%- if offer_logo != blank -%}
         <div class="offer__logo" data-reveal="fade">{{ offer_logo }}</div>
       {%- endif -%}
@@ -136,6 +185,14 @@
         <div class="offer__body">
         {%- if text != blank -%}
           <div class="offer__text" data-reveal>{{ text }}</div>
+        {%- endif -%}
+        {%- if s.bullets != blank -%}
+          <ul class="offer__list" data-stagger="70">
+            {%- for line in bullets -%}
+              {%- assign item = line | strip | strip_newlines -%}
+              {%- if item != blank -%}<li>{% render 'icon', name: 'check' %}<span>{{ item | escape }}</span></li>{%- endif -%}
+            {%- endfor -%}
+          </ul>
         {%- endif -%}
         {%- if s.label_1 != blank or s.label_2 != blank -%}
           <div class="offer__actions" data-stagger="80">
@@ -172,8 +229,8 @@
             {{ s.advice_text }}
           </div>
         {%- endif -%}
-        {%- if contact_missing and pages['contact'] != blank -%}
-          <div data-reveal><a class="btn {% if dark %}btn--outline-light{% else %}btn--secondary{% endif %}" href="{{ pages['contact'].url }}">{% render 'icon', name: 'mail' %}Kontakt aufnehmen</a></div>
+        {%- if contact_missing and fallback != blank -%}
+          <div data-reveal><a class="btn {% if dark %}btn--outline-light{% else %}btn--secondary{% endif %}" href="{{ fallback }}">{% render 'icon', name: 'mail' %}Kontakt aufnehmen</a></div>
         {%- endif -%}
         {%- if s.footnote != blank and s.footnote_term != blank -%}
           <p class="caption offer__footnote">* {{ s.footnote | escape }}</p>

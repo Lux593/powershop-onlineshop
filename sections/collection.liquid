@@ -36,7 +36,7 @@
       assign film_lead = 'Neue Maschinen, direkt vor der Tür. Aufsteigen und Probe fahren.'
       assign film_label = 'Ein Fahrer setzt den Helm auf und steigt auf ein Motorrad. Im Bild steht: Get a Harley.'
       assign film_link_label = 'Probefahrt anfragen'
-      assign film_link_url = '/pages/service#probefahrt'
+      assign film_link_url = '/pages/dienstleistungen#probefahrt'
     when 'sale'
       assign banner_asset = 'banner-sale.jpg'
     else
@@ -54,6 +54,7 @@
   endif
 -%}
 
+{%- if film_file != blank -%}<script src="{{ 'film-banner.js' | asset_url }}" defer></script>{%- endif -%}
 <div data-collection data-section-id="{{ section.id }}">
   <section class="page-banner on-dark textured{% if film_file != blank %} page-banner--film{% endif %}">
     <div class="container page-banner__inner">
@@ -79,7 +80,7 @@
         {%- if film_file != blank -%}
           <div class="film-banner__frame">
             {%- comment -%}
-              Kein autoplay im Markup: collection.js startet den Film nach Load und Leerlauf, nicht bei Datensparen oder reduzierter Bewegung. Ohne JS bleibt das Poster.
+              Kein autoplay im Markup: film-banner.js startet den Film nach Load und Leerlauf, nicht bei Datensparen oder reduzierter Bewegung. Ohne JS bleibt das Poster.
               Das Poster ist ein eigenes Bild unter dem Film (wie im Hero), kein poster-Attribut: iOS Safari nimmt das Attribut beim Start weg,
               bevor das erste Bild des Films da ist, und zeigte kurz Schwarz. Der Film blendet erst ein, wenn er läuft (.is-playing).
             {%- endcomment -%}

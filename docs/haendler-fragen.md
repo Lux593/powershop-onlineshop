@@ -95,6 +95,26 @@ unter `/pages/service#finanzierung` und `#versicherung` (Blöcke „Partner-Ange
 38. **Bilder und Logos** (Wichtig): Das Breakout-Foto ist Harley-Davidson-Werbematerial (Modelljahr 2026). Für den hellen Abschnitt wurde aus dem weißen
     Finance-Logo eine Fassung mit schwarzer Schrift abgeleitet (Orange unverändert). Ist das nach den Händler-Vorgaben in Ordnung?
 
+## H. Service-Bereich: Kaufweg, Lieferung, Über uns (Stand 27. Oktober 2026)
+
+Die Service-Seite ist neu gegliedert: Tür zur Werkstatt, Kaufweg in fünf Schritten, Events, Standort & Kontakt.
+Plan und Stand: `docs/plan-service-werkstatt.md`.
+
+39. **Kontaktdaten bestätigen** (Pflicht): Von der alten Website stammen Telefon +49 7621 62022, WhatsApp +49 174 3201879 und
+    E-Mail info@powershop-weil.com. Stimmen sie für den Onlineshop? Erst dann trage ich sie ein. Das schaltet überall Anrufen, WhatsApp und
+    E-Mail frei, auch „Anfragen“ auf den Motorrad-Karten.
+40. **Inzahlungnahme** (Wichtig): Ablauf in drei Schritten (Daten schicken, Angebot bekommen, beim Kauf anrechnen) und „Das brauchen wir von dir:
+    Fahrzeugschein und -brief (Zulassungsbescheinigung Teil I und II), Serviceheft und alle Schlüssel.“ Stimmt das so? Fehlt etwas?
+41. **Anmeldung & Lieferung** (Wichtig): Übernommen von der alten Seite „Verkauf & Lieferung DE/CH/FR“: Kauf vor Ort oder per Telefon und E-Mail,
+    Lieferung in Deutschland über die Harley-Davidson-Spedition SKS, Export und Verzollung in die Schweiz mit Zollkennzeichen bis zum MFK-Termin,
+    Exportabwicklung nach Frankreich mit WW-Kennzeichen. Ist das noch aktuell, und läuft es weiter über SKS?
+42. **Fotos für den Service-Bereich** (Wichtig): Echte Bilder für das Service-Banner, die Inzahlungnahme und die Events. Bis dahin bleiben diese
+    Stellen ohne Bild.
+43. **Über uns** (Wichtig): Die Geschichte bestätigen (1985 Schusterinsel, 1991 Haltingen, 2016 zweite Generation), je Person ein Satz,
+    Teamporträts in hoher Auflösung (die alten haben 300 × 300 px) mit schriftlicher Einwilligung, Fotos von Gebäude und Geschichte.
+    Nutzungsrechte am YouTube-Film klären, er liegt auf dem Kanal eines Dritten.
+44. **Alte Domain** (Wichtig): Soll powershop-weil.com auf den Shop zeigen, und wann? Dann brauchen die alten Seiten Weiterleitungen.
+
 ---
 
 **Was mit den Antworten passiert:** Die Werte werden im Theme-Editor und im Code eingetragen, Beispielwerte entfallen, sobald die echten Angaben da sind.

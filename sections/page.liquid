@@ -12,11 +12,21 @@
   </div>
 </section>
 
-<div class="container section--tight">
-  <div class="page-content">
-    {{ page.content }}
+{%- liquid
+  # Seiten ohne eigenen Text (z. B. Kontakt, deren Inhalt aus Sektionen kommt) lassen keine leere Fläche stehen
+  assign has_body = false
+  assign body_text = page.content | strip_html | strip
+  if body_text != blank or page.content contains '<img' or page.content contains '<iframe' or page.content contains '<video'
+    assign has_body = true
+  endif
+-%}
+{%- if has_body -%}
+  <div class="container section--tight">
+    <div class="page-content">
+      {{ page.content }}
+    </div>
   </div>
-</div>
+{%- endif -%}
 
 {% schema %}
 {

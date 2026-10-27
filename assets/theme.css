@@ -77,8 +77,8 @@
   /* Farbfelder tragen ihre Farbe als Hintergrund und wären sonst leere Kreise; der Rand hält dunkle Farben auf dunklem Grund sichtbar */
   .swatch, .fgroup__swatch { forced-color-adjust: none; border: 1px solid CanvasText; }
   /* Ring um das gewählte Feld; ungewählt unsichtbar (die transparente Linie würde sonst in Systemfarbe sichtbar) */
-  .swatch-btn, .filterbar .grid-toggle button, .gallery .gallery__thumbs button { border-color: Canvas; }
-  .swatch-btn[aria-pressed="true"], .filterbar .grid-toggle button[aria-pressed="true"], .gallery .gallery__thumbs button[aria-current="true"] { border-color: Highlight; }
+  .swatch-btn, .bcard__swatch, .filterbar .grid-toggle button, .gallery .gallery__thumbs button { border-color: Canvas; }
+  .swatch-btn[aria-pressed="true"], .bcard__swatch[aria-pressed="true"], .filterbar .grid-toggle button[aria-pressed="true"], .gallery .gallery__thumbs button[aria-current="true"] { border-color: Highlight; }
   .filterbar .grid-toggle button { border-width: 2px; }
   /* Hero-Tabs: die orange Linie (Hintergrund) würde als Canvas-Balken den Rand überdecken. Sie bleibt in Systemfarbe stehen und
      darf nicht entfallen: hero.js wechselt den Slide über ihr animationend. Der gewählte Tab behält zusätzlich einen kräftigen Strich. */

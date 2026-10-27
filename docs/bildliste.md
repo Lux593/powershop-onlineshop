@@ -21,7 +21,7 @@ Austausch den Dateinamen aus der Liste streichen (siehe `README.md`).
 | `hero-ride-road.jpg` | 1024 × 576 | Lifestyle/Marke | echt | Zwei Fahrer auf einer Road Glide, unterwegs auf einer Landstraße mit gelber Doppellinie (Startbild des Hero-Clips, siehe `docs/hero-clip.md`) | Homepage · Hero, Modell Road Glide |
 | `hero-ride-street.jpg` | 1024 × 576 | Lifestyle/Marke | echt | Zwei Fahrer auf einer Street Glide, unterwegs auf einer Landstraße mit gelber Doppellinie | Homepage · Hero, Modell Street Glide |
 | `hero-ride-cvo.jpg` | 1500 × 1000 | Lifestyle/Marke | echt | Fahrer auf einer CVO Road Glide, unterwegs auf einer Landstraße | Homepage · Hero, Modell CVO |
-| `bento-motorraeder.jpg` | 1400 × 1000 | Lifestyle/Marke | echt | Fahrer auf einer CVO Road Glide in voller Fahrt auf einer Landstraße, Hügel im Hintergrund | Homepage · Kategorie-Kachel Motorräder |
+| `bento-motorraeder.jpg` | 1400 × 1000 | Lifestyle/Marke | echt | Fahrer auf einer CVO Road Glide in voller Fahrt auf einer Landstraße, Hügel im Hintergrund | Homepage · Kategorie-Kachel Motorräder · Megamenü Motorräder · Kachel Fahrzeuge |
 | `bento-herren.jpg` | 736 × 738 | Lifestyle/Marke | echt | Bärtiger Fahrer im Profil in schwarz-oranger H-D-Jacke, Oberkörper, Bäume unscharf im Hintergrund | Megamenü · Teaser Herren |
 | `bento-herren-ruecken.jpg` | 864 × 720 | Lifestyle/Marke | echt | Mann in brauner Jacke mit Harley-Davidson-Schriftzug von hinten im Laden (Standbild aus `clothing-herren.mp4` bei 17,5 s, keine Gesichter) | Homepage · Kategorie-Kachel Herren |
 | `bento-damen.jpg` | 960 × 867 | Lifestyle/Marke | echt | Frau in ärmelloser Bluse hält eine Lederjacke, Bike im Hintergrund | Megamenü · Teaser Damen |
@@ -40,12 +40,27 @@ Austausch den Dateinamen aus der Liste streichen (siehe `README.md`).
 | `mega-damen.jpg` | 600 × 750 | Lifestyle/Marke | Platzhalter | Neue Damen-Kollektion, Model in Jacke | Megamenü Damen · Teaser |
 | `mega-teile.jpg` | 600 × 750 | Lifestyle/Marke | Platzhalter | Custom-Umbau vorher/nachher | Megamenü Teile · Teaser Custom-Umbauten |
 | `mega-accessoires.jpg` | 600 × 750 | Lifestyle/Marke | Platzhalter | Geschenkideen: Gutschein, Tasse, Cap | Megamenü Accessoires · Teaser |
-| `powershop-team.webp` | 980 × 807 | Lifestyle/Marke | echt | Das Team vom Power Shop, Porträtraster mit Namen und Funktion (WebP, Qualität 90, ca. 140 KB; Quelle: `pics_to_use/powershop-team.png`) | Homepage · Storytelling „Über uns“ |
-| `event-1.jpg` | 800 × 500 | Lifestyle/Marke | Platzhalter | Gruppenausfahrt auf Landstraße | Homepage/Service · Event-Kachel 1 |
-| `event-2.jpg` | 800 × 500 | Lifestyle/Marke | Platzhalter | Bike Night im Hof, Lichterketten, Community | Homepage/Service · Event-Kachel 2 |
-| `event-3.jpg` | 800 × 500 | Lifestyle/Marke | Platzhalter | Winter-Check in der Werkstatt, Kunden mit Kaffee | Homepage/Service · Event-Kachel 3 |
+| `mega-motorraeder-familien.webp` | 1600 × 600 | Presse | echt | Drei Touring-Modelle 2025 vor Schwarz (Road Glide, Street Glide, Road King Special): Kopfbild der Seite „Harley-Davidson Modelle 2025“ auf 1903shop.de (`2025HD01_Touring_Modelle.jpg`, 1795 × 1154, vom Nutzer gewählt), Ausschnitt y 170–1000, auf 560 px Höhe verkleinert, Ränder weich nach Schwarz ausgeblendet und mit Schwarz auf 1600 × 600 erweitert. Bildrechte vermutlich Harley-Davidson-Pressebild, vor Live-Gang klären | Megamenü Motorräder · Kachel Modellfamilien |
+| `mega-herren-bekleidung.webp` | 1080 × 660 | Lifestyle/Marke | echt | Mann von hinten mit Cap im schwarzen Hoodie mit grünem Zylinder-Motiv und Bar & Shield auf dem Rücken, ohne Gesicht (Standbild aus dem Herren-Film, vom Nutzer als Bild geliefert; unterer Ausschnitt 1106 × 676, auf 1080 × 660 verkleinert) | Megamenü Herren · Kachel Bekleidung |
+| `mega-herren-motorrad.webp` | 1080 × 660 | Lifestyle/Marke | echt | Mann mit aufgesetztem schwarzem Integralhelm und Motorradjacke mit Bar-&-Shield-Tasche, Gesicht hinter dem Visier (Herren-Film: `collection-2.mov` Bild 592, ab y = 470; vom Nutzer ausgewählt) | Megamenü Herren · Kachel Motorradbekleidung |
+| `mega-herren-kollektionen.webp` | 1080 × 660 | Lifestyle/Marke | echt | Mann von hinten im Hoodie „Harley-Davidson Factory Racing“ (Herren-Film: `clothing-intro.mov` Bild 0, ab y = 630) | Megamenü Herren · Kachel Kollektionen |
+| `mega-damen-bekleidung.webp` | 1080 × 660 | Lifestyle/Marke | echt | Frau von hinten im schwarzen T-Shirt mit „Ride“-Druck auf dem Rücken, ohne Gesicht (Damen-Film: `collection-2.mov` Bild 40, ab y = 820) | Megamenü Damen · Kachel Bekleidung |
+| `mega-damen-motorrad.webp` | 1080 × 660 | Lifestyle/Marke | echt | Frau von hinten in schwarzer Lederjacke mit geprägtem Bar & Shield und Kapuze, ohne Gesicht (Damen-Film: `clothing-intro.mov` Bild 304, ab y = 640; vom Nutzer ausgewählt) | Megamenü Damen · Kachel Motorradbekleidung |
+| `mega-damen-kollektionen.webp` | 1080 × 660 | Lifestyle/Marke | echt | Frau im schwarzen Harley-Davidson-Zip-Hoodie, Ausschnitt vom Hals abwärts, ohne Gesicht (Damen-Film: `clothing-intro.mov` Bild 200, ab y = 940) | Megamenü Damen · Kachel Kollektionen |
+| `mega-teile-komfort.webp` | 1080 × 660 | Lifestyle/Marke | echt | Hellgraue Touring im Laden: Soziussitz mit Rückenlehne, Lautsprecher und Topcase mit Gepäckträger, Kleiderständer unscharf dahinter (Foto des Nutzers `komfort-touring.jpg`, 6336 × 9504, auf 1080 px Breite verkleinert, Ausschnitt ab y = 220) | Megamenü Teile & Zubehör · Kachel Komfort & Touring |
+| `mega-teile-optik.webp` | 1080 × 660 | Lifestyle/Marke | echt | Heck eines Custom-Bikes: mattschwarzer Endtopf mit Plakette „Dr. Jekill & Mr. Hyde“, blaues Heckteil, Hinterrad, Pflaster unscharf dahinter (Foto des Nutzers `optik-pflege.jpg`, 6336 × 9504, auf 1080 px Breite verkleinert, Ausschnitt ab y = 290) | Megamenü Teile & Zubehör · Kachel Optik & Custom |
+| `mega-teile-technik.webp` | 1080 × 660 | Lifestyle/Marke | echt | Bremssattel am Vorderrad mit Bar-&-Shield-Plakette und gelochter Blende, Holzboden unscharf dahinter (Foto des Nutzers `technik-pflege.jpg`, 6336 × 9504, auf 1080 px Breite verkleinert, Ausschnitt ab y = 480) | Megamenü Teile & Zubehör · Kachel Technik & Pflege |
+| `mega-service-werkstatt.webp` | 1080 × 660 | Lifestyle/Marke | echt | Ausschnitt aus `service-werkstatt.jpg` (1200 × 733 ab y = 33): Werkstatt mit Bike auf der Hebebühne, orange Rückwand | Megamenü Service · Kachel Werkstatt |
+| `mega-service-dienstleistungen.webp` | 1080 × 660 | Lifestyle/Marke | echt | Ausschnitt aus `finanzierung-breakout.jpg` (1200 × 733 ab y = 40): Fahrer geht im Abendlicht von seiner Breakout weg, von hinten | Megamenü Service · Kachel Dienstleistungen |
+| `mega-service-ueber-uns.webp` | 1080 × 660 | Lifestyle/Marke | echt | Ausschnitt aus `entwuerfe/ueber-uns/bilder/foto/showroom-theke.jpg` (alte Website, 1600 × 978 ab y = 150): Showroom mit Holztheke und Harley-Davidson-Schriftzug, ohne Personen | Megamenü Service · Kachel Über uns |
+| `tuer-dienstleistungen-{720,1280,1920}.webp` | 1920 × 1280 (und kleiner) | Lifestyle/Marke | echt | Fahrer geht im Abendlicht von seiner Breakout weg, von hinten, ohne Gesicht (alte Website: `alte-website/finanzierung-versicherung/bilder/01-finanzierung-breakout.jpg`, nur verkleinert) | Service · Tür Dienstleistungen · Startseite · Story |
+| `tuer-ueber-uns-{720,1280,1600}.webp` | 1600 × 1066 (und kleiner) | Lifestyle/Marke | echt | Showroom mit Holztheke und Harley-Davidson-Schriftzug, ohne Personen (`entwuerfe/ueber-uns/bilder/foto/showroom-theke.jpg`, Ausschnitt 1600 × 1067 ab y = 100) | Service · Tür Über uns · Startseite · Story |
+| `powershop-team.webp` | 980 × 807 | Lifestyle/Marke | echt | Das Team vom Power Shop, Porträtraster mit Namen und Funktion (WebP, Qualität 90, ca. 140 KB; Quelle: `pics_to_use/powershop-team.png`) | Seit 27.10.2026 nicht mehr eingesetzt (Startseite ohne Teamfoto), Kandidat für Über uns |
+| `event-1.jpg` | 800 × 500 | Lifestyle/Marke | Platzhalter | Gruppenausfahrt auf Landstraße | Homepage · Event-Kachel 1 |
+| `event-2.jpg` | 800 × 500 | Lifestyle/Marke | Platzhalter | Bike Night im Hof, Lichterketten, Community | Homepage · Event-Kachel 2 |
+| `event-3.jpg` | 800 × 500 | Lifestyle/Marke | Platzhalter | Winter-Check in der Werkstatt, Kunden mit Kaffee | Homepage · Event-Kachel 3 |
 | `team-verkauf.jpg` | 400 × 400 | Lifestyle/Marke | Platzhalter | Porträt Verkaufsberater, freundlich, im Showroom | Kontakt-Box · Ansprechpartner |
-| `service-probefahrt.jpg` | 1200 × 800 | Lifestyle/Marke | echt | Lenker und Scheinwerfer eines Bikes in der Frontansicht, ohne Person | Service · Probefahrt |
+| `service-probefahrt.jpg` | 1200 × 800 | Lifestyle/Marke | echt | Lenker und Scheinwerfer eines Bikes in der Frontansicht, ohne Person | Service · Probefahrt (Foto der Kontakt-Karte, 4 : 5) |
 | `service-finanzierung.jpg` | 1200 × 800 | Lifestyle/Marke | Platzhalter | Beratungsgespräch am Tisch, Bike im Hintergrund | Service · Finanzierung |
 | `service-werkstatt.jpg` | 1200 × 800 | Lifestyle/Marke | echt | Werkstatt mit Bike auf der Hebebühne, schwarze Werkbänke mit oranger Rückwand, ohne Person | Service · Werkstatt |
 | `service-inzahlungnahme.jpg` | 1200 × 800 | Lifestyle/Marke | Platzhalter | Handschlag vor Gebrauchtbike | Service · Inzahlungnahme |
@@ -80,12 +95,13 @@ Die gesamte Liste der offenen Händlerfreigaben steht in [`freigaben.md`](freiga
 | `bikes-intro.mp4` · `bikes-intro-poster.jpg` | 960 × 720, ca. 17 s | Kategorieseite Motorräder · Film-Intro |
 | `clothing-herren.mp4` · `clothing-herren-poster.jpg` | 960 × 720, ca. 18 s | Kategorieseite Herren · Film-Intro |
 | `clothing-damen.mp4` · `clothing-damen-poster.jpg` | 960 × 720, ca. 6 s | Kategorieseite Damen · Film-Intro |
+| `werkstatt-intro.mp4` · `werkstatt-intro-poster.jpg` | 960 × 720, 24 fps, ca. 15 s, ohne Ton | Werkstatt · Seitenkopf. Quelle `~/Downloads/werkstatt-intro.mp4` (1920 × 1080, 6 s, Kamerafahrt). Mitte 4 : 3 (`crop=1440:1080:240:0`), `minterpolate` auf 192 fps, Zeitkurve mit sanftem Anlauf (erste 0,5 s) und Auslauf (letzte 1 s bis Bild 143), dann vorwärts und rückwärts aneinander (Ping-Pong, Doppelbilder an den Wenden entfernt): keine harte Schleife. x264 slow, CRF 26. Poster = Bild 0. |
 
 ## Custom-Umbauten (Werkstatt-Seite)
 
 Fotos des Händlers aus `pics_to_use/custom-*` (iPhone, 26./27.10.2026). Je Foto WebP in mehreren Breiten, ohne Metadaten (GPS und Gerät
 entfernt): Querformat 720 / 1280 / 1920 px, Hochformat 720 / 1080 / 1440 px, nie größer als das Original. Name: `umbau-<umbau>-<nr>-<breite>.webp`.
-Eingesetzt in `templates/page.werkstatt.json` (Blöcke „Umbau-Bild“). Im Theme-Editor lässt sich jedes Foto durch ein hochgeladenes Bild ersetzen,
+Eingesetzt in `templates/page.werkstatt.json` (Blöcke „Umbau-Bild“; `umbau-falk-2` auch im Seitenkopf und auf der Werkstatt-Tür der Service-Seite). Im Theme-Editor lässt sich jedes Foto durch ein hochgeladenes Bild ersetzen,
 dann liefert das Shopify-CDN die Größen selbst.
 
 | Umbau | Fotos (Nr.) | Größte Datei | Hinweis |

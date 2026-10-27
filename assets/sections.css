@@ -23,21 +23,7 @@
 .event-card__body p { display: flex; align-items: center; gap: 6px; font-size: var(--fs-small); color: var(--c-muted-dark); }
 .event-card__body .icon { width: 16px; height: 16px; }
 
-/* ---------- Service-Seite ---------- */
-.service-nav { position: sticky; top: var(--header-offset); z-index: 20; background: var(--c-offwhite); border-bottom: 1px solid var(--c-line); }
-.service-nav .chip-row { flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; padding-block: 12px; scrollbar-width: none; }
-.service-block { display: grid; gap: 32px; padding-block: var(--s-8); border-bottom: 1px solid var(--c-line); }
-@media (min-width: 1024px) { .service-block { grid-template-columns: 7fr 5fr; gap: 56px; align-items: start; } }
-.service-block__text { display: grid; gap: 16px; }
-.service-block__text img { aspect-ratio: 3 / 2; object-fit: cover; width: 100%; }
-.service-block__text ul { display: grid; gap: 8px; }
-.service-block__text li { display: flex; gap: 10px; }
-.service-block__text li .icon { color: var(--c-success); width: 18px; height: 18px; margin-top: 3px; }
-.service-block.service-block--single { grid-template-columns: 1fr; }
-.service-events { padding: 24px; }
-.map-ph { aspect-ratio: 16 / 9; display: grid; place-content: center; justify-items: center; gap: 12px; text-align: center; padding: 24px; background: repeating-linear-gradient(45deg, var(--c-stone), var(--c-stone) 12px, var(--c-stone-deep) 12px, var(--c-stone-deep) 24px); color: var(--c-muted); font-size: var(--fs-small); }
-.map-ph .icon { color: var(--c-black); }
-.map-ph a { color: var(--c-black); font-weight: 600; }
+/* Service-Seite: Stile in assets/pages.css (lädt auf allen Seiten-Vorlagen) */
 
 /* Grid-Kinder dürfen schrumpfen (verhindert horizontales Scrollen auf Mobil) */
-.pdp > *, .service-block > *, .story > *, .footer__news > *, .page-banner__inner > * { min-width: 0; }
+.pdp > *, .story > *, .footer__news > *, .page-banner__inner > * { min-width: 0; }

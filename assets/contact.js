@@ -10,6 +10,7 @@
     finanzierung: { subj: 'Finanzierung', text: function (x) { return 'ich interessiere mich für eine Finanzierung' + (x ? ' der ' + x : '') + '. Könnt ihr mir ein Angebot machen?'; } },
     versicherung: { subj: 'Versicherung', text: function (x) { return 'ich interessiere mich für eine Versicherung' + (x ? ' für die ' + x : ' für mein Bike') + '. Könnt ihr mich beraten?'; } },
     inzahlungnahme: { subj: 'Inzahlungnahme', text: function (x) { return 'ich möchte mein aktuelles Motorrad in Zahlung geben' + (x ? ' und interessiere mich für die ' + x : '') + '. Mein Bike: Modell …, Baujahr …, km-Stand …'; } },
+    lieferung: { subj: 'Lieferung', text: function (x) { return 'ich interessiere mich für ' + (x ? 'die ' + x : 'ein Motorrad') + ' mit Lieferung. Lieferland: Deutschland / Schweiz / Frankreich, Ort: …'; } },
     reservierung: { subj: 'Reservierungsanfrage', text: function (x) { return 'ich möchte die ' + x + ' reservieren. Bitte schickt mir den Zahlungslink für die Reservierungsgebühr.'; } },
     werkstatt: { subj: 'Werkstatt-Termin', text: function () { return 'ich hätte gerne einen Werkstatt-Termin. Mein Bike: Modell …, Baujahr …, Anliegen: …'; } },
     kompatibilitaet: { subj: 'Frage zur Kompatibilität', text: function (x) { return 'passt ' + x + ' an mein Motorrad? Modell …, Baujahr …'; } },
@@ -17,9 +18,10 @@
     frage: { subj: 'Frage', text: function (x) { return 'ich habe eine Frage' + (x ? ' zur ' + x : '') + ': …'; } }
   };
 
+  // Thema: der gedrückte Chip, sonst das feste Thema der kompakten Anfrage-Zeile (data-topic-default), sonst „Frage“
   function update(box) {
     var pressed = box.querySelector('[data-topic][aria-pressed="true"]');
-    var topic = TOPICS[(pressed && pressed.dataset.topic) || 'frage'] || TOPICS.frage;
+    var topic = TOPICS[(pressed && pressed.dataset.topic) || box.dataset.topicDefault || 'frage'] || TOPICS.frage;
     var subject = box.dataset.subject;
     var ref = box.dataset.ref || window.location.href;
     var message = 'Hallo Power-Shop-Team, ' + topic.text(subject) + (ref ? '\n\n' + ref : '') + '\n\nViele Grüße';
@@ -55,16 +57,15 @@
       el.textContent = 'Gerade geschlossen – schreib uns, wir melden uns.';
       el.classList.remove('is-open');
     }
+    el.hidden = false; // „Komm vorbei“ liefert den Status leer und versteckt aus, damit ohne JavaScript kein leerer Punkt steht
   }
 
   // product.js ruft das nach einer Variantenwahl auf, wenn sich der Betreff (data-subject) geändert hat
   PS.refreshContact = update;
 
-  PS.on('[data-contact]', function (box) {
-    update(box);
-    var state = box.querySelector('[data-open-state]');
-    if (state) openState(state);
-  });
+  PS.on('[data-contact]', update);
+  // Auch außerhalb der Box: „Komm vorbei“ (sections/visit.liquid) zeigt die Öffnungszeiten selbst
+  PS.on('[data-open-state]', openState);
 
   document.addEventListener('click', function (event) {
     var chip = event.target.closest('[data-contact] [data-topic]');

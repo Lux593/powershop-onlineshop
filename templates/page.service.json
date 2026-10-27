@@ -1,164 +1,82 @@
 {
   "sections": {
+    "subnav": {
+      "type": "service-subnav",
+      "settings": {
+        "menu": "main-menu",
+        "parent": "Service",
+        "scheme": "dark",
+        "sticky": false
+      }
+    },
     "main": {
       "type": "service-page",
       "blocks": {
-        "probefahrt": {
-          "type": "service",
+        "tuer_werkstatt": {
+          "type": "door",
           "settings": {
-            "chip": "Probefahrt",
-            "anchor": "probefahrt",
-            "image_asset": "service-probefahrt.jpg",
-            "image_alt": "Frontansicht eines Motorrads mit Rundscheinwerfer, zwei Zusatzscheinwerfern und hohem Lenker",
-            "title": "Erst fahren, dann entscheiden",
-            "text": "<p>Wähle dein Wunsch-Modell – vom Einsteiger-Bike bis zur CVO. Wir nehmen uns Zeit, erklären dir alles in Ruhe und passen Sitzposition und Lenker für dich an.</p>",
-            "bullets": "Gültiger Führerschein der passenden Klasse (A / A2) mitbringen\nHelm und Schutzkleidung leihen wir dir auf Wunsch\nAuch für Wiedereinsteiger und Neulinge – ohne Druck",
-            "contact_title": "Probefahrt anfragen",
-            "topic": "probefahrt"
-          }
-        },
-        "finanzierung": {
-          "type": "partner",
-          "settings": {
-            "chip": "Finanzierung",
-            "anchor": "finanzierung",
-            "scheme": "light",
-            "logo_asset": "logo-hd-financial-services-dunkel.png",
-            "logo_width": 423,
-            "logo_height": 50,
-            "logo_alt": "Harley-Davidson Finance",
-            "heading": "Der Preis sollte nie ein Hindernis sein, seine Träume zu verwirklichen",
-            "image_asset": "finanzierung-breakout.jpg",
-            "image_alt": "Fahrer geht im Abendlicht von seiner Harley-Davidson Breakout weg",
-            "text": "<p>Hole Dir Dein Traum Harley-Davidson® Motorrad für weniger als Du denkst. Hier klicken, um zu sehen, was unser Finanzrechner für Dich tun kann.</p>",
-            "label_1": "Finanzierungsrechner",
-            "url_1": "https://calculator.harley-davidson.com/de/finance/choose-bike/",
-            "label_2": "Mehr erfahren",
-            "url_2": "https://calculator.harley-davidson.com/de/home",
-            "advice_heading": "Persönliche Beratung",
-            "advice_text": "<p>Gerne unterstützen wir dich bei allen Fragen rund um Finanzierung und Versicherung. Wir kalkulieren für dich auf Wunsch ein individuelles Angebot, passend zu deinem Bike und deinen Vorstellungen. Kontaktiere uns einfach, wir beraten dich persönlich.</p>",
-            "footnote_term": "",
-            "footnote": "",
-            "aside": "contact",
-            "contact_title": "Finanzierung anfragen",
-            "topic": "finanzierung"
-          }
-        },
-        "versicherung": {
-          "type": "partner",
-          "settings": {
-            "chip": "Versicherung",
-            "anchor": "versicherung",
-            "scheme": "dark",
-            "logo_asset": "logo-hd-insurance-services.png",
-            "logo_width": 386,
-            "logo_height": 52,
-            "logo_alt": "Harley-Davidson Insurance Services",
-            "heading": "Maßgeschnei­derter Versicherungs­schutz zu einer fairen Prämie",
-            "image_asset": "",
-            "image_alt": "",
-            "text": "<p>Harley-Davidson Financial Services bietet in Zusammenarbeit mit der ERGO Versicherung unter dem Namen Harley-Davidson Insurance Services allen Harley Besitzern attraktive Versicherungspakete an. Ganz gleich ob Vollkasko, Teilkasko oder Haftpflichtthemen, kontaktiere Daniel Meier. Gerne rechnet er dir die passende Prämie für dein Bike.</p>",
-            "label_1": "Prämienrechner",
-            "url_1": "https://www.ergo-hdis.de/praemienberechnung/allgemeine-daten",
-            "label_2": "Mehr erfahren",
-            "url_2": "https://www.ergo-hdis.de/",
-            "advice_heading": "",
-            "advice_text": "",
-            "footnote_term": "Harley-Davidson Insurance Services",
-            "footnote": "",
-            "aside": "person",
-            "person_image_asset": "versicherung-daniel-meier.jpg",
-            "person_image_alt": "Daniel Meier, Versicherungsberater der ERGO für Harley-Davidson Insurance Services",
-            "person_name": "Daniel Meier",
-            "person_company": "Geschäftsstelle der ERGO Beratung und Vertrieb AG",
-            "person_address": "Tullastr. 89\n79108 Freiburg",
-            "person_phone": "0761 88664460",
-            "person_mobile": "0171 6579388"
-          }
-        },
-        "werkstatt": {
-          "type": "service",
-          "settings": {
-            "chip": "Werkstatt",
+            "title": "Werkstatt",
+            "subtitle": "Inspektion, Umbau & Eintragung",
+            "url": "shopify://pages/werkstatt",
             "anchor": "werkstatt",
-            "image_asset": "service-werkstatt.jpg",
-            "image_alt": "Motorrad auf der Hebebühne in der Werkstatt",
-            "title": "Service, Umbau & Eintragung",
-            "text": "<p>Inspektion nach Herstellervorgabe, Reifen, Winter-Check oder kompletter Custom-Umbau: Unsere Meisterwerkstatt kennt jede Harley. Teile aus dem Shop bauen wir dir direkt ein und kümmern uns um Abnahme und Eintragung.</p>",
-            "bullets": "Inspektion & Wartung mit Original-Teilen\nEinbau von Zubehör inkl. TÜV/DEKRA-Abnahme",
-            "contact_title": "Werkstatt-Termin anfragen",
-            "topic": "werkstatt"
+            "image_asset": "umbau-falk-2-1920.webp",
+            "image_srcset": "umbau-falk-2-720.webp 720w, umbau-falk-2-1280.webp 1280w, umbau-falk-2-1920.webp 1920w",
+            "image_position": "50% 70%"
           }
         },
-        "inzahlungnahme": {
-          "type": "service",
+        "tuer_dienstleistungen": {
+          "type": "door",
           "settings": {
-            "chip": "Inzahlungnahme",
-            "anchor": "inzahlungnahme",
-            "image_asset": "service-inzahlungnahme.jpg",
-            "image_alt": "Handschlag vor einem Gebrauchtmotorrad",
-            "title": "Dein altes Bike zählt",
-            "text": "<p>Schick uns Modell, Baujahr, km-Stand und ein paar Fotos – wir machen dir ein faires Angebot und rechnen es direkt beim Kauf deines neuen Bikes an.</p>",
-            "bullets": "",
-            "contact_title": "Bike bewerten lassen",
-            "topic": "inzahlungnahme"
+            "title": "Dienstleistungen",
+            "subtitle": "Probefahrt, Inzahlungnahme, Finanzierung & Versicherung",
+            "url": "shopify://pages/dienstleistungen",
+            "anchor": "dienstleistungen",
+            "forward_anchors": "probefahrt, inzahlungnahme, finanzierung, versicherung, lieferung",
+            "image_asset": "tuer-dienstleistungen-1920.webp",
+            "image_srcset": "tuer-dienstleistungen-720.webp 720w, tuer-dienstleistungen-1280.webp 1280w, tuer-dienstleistungen-1920.webp 1920w",
+            "image_position": "50% 60%"
           }
         },
-        "event_1": {
-          "type": "event",
+        "tuer_ueber_uns": {
+          "type": "door",
           "settings": {
-            "date": "2026-10-11",
-            "title": "Saisonabschluss-Ausfahrt",
-            "place": "Start: Power Shop, 10:00 Uhr",
-            "image_asset": "event-1.jpg"
-          }
-        },
-        "event_2": {
-          "type": "event",
-          "settings": {
-            "date": "2026-10-24",
-            "title": "Bike Night & Custom Show",
-            "place": "Power Shop Hof, ab 18:00 Uhr",
-            "image_asset": "event-2.jpg"
-          }
-        },
-        "event_3": {
-          "type": "event",
-          "settings": {
-            "date": "2026-11-14",
-            "title": "Winter-Check-Tag",
-            "place": "Werkstatt, 09:00–14:00 Uhr",
-            "image_asset": "event-3.jpg"
-          }
-        },
-        "standort": {
-          "type": "location",
-          "settings": {
-            "chip": "Standort & Kontakt",
-            "anchor": "standort",
-            "title": "Besuch uns im Power Shop",
-            "contact_title": "Schreib uns"
+            "title": "Über uns",
+            "subtitle": "Team & Geschichte seit 1985",
+            "url": "shopify://pages/ueber-uns",
+            "anchor": "ueber-uns",
+            "image_asset": "tuer-ueber-uns-1600.webp",
+            "image_srcset": "tuer-ueber-uns-720.webp 720w, tuer-ueber-uns-1280.webp 1280w, tuer-ueber-uns-1600.webp 1600w",
+            "image_position": "50% 55%"
           }
         }
       },
       "block_order": [
-        "probefahrt",
-        "finanzierung",
-        "versicherung",
-        "werkstatt",
-        "inzahlungnahme",
-        "event_1",
-        "event_2",
-        "event_3",
-        "standort"
+        "tuer_werkstatt",
+        "tuer_dienstleistungen",
+        "tuer_ueber_uns"
       ],
       "settings": {
         "heading": "Service",
-        "intro": "Probefahrt, Finanzierung, Werkstatt und Inzahlungnahme – schreib uns per WhatsApp, E-Mail oder ruf einfach an."
+        "intro": "Werkstatt, Kauf und das Team dahinter: alles, was wir rund um dein Motorrad für dich tun.",
+        "numbered": false
+      }
+    },
+    "standort": {
+      "type": "visit",
+      "settings": {
+        "heading": "Standort & Kontakt",
+        "anchor": "standort",
+        "note": "Im Stadtteil Haltingen, mitten im Dreiländereck.",
+        "show_map": true,
+        "scheme": "light",
+        "contact_title": "Schreib uns",
+        "foot": "Zu weit für einen Besuch? Wir <a href=\"/pages/dienstleistungen#lieferung\">liefern dein Motorrad</a> bundesweit, in die Schweiz und nach Frankreich."
       }
     }
   },
   "order": [
-    "main"
+    "subnav",
+    "main",
+    "standort"
   ]
 }

@@ -1,18 +1,115 @@
 {%- comment -%}
-  Umbau-Buch der Werkstatt: Custom-Umbauten als Boxen nebeneinander (Blöcke „Umbau“ mit Kind-Blöcken „Umbau-Bild“).
-  CSS und JS laden nur mit dieser Section. Ohne Skript stehen alle Umbauten offen untereinander.
+  Umbau-Buch der Werkstatt: Seitenkopf wie bei den Bekleidungsseiten, ein helles Band als Einleitung, darunter die
+  Custom-Umbauten als Boxen nebeneinander (Blöcke „Umbau“ mit Kind-Blöcken „Umbau-Bild“).
+  Der Seitenkopf ist das Banner der Kategorieseiten mit Filmfenster (shop.css .page-banner--film, Verhalten in
+  assets/film-banner.js): Brotkrumen, Titel, Einleitung, rechts der Film im Fenster 4 : 3 über seinem Standbild. Ohne Film
+  bleibt das Standbild. Unter 1024 px entfallen die Brotkrumen, dort zeigt die Service-Navigation darüber den Weg (pages.css).
+  CSS und JS des Umbau-Buchs laden nur mit dieser Section. Ohne Skript stehen alle Umbauten offen untereinander.
   Entwurf und Messungen: docs/architecture.md, docs/research/werkstatt-umbau-buch.md.
 {%- endcomment -%}
 {{ 'build-book.css' | asset_url | stylesheet_tag }}
 <script src="{{ 'build-book.js' | asset_url }}" defer></script>
+<script src="{{ 'film-banner.js' | asset_url }}" defer></script>
 
-<section class="build-book on-dark textured" data-build-book aria-labelledby="bb-title-{{ section.id }}">
-  <div class="container bb-head">
-    <h1 id="bb-title-{{ section.id }}">{{ section.settings.heading | default: page.title | default: 'Werkstatt' | escape }}</h1>
-    {%- if section.settings.intro != blank -%}<p>{{ section.settings.intro | escape }}</p>{%- endif -%}
-    <span class="bb-head__count" data-bb-count></span>
+{%- liquid
+  assign heading = section.settings.heading | default: page.title | default: 'Werkstatt'
+  assign parent = section.settings.parent_page
+  assign film = section.settings.video_asset
+
+  comment
+    Mit Film ist das Standbild nur Platzhalter darunter (alt leer), den Inhalt beschreibt das Label des Films.
+  endcomment
+  assign poster_alt = section.settings.image_alt
+  if film != blank
+    assign poster_alt = ''
+  endif
+
+  assign builds_heading = section.settings.builds_heading
+  assign book_label = 'bb-title-' | append: section.id
+  if builds_heading != blank
+    assign book_label = 'bb-lead-' | append: section.id
+  endif
+-%}
+{%- capture banner_media -%}
+  {%- render 'media',
+    image: section.settings.image,
+    asset: section.settings.image_asset,
+    srcset: section.settings.image_srcset,
+    width: 960,
+    height: 720,
+    alt: poster_alt,
+    sizes: '(min-width: 1320px) 448px, (min-width: 768px) 34vw, calc(100vw - 32px)',
+    fetchpriority: 'high',
+    class: 'film-banner__poster'
+  -%}
+{%- endcapture -%}
+{%- assign banner_media = banner_media | strip -%}
+
+<section class="page-banner page-banner--film on-dark textured">
+  <div class="container page-banner__inner">
+    <div class="page-banner__text">
+      <nav class="breadcrumb" aria-label="Brotkrumen">
+        <ol>
+          <li><a href="{{ routes.root_url }}">Home</a></li>
+          {%- if parent != blank -%}<li><a href="{{ parent.url }}">{{ parent.title | escape }}</a></li>{%- endif -%}
+          <li><span aria-current="page">{{ heading | escape }}</span></li>
+        </ol>
+      </nav>
+      <h1 id="bb-title-{{ section.id }}">{{ heading | escape }}</h1>
+      {%- if section.settings.intro != blank -%}<p class="film-banner__lead">{{ section.settings.intro | escape }}</p>{%- endif -%}
+    </div>
+    <div class="page-banner__media">
+      {%- if banner_media != blank or film != blank -%}
+        <div class="film-banner__frame" style="--poster-pos: {{ section.settings.image_position | default: '50% 50%' | escape }}">
+          {{- banner_media -}}
+          {%- if film != blank -%}
+            {%- comment -%} Wie auf den Kategorieseiten: kein autoplay, film-banner.js startet nach Load und Leerlauf {%- endcomment -%}
+            <video
+              class="film-banner__video"
+              data-film
+              width="960"
+              height="720"
+              muted
+              loop
+              playsinline
+              preload="none"
+              aria-label="{{ section.settings.video_label | escape }}"
+            >
+              <source src="{{ film | asset_url }}" type="video/mp4">
+            </video>
+            <button class="film-banner__toggle" type="button" data-film-toggle data-state="paused" aria-label="Film abspielen" hidden>
+              {% render 'icon', name: 'pause', class: 'film-banner__icon--pause' %}
+              {% render 'icon', name: 'play', class: 'film-banner__icon--play' %}
+            </button>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    </div>
   </div>
+</section>
 
+{%- if builds_heading != blank or section.settings.builds_text != blank or section.settings.builds_more != blank -%}
+  {%- comment -%}
+    Schrift wie der Willkommensblock der Startseite (Regeln .statement__title und .statement__text in home.css), aber
+    ruhig: kein Bar & Shield, keine Gebäudezeichnung, kein Aufleuchten beim Scrollen. Das Band steht direkt unter dem
+    Seitenkopf schon beim Laden im Bild, ein Scrub hätte dort nichts zu zeigen.
+  {%- endcomment -%}
+  <div class="bb-lead">
+    <div class="container">
+      {%- if builds_heading != blank -%}
+        <h2 class="statement__title" id="bb-lead-{{ section.id }}">{{ builds_heading | escape }}</h2>
+      {%- endif -%}
+      {%- if section.settings.builds_text != blank -%}
+        <p class="statement__text">{{ section.settings.builds_text | escape }}</p>
+      {%- endif -%}
+      {%- if section.settings.builds_more != blank -%}
+        <p class="bb-lead__more">{{ section.settings.builds_more | escape }}</p>
+      {%- endif -%}
+    </div>
+  </div>
+{%- endif -%}
+
+<section class="build-book on-dark textured" data-build-book aria-labelledby="{{ book_label }}">
   <div class="bb-bays" data-bb-bays>{% content_for 'blocks' %}</div>
   <p class="sr-only" aria-live="polite" data-bb-live></p>
 
@@ -40,8 +137,22 @@
   "class": "section-build-book",
   "blocks": [{ "type": "build" }],
   "settings": [
+    { "type": "header", "content": "Seitenkopf" },
     { "type": "text", "id": "heading", "label": "Überschrift", "info": "Leer = Titel der Seite." },
-    { "type": "textarea", "id": "intro", "label": "Einleitung", "default": "Custom-Umbauten aus unserer Meisterwerkstatt. Wähl einen Umbau, um alle Bilder und Details zu sehen." }
+    { "type": "textarea", "id": "intro", "label": "Einleitung", "default": "Inspektion, Einbau, Custom-Umbau und Eintragung: Unsere Meisterwerkstatt kümmert sich um dein Bike." },
+    { "type": "page", "id": "parent_page", "label": "Übergeordnete Seite", "info": "Steht in den Brotkrumen zwischen Home und dieser Seite, z. B. Service." },
+    { "type": "text", "id": "video_asset", "label": "Film im Fenster (Datei im Theme)", "default": "werkstatt-intro.mp4", "info": "MP4 im Format 4 : 3 ohne Ton, z. B. 960 × 720. Läuft stumm in Schleife, nicht bei reduzierter Bewegung oder Datensparen. Leer = nur das Standbild." },
+    { "type": "text", "id": "video_label", "label": "Beschreibung des Films", "default": "Langsame Kamerafahrt auf ein Motorrad in der Werkstatt, vor Werkzeugwänden und einer orangen Wand", "info": "Für Screenreader." },
+    { "type": "image_picker", "id": "image", "label": "Standbild (4 : 3)", "info": "Am besten das erste Bild des Films: Es steht da, bis der Film läuft, und ohne Film allein." },
+    { "type": "text", "id": "image_asset", "label": "Standard-Standbild im Theme", "default": "werkstatt-intro-poster.jpg" },
+    { "type": "text", "id": "image_srcset", "label": "Kleinere Fassungen des Standbilds", "info": "Optional, mit Breite, z. B. „bild-720.webp 720w, bild-1280.webp 1280w“." },
+    { "type": "text", "id": "image_position", "label": "Bildausschnitt", "default": "50% 50%", "info": "Welcher Punkt des Bildes sichtbar bleibt, waagerecht und senkrecht in Prozent, z. B. „50% 70%“." },
+    { "type": "text", "id": "image_alt", "label": "Bildbeschreibung", "info": "Nur ohne Film nötig, mit Film beschreibt die Filmbeschreibung das Fenster." },
+    { "type": "header", "content": "Einleitung zu den Umbauten" },
+    { "type": "paragraph", "content": "Helles Band zwischen Seitenkopf und Umbauten, in der Schrift des Willkommensblocks der Startseite. Alle Felder leer = kein Band." },
+    { "type": "text", "id": "builds_heading", "label": "Überschrift", "default": "Custom-Umbauten aus unserer Meisterwerkstatt" },
+    { "type": "textarea", "id": "builds_text", "label": "Aussage (optional)", "info": "Großer Satz unter der Überschrift. Leer = nur Überschrift und Text darunter." },
+    { "type": "textarea", "id": "builds_more", "label": "Text darunter", "default": "Du bringst die Idee mit, wir setzen sie in unserer Meisterwerkstatt um, vom neuen Lenker bis zum kompletten Umbau. Wähl einen Umbau und schau dir in der Galerie alle Bilder und Details an." }
   ],
   "presets": [{ "name": "Umbau-Buch", "blocks": [{ "type": "build" }] }]
 }

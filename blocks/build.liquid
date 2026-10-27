@@ -55,12 +55,10 @@
 
   <button class="bb-door" type="button" aria-expanded="false" aria-controls="bb-room-{{ block.id }}">
     <span class="bb-label bb-label--narrow" aria-hidden="true">
-      {%- if base != blank -%}<span class="bb-label__base">{{ base | escape }}</span>{%- endif -%}
       <span class="bb-label__name">{{ name | escape }}</span>
     </span>
     <span class="bb-label bb-label--wide" aria-hidden="true">
       <span class="bb-label__name">{{ name | escape }}</span>
-      {%- if base != blank -%}<span class="bb-label__base">{{ base | escape }}</span>{%- endif -%}
     </span>
     <span class="sr-only">Umbau {{ name | escape }} öffnen{% if base != blank %}, Basis {{ base | escape }}{% endif %}</span>
   </button>
@@ -97,7 +95,7 @@
         {%- endfor -%}
       </dl>
       <div class="bb-actions">
-        <button class="btn btn--outline-dark btn--block" type="button" data-bb-all>{% render 'icon', name: 'maximize-2' %}Alle Bilder ansehen</button>
+        <button class="btn btn--outline-light btn--block" type="button" data-bb-all>{% render 'icon', name: 'maximize-2' %}Alle Bilder ansehen</button>
         {%- if has_channel -%}
           <a class="btn btn--primary btn--block" href="{{ block.settings.cta_target | default: '#termin' }}">{{ block.settings.cta_label | default: 'Ähnlichen Umbau anfragen' | escape }}</a>
         {%- endif -%}
@@ -116,7 +114,7 @@
   "blocks": [{ "type": "build-photo" }],
   "settings": [
     { "type": "text", "id": "name", "label": "Name", "default": "Umbau" },
-    { "type": "text", "id": "base", "label": "Basis-Modell", "info": "Steht im Paneel und als erste Zeile der Umbau-Tabelle." },
+    { "type": "text", "id": "base", "label": "Basis-Modell", "info": "Steht als erste Zeile der Umbau-Tabelle." },
     { "type": "textarea", "id": "intro", "label": "Kurztext" },
     { "type": "textarea", "id": "specs", "label": "Umbau-Tabelle", "info": "Eine Zeile pro Umbau, Bereich und Umbau mit Doppelpunkt getrennt, z. B. Lack: Schwarz mit orangen Flammen" },
     { "type": "text", "id": "cta_label", "label": "Anfrage-Button", "default": "Ähnlichen Umbau anfragen" },

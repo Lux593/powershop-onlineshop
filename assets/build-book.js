@@ -108,9 +108,6 @@
       };
     });
 
-    var count = root.querySelector('[data-bb-count]');
-    if (count) count.textContent = els.length + (els.length === 1 ? ' Umbau' : ' Umbauten');
-
     // Mehr als 7 Fotos: der Bildblock zeigt 7 Kacheln, die letzte mit „+N“, das Vollbild alle
     data.forEach(function (d) {
       d.items.forEach(function (it, i) { it.classList.toggle('is-extra', i >= MAX_TILES); });

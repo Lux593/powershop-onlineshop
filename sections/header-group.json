@@ -7,7 +7,7 @@
       "blocks": {
         "shipping": { "type": "message", "settings": { "text": "Versandkostenfrei ab {schwelle}*", "hide_on_mobile": false } },
         "returns": { "type": "message", "settings": { "text": "{tage} Tage Rückgabe", "hide_on_mobile": true } },
-        "testdrive": { "type": "message", "settings": { "text": "", "link_label": "Probefahrt anfragen", "link_url": "/pages/service#probefahrt", "hide_on_mobile": false } }
+        "testdrive": { "type": "message", "settings": { "text": "", "link_label": "Probefahrt anfragen", "link_url": "/pages/dienstleistungen#probefahrt", "hide_on_mobile": false } }
       },
       "block_order": ["shipping", "returns", "testdrive"],
       "settings": {}
@@ -21,36 +21,54 @@
             "parent": "Motorräder",
             "text": "Persönliche Beratung, Probefahrt und Finanzierung – direkt bei uns im Showroom.",
             "primary_label": "Probefahrt anfragen",
-            "primary_url": "/pages/service#probefahrt",
+            "primary_url": "/pages/dienstleistungen#probefahrt",
             "secondary_label": "Finanzierung anfragen",
-            "secondary_url": "/pages/service#finanzierung"
+            "secondary_url": "/pages/dienstleistungen#finanzierung"
           }
         },
-        "teaser_herren_1": { "type": "teaser", "settings": { "parent": "Herren", "image_asset": "mega-herren.jpg", "label": "Neue Kollektion", "url": "" } },
-        "teaser_herren_2": { "type": "teaser", "settings": { "parent": "Herren", "image_asset": "bento-herren.jpg", "label": "Riding Gear", "url": "" } },
-        "teaser_damen_1": { "type": "teaser", "settings": { "parent": "Damen", "image_asset": "mega-damen.jpg", "label": "Neue Kollektion", "url": "" } },
-        "teaser_damen_2": { "type": "teaser", "settings": { "parent": "Damen", "image_asset": "bento-damen.jpg", "label": "Riding Gear", "url": "" } },
-        "teaser_teile_1": { "type": "teaser", "settings": { "parent": "Teile & Zubehör", "image_asset": "mega-teile.jpg", "label": "Custom-Umbauten", "url": "/pages/service#werkstatt" } },
-        "teaser_teile_2": { "type": "teaser", "settings": { "parent": "Teile & Zubehör", "image_asset": "bento-teile.jpg", "label": "Performance-Teile", "url": "" } },
-        "teaser_acc_1": { "type": "teaser", "settings": { "parent": "Accessoires", "image_asset": "mega-accessoires.jpg", "label": "Geschenkideen", "url": "" } },
-        "teaser_acc_2": { "type": "teaser", "settings": { "parent": "Accessoires", "image_asset": "bento-accessoires.jpg", "label": "Helme & Brillen", "url": "" } },
+        "tile_motorraeder_fahrzeuge": { "type": "tile", "settings": { "parent": "Motorräder", "group": "Fahrzeuge", "image_asset": "bento-motorraeder.jpg", "focus": "center" } },
+        "tile_motorraeder_familien": { "type": "tile", "settings": { "parent": "Motorräder", "group": "Modellfamilien", "image_asset": "mega-motorraeder-familien.webp", "focus": "center" } },
+        "tile_herren_bekleidung": { "type": "tile", "settings": { "parent": "Herren", "group": "Bekleidung", "image_asset": "mega-herren-bekleidung.webp", "focus": "center" } },
+        "tile_herren_motorrad": { "type": "tile", "settings": { "parent": "Herren", "group": "Motorradbekleidung", "image_asset": "mega-herren-motorrad.webp", "focus": "center" } },
+        "tile_herren_kollektionen": { "type": "tile", "settings": { "parent": "Herren", "group": "Kollektionen", "image_asset": "mega-herren-kollektionen.webp", "focus": "center" } },
+        "tile_damen_bekleidung": { "type": "tile", "settings": { "parent": "Damen", "group": "Bekleidung", "image_asset": "mega-damen-bekleidung.webp", "focus": "center" } },
+        "tile_damen_motorrad": { "type": "tile", "settings": { "parent": "Damen", "group": "Motorradbekleidung", "image_asset": "mega-damen-motorrad.webp", "focus": "center" } },
+        "tile_damen_kollektionen": { "type": "tile", "settings": { "parent": "Damen", "group": "Kollektionen", "image_asset": "mega-damen-kollektionen.webp", "focus": "center" } },
+        "tile_teile_komfort": { "type": "tile", "settings": { "parent": "Teile & Zubehör", "group": "Komfort & Touring", "image_asset": "mega-teile-komfort.webp", "focus": "center" } },
+        "tile_teile_optik": { "type": "tile", "settings": { "parent": "Teile & Zubehör", "group": "Optik & Custom", "image_asset": "mega-teile-optik.webp", "focus": "center" } },
+        "tile_teile_technik": { "type": "tile", "settings": { "parent": "Teile & Zubehör", "group": "Technik & Pflege", "image_asset": "mega-teile-technik.webp", "focus": "center" } },
+        "tile_acc_mode": { "type": "tile", "settings": { "parent": "Accessoires", "group": "Mode-Accessoires", "image_asset": "sportster-s-poster.webp", "focus": "center" } },
+        "tile_acc_zuhause": { "type": "tile", "settings": { "parent": "Accessoires", "group": "Zuhause & Garage", "image_asset": "bento-accessoires-eiskuebel.jpg", "focus": "center" } },
+        "tile_acc_extras": { "type": "tile", "settings": { "parent": "Accessoires", "group": "Biker-Extras & Geschenke", "image_asset": "bento-teile.jpg", "focus": "center" } },
+        "tile_service_werkstatt": { "type": "tile", "settings": { "parent": "Service", "group": "Werkstatt", "image_asset": "mega-service-werkstatt.webp", "focus": "center" } },
+        "tile_service_dienstleistungen": { "type": "tile", "settings": { "parent": "Service", "group": "Dienstleistungen", "image_asset": "mega-service-dienstleistungen.webp", "focus": "center" } },
+        "tile_service_ueber_uns": { "type": "tile", "settings": { "parent": "Service", "group": "Über uns", "image_asset": "mega-service-ueber-uns.webp", "focus": "center" } },
         "contact_service": { "type": "contact", "settings": { "parent": "Service", "title": "Direkter Draht" } }
       },
       "block_order": [
         "cta_motorraeder",
-        "teaser_herren_1",
-        "teaser_herren_2",
-        "teaser_damen_1",
-        "teaser_damen_2",
-        "teaser_teile_1",
-        "teaser_teile_2",
-        "teaser_acc_1",
-        "teaser_acc_2",
+        "tile_motorraeder_fahrzeuge",
+        "tile_motorraeder_familien",
+        "tile_herren_bekleidung",
+        "tile_herren_motorrad",
+        "tile_herren_kollektionen",
+        "tile_damen_bekleidung",
+        "tile_damen_motorrad",
+        "tile_damen_kollektionen",
+        "tile_teile_komfort",
+        "tile_teile_optik",
+        "tile_teile_technik",
+        "tile_acc_mode",
+        "tile_acc_zuhause",
+        "tile_acc_extras",
+        "tile_service_werkstatt",
+        "tile_service_dienstleistungen",
+        "tile_service_ueber_uns",
         "contact_service"
       ],
       "settings": {
         "menu": "main-menu",
-        "keep_order": "Fahrzeuge, Modellfamilien, Kollektionen",
+        "keep_order": "Fahrzeuge, Modellfamilien, Kollektionen, Dienstleistungen",
         "search_terms": "Lederjacke\nStreet Glide\nAuspuff\nHelm\nGebraucht"
       }
     }

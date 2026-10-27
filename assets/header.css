@@ -30,7 +30,7 @@ html:not(:has(.announce)) { --announce-h: 0px; }
    (Ausnahme von „nur transform, opacity, clip-path“): eine Transition auf der Variable würde in jedem Frame den ganzen Baum neu berechnen. */
 .site-header-wrap { transition: transform var(--t-med) var(--ease); }
 .site-header-wrap.is-away { transform: translateY(calc(-100% - env(safe-area-inset-top, 0px))); }
-.pdp__info, .service-nav, .cart-page__summary { transition: top var(--t-med) var(--ease); }
+.pdp__info, .shopify-section:has(> .service-subnav--sticky), .cart-page__summary { transition: top var(--t-med) var(--ease); }
 
 /* Überlagerung über dem Hero (body[data-header-overlay], nur Startseite): oben transparent mit weichem Verlauf für die Lesbarkeit,
    nach etwa 40 px Scroll schwarz mit Blur (header.js setzt is-solid). Der transparente Zustand steht im CSS: kein schwarzer Blitz
@@ -169,30 +169,94 @@ html:not(:has(.announce)) { --announce-h: 0px; }
   .mega { transition: opacity var(--t-fast), transform var(--t-fast), visibility 0s linear var(--t-fast), content-visibility 0s linear var(--t-fast) allow-discrete; }
 }
 .mainnav__item.is-open .mega { visibility: visible; opacity: 1; transform: none; content-visibility: visible; transition-delay: 0s; }
-.mega__inner { display: grid; gap: 40px; padding-block: 36px 40px; }
-/* Spaltentitel heben sich von den Einträgen ab: weiß und größer als die Einträge (15 px) */
-.mega__title {
-  font-family: var(--f-head); font-weight: 700; font-size: 19px; letter-spacing: 0.08em; text-transform: uppercase;
-  color: var(--c-white); margin-bottom: 16px;
+/* Inhalt (snippets/mega-menu.liquid): oben --tiles Kacheln in einer Reihe, darunter die Links der offenen Kachel, unten die Fußzeile.
+   Mindestens so hoch wie der Kategorie-Kopf mit Film (.page-banner--film in shop.css: 2 × 32 px Rand plus Filmfenster 4:3 in der
+   Breite clamp(300px, 34vw, 448px)): auch mit zugeklappten Links läuft der Film nie unter dem Menü weiter. Den freien Platz nimmt
+   der Rand unter den Links, die Fußzeile steht unten. */
+.mega__inner { display: flex; flex-direction: column; min-height: calc(64px + 0.75 * clamp(300px, 34vw, 448px)); padding-block: 32px 24px; }
+.mega__tiles { display: grid; grid-template-columns: repeat(var(--tiles, 3), minmax(0, 1fr)); gap: 12px; }
+.mega-tile {
+  position: relative; isolation: isolate; overflow: hidden;
+  display: flex; align-items: flex-end; gap: 16px; height: clamp(200px, 26vh, 240px); padding: 20px 20px 22px;
+  background: var(--c-anthracite); color: var(--c-white); text-align: left;
 }
-.mega__title a { display: inline-block; padding-block: 8px; margin-block: -8px; color: var(--c-white); } /* Titel einer Spalte ohne Unterpunkte: Link, 36 px Trefferfläche ohne Layoutänderung */
-.mega__title a:hover { color: var(--c-orange); }
-.mega__links { display: grid; gap: 2px; }
+/* Geschlossene Kacheln gedämpft, die offene in voller Farbe: so liest sich auch ohne Fokusrahmen, welche Gruppe unten steht */
+.mega-tile__img {
+  position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover;
+  filter: brightness(0.52) saturate(0.6);
+  transition: filter var(--t-med) var(--ease), transform var(--t-slow) var(--ease-out);
+}
+.mega-tile__img--top { object-position: 50% 20%; }
+.mega-tile__img--bottom { object-position: 50% 80%; }
+/* Verlauf von unten trägt die Schrift; der orange Strich markiert die offene Kachel wie der Strich unter dem Hauptpunkt */
+.mega-tile::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0) 72%); }
+.mega-tile::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--c-orange);
+  transform: scaleX(0); transform-origin: left; transition: transform var(--t-med) var(--ease-out);
+}
+.mega-tile:hover .mega-tile__img { filter: brightness(0.7) saturate(0.85); transform: scale(1.03); }
+.mega-tile[aria-expanded="true"] .mega-tile__img { filter: brightness(0.9) saturate(1); }
+.mega-tile[aria-expanded="true"]::after { transform: scaleX(1); }
+.mega-tile__body { flex: 1; min-width: 0; display: grid; gap: 8px; }
+.mega-tile__title { font-family: var(--f-head); font-weight: 700; font-size: 26px; line-height: 1; letter-spacing: 0.04em; text-transform: uppercase; text-wrap: balance; }
+.mega-tile__meta { font-size: 13px; color: var(--c-on-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: opacity var(--t-fast) var(--ease); }
+.mega-tile[aria-expanded="true"] .mega-tile__meta { opacity: 0; } /* Die Vorschau steht offen darunter */
+.mega-tile > .icon { flex: none; width: 20px; height: 20px; transition: transform var(--t-med) var(--ease-out); }
+.mega-tile[aria-expanded="true"] > .icon { transform: rotate(180deg); }
+.mega-tile--link:hover > .icon { transform: translateX(4px); }
+/* Raster ohne Gruppen (Hauptpunkt, dessen Ebene-2-Punkte alle ohne Unterpunkte sind): kleinere Kacheln, vier je Reihe, die letzte ist der Kontakt. Die Kacheln einer Reihe wachsen mit
+   der höchsten (Kontakt mit Öffnungszeiten); den Platz bis zur Mindesthöhe nimmt der Rand über der Fußzeile. */
+.mega__tiles--grid { margin-bottom: auto; }
+.mega__tiles--grid .mega-tile { height: auto; min-height: clamp(140px, 18vh, 168px); padding: 18px 18px 20px; }
+.mega__tiles--grid .mega-tile__title { font-size: 22px; }
+/* Hier ist keine Kachel „offen“, die sich abheben müsste: Fotos heller als in der Kachelreihe */
+.mega__tiles--grid .mega-tile__img { filter: brightness(0.62) saturate(0.8); }
+.mega__tiles--grid .mega-tile:hover .mega-tile__img { filter: brightness(0.85) saturate(1); }
+.mega-tile--contact { flex-direction: column; align-items: flex-start; justify-content: flex-end; gap: 8px; border: 1px solid var(--c-steel); }
+.mega-tile--contact::before { content: none; }
+.mega-tile--contact .mega__contact { flex-direction: column; align-items: flex-start; gap: 0; font-size: 14px; }
+.mega-tile--contact .mega__contact a, .mega-tile--contact .mega__contact span { min-height: 30px; }
+
+/* Die Links der offenen Kachel klappen direkt unter ihr auf (Zeilenhöhe 0fr ↔ 1fr), eingerückt bis zum Kacheltitel. Jede Gruppe
+   steht in der Spalte ihrer Kachel (--col), alle in derselben Zeile: das Menü behält beim Wechsel die Höhe der längsten Gruppe,
+   nur die Links blenden über (gestaffelt über --i). Die einzige Gruppe reicht von ihrer Kachel bis zum Rand (bei einer
+   Kachel über die ganze Breite; bei Service unter Dienstleistungen, neben den Link-Kacheln Werkstatt und Über uns). */
+.mega__drawer { display: grid; grid-template-rows: 1fr; margin-bottom: auto; transition: grid-template-rows var(--t-med) var(--ease-out); }
+.mega__drawer.is-closed { grid-template-rows: 0fr; }
+.mega__stack { display: grid; grid-template-columns: repeat(var(--tiles, 3), minmax(0, 1fr)); column-gap: 12px; min-height: 0; overflow: hidden; }
+.mega__group { grid-row: 1; grid-column: var(--col, 1); padding-top: 16px; visibility: hidden; transition: visibility 0s linear var(--t-med); }
+.mega__group:only-child { grid-column: var(--col, 1) / -1; }
+.mega__group.is-active { visibility: visible; transition-delay: 0s; }
+.mega__links {
+  display: grid; grid-template-columns: repeat(var(--cols, 1), minmax(0, 1fr)); grid-template-rows: repeat(var(--rows, 1), auto);
+  grid-auto-flow: column; column-gap: 24px; padding-inline: 20px;
+}
+.mega__links li { opacity: 0; transform: translateY(6px); transition: opacity var(--t-fast) var(--ease), transform var(--t-med) var(--ease-out); }
+.mega__group.is-active li { opacity: 1; transform: none; transition-delay: calc(var(--i, 0) * 18ms + 60ms); }
 .mega__links a { display: flex; align-items: center; min-height: 36px; font-size: 15px; color: var(--c-on-dark-strong); }
 .mega__links a:hover { color: var(--c-orange); }
-.mega__links--2col { grid-template-columns: 1fr 1fr; column-gap: 24px; }
-.mega__links .is-strong { font-weight: 600; color: var(--c-white); }
-.mega__families { display: grid; grid-template-columns: repeat(var(--tile-cols, 3), 1fr); gap: 12px; } /* Spaltenzahl aus snippets/mega-menu.liquid: genau vier Kacheln in einer Zeile statt drei plus einer allein in Zeile 2 (das Menü wird dadurch niedriger) */
-.mega-tile { position: relative; display: block; aspect-ratio: 3 / 2; overflow: hidden; background: var(--c-black); }
-.mega-tile img { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: transform 500ms var(--ease), opacity var(--t-fast); }
-.mega-tile:hover img { transform: scale(1.05); opacity: 1; }
-.mega-tile span { position: absolute; left: 12px; right: 12px; bottom: 10px; font-family: var(--f-head); font-weight: 700; font-size: 18px; text-transform: uppercase; letter-spacing: 0.03em; text-shadow: 0 1px 12px rgba(0, 0, 0, 0.7); }
-.mega-tile::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent 60%); }
-.mega-tile span { z-index: 1; }
-.mega__teasers { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.mega__teasers .mega-tile { aspect-ratio: 4 / 5; }
-.mega__cta { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; padding-top: 20px; border-top: 1px solid var(--c-steel); }
-.mega__cta p { color: var(--c-muted-dark); font-size: var(--fs-small); margin-right: auto; }
+
+/* Fußzeile: links der Weg zum Hauptpunkt, rechts Aufruf-Zeile (Motorräder) oder Kontakt (Service) */
+.mega__foot { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 32px; margin-top: 20px; padding-top: 12px; border-top: 1px solid var(--c-steel); }
+.mega__foot:not(:has(> *)) { display: none; }
+.mega__all { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-size: 15px; font-weight: 600; color: var(--c-white); }
+.mega__all .icon { width: 18px; height: 18px; color: var(--c-orange); transition: transform var(--t-fast) var(--ease); }
+.mega__all:hover { color: var(--c-orange); }
+.mega__all:hover .icon { transform: translateX(4px); }
+.mega__cta { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; margin-left: auto; }
+.mega__cta p { color: var(--c-muted-dark); font-size: var(--fs-small); }
+.mega__contact { display: flex; flex-wrap: wrap; align-items: center; gap: 0 28px; font-size: 15px; color: var(--c-on-dark-strong); }
+.mega__all + .mega__contact { margin-left: auto; }
+.mega__contact-title { font-family: var(--f-head); font-weight: 700; font-size: 17px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--c-white); }
+.mega__contact a, .mega__contact span { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; }
+.mega__contact a:hover { color: var(--c-orange); }
+.mega__contact .icon { color: var(--c-muted-dark); }
+@media (max-width: 1279px) {
+  .mega-tile { height: clamp(180px, 24vh, 208px); padding: 16px 16px 18px; }
+  .mega__links { padding-inline: 16px; }
+  .mega-tile__title { font-size: 22px; }
+  .mega__tiles--grid .mega-tile__title { font-size: 20px; }
+}
 
 /* Mobile-Menü */
 .mobile-menu { background: var(--c-black); color: var(--c-white); }

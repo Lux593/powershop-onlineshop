@@ -1,20 +1,17 @@
 {%- comment -%}
-  Werkstatt-Leistungen: Überschrift, Einleitung, Leistungen als Info-Felder (Desktop Liste, Handy 2 × 2 Kacheln im Raster der
-  Startseiten-Kacheln, ohne Link) und die Termin-Box (snippets/contact-box, Anker #termin). Styles in assets/pages.css.
+  Werkstatt-Leistungen: Überschrift, Einleitung, die Leistungen als Info-Kacheln im Raster der Startseiten-Kacheln
+  (snippets/service-tile, ohne Link, 2 × 2) und die Termin-Box (snippets/contact-box, Anker #termin, „Anrufen“ ohne Nummer).
+  Ab 1024 px stehen Text und Kacheln links, die Termin-Box rechts (7 : 5 wie „Komm vorbei“). Styles in assets/pages.css.
 {%- endcomment -%}
 <section class="workshop-services" aria-labelledby="ws-title-{{ section.id }}">
   <div class="container workshop-services__grid">
-    <div>
-      <h2 id="ws-title-{{ section.id }}">{{ section.settings.heading | escape }}</h2>
+    <div class="workshop-services__main">
+      <h2 class="workshop-services__title" id="ws-title-{{ section.id }}">{{ section.settings.heading | escape }}</h2>
       {%- if section.settings.intro != blank -%}<p class="workshop-services__intro">{{ section.settings.intro | escape }}</p>{%- endif -%}
       {%- if section.blocks.size > 0 -%}
-        <div class="workshop-services__list">
+        <div class="service-tiles workshop-services__tiles">
           {%- for block in section.blocks -%}
-            <div class="workshop-services__item" {{ block.shopify_attributes }}>
-              {% render 'icon', name: block.settings.icon %}
-              <h3>{{ block.settings.title | escape }}</h3>
-              {%- if block.settings.text != blank -%}<p>{{ block.settings.text | escape }}</p>{%- endif -%}
-            </div>
+            {%- render 'service-tile', block: block -%}
           {%- endfor -%}
         </div>
       {%- endif -%}
@@ -24,7 +21,8 @@
       title: section.settings.contact_title,
       intro: section.settings.contact_intro,
       topics: 'werkstatt,einbau,frage',
-      topic: 'werkstatt'
+      topic: 'werkstatt',
+      number: false
     %}
   </div>
 </section>

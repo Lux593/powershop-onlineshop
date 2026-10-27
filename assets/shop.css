@@ -25,6 +25,8 @@
 .page-banner--film .page-banner__media::before { content: none; }
 .film-banner__frame { position: relative; aspect-ratio: 4 / 3; overflow: hidden; background: var(--c-black); }
 .film-banner__frame .film-banner__poster, .film-banner__video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+/* Bildausschnitt eines Standbilds ohne Film (Werkstatt: --poster-pos aus der Section) */
+.film-banner__frame .film-banner__poster { object-position: var(--poster-pos, 50% 50%); }
 /* Film über dem Poster: erst sichtbar, wenn er läuft (der erste Frame ist das Poster, die Überblendung fällt nicht auf) */
 .film-banner__video { opacity: 0; transition: opacity 300ms var(--ease); }
 .film-banner__frame.is-playing .film-banner__video { opacity: 1; }
@@ -52,7 +54,7 @@
 /* Mobil, nur mit Bewegung: Beim Runterscrollen bleibt der Text unter dem Header stehen, der Film schiebt sich ganz dahinter nach oben.
    Erst wenn die Filmunterkante 24 px unter dem Text angekommen ist, endet der Sticky-Bereich und der Film nimmt den Text mit: Der Rand
    unter dem Text (zugleich der Abstand Text–Film vorher) zählt beim Sticky mit, Grenze ist die Unterkante des Films. Der Pause-Knopf
-   blendet aus, sobald der Film hinter den Text rutscht (.is-behind, collection.js), und beim Zurückscrollen wieder ein.
+   blendet aus, sobald der Film hinter den Text rutscht (.is-behind, film-banner.js), und beim Zurückscrollen wieder ein.
    overflow: clip statt hidden: hidden machte das Banner zum Scroll-Container, sticky griffe nicht. */
 @media (max-width: 767px) {
   .has-motion .page-banner--film { overflow: clip; }
@@ -68,7 +70,7 @@
     transition: background-color var(--t-fast), opacity var(--t-fast), visibility 0s var(--t-fast);
   }
   /* Schleier für die Lesbarkeit: Er hängt am Text und wandert mit ihm, der Film wird genau dort dunkel, wo er unter dem Text liegt.
-     Kein Skript, kein Zeitversatz zum Scrollen (vorher blendete collection.js je Frame einen Schleier über den ganzen Film ein,
+     Kein Skript, kein Zeitversatz zum Scrollen (vorher blendete ein Skript je Frame einen Schleier über den ganzen Film ein,
      beim schnellen Scrollen sprang er sichtbar in Stufen). Über dem schwarzen Banner fällt er nicht auf. Gleichmäßig dunkel ohne
      Verlauf (keine Stufen), unten läuft er über 28 px weich aus. */
   .has-motion .page-banner--film .page-banner__text::before {
@@ -88,7 +90,7 @@
 
 /* Ab 768 px, nur mit Bewegung: Tiefe beim Scrollen. Das Filmfenster läuft langsamer als die Seite und taucht unten hinter die Kante
    des Banners, der Film darin zoomt dabei leicht heraus (1,1 auf 1); der Text zieht schneller nach oben und blendet aus.
-   collection.js setzt nur --film-depth (0 oben bis 1, wenn um die Bannerhöhe gescrollt ist). Der Zoom 1,1 steht schon vor dem
+   film-banner.js setzt nur --film-depth (0 oben bis 1, wenn um die Bannerhöhe gescrollt ist). Der Zoom 1,1 steht schon vor dem
    Skript (has-motion setzt das Head-Skript), damit nichts springt. Nur transform und opacity, kein Layout je Frame. */
 @media (min-width: 768px) {
   .has-motion .page-banner--film .film-banner__frame { transform: translateY(calc(var(--film-depth, 0) * 30%)); }
@@ -279,6 +281,12 @@
 .open-state::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--c-muted); }
 .open-state.is-open::before { background: var(--c-success); }
 .hours { font-size: var(--fs-small); color: var(--c-muted); }
+/* Kompakte Anfrage-Zeile (contact-box mit compact): unter einem Text, ohne Kasten. Handy: Knöpfe untereinander in voller
+   Breite, ab 640 px in einer Reihe. */
+.contact-row { display: grid; gap: 12px; padding-top: var(--s-3); border-top: 1px solid var(--c-line); }
+.contact-row__title { font-family: var(--f-head); font-weight: 700; font-size: 20px; line-height: 1.1; letter-spacing: 0.02em; text-transform: uppercase; }
+.contact-row__buttons { display: grid; gap: 8px; }
+@media (min-width: 640px) { .contact-row__buttons { display: flex; flex-wrap: wrap; } }
 .reserve-note { display: grid; gap: 8px; padding: 16px; background: var(--c-offwhite); border: 1px dashed var(--c-border-soft); font-size: var(--fs-small); }
 .reserve-note strong { display: flex; align-items: center; gap: 8px; font-size: var(--fs-body); }
 .reserve-note ol { list-style: decimal; padding-left: 18px; display: grid; gap: 2px; }

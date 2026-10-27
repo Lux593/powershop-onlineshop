@@ -1,0 +1,111 @@
+{%- comment -%}
+  „Komm vorbei“: Standort mit Karte des Dreiländerecks, Adresse, „Route planen“, Öffnungszeiten und Kontakt-Box. Eine
+  Sektion für Service (#standort, „Standort & Kontakt“), Über uns und die Kontakt-Seite. Adresse, Kanäle und Öffnungszeiten
+  kommen aus den Theme-Einstellungen (Händlerdaten). Ohne jede Angabe erscheint die Sektion im Shop nicht.
+  Die Karte ist ein vorskaliertes WebP der OpenStreetMap mit Pin auf Burghölzle 15 (assets/karte-dreilaendereck-*.webp).
+  Pin, Länder und Dreiländereck stehen in Prozent der Kartendatei; pages.css hält sie bei jedem Seitenverhältnis im Bild.
+  „Route planen“ öffnet Google Maps in einem neuen Fenster, eingebettet wird nichts. Die Öffnungszeiten stehen hier, die
+  Kontakt-Box zeigt sie darum nicht noch einmal (hours: false). Styles in assets/pages.css.
+{%- endcomment -%}
+{%- liquid
+  assign has_channel = false
+  if settings.phone != blank or settings.whatsapp != blank or settings.email != blank
+    assign has_channel = true
+  endif
+  assign has_data = request.design_mode
+  if settings.address != blank or has_channel or settings.hours_enabled
+    assign has_data = true
+  endif
+  assign anchor = section.settings.anchor | default: 'standort'
+  assign contact_anchor = anchor | append: '-kontakt'
+  assign address_lines = settings.address | newline_to_br | split: '<br />'
+  assign route_query = settings.address | newline_to_br | replace: '<br />', ', ' | strip_newlines | strip | url_encode
+-%}
+
+{%- if has_data -%}
+  <section class="visit{% if section.settings.scheme == 'dark' %} visit--dark on-dark textured{% endif %}" id="{{ anchor | escape }}" aria-labelledby="visit-title-{{ section.id }}">
+    <div class="container visit__grid">
+      <h2 class="visit__title" id="visit-title-{{ section.id }}">{{ section.settings.heading | escape }}</h2>
+
+      {%- if section.settings.show_map -%}
+        <div class="visit__map" data-reveal="clip">
+          <div class="visit__frame">
+            <div class="visit__layer">
+              {%- render 'media',
+                asset: 'karte-dreilaendereck-1600.webp',
+                srcset: 'karte-dreilaendereck-800.webp 800w, karte-dreilaendereck-1200.webp 1200w, karte-dreilaendereck-1600.webp 1600w',
+                sizes: '(min-width: 1280px) 1300px, (min-width: 640px) 100vw, 160vw',
+                width: 1600,
+                height: 1000,
+                alt: 'Karte des Dreiländerecks mit Weil am Rhein, Basel und Saint-Louis. Markiert ist der Power Shop in Weil am Rhein-Haltingen.',
+                class: 'visit__img'
+              -%}
+              <span class="visit__label visit__label--end" style="--x: 83.95%; --y: 15.98%" aria-hidden="true">Deutschland</span>
+              <span class="visit__label" style="--x: 44.12%; --y: 44.67%" aria-hidden="true">Frankreich</span>
+              <span class="visit__label visit__label--south" style="--x: 71.93%; --y: 92%" aria-hidden="true">Schweiz</span>
+              <span class="visit__mark" style="--x: 55.98%; --y: 67.47%" aria-hidden="true"><i></i>Dreiländereck</span>
+              <span class="visit__pin" style="--x: 66.51%; --y: 39.97%" aria-hidden="true"><i class="visit__ring"></i><i class="visit__dot"></i><span class="visit__tag">Power Shop</span></span>
+            </div>
+          </div>
+          <a class="visit__credit" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">Karte © OpenStreetMap-Mitwirkende<span class="sr-only"> (öffnet neues Fenster)</span></a>
+        </div>
+      {%- endif -%}
+
+      <div class="visit__info">
+        {%- if settings.address != blank -%}
+          <address class="visit__address">
+            {%- for line in address_lines -%}
+              {%- assign item = line | strip | strip_newlines -%}
+              {%- if item != blank -%}
+                <span class="{% if forloop.first %}visit__street{% else %}visit__city{% endif %}">{{ item | escape }}</span>
+              {%- endif -%}
+            {%- endfor -%}
+          </address>
+          {%- if section.settings.note != blank -%}<p class="visit__note">{{ section.settings.note | escape }}</p>{%- endif -%}
+          <a class="btn btn--primary visit__route" href="https://www.google.com/maps/dir/?api=1&amp;destination={{ route_query }}" target="_blank" rel="noopener">
+            {%- render 'icon', name: 'route' -%}Route planen<span class="sr-only"> (Google Maps, öffnet neues Fenster)</span>
+          </a>
+        {%- elsif request.design_mode -%}
+          <p class="small" role="note"><strong>Adresse fehlt.</strong> Trage sie unter „Theme-Einstellungen &gt; Händlerdaten“ ein.</p>
+        {%- endif -%}
+        {%- if settings.hours_enabled -%}
+          <div class="visit__hours">
+            <h3 class="visit__subhead">Öffnungszeiten</h3>
+            <p class="open-state" data-open-state hidden></p>
+            <ul class="visit__hours-list">{% render 'opening-hours' %}</ul>
+          </div>
+        {%- endif -%}
+        {%- if section.settings.foot != blank -%}<p class="visit__foot">{{ section.settings.foot }}</p>{%- endif -%}
+      </div>
+
+      {% render 'contact-box', anchor: contact_anchor, title: section.settings.contact_title, topics: 'probefahrt,inzahlungnahme,finanzierung,versicherung,lieferung,werkstatt,frage', topic: 'frage', hours: false %}
+    </div>
+  </section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Komm vorbei",
+  "settings": [
+    { "type": "paragraph", "content": "Adresse, Telefon, WhatsApp, E-Mail und Öffnungszeiten kommen aus den Theme-Einstellungen unter „Händlerdaten“." },
+    { "type": "text", "id": "heading", "label": "Überschrift", "default": "Komm vorbei." },
+    { "type": "text", "id": "anchor", "label": "Anker (ohne #)", "default": "standort", "info": "Sprungziel, z. B. /pages/service#standort. Der Menüpunkt „Standort & Kontakt“ zeigt darauf." },
+    { "type": "text", "id": "note", "label": "Satz unter der Adresse", "default": "Im Stadtteil Haltingen, mitten im Dreiländereck." },
+    { "type": "checkbox", "id": "show_map", "label": "Karte des Dreiländerecks zeigen", "default": true },
+    {
+      "type": "select",
+      "id": "scheme",
+      "label": "Farbe",
+      "options": [
+        { "value": "light", "label": "Hell" },
+        { "value": "dark", "label": "Dunkel mit Körnung" }
+      ],
+      "default": "light"
+    },
+    { "type": "text", "id": "contact_title", "label": "Titel der Kontakt-Box", "default": "Schreib uns" },
+    { "type": "inline_richtext", "id": "foot", "label": "Hinweis unten", "info": "Optional, z. B. zur Lieferung für alle, denen der Weg zu weit ist." }
+  ],
+  "enabled_on": { "templates": ["page"] },
+  "presets": [{ "name": "Komm vorbei" }]
+}
+{% endschema %}

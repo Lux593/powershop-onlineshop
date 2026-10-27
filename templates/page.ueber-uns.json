@@ -1,0 +1,26 @@
+{
+  "sections": {
+    "subnav": {
+      "type": "service-subnav",
+      "settings": {
+        "menu": "main-menu",
+        "parent": "Service",
+        "scheme": "dark",
+        "sticky": false
+      }
+    },
+    "main": {
+      "type": "service-page",
+      "settings": {
+        "heading": "Über uns",
+        "intro": "",
+        "parent_page": "service",
+        "numbered": false
+      }
+    }
+  },
+  "order": [
+    "subnav",
+    "main"
+  ]
+}

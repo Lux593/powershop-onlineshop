@@ -3,19 +3,30 @@
   (.contact-box). Links und Text setzt assets/contact.js, das auf Produkt- und Seiten-Templates lädt.
   Gezeigt werden nur Kanäle, die in den Theme-Einstellungen (Händlerdaten) gepflegt sind.
   Ohne jeden Kanal erscheint die Box im Shop nicht, im Theme-Editor steht stattdessen ein Hinweis.
+  Kompakt (compact) ist sie eine schlanke Anfrage-Zeile (.contact-row): Beschriftung und die drei Kanäle, ohne Themenwahl,
+  Ansprechperson und Öffnungszeiten. Das Thema steht dann fest (topic, als data-topic-default für contact.js).
 
   @param {string} [anchor] - ID der Box, Standard "kontakt"
-  @param {string} [title] - Überschrift
+  @param {string} [title] - Überschrift, kompakt die Beschriftung der Zeile
   @param {string} [intro] - Kurzer Text unter der Überschrift
-  @param {string} [topics] - Themen, kommagetrennt: probefahrt, finanzierung, versicherung, inzahlungnahme, reservierung, werkstatt, kompatibilitaet, einbau, frage
+  @param {string} [topics] - Themen, kommagetrennt: probefahrt, finanzierung, versicherung, inzahlungnahme, lieferung, reservierung, werkstatt, kompatibilitaet, einbau, frage
   @param {string} [topic] - Voreingestelltes Thema
   @param {string} [subject] - Fahrzeug oder Artikel, wird in die Nachricht eingesetzt
   @param {string} [ref] - Zusatzzeile in der Nachricht, z. B. Link zur Seite. Leer = Adresse der aktuellen Seite
   @param {boolean} [primary] - Haupt-Box der Seite (steuert die mobile Kontaktleiste)
+  @param {boolean} [compact] - Schlanke Anfrage-Zeile unter einem Text (Service-Seite)
+  @param {boolean} [hours] - false blendet die Öffnungszeiten aus, wenn die Seite sie daneben schon zeigt (sections/visit.liquid)
+  @param {boolean} [number] - false zeigt „Anrufen“ ohne die Nummer daneben (Termin-Box der Werkstatt)
+  @param {boolean} [bare] - Nur die Kanal-Buttons mit festem Thema, ohne Box und Beschriftung (Kontakt-Karte in snippets/partner-offer)
+  @param {string} [class] - Klasse des Button-Rahmens bei bare, Standard "contact-box__buttons"
+  @param {boolean} [dark] - Auf dunklem Grund: WhatsApp und E-Mail mit heller Kontur
   @param {string} [extra] - Zusätzliches HTML unter den Buttons
 
   @example
   {% render 'contact-box', title: 'Interesse an diesem Bike?', topics: 'probefahrt,finanzierung,frage', subject: product.title %}
+
+  @example
+  {% render 'contact-box', compact: true, anchor: 'probefahrt-kontakt', title: 'Probefahrt anfragen', topic: 'probefahrt' %}
 {% enddoc %}
 
 {%- liquid
@@ -31,9 +42,61 @@
   if settings.phone != blank
     assign has_channel = true
   endif
+
+  assign outline = 'btn--outline-dark'
+  if dark
+    assign outline = 'btn--outline-light'
+  endif
 -%}
 
-{%- if has_channel or request.design_mode -%}
+{%- capture contact_buttons -%}
+  {%- if settings.phone != blank -%}
+    <a class="btn btn--primary" data-cb="tel" href="{% render 'contact-href', kind: 'tel' %}">
+      {% render 'icon', name: 'phone' %}<span>Anrufen</span>
+      {%- if number != false -%}<span class="contact-box__phone hide-mobile">· {{ settings.phone | escape }}</span>{%- endif -%}
+    </a>
+  {%- endif -%}
+  {%- if settings.whatsapp != blank -%}
+    <a class="btn {{ outline }}" data-cb="wa" href="{% render 'contact-href', kind: 'wa' %}" target="_blank" rel="noopener">{% render 'icon', name: 'message-circle' %}WhatsApp</a>
+  {%- endif -%}
+  {%- if settings.email != blank -%}
+    <a class="btn {{ outline }}" data-cb="mail" href="{% render 'contact-href', kind: 'mail' %}">{% render 'icon', name: 'mail' %}E-Mail</a>
+  {%- endif -%}
+{%- endcapture -%}
+
+{%- capture missing_note -%}
+  <p class="small" role="note"><strong>Händlerdaten fehlen.</strong> Trage Telefon, WhatsApp oder E-Mail unter „Theme-Einstellungen &gt; Händlerdaten“ ein. Besucher sehen {% if compact %}diese Zeile{% else %}diese Box{% endif %} erst dann.</p>
+{%- endcapture -%}
+
+{%- if bare -%}
+  {%- comment -%} Ohne Kanal bleibt die Ausgabe leer: Der Aufrufer setzt dann seinen Ersatzlink {%- endcomment -%}
+  {%- if has_channel -%}
+    <div
+      class="{{ class | default: 'contact-box__buttons' }}"
+      data-contact
+      data-topic-default="{{ active_topic | escape }}"
+      data-subject="{{ subject | escape }}"
+      data-ref="{{ ref | escape }}"
+    >{{ contact_buttons }}</div>
+  {%- endif -%}
+{%- elsif compact -%}
+  {%- if has_channel or request.design_mode -%}
+    <div
+      class="contact-row"
+      id="{{ box_id }}"
+      role="group"
+      data-contact
+      data-topic-default="{{ active_topic | escape }}"
+      data-subject="{{ subject | escape }}"
+      data-ref="{{ ref | escape }}"
+      aria-labelledby="{{ box_id }}-title"
+    >
+      <p class="contact-row__title" id="{{ box_id }}-title">{{ title | default: 'Frag uns' | escape }}</p>
+      {%- unless has_channel -%}{{ missing_note }}{%- endunless -%}
+      {%- if has_channel -%}<div class="contact-row__buttons">{{ contact_buttons }}</div>{%- endif -%}
+    </div>
+  {%- endif -%}
+{%- elsif has_channel or request.design_mode -%}
   <section
     class="contact-box"
     id="{{ box_id }}"
@@ -46,9 +109,7 @@
     <h2 class="h3" id="{{ box_id }}-title">{{ title | default: 'Interesse? Sprich mit uns' }}</h2>
     {%- if intro != blank -%}<p class="small muted">{{ intro }}</p>{%- endif -%}
 
-    {%- unless has_channel -%}
-      <p class="small" role="note"><strong>Händlerdaten fehlen.</strong> Trage Telefon, WhatsApp oder E-Mail unter „Theme-Einstellungen &gt; Händlerdaten“ ein. Besucher sehen diese Box erst dann.</p>
-    {%- endunless -%}
+    {%- unless has_channel -%}{{ missing_note }}{%- endunless -%}
 
     {%- if has_message_channel -%}
       <fieldset class="contact-box__topics">
@@ -65,6 +126,8 @@
                   assign topic_label = 'Versicherung'
                 when 'inzahlungnahme'
                   assign topic_label = 'Inzahlungnahme'
+                when 'lieferung'
+                  assign topic_label = 'Lieferung'
                 when 'reservierung'
                   assign topic_label = 'Reservierung'
                 when 'werkstatt'
@@ -83,19 +146,7 @@
       </fieldset>
     {%- endif -%}
 
-    <div class="contact-box__buttons">
-      {%- if settings.phone != blank -%}
-        <a class="btn btn--primary" data-cb="tel" href="{% render 'contact-href', kind: 'tel' %}">
-          {% render 'icon', name: 'phone' %}<span>Anrufen</span><span class="contact-box__phone hide-mobile">· {{ settings.phone | escape }}</span>
-        </a>
-      {%- endif -%}
-      {%- if settings.whatsapp != blank -%}
-        <a class="btn btn--outline-dark" data-cb="wa" href="{% render 'contact-href', kind: 'wa' %}" target="_blank" rel="noopener">{% render 'icon', name: 'message-circle' %}WhatsApp</a>
-      {%- endif -%}
-      {%- if settings.email != blank -%}
-        <a class="btn btn--outline-dark" data-cb="mail" href="{% render 'contact-href', kind: 'mail' %}">{% render 'icon', name: 'mail' %}E-Mail</a>
-      {%- endif -%}
-    </div>
+    <div class="contact-box__buttons">{{ contact_buttons }}</div>
     {%- if has_message_channel -%}
       <p class="caption muted">Nachricht wird mit deinem Anliegen{% if subject != blank %} und dem Fahrzeug/Artikel{% endif %} vorausgefüllt – du kannst sie vor dem Senden anpassen.</p>
     {%- endif -%}
@@ -109,7 +160,7 @@
       </div>
     {%- endif -%}
 
-    {%- if settings.hours_enabled -%}
+    {%- if settings.hours_enabled and hours != false -%}
       <p class="open-state" data-open-state>Öffnungszeiten siehe unten.</p>
       <p class="hours">{% render 'opening-hours', as: 'inline' %}</p>
     {%- endif -%}

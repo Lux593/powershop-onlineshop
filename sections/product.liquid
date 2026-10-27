@@ -431,7 +431,7 @@
 
           <div class="note">
             {% render 'icon', name: 'wrench' %}
-            <div>Einbau durch Fachwerkstatt empfohlen. <a class="text-link" href="{{ pages['service'].url | default: '/pages/service' }}#werkstatt">Werkstatt-Termin anfragen</a></div>
+            <div>Einbau durch Fachwerkstatt empfohlen. <a class="text-link" href="{{ pages['werkstatt'].url | default: '/pages/service#werkstatt' }}">Werkstatt-Termin anfragen</a></div>
           </div>
 
           {% render 'pdp-buy', product: product %}

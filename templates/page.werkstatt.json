@@ -12,13 +12,23 @@
       "type": "build-book",
       "settings": {
         "heading": "Werkstatt",
-        "intro": "Custom-Umbauten aus unserer Meisterwerkstatt. Wähl einen Umbau, um alle Bilder und Details zu sehen."
+        "intro": "Inspektion, Einbau, Custom-Umbau und Eintragung: Unsere Meisterwerkstatt kümmert sich um dein Bike.",
+        "parent_page": "service",
+        "image_asset": "werkstatt-intro-poster.jpg",
+        "image_srcset": "",
+        "image_position": "50% 50%",
+        "image_alt": "",
+        "video_asset": "werkstatt-intro.mp4",
+        "video_label": "Langsame Kamerafahrt auf ein Motorrad in der Werkstatt, vor Werkzeugwänden und einer orangen Wand",
+        "builds_heading": "Custom-Umbauten aus unserer Meisterwerkstatt",
+        "builds_text": "",
+        "builds_more": "Du bringst die Idee mit, wir setzen sie in unserer Meisterwerkstatt um, vom neuen Lenker bis zum kompletten Umbau. Wähl einen Umbau und schau dir in der Galerie alle Bilder und Details an."
       },
       "blocks": {
         "falk": {
           "type": "build",
           "settings": {
-            "name": "Falk",
+            "name": "Project Falk",
             "base": "Softail Standard",
             "intro": "Ein Chopper mit allem, was dazugehört: hoher Ape-Hanger, viel Chrom an der Front und ein Tank mit orangen Flammen. Aufgebaut auf einer Softail Standard und reduziert auf das, was zählt.",
             "specs": "Lenker: Ape-Hanger\nLack: Tank mit Flammen in Orange\nAuspuff: Doppelrohr in Chrom\nRäder: Speichenräder vorn und hinten\nSitz: Solo-Sitz",
@@ -144,7 +154,7 @@
         "police": {
           "type": "build",
           "settings": {
-            "name": "Police",
+            "name": "Police Bike",
             "base": "Electra Glide",
             "intro": "Eine Electra Glide im Look der klassischen Police-Maschinen: schwarz-weiße Lackierung und Police-Schriftzüge an Verkleidung und Koffern. Im Showroom bleibt hier jeder stehen.",
             "specs": "Lack: Schwarz-Weiß im Police-Stil\nSchriftzüge: Police an Verkleidung und Koffern\nLicht: Blaue und rote Zusatzleuchte vorn\nKoffer: In Wagenfarbe",
@@ -266,13 +276,99 @@
             "breakout-bild-3",
             "breakout-bild-4"
           ]
+        },
+        "heritage": {
+          "type": "build",
+          "settings": {
+            "name": "Heritage",
+            "base": "Heritage Classic",
+            "intro": "Retro-Look mit dunkler Seite: Die Heritage Classic bekam Tank und Kotflügel in Creme, Weißwandreifen auf Speichenrädern und einen hohen schwarzen Lenker. Motor, Auspuff und Scheinwerfer sind schwarz.",
+            "specs": "Lack: Tank und Kotflügel in Creme\nLenker: Ape-Hanger in Schwarz\nRäder: Speichenräder mit Weißwandreifen\nAuspuff: Doppelrohr in Mattschwarz\nLicht: Schwarzer Scheinwerfer mit Zusatzscheinwerfern\nSitz: Solo-Sitz",
+            "cta_label": "Ähnlichen Umbau anfragen",
+            "cta_target": "#termin",
+            "cover_asset": "umbau-heritage-1-1080.webp",
+            "cover_position": "55% 60%",
+            "cover_mobile_asset": "umbau-heritage-3-1080.webp",
+            "cover_mobile_position": "50% 60%"
+          },
+          "blocks": {
+            "heritage-bild-1": {
+              "type": "build-photo",
+              "settings": {
+                "alt": "Die Heritage von schräg vorn: Tank und Kotflügel in Creme, hoher schwarzer Lenker und Weißwandreifen, vor einer Industriehalle",
+                "asset": "umbau-heritage-1-1440.webp",
+                "asset_srcset": "umbau-heritage-1-720.webp 720w, umbau-heritage-1-1080.webp 1080w, umbau-heritage-1-1440.webp 1440w",
+                "asset_width": 1440,
+                "asset_height": 1920
+              }
+            },
+            "heritage-bild-3": {
+              "type": "build-photo",
+              "settings": {
+                "alt": "Die Heritage im Profil auf einer Gasse zwischen zwei Hallen",
+                "asset": "umbau-heritage-3-1440.webp",
+                "asset_srcset": "umbau-heritage-3-720.webp 720w, umbau-heritage-3-1080.webp 1080w, umbau-heritage-3-1440.webp 1440w",
+                "asset_width": 1440,
+                "asset_height": 1920
+              }
+            },
+            "heritage-bild-2": {
+              "type": "build-photo",
+              "settings": {
+                "alt": "Cremefarbener Tank mit Harley-Davidson-Emblem über dem schwarzen 114er-Motor",
+                "asset": "umbau-heritage-2-1440.webp",
+                "asset_srcset": "umbau-heritage-2-720.webp 720w, umbau-heritage-2-1080.webp 1080w, umbau-heritage-2-1440.webp 1440w",
+                "asset_width": 1440,
+                "asset_height": 1920
+              }
+            },
+            "heritage-bild-6": {
+              "type": "build-photo",
+              "settings": {
+                "alt": "Frontansicht mit schwarzem Scheinwerfer, zwei Zusatzscheinwerfern und hohem Lenker",
+                "asset": "umbau-heritage-6-1440.webp",
+                "asset_srcset": "umbau-heritage-6-720.webp 720w, umbau-heritage-6-1080.webp 1080w, umbau-heritage-6-1440.webp 1440w",
+                "asset_width": 1440,
+                "asset_height": 1920
+              }
+            },
+            "heritage-bild-5": {
+              "type": "build-photo",
+              "settings": {
+                "alt": "Heck mit kurzem cremefarbenem Kotflügel, Kennzeichenhalter und schwarzer Seitentasche",
+                "asset": "umbau-heritage-5-1440.webp",
+                "asset_srcset": "umbau-heritage-5-720.webp 720w, umbau-heritage-5-1080.webp 1080w, umbau-heritage-5-1440.webp 1440w",
+                "asset_width": 1440,
+                "asset_height": 1919
+              }
+            },
+            "heritage-bild-4": {
+              "type": "build-photo",
+              "settings": {
+                "alt": "Schwarzer Doppelauspuff mit schrägem Abschluss, darüber der Solo-Sitz",
+                "asset": "umbau-heritage-4-1440.webp",
+                "asset_srcset": "umbau-heritage-4-720.webp 720w, umbau-heritage-4-1080.webp 1080w, umbau-heritage-4-1440.webp 1440w",
+                "asset_width": 1440,
+                "asset_height": 1920
+              }
+            }
+          },
+          "block_order": [
+            "heritage-bild-1",
+            "heritage-bild-3",
+            "heritage-bild-2",
+            "heritage-bild-6",
+            "heritage-bild-5",
+            "heritage-bild-4"
+          ]
         }
       },
       "block_order": [
+        "heritage",
         "falk",
         "lowrider-st",
-        "police",
-        "breakout"
+        "breakout",
+        "police"
       ]
     },
     "leistungen": {

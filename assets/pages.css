@@ -1,14 +1,14 @@
 /* ==========================================================================
-   Power Shop – Seiten (Vorlagen page.*): Partner-Abschnitte der Service-Seite (Finanzierung, Versicherung;
-   snippets/partner-offer.liquid). Lädt nur auf Seiten (layout/theme.liquid).
+   Power Shop – Seiten (Vorlagen page.*): Service-Seite mit Türen, Kaufweg und Partner-Abschnitten
+   (sections/service-page.liquid, snippets/partner-offer.liquid), Service-Navigation, „Komm vorbei“ (sections/visit.liquid)
+   und Werkstatt-Leistungen. Lädt nur auf Seiten (layout/theme.liquid).
    Bewegungszustände gelten nur unter html.has-motion (Vertrag: docs/motion-api.md); ohne sie ist alles statisch.
    ========================================================================== */
 
 /* ---------- Partner-Angebot ---------- */
 /* Hell: Offwhite der Seite. Dunkel: Schwarz mit Körnung (.on-dark.textured). Die Scrub-Farben hängen am Schema.
-   --offer-sticky: Oberkante der stehenbleibenden Textspalte; auf der Service-Seite zählt die Themenleiste (69 px) mit. */
-.offer { --scrub-dim: var(--c-dim-light); --scrub-lit: var(--c-black); --offer-sticky: calc(var(--header-offset) + var(--s-4)); }
-.service-page .offer { --offer-sticky: calc(var(--header-offset) + 69px + var(--s-4)); scroll-margin-top: 69px; } /* Sprung auf #finanzierung landet unter der Themenleiste */
+   --offer-sticky: Oberkante der stehenbleibenden Textspalte; klebt die Service-Navigation, zählt sie mit (--subnav-h). */
+.offer { --scrub-dim: var(--c-dim-light); --scrub-lit: var(--c-black); --offer-sticky: calc(var(--header-offset) + var(--subnav-h, 0px) + var(--s-4)); }
 .offer--dark { --scrub-dim: var(--c-dim-dark); --scrub-lit: var(--c-white); }
 
 .offer__head { display: grid; gap: var(--s-3); margin-bottom: var(--s-6); }
@@ -48,6 +48,11 @@
 .offer__media img { width: 100%; height: 100%; object-fit: cover; }
 .offer__text p { font-size: 18px; line-height: 1.6; }
 .offer__text sup { font-size: 0.7em; line-height: 0; }
+/* Stichpunkte unter dem Text (Probefahrt): Häkchen in Orange, auf hell wie auf dunkel (Grafik, kein Text) */
+.offer__list { display: grid; gap: 10px; }
+.offer__list li { display: flex; gap: 12px; font-size: 17px; line-height: 1.5; }
+.offer__list .icon { flex: none; width: 20px; height: 20px; margin-top: 3px; color: var(--c-orange); }
+.offer--dark .offer__list li { color: var(--c-on-dark); }
 .offer__actions { display: flex; flex-wrap: wrap; gap: 12px; }
 /* Externer Link: der Pfeil weist beim Überfahren schräg aus der Seite heraus */
 .offer__actions .btn .icon { transition: transform var(--t-fast) var(--ease); }
@@ -58,17 +63,19 @@
 .offer--dark .offer__advice { border-top-color: var(--c-border-dark); }
 .offer--dark .offer__footnote { color: var(--c-muted-dark); }
 
-/* Ansprechpartner: Porträt 4:5 mit orangem Balken unten links (wie .story__media), darunter Name, Adresse, Telefon */
+/* Ansprechpartner: Porträt 4:5 mit orangem Balken unten links, darunter Name, Adresse, Telefon */
 .agent { display: grid; gap: var(--s-3); }
 @media (min-width: 640px) and (max-width: 1023px) { .agent { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); align-items: end; } }
 .agent__photo { position: relative; aspect-ratio: 4 / 5; overflow: hidden; background: var(--c-anthracite); }
-.agent__photo img { width: 100%; height: 100%; object-fit: cover; }
+.agent__photo img { width: 100%; height: 100%; object-fit: cover; object-position: var(--photo-pos, 50% 50%); }
 .agent__photo::after { content: ""; position: absolute; left: 0; bottom: 0; width: 96px; height: 6px; background: var(--c-orange); }
 .agent__body { display: grid; gap: 12px; }
 .agent h3 { font-size: 32px; }
 .agent address { font-style: normal; line-height: 1.6; color: var(--c-muted); }
 .offer--dark .agent address { color: var(--c-on-dark); }
 .agent__actions { display: grid; gap: 8px; margin-top: 4px; }
+/* Kontakt-Karte des Shops: Nummer wie beim Ansprechpartner in der Grundschrift (contact-box blendet sie am Handy aus) */
+.agent__actions .contact-box__phone { font-family: var(--f-body); font-weight: 600; letter-spacing: 0; text-transform: none; }
 .agent__number { font-family: var(--f-body); font-weight: 600; letter-spacing: 0; text-transform: none; }
 
 /* ---------- Scrub der Aussagen (assets/pages.js setzt .is-scrub und .is-lit) ----------
@@ -79,15 +86,119 @@
 .has-motion [data-scrub].is-scrub .ps-wi.is-lit { color: var(--scrub-lit, var(--c-black)); }
 @media print { [data-scrub] .ps-wi { color: inherit !important; } }
 
+/* ---------- Service-Seite (sections/service-page.liquid) ----------
+   Unter dem Banner die Türen zu Werkstatt und Über uns, darunter der Kaufweg: nummerierte Schritte, getrennt durch
+   Haarlinien. Handy und Tablet: Nummer, Titel, Bild (16:9), Text, Anfrage-Zeile. Ab 1024 px steht der Text links und
+   das Bild rechts; ohne Bild steht der Text auf Lesebreite, ohne leere Spalte daneben. */
+.service-block { display: grid; grid-template-areas: "head" "media" "body"; gap: var(--s-3); padding-block: var(--s-8); border-bottom: 1px solid var(--c-line); }
+.service-block > * { min-width: 0; }
+.service-block__head { grid-area: head; display: grid; gap: var(--s-2); }
+.service-block__head h2 { max-width: 20ch; overflow-wrap: break-word; }
+.service-block__media { grid-area: media; aspect-ratio: 16 / 9; overflow: hidden; background: var(--c-stone); }
+.service-block__media img { width: 100%; height: 100%; object-fit: cover; }
+.service-block__body { grid-area: body; display: grid; gap: var(--s-2); align-content: start; max-width: 68ch; }
+.service-block__text p { font-size: 18px; line-height: 1.6; }
+@media (min-width: 1024px) {
+  .service-block:has(> .service-block__media) { grid-template: "head media" auto "body media" 1fr / minmax(0, 7fr) minmax(0, 5fr); column-gap: 56px; }
+  .service-block__media { aspect-ratio: 3 / 2; }
+}
+
+/* Schritt-Nummer (snippets/step-no.liquid): schwarz, Orange nur als Strich dahinter */
+.step-no { display: flex; align-items: center; gap: 14px; font-family: var(--f-head); font-weight: 800; font-size: 40px; line-height: 0.8; letter-spacing: 0.02em; font-variant-numeric: tabular-nums; color: var(--c-black); }
+.step-no::after { content: ""; flex: none; width: 40px; height: 3px; background: var(--c-orange); }
+.on-dark .step-no { color: var(--c-white); }
+@media (min-width: 1024px) { .step-no { font-size: 48px; } .step-no::after { width: 56px; } }
+
+/* Stichpunkte: Häkchen wie bisher. Zeilen der Form „Land: Text“ bekommen ein fettes Label; tragen alle Zeilen eins
+   (Lieferung DE/CH/FR), wird jede ein eigener Absatz, ab 1024 px ohne Bild nebeneinander. */
+.service-block__list { display: grid; gap: 10px; }
+.service-block__list li { display: flex; gap: 10px; }
+.service-block__list .icon { flex: none; width: 18px; height: 18px; margin-top: 3px; color: var(--c-success); }
+.service-block__list--labeled { gap: var(--s-3); }
+.service-block__list--labeled li { display: grid; gap: 8px; align-content: start; padding-top: var(--s-2); border-top: 1px solid var(--c-line); hyphens: auto; hyphenate-limit-chars: 8 4 4; } /* kurze Wörter („deines“) nicht trennen */
+.service-block__list--labeled strong { font-family: var(--f-head); font-weight: 700; font-size: 22px; line-height: 1; letter-spacing: 0.02em; text-transform: uppercase; }
+@media (min-width: 1024px) {
+  .service-block--text .service-block__body { max-width: none; }
+  .service-block--text .service-block__body > * { max-width: 68ch; }
+  .service-block--text .service-block__list--labeled { max-width: none; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); column-gap: var(--s-4); }
+  .service-block--text .service-block__body > :is(.contact-row, .steps, .checklist) { max-width: none; } /* so breit wie die Spalten darüber */
+}
+
+/* Ablauf (Themenblock mit „Ablauf mit nummerierten Schritten“, Inzahlungnahme): Stationen mit Nummer im schwarzen Quadrat,
+   verbunden durch die orange Linie der Schritt-Nummern. Ab 768 px nebeneinander, die Linie läuft von Quadrat zu Quadrat;
+   darunter untereinander mit senkrechter Linie. Die Nummern sind nur Bild, die Reihenfolge trägt die <ol>. */
+.steps { --no: 44px; --gap-x: var(--s-4); display: grid; margin-block: var(--s-2); }
+.steps__item { position: relative; display: grid; grid-template-columns: var(--no) minmax(0, 1fr); column-gap: var(--s-2); align-content: start; padding-bottom: var(--s-3); } /* start: gleich hohe Stationen strecken sonst die Zeile der Nummer */
+.steps__item:last-child { padding-bottom: 0; }
+.steps__no {
+  display: grid; place-items: center; width: var(--no); height: var(--no); background: var(--c-black); color: var(--c-white);
+  font-family: var(--f-head); font-weight: 800; font-size: 22px; line-height: 1; font-variant-numeric: tabular-nums;
+}
+.steps__item:not(:last-child)::after { content: ""; position: absolute; top: calc(var(--no) + 8px); bottom: 8px; left: calc(var(--no) / 2 - 1px); width: 3px; background: var(--c-orange); }
+.steps__body { display: grid; gap: 6px; align-content: start; padding-top: 10px; min-width: 0; }
+.steps__title { font-size: 22px; line-height: 1.05; hyphens: auto; hyphenate-limit-chars: 8 4 4; }
+.steps__body p { color: var(--c-text-soft); }
+@media (min-width: 768px) {
+  .steps { grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); column-gap: var(--gap-x); }
+  .steps__item { grid-template-columns: minmax(0, 1fr); row-gap: var(--s-2); padding-bottom: 0; }
+  .steps__item:not(:last-child)::after { top: calc(var(--no) / 2 - 1px); bottom: auto; left: calc(var(--no) + 12px); right: calc(12px - var(--gap-x)); width: auto; height: 3px; }
+  .steps__body { padding-top: 0; }
+}
+
+/* Checkliste (Inzahlungnahme: „Das brauchen wir von dir“): eigene weiße Fläche mit Haarlinie wie die Kacheln, Häkchen wie in
+   den Stichpunkten. Ab 640 px zwei Spalten, ab 1024 px steht die Überschrift links daneben. */
+.checklist { display: grid; gap: var(--s-2); padding: var(--s-3); background: var(--c-white); border: 1px solid var(--c-line); }
+.checklist__title { font-size: 20px; line-height: 1.1; }
+.checklist__items { display: grid; gap: 10px var(--s-3); }
+.checklist__items li { display: flex; gap: 10px; }
+.checklist__items .icon { flex: none; width: 18px; height: 18px; margin-top: 3px; color: var(--c-success); }
+@media (min-width: 640px) { .checklist__items { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1024px) { .checklist { grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); column-gap: var(--s-4); align-items: start; } }
+
+/* Events: Die Karten bringen ihre dunkle Fläche selbst mit (sections.css) und stehen direkt auf dem hellen Grund. Spalten ab
+   320 px Breite statt fester Drei: Ein einzelner Termin bleibt eine Karte und wird kein Balken über die ganze Breite.
+   Steht kein Termin an, ein Satz statt einer Lücke (die Leiste verlinkt #events). */
+.service-block--events { grid-template-areas: "head" "body" "events"; }
+.service-block--events .service-events { grid-area: events; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); }
+.service-events__empty { grid-area: events; display: flex; align-items: flex-start; gap: 10px; max-width: 68ch; color: var(--c-text-soft); }
+.service-events__empty .icon { flex: none; width: 20px; height: 20px; margin-top: 2px; color: var(--c-black); }
+
+/* Türen auf der Service-Seite: Größe und Abstände der Kacheln stehen in home.css (auch in der Story der Startseite) */
+.doors { padding-top: var(--s-6); }
+/* Folgt auf die Türen ein dunkler Abschnitt (Probefahrt), stieße seine Fläche sonst direkt an die Kachel */
+.container:has(> .doors) + .offer--dark { margin-top: var(--s-6); }
+
 /* ---------- Service-Navigation (sections/service-subnav.liquid) ----------
-   Unterpunkte von „Service“ aus dem Hauptmenü. Dunkel über dunklen Bühnen (Werkstatt), hell über hellen Seiten.
-   Orange nur als Unterstreichung des aktuellen Punkts (auf hell nie als Schrift). */
+   Unterpunkte von „Service“ aus dem Hauptmenü. Dunkel über dunklen Bühnen (Werkstatt, Service), hell über hellen Seiten.
+   Orange nur als Unterstreichung des aktuellen Punkts (auf hell nie als Schrift).
+   Kleben (Einstellung, nur Service): Es klebt die umgebende Shopify-Section, nicht die Leiste. Die Section ist nur so hoch
+   wie die Leiste, darin hätte sticky keinen Weg. Bei höchstens 540 px Fensterhöhe (Handy quer, starker Zoom) klebt sie nie,
+   sonst bliebe kaum Platz für den Inhalt (dieselbe Schwelle wie beim Hero). --subnav-h (56 px plus Linie) zählt im
+   Anker-Abstand mit, der auch den Tastaturfokus freihält, und in der stehenbleibenden Textspalte der Partner-Abschnitte.
+   Die Leiste ist wischbar und ohne Scrollleiste: Ein Verlauf am Rand zeigt weitere Punkte an (has-more-*, pages.js). */
+.shopify-section:has(> .service-subnav--sticky) { position: sticky; top: var(--header-offset); z-index: 20; }
+html:has(.service-subnav--sticky) { --subnav-h: 57px; scroll-padding-top: calc(var(--header-offset) + var(--subnav-h) + 16px); }
+@media (max-height: 540px) {
+  .shopify-section:has(> .service-subnav--sticky) { position: static; }
+  html:has(.service-subnav--sticky) { --subnav-h: 0px; }
+}
 .service-subnav { background: var(--c-offwhite); border-bottom: 1px solid var(--c-line); }
 .service-subnav--dark { background: var(--c-black); border-bottom-color: var(--c-steel); }
 .service-subnav__inner { display: flex; align-items: center; gap: 24px; min-height: 56px; overflow-x: auto; scrollbar-width: none; }
 .service-subnav__inner::-webkit-scrollbar { display: none; }
-.service-subnav__crumb { flex: none; font-size: 13px; color: var(--c-muted); white-space: nowrap; }
-.service-subnav__crumb:hover { color: var(--c-black); }
+.service-subnav.has-more-end .service-subnav__inner { -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 56px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 56px), transparent); }
+.service-subnav.has-more-start .service-subnav__inner { -webkit-mask-image: linear-gradient(90deg, transparent, #000 56px); mask-image: linear-gradient(90deg, transparent, #000 56px); }
+.service-subnav.has-more-start.has-more-end .service-subnav__inner {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 56px, #000 calc(100% - 56px), transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 56px, #000 calc(100% - 56px), transparent);
+}
+/* Der Crumb steht in derselben Schrift wie die Punkte (SERVICE), der Pfeil trennt ihn von ihnen */
+.service-subnav__crumb {
+  flex: none; display: inline-flex; align-items: center; gap: 4px; min-height: 44px;
+  font-family: var(--f-head); font-weight: 600; font-size: 15px; letter-spacing: .8px; text-transform: uppercase; white-space: nowrap;
+  color: var(--c-muted);
+}
+.service-subnav__crumb:hover, .service-subnav__crumb[aria-current] { color: var(--c-black); }
 .service-subnav__links { display: flex; gap: 4px; }
 .service-subnav__links a {
   display: inline-flex; align-items: center; min-height: 44px; padding: 0 12px; border-bottom: 2px solid transparent;
@@ -97,29 +208,116 @@
 .service-subnav__links a:hover { color: var(--c-black); }
 .service-subnav__links a[aria-current] { color: var(--c-black); border-bottom-color: var(--c-orange); }
 .service-subnav--dark .service-subnav__crumb, .service-subnav--dark .service-subnav__links a { color: var(--c-muted-dark); }
-.service-subnav--dark .service-subnav__crumb:hover, .service-subnav--dark .service-subnav__links a:hover,
-.service-subnav--dark .service-subnav__links a[aria-current] { color: var(--c-white); }
+.service-subnav--dark .service-subnav__crumb:hover, .service-subnav--dark .service-subnav__crumb[aria-current],
+.service-subnav--dark .service-subnav__links a:hover, .service-subnav--dark .service-subnav__links a[aria-current] { color: var(--c-white); }
 .service-subnav__hint { padding-block: 16px; font-size: 14px; color: var(--c-muted); }
+/* Unter 1024 px zeigt die Service-Navigation über dem Seitenkopf schon den Weg: keine zweiten Brotkrumen darunter. */
+@media (max-width: 1023px) {
+  #main:has(.service-subnav) .page-banner .breadcrumb { display: none; }
+}
 
 /* ---------- Werkstatt-Leistungen (sections/workshop-services.liquid) ----------
-   Desktop: Liste mit Haarlinien neben der Termin-Box. Bis 1023 px: 2 x 2 Info-Kacheln im Raster der Startseiten-Kacheln
-   (home.css .service-tiles), ohne Link und ohne Hover-Linie. */
+   Die Leistungen sind Info-Kacheln im Raster der Startseiten-Kacheln (home.css .service-tiles), ohne Link und daher ohne
+   Hover-Linie, in jeder Größe 2 x 2. Ab 1024 px stehen Text und Kacheln links, die Termin-Box rechts (7 : 5 wie „Komm vorbei“).
+   Die Überschrift hat eine eigene Klasse: Eine Regel auf h2 träfe auch den Titel der Termin-Box (h2.h3, shop.css). */
 .workshop-services { padding-block: var(--section-y); background: var(--c-offwhite); color: var(--c-text); }
-.workshop-services__grid { display: grid; gap: 48px; }
+.workshop-services__grid { display: grid; gap: var(--s-6); }
 .workshop-services__grid > * { min-width: 0; }
-.workshop-services h2 { font-size: var(--fs-h2); }
-.workshop-services__intro { max-width: 60ch; margin-top: 16px; color: var(--c-text-soft); }
-.workshop-services__list { display: grid; margin-top: 32px; border-top: 1px solid var(--c-line); }
-.workshop-services__item { display: grid; align-content: start; gap: 6px; min-width: 0; padding-block: 20px; border-bottom: 1px solid var(--c-line); overflow-wrap: break-word; }
-.workshop-services__item > .icon { display: none; }
-.workshop-services__item h3 { font-size: var(--fs-h4); }
-.workshop-services__item p { max-width: 62ch; font-size: 15px; color: var(--c-muted); }
-@media (min-width: 1024px) { .workshop-services__grid:has(> .contact-box) { grid-template-columns: minmax(0, 1fr) 380px; align-items: start; gap: 64px; } }
-@media (max-width: 1023px) {
-  .workshop-services__list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--c-line); border: 1px solid var(--c-line); }
-  .workshop-services__item { gap: 8px; padding: 24px 20px; border-bottom: 0; background: var(--c-white); }
-  .workshop-services__item > .icon { display: block; width: 32px; height: 32px; color: var(--c-orange); }
-  .workshop-services__item h3 { margin-top: 8px; font-size: 22px; }
-  .workshop-services__item p { font-size: var(--fs-small); }
+.workshop-services__intro { max-width: 60ch; margin-top: var(--s-2); color: var(--c-text-soft); }
+.workshop-services__tiles { margin-top: var(--s-4); }
+@media (min-width: 1024px) {
+  .workshop-services .service-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .workshop-services__grid:has(> .contact-box) { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); column-gap: 56px; align-items: start; }
 }
-@media (max-width: 479px) { .workshop-services__item h3 { hyphens: auto; } }
+
+/* ---------- Komm vorbei (sections/visit.liquid) ----------
+   Dunkle Karte des Dreiländerecks mit Pin, dazu Adresse, Route, Öffnungszeiten und Kontakt-Box. Die Überschrift steht vor der
+   Karte, damit der Abschnitt nicht mit einer namenlosen Fläche beginnt.
+   - Bis 1023 px alles untereinander: Die Kontakt-Box stellt dort ihre drei Knöpfe nebeneinander und braucht die volle Breite (shop.css).
+   - 1024 bis 1279 px (iPad quer): Karte über die volle Breite, darunter Angaben und Kontakt-Box nebeneinander.
+   - Ab 1280 px Karte links, rechts Überschrift, Angaben und Kontakt-Box. Die Karte wird so hoch wie die rechte Spalte, aber nie
+     schmaler als 0,9 : 1, sonst fiele „Deutschland“ aus dem Bild. Die Rahmenbreite steht darum als Formel in der max-height.
+   Die Kartenebene verhält sich wie ein cover-Bild, das an einem Punkt verankert ist (Containereinheiten): Der Pin steht
+   immer bei --ax Prozent der Rahmenbreite und 39,97 % der Höhe, Länder und Dreiländereck bleiben bei jedem Seitenverhältnis
+   im Bild. Auf dem Handy rückt der Anker nach links (55 %), damit das Schild „Power Shop“ rechts neben dem Pin Platz hat;
+   --mw ist dort mindestens 135 % der Breite, damit die Karte den Rahmen trotzdem ganz füllt.
+   Container ist .visit__frame, absolut über die ganze Karte gelegt: So steht seine Größe immer fest, auch wenn sich die Karte
+   ab 1280 px nach der Nachbarspalte streckt (mit height:auto rechnet Chrome cqh sonst mit 0). */
+.visit { padding-block: var(--section-y); }
+.visit__grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s-4); }
+.visit__grid > * { min-width: 0; }
+.visit__title { margin-bottom: calc(var(--s-3) - var(--s-4)); } /* rückt näher an Karte oder Adresse als die Blöcke untereinander */
+.visit__map { position: relative; overflow: hidden; height: clamp(300px, 92vw, 440px); background: var(--c-black-soft); }
+.visit__frame { position: absolute; inset: 0; container-type: size; }
+.visit__info { display: grid; gap: var(--s-2); align-content: start; }
+.visit__grid > .contact-box { align-self: start; }
+/* Höchstens 75 % der Bildschirmhöhe: Handy quer (844 × 390) sieht sonst nur Karte */
+@media (min-width: 640px) { .visit__map { height: clamp(300px, 58vw, 75svh); } }
+/* Raster nur, wo eine Vorlage passt: Ohne Karte und Kontakt-Box (oder bis 1279 px ohne Kontakt-Box) bleibt alles untereinander */
+@media (min-width: 1024px) {
+  .visit__grid:not(:has(> .visit__map)):has(> .contact-box) { grid-template: "title contact" auto "info contact" 1fr / minmax(0, 7fr) minmax(0, 5fr); column-gap: 56px; }
+  .visit__grid:has(> .contact-box) > .visit__title { grid-area: title; }
+  .visit__grid:has(> .contact-box) > .visit__map { grid-area: map; }
+  .visit__grid:has(> .contact-box) > .visit__info { grid-area: info; }
+  .visit__grid > .contact-box { grid-area: contact; }
+}
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .visit__grid:has(> .visit__map):has(> .contact-box) { grid-template: "title title" auto "map map" auto "info contact" auto / minmax(0, 5fr) minmax(0, 7fr); column-gap: var(--s-6); }
+  /* Drei Knöpfe passen mit der Telefonnummer erst ab etwa 600 px Boxbreite: Anrufen über die ganze Zeile, darunter die beiden anderen */
+  .visit .contact-box__buttons { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .visit .contact-box__buttons > :first-child:nth-last-child(odd) { grid-column: 1 / -1; }
+}
+@media (min-width: 1280px) {
+  .visit__grid:has(> .visit__map) { grid-template: "map title" auto "map info" auto "map contact" 1fr / minmax(0, 7fr) minmax(0, 5fr); column-gap: 56px; }
+  .visit__grid:has(> .visit__map) > .visit__title { grid-area: title; }
+  .visit__grid:has(> .visit__map) > .visit__info { grid-area: info; }
+  .visit__grid > .visit__map { grid-area: map; height: auto; min-height: clamp(460px, 38vw, 600px); max-height: calc((min(100vw, var(--container)) - 2 * var(--gutter) - 56px) * 7 / 12 / 0.9); }
+}
+
+.visit__layer { --ax: 55; --mw: max(135cqw, 160cqh); position: absolute; width: var(--mw); aspect-ratio: 1600 / 1000; left: calc(var(--ax) * 1cqw - 0.6651 * var(--mw)); top: calc(39.97cqh - 0.3997 * var(--mw) / 1.6); }
+@media (min-width: 640px) { .visit__layer { --ax: 66.51; --mw: max(100cqw, 160cqh); } }
+.visit__img { display: block; width: 100%; height: 100%; }
+.visit__label, .visit__mark, .visit__pin { position: absolute; left: var(--x); top: var(--y); pointer-events: none; }
+.visit__label { z-index: 1; translate: -50% -50%; font: 700 11px/1 var(--f-head); letter-spacing: 0.26em; text-transform: uppercase; white-space: nowrap; color: rgb(233 230 225 / 0.64); }
+.visit__label--end { translate: -100% -50%; } /* endet am Kartenpunkt und bleibt so auf deutschem Gebiet */
+/* Breite, flache Rahmen (Handy quer, 200 % Zoom) zeigen nur ein Band der Karte: Länder, die oben oder unten herausfielen, entfallen
+   ganz statt halb abgeschnitten. Schweiz liegt am tiefsten (92 %), Deutschland am höchsten (16 %). */
+@container (aspect-ratio > 9 / 5) { .visit__label--south { display: none; } }
+@container (aspect-ratio > 5 / 2) { .visit__label { display: none; } }
+.visit__mark { z-index: 1; display: flex; align-items: center; gap: 8px; translate: -5px -50%; font-size: 12px; line-height: 1; white-space: nowrap; color: rgb(233 230 225 / 0.72); }
+.visit__mark i { width: 10px; height: 10px; border: 1.5px solid rgb(233 230 225 / 0.8); rotate: 45deg; }
+.visit__pin { z-index: 2; width: 0; height: 0; }
+.visit__dot { position: absolute; left: -11px; top: -11px; width: 22px; height: 22px; border-radius: 50%; background: var(--c-orange); border: 4px solid var(--c-black); box-shadow: 0 8px 18px rgb(0 0 0 / 0.55); }
+.visit__ring { position: absolute; left: -24px; top: -24px; width: 48px; height: 48px; border-radius: 50%; border: 2px solid var(--c-orange); opacity: 0; }
+.visit__tag { position: absolute; left: 22px; top: 0; translate: 0 -50%; padding: 7px 10px 6px; background: var(--c-black); color: var(--c-white); font: 700 13px/1 var(--f-head); letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; box-shadow: 0 8px 18px rgb(0 0 0 / 0.45); }
+@media (min-width: 1024px) {
+  .visit__label { font-size: clamp(12px, 1.05vw, 15px); letter-spacing: 0.34em; }
+  .visit__mark { font-size: 13px; }
+  .visit__tag { padding: 8px 12px 7px; font-size: 15px; }
+}
+.visit__credit { position: absolute; z-index: 2; right: 4px; bottom: 2px; padding: 6px 8px; font-size: 11px; line-height: 1.2; color: rgb(233 230 225 / 0.72); }
+.visit__credit:hover { color: var(--c-white); text-decoration: underline; text-underline-offset: 3px; }
+
+/* Ankunft: Ist die Karte eingeblendet (data-reveal, motion.js), landet der Pin, und ein Ring läuft zweimal aus */
+@keyframes visit-ring { from { opacity: 0.95; scale: 0.45; } to { opacity: 0; scale: 2.4; } }
+@media (prefers-reduced-motion: no-preference) {
+  .has-motion .visit__map .visit__dot, .has-motion .visit__map .visit__tag { transition: opacity 500ms var(--ease) 500ms, translate 800ms var(--ease-out) 500ms; }
+  .has-motion .visit__map .visit__tag { transition-delay: 660ms; }
+  .has-motion .visit__map:not(.is-in) .visit__dot { opacity: 0; translate: 0 -18px; }
+  .has-motion .visit__map:not(.is-in) .visit__tag { opacity: 0; translate: 0 calc(-50% - 18px); }
+  .has-motion .visit__map.is-in .visit__ring { animation: visit-ring 1700ms var(--ease-out) 850ms 2; }
+}
+
+.visit__address { display: grid; gap: 6px; font-style: normal; }
+.visit__street { font-family: var(--f-head); font-weight: 800; font-size: clamp(28px, 2.4vw, 34px); line-height: 0.95; letter-spacing: 0.01em; text-transform: uppercase; }
+.visit__city { font-size: 17px; }
+.visit__note { font-size: var(--fs-small); color: var(--c-muted); }
+.visit__route { width: 100%; margin-top: 8px; }
+@media (min-width: 640px) { .visit__route { justify-self: start; width: auto; } }
+.visit__hours { display: grid; gap: 8px; margin-top: 8px; padding-top: var(--s-2); border-top: 1px solid var(--c-line); }
+.visit__subhead { font-size: var(--fs-h4); }
+.visit__hours-list { display: grid; gap: 4px; font-size: var(--fs-small); }
+.visit__foot { margin-top: 8px; font-size: var(--fs-small); color: var(--c-text-soft); }
+.visit--dark .visit__note { color: var(--c-muted-dark); }
+.visit--dark .visit__hours { border-top-color: var(--c-border-dark); }
+.visit--dark .visit__foot { color: var(--c-on-dark); }

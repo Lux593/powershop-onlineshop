@@ -35,9 +35,11 @@ Die eigenen Umbauten sind der Beweis, den kein Online-Händler kopieren kann.
 
 - Shopify-Liquid-Theme ohne Build-Step; der Branch `main` ist mit dem Live-Theme verbunden, jeder Push geht live.
 - Schriften self-hosted (DSGVO, kein Google-Fonts-CDN).
-- Service-Bereich (Entscheidung 2026-10-26): Übersichtsseite plus eigene Seiten. Werkstatt steht an erster Stelle, dazu
-  „Über uns“ mit Vorstellung der Teammitglieder.
-- Custom-Umbauten werden fest ins Theme eingebaut, Änderungen laufen über die Entwicklung (Entscheidung 2026-10-26).
+- Service-Bereich (Entscheidung 2026-10-27): Werkstatt und Über uns sind eigene, besondere Seiten. Die Service-Seite führt als
+  Kaufweg durch Probefahrt, Inzahlungnahme, Finanzierung, Versicherung und Anmeldung & Lieferung, dazu Events und Standort & Kontakt.
+  Finanzierung und Versicherung bekommen keine eigene Seite. Plan: `docs/plan-service-werkstatt.md`.
+- Custom-Umbauten kommen mit dem Theme (Standardbilder in `assets/`) und sind im Theme-Editor pflegbar
+  (Entscheidung 2026-10-26, aktualisiert; ADR in `docs/plan-service-werkstatt.md`).
 - Je Umbau gibt es Name, Basis-Modell und eine Umbau-Liste. Story-Texte und Vorher-Bilder gibt es nicht.
 
 ## Brand Commitments

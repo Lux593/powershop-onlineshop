@@ -223,7 +223,8 @@ Alle laden mit `defer` am Seitenende von `layout/theme.liquid`, die Reihenfolge 
 | `lenis.min.js` | index, collection, product, nur mit „Weiches Scrollen“ und nur für Maus/Trackpad (`pointer: fine`, `hover: hover`). Kein `<script>` am Seitenende: das Head-Skript lädt es vor, `motion.js` hängt es an. Touch-Geräte laden es nie | Weiches Scrollen |
 | `motion.js` | überall (vor `header.js`) | diese Schicht |
 | `header.js`, `cart.js`, `sections.js` | überall | Header, Warenkorb und Drawer, Showroom und Quick-Add |
-| `contact.js` | product, page, im Theme-Editor immer | Kontakt-Box: Thema wählen, WhatsApp-/E-Mail-Link, Öffnungsstatus |
+| `contact.js` | product, page, im Theme-Editor immer | Kontakt-Box und Anfrage-Zeile (`compact`, festes Thema über `data-topic-default`): Thema wählen, WhatsApp-/E-Mail-Link, Öffnungsstatus |
+| `pages.js` | page (alle Seitenvorlagen) | Scrub der Partner-Aussagen (nur mit Bewegung); Service-Leiste: Scrollspy mit `aria-current="location"` und Verlauf am Rand, läuft auch ohne Bewegung |
 | `search.js` | beim ersten Öffnen des Such-Dialogs (`data-lazy-script`) | Vorschläge der Suche |
 | `collection.js` | collection, search | AJAX-Filter, Sortierung, Seitenwechsel |
 | `product.js` | product | Galerie, Varianten, Kaufleisten |
@@ -244,12 +245,13 @@ Die Regeln und Module liegen nach Bereich getrennt (früher alles in `sections.c
 | `assets/footer.css` | Footer |
 | `assets/shop.css` | Kategorieseite (Banner, Film-Intro, Filter), Produktseite, Warenkorb und Drawer, Bewegung der Shop-Seiten (Megamenü, Karten, View Transitions) |
 | `snippets/search-dialog.liquid` | Markup des Such-Dialogs, aus `sections/header.liquid` per `{% render %}` |
-| `assets/sections.css` | geteilte Reste: Events (Raster und Karten), Service-Seite, eine `min-width`-Regel für Grid-Kinder mehrerer Bereiche |
+| `assets/sections.css` | geteilte Reste: Events (Raster und Karten), eine `min-width`-Regel für Grid-Kinder mehrerer Bereiche |
+| `assets/pages.css`, `assets/pages.js` | nur Seitenvorlagen: Service-Seite (Türen, Kaufweg mit Schritt-Nummern, Events), Partner-Abschnitte, Service-Leiste (klebend, Scrollspy), „Komm vorbei“ mit Karte (`sections/visit.liquid`). Leiste und „Komm vorbei“ sind per `enabled_on` auf Seiten beschränkt |
 | `assets/theme.css` | Shopify-Ergänzungen; am Ende der Block `@media (forced-colors: active)` für gewählte Zustände (Umschalter, Chips, Farbfelder, Hero-Tabs, Spalten-Wahl), auch für Klassen aus `shop.css`/`hero.css` (dort mit einer Stufe mehr Spezifität). Der Tab-Indikator der Produkt-Tabs steht in `home.css`. |
 | `assets/sections.js` | globale Section-Module: Showroom, Quick-Toggle der Produktkarte (`PS.quick`), Escape für Tooltips |
 
 CSS-Ladereihenfolge (`layout/theme.liquid`, entspricht der Kaskade): tokens, base, components, sections, theme, motion, header, hero, home,
-footer, shop. Auf der Startseite laden alle elf Dateien, auf allen anderen Seiten zehn (ohne `hero.css`). Die Sonderlayouts laden nur sechs: `layout/password.liquid` und
+footer, shop, auf Seitenvorlagen zuletzt pages. Auf der Startseite laden alle elf Dateien, auf allen anderen Seiten zehn (ohne `hero.css`). Die Sonderlayouts laden nur sechs: `layout/password.liquid` und
 `templates/gift_card.liquid` binden tokens, base, components, sections, theme und header ein, nicht motion, hero, home, footer und shop.
 Was dort stehen soll (z. B. die Formulare der Passwortseite), gehört also in diese sechs Dateien, vor allem in `header.css`.
 

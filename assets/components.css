@@ -228,6 +228,17 @@
 .bcard__body { display: flex; flex-direction: column; gap: 10px; padding: 20px; flex: 1; }
 .bcard__title { font-size: 26px; }
 .bcard__title a:hover { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; }
+/* Farben: Felder als 32-px-Ziele mit Ring; der Abstand links gleicht den Ring aus, damit das erste Feld bündig mit dem Text steht.
+   Der Farbname steht immer in der Zeile darunter: so sind alle Karten gleich gebaut, auch bei langen Namen und vielen Farben. */
+.bcard__colors { display: grid; gap: 2px; }
+.bcard__swatches { display: flex; align-items: center; gap: 2px; margin-left: -6px; }
+.bcard__swatch { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; border: 2px solid transparent; transition: border-color 150ms var(--ease); }
+.bcard__swatch .swatch { width: 20px; height: 20px; }
+@media (hover: hover) { button.bcard__swatch:not([aria-pressed="true"]):hover { border-color: var(--c-line); } } /* nur echte Maus: nach dem Tippen bliebe der graue Ring sonst über dem gewählten stehen */
+.bcard__swatch[aria-pressed="true"] { border-color: var(--c-black); }
+.bcard__more { min-width: 32px; min-height: 32px; display: inline-grid; place-items: center; color: var(--c-muted); }
+.bcard__more:hover { color: var(--c-black); text-decoration: underline; text-underline-offset: 3px; }
+.bcard__color { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .facts { display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: var(--fs-small); color: var(--c-text-soft); }
 .facts li { display: inline-flex; align-items: center; gap: 6px; }
 .facts .icon { width: 16px; height: 16px; color: var(--c-muted); }

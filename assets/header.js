@@ -19,6 +19,9 @@
     /* ---------------- Megamenü ---------------- */
     function setOpen(li, open) {
       if (open) items.forEach(function (other) { if (other !== li) setOpen(other, false); });
+      // Jedes Öffnen beginnt mit zugeklappten Kacheln. Das Menü rendert dann noch nicht (header.css), es klappt also nichts sichtbar zu.
+      var groups = li.querySelector('[data-mega-groups]');
+      if (open && groups && !li.classList.contains('is-open')) showGroup(groups, null);
       li.classList.toggle('is-open', open);
       li.querySelector('.mainnav__toggle').setAttribute('aria-expanded', open);
       update();
@@ -42,7 +45,9 @@
       li.querySelector('.mainnav__link').addEventListener('click', function (e) {
         if (lastPointer === 'touch' && !li.classList.contains('is-open')) { e.preventDefault(); setOpen(li, true); }
       });
-      li.addEventListener('focusout', function (e) { if (!li.contains(e.relatedTarget)) setOpen(li, false); });
+      // Safari fokussiert Knöpfe beim Klick nicht: ein Klick auf eine Kachel, während ein Link im Menü den Fokus hat, meldet
+      // focusout ohne Ziel. Unter der Maus bleibt das Menü offen, mouseleave schließt es.
+      li.addEventListener('focusout', function (e) { if (!li.contains(e.relatedTarget) && !li.matches(':hover')) setOpen(li, false); });
       li.addEventListener('keydown', function (e) {
         if (e.key === 'Escape' && li.classList.contains('is-open')) {
           setOpen(li, false);
@@ -54,6 +59,25 @@
     document.addEventListener('click', function (e) {
       if (!e.target.closest('.mainnav')) items.forEach(function (li) { setOpen(li, false); });
     }, sig);
+
+    // Kacheln im Megamenü (snippets/mega-menu.liquid): alle Gruppen sind zu, ein Klick klappt die Links der Kachel unter der Reihe
+    // auf und die offene zu, ein Klick auf die offene schließt sie. Die Gruppen liegen übereinander, is-active blendet über, is-closed
+    // klappt den Bereich ein. showGroup(mega, null) schließt alle.
+    function showGroup(mega, tile) {
+      mega.querySelectorAll('.mega-tile[aria-controls]').forEach(function (other) {
+        var on = other === tile;
+        other.setAttribute('aria-expanded', on);
+        document.getElementById(other.getAttribute('aria-controls')).classList.toggle('is-active', on);
+      });
+      mega.querySelector('.mega__drawer').classList.toggle('is-closed', !tile);
+    }
+    header.querySelectorAll('[data-mega-groups]').forEach(function (mega) {
+      mega.querySelectorAll('.mega-tile[aria-controls]').forEach(function (tile) {
+        tile.addEventListener('click', function () {
+          showGroup(mega, tile.getAttribute('aria-expanded') === 'true' ? null : tile);
+        });
+      });
+    });
 
     // Das geschlossene Menü rendert nicht (header.css): seine lazy Bilder laden nicht von selbst. Nach Load plus Idle holen, nur wo das
     // Menü existiert (Desktop) und ohne Datensparen; ein Hover davor lädt sie ohnehin sofort.

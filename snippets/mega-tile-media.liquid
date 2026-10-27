@@ -1,0 +1,23 @@
+{% doc %}
+  Foto einer Megamenü-Kachel aus einem Block „Megamenü: Kachelbild“ (sections/header.liquid). Ohne Block, ohne Bild oder mit einer
+  Standarddatei aus der Platzhalterliste gibt es kein Bild: die Kachel bleibt anthrazit (snippets/media.liquid blendet Platzhalter aus).
+  Der Bildausschnitt (oben, Mitte, unten) wird zur Klasse am Bild; die Kachel ist breiter als hoch und schneidet das Foto zu.
+
+  @param {object} [block] - Block vom Typ tile
+  @param {string} sizes - sizes-Attribut, Breite der Kachel
+
+  @example
+  {% render 'mega-tile-media', block: tile_block, sizes: '424px' %}
+{% enddoc %}
+
+{%- if block -%}
+  {%- assign focus_class = 'mega-tile__img mega-tile__img--' | append: block.settings.focus -%}
+  {%- render 'media',
+    image: block.settings.image,
+    asset: block.settings.image_asset,
+    width: 1200,
+    height: 800,
+    sizes: sizes,
+    class: focus_class
+  -%}
+{%- endif -%}

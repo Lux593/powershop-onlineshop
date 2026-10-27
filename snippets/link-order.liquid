@@ -16,8 +16,12 @@
   assign keep_order = false
   assign group_title = group.title | downcase | strip
   assign keep_titles = keep | downcase | split: ','
-  for keep_title in keep_titles
-    assign keep_title = keep_title | strip
+  comment
+    Eigener Name fürs gekürzte Wort: ein assign auf die Schleifenvariable bleibt im Shopify-Liquid wirkungslos, dann zählte
+    nur der erste Titel (der ohne Leerzeichen davor).
+  endcomment
+  for keep_entry in keep_titles
+    assign keep_title = keep_entry | strip
     if keep_title == group_title
       assign keep_order = true
       break

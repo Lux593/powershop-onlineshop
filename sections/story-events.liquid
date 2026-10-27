@@ -1,41 +1,53 @@
-{%- capture story_image -%}
-  {%- render 'media', image: section.settings.image, asset: section.settings.image_asset, width: 980, height: 807, alt: section.settings.image_alt, sizes: '(min-width: 1024px) 50vw, 100vw' -%}
-{%- endcapture -%}
-{%- assign story_image_text = story_image | strip -%}
+{%- comment -%}
+  Story: Überschrift und Text oben, darunter bis zu drei Türen zu den Bereichen (Werkstatt, Dienstleistungen, Über uns),
+  untereinander über die volle Breite wie auf der Service-Seite, und als Abschluss die Kennzahlen. Ein Teamfoto gibt es hier nicht mehr (27.10.2026), die Menschen bekommen die Seite Über uns.
+{%- endcomment -%}
+{%- liquid
+  assign has_areas = false
+  assign has_stats = false
+  for block in section.blocks
+    if block.type == 'area'
+      assign has_areas = true
+    elsif block.type == 'stat'
+      assign has_stats = true
+    endif
+  endfor
+-%}
 
 <section class="section on-dark textured" aria-labelledby="story-title-{{ section.id }}" data-section-id="{{ section.id }}">
   <div class="container">
-    <div class="story{% if story_image_text == blank %} story--text{% endif %}">
-      {%- comment -%} Ohne Bild (Platzhalter ausgeblendet) entfällt die Bildfläche statt als schwarzer Block zu stehen. {%- endcomment -%}
-      {%- if story_image_text != blank -%}
-        <div class="story__media" data-parallax="0.08">
-          {{ story_image_text }}
-        </div>
-      {%- endif -%}
+    <div class="story">
       <div class="story__text">
         <h2 id="story-title-{{ section.id }}">{{ section.settings.heading }}</h2>
         {{ section.settings.text }}
-        {%- assign has_stats = false -%}
-        {%- for block in section.blocks -%}{%- if block.type == 'stat' %}{% assign has_stats = true %}{% endif -%}{%- endfor -%}
-        {%- if has_stats -%}
-          <div class="stats">
-            {%- for block in section.blocks -%}
-              {%- if block.type == 'stat' -%}
-                {%- comment -%}
-                  Nur Zahlen ab 10 zählen hoch (eine „1“ von 0 an zählen zu lassen wäre Spielerei). „∞“ zählt immer schneller
-                  hoch und wird am Ende zum Zeichen (assets/motion.js).
-                {%- endcomment -%}
-                {%- assign stat_value = block.settings.value | strip -%}
-                {%- assign stat_number = stat_value | replace: '.', '' | replace: ',', '.' | replace: '+', '' | plus: 0 -%}
-                <div {{ block.shopify_attributes }}><strong{% if stat_number > 9 or stat_value == '∞' %} data-countup{% endif %}>{{ block.settings.value }}</strong><span>{{ block.settings.label }}</span></div>
-              {%- endif -%}
-            {%- endfor -%}
-          </div>
-        {%- endif -%}
-        {%- if section.settings.button_label != blank and section.settings.button_url != blank -%}
-          <div><a class="btn btn--outline-light" href="{{ section.settings.button_url }}">{{ section.settings.button_label }}</a></div>
-        {%- endif -%}
       </div>
+      {%- if has_areas -%}
+        <div class="doors">
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'area' -%}
+              {% render 'bento-tile', block: block, modifier: 'bento-tile--door', width: 1920, height: 1280, sizes: '(min-width: 1320px) 1272px, 100vw', srcset: block.settings.image_srcset, position: block.settings.image_position %}
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+      {%- if has_stats -%}
+        <div class="stats">
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'stat' -%}
+              {%- comment -%}
+                Nur Zahlen ab 10 zählen hoch (eine „1“ von 0 an zählen zu lassen wäre Spielerei). „∞“ zählt immer schneller
+                hoch und wird am Ende zum Zeichen (assets/motion.js).
+              {%- endcomment -%}
+              {%- assign stat_value = block.settings.value | strip -%}
+              {%- assign stat_number = stat_value | replace: '.', '' | replace: ',', '.' | replace: '+', '' | plus: 0 -%}
+              <div {{ block.shopify_attributes }}><strong{% if stat_number > 9 or stat_value == '∞' %} data-countup{% endif %}>{{ block.settings.value }}</strong><span>{{ block.settings.label }}</span></div>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+      {%- if section.settings.button_label != blank and section.settings.button_url != blank -%}
+        <div><a class="btn btn--outline-light" href="{{ section.settings.button_url }}">{{ section.settings.button_label }}</a></div>
+      {%- endif -%}
     </div>
 
     {%- comment -%} Vergangene Events filtert das Snippet event-card. Überschrift und Link erscheinen nur, wenn danach eine Karte übrig bleibt. {%- endcomment -%}
@@ -69,9 +81,6 @@
   "name": "Story und Events",
   "settings": [
     { "type": "header", "content": "Story" },
-    { "type": "image_picker", "id": "image", "label": "Bild" },
-    { "type": "text", "id": "image_asset", "label": "Standard-Bilddatei im Theme", "default": "powershop-team.webp" },
-    { "type": "text", "id": "image_alt", "label": "Bildbeschreibung", "default": "Das Team vom Power Shop, acht Porträtfotos mit Name und Funktion: Gerhard Link, Ingrid Link, Richard Link, Falk Link, Franziska Link, Jürgen Scheurer, Aaron Klosterhuber und Jean-Nicolas Kibler", "info": "Das Bild enthält Namen und Funktionen als Text: Wird es ersetzt, passe auch diese Beschreibung an." },
     { "type": "text", "id": "heading", "label": "Überschrift", "default": "Mehr als ein Shop" },
     {
       "type": "richtext",
@@ -86,6 +95,21 @@
     { "type": "url", "id": "events_url", "label": "Link zu allen Events" }
   ],
   "blocks": [
+    {
+      "type": "area",
+      "name": "Bereich",
+      "limit": 3,
+      "settings": [
+        { "type": "paragraph", "content": "Große Bildkarte unter dem Text, z. B. zur Werkstatt, zu Dienstleistungen oder zu Über uns. Jeder Bereich läuft über die volle Breite, mehrere stehen untereinander (wie die Türen auf der Service-Seite)." },
+        { "type": "text", "id": "title", "label": "Titel", "default": "Werkstatt" },
+        { "type": "text", "id": "subtitle", "label": "Untertitel", "default": "Inspektion, Umbau & Eintragung" },
+        { "type": "url", "id": "url", "label": "Link" },
+        { "type": "image_picker", "id": "image", "label": "Bild" },
+        { "type": "text", "id": "image_asset", "label": "Standard-Bilddatei im Theme", "info": "Querformat 3:2, mindestens 1920 px breit" },
+        { "type": "text", "id": "image_srcset", "label": "Kleinere Fassungen der Standarddatei", "info": "Optional, mit Breite, z. B. „bild-720.webp 720w, bild-1280.webp 1280w“." },
+        { "type": "text", "id": "image_position", "label": "Bildausschnitt", "default": "50% 50%", "info": "Welcher Punkt des Bildes sichtbar bleibt, waagerecht und senkrecht in Prozent, z. B. „50% 70%“." }
+      ]
+    },
     {
       "type": "stat",
       "name": "Kennzahl",
@@ -113,6 +137,9 @@
     {
       "name": "Story und Events",
       "blocks": [
+        { "type": "area", "settings": { "title": "Werkstatt", "subtitle": "Inspektion, Umbau & Eintragung", "url": "/pages/werkstatt", "image_asset": "umbau-falk-2-1920.webp", "image_srcset": "umbau-falk-2-720.webp 720w, umbau-falk-2-1280.webp 1280w, umbau-falk-2-1920.webp 1920w", "image_position": "50% 70%" } },
+        { "type": "area", "settings": { "title": "Dienstleistungen", "subtitle": "Probefahrt, Inzahlungnahme, Finanzierung & Versicherung", "url": "/pages/dienstleistungen", "image_asset": "tuer-dienstleistungen-1920.webp", "image_srcset": "tuer-dienstleistungen-720.webp 720w, tuer-dienstleistungen-1280.webp 1280w, tuer-dienstleistungen-1920.webp 1920w", "image_position": "50% 60%" } },
+        { "type": "area", "settings": { "title": "Über uns", "subtitle": "Team & Geschichte seit 1985", "url": "/pages/ueber-uns", "image_asset": "tuer-ueber-uns-1600.webp", "image_srcset": "tuer-ueber-uns-720.webp 720w, tuer-ueber-uns-1280.webp 1280w, tuer-ueber-uns-1600.webp 1600w", "image_position": "50% 55%" } },
         { "type": "stat", "settings": { "value": "45+", "label": "Jahre Erfahrung" } },
         { "type": "stat", "settings": { "value": "2", "label": "Motorrad-Meister" } },
         { "type": "stat", "settings": { "value": "∞", "label": "Kunden & Freunde" } },

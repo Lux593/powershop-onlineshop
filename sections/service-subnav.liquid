@@ -1,7 +1,13 @@
 {%- comment -%}
   Unternavigation der Service-Seiten: die Unterpunkte des Hauptmenüpunkts „Service“ aus dem gewählten Menü.
+  Gruppen (Ebene 2 mit Unterpunkten, z. B. „Dienstleistungen“) stehen nicht selbst in der Leiste, sondern ihre Unterpunkte
+  an ihrer Stelle: Werkstatt · Probefahrt · Inzahlungnahme · … · Über uns.
   Aktiv ist der Punkt, dessen Link auf die aktuelle Seite zeigt, auch als Anker der Übersicht (/pages/service#werkstatt).
-  Styles in assets/pages.css.
+  Zeigt der Hauptpunkt selbst auf die aktuelle Seite (Service), ist der Crumb davor aktuell.
+  Anker auf derselben Seite (Probefahrt, Finanzierung … auf Service) verlinken nur „#anker“, damit ein Klick die Seite nicht
+  neu lädt, und tragen data-spy: assets/pages.js markiert beim Scrollen den Abschnitt, den man gerade liest
+  (aria-current="location"), auch ohne Animationen. „Beim Scrollen stehen lassen“ (sticky) lässt die umgebende
+  Shopify-Section unter dem Header kleben, nur auf Service (pages.css). Styles in assets/pages.css.
 {%- endcomment -%}
 {%- liquid
   assign parent_title = section.settings.parent | default: 'Service'
@@ -13,28 +19,45 @@
     endif
   endfor
   assign page_path = '/pages/' | append: page.handle
+  assign parent_path = parent.url | split: '#' | first
 -%}
 
 {%- if parent and parent.links.size > 0 -%}
-  <nav class="service-subnav service-subnav--{{ section.settings.scheme }}" aria-label="{{ parent_title | escape }}">
-    <div class="container service-subnav__inner">
-      <a class="service-subnav__crumb" href="{{ parent.url }}">{{ parent_title | escape }} <span aria-hidden="true">›</span></a>
+  <nav class="service-subnav service-subnav--{{ section.settings.scheme }}{% if section.settings.sticky %} service-subnav--sticky{% endif %}" aria-label="{{ parent_title | escape }}" data-subnav>
+    <div class="container service-subnav__inner" data-subnav-strip>
+      <a class="service-subnav__crumb" href="{{ parent.url }}"{% if page.handle != blank and parent_path == page_path %} aria-current="page"{% endif %}>{{ parent_title | escape }} <span aria-hidden="true">›</span></a>
       <ul class="service-subnav__links">
-        {%- for link in parent.links -%}
+        {%- for group in parent.links -%}
           {%- liquid
-            assign is_current = false
-            assign link_parts = link.url | split: '#'
-            assign link_path = link_parts[0]
-            assign link_anchor = link_parts[1]
-            if page.handle != blank
-              if link_anchor == blank and link_path == page_path
-                assign is_current = true
-              elsif link_anchor == page.handle
-                assign is_current = true
-              endif
+            if group.links.size > 0
+              assign entries = group.links
+            else
+              assign entries = parent.links | where: 'title', group.title
             endif
           -%}
-          <li><a href="{{ link.url }}"{% if is_current %} aria-current="page"{% endif %}>{{ link.title | escape }}</a></li>
+          {%- for link in entries -%}
+            {%- liquid
+              assign is_current = false
+              assign spy = ''
+              assign link_parts = link.url | split: '#'
+              assign link_path = link_parts[0]
+              assign link_anchor = link_parts[1]
+              if page.handle != blank
+                if link_anchor == blank and link_path == page_path
+                  assign is_current = true
+                elsif link_anchor == page.handle
+                  assign is_current = true
+                elsif link_anchor != blank and link_path == page_path
+                  assign spy = link_anchor
+                endif
+              endif
+            -%}
+            {%- if spy != blank -%}
+              <li><a href="#{{ spy | escape }}" data-spy="{{ spy | escape }}">{{ link.title | escape }}</a></li>
+            {%- else -%}
+              <li><a href="{{ link.url }}"{% if is_current %} aria-current="page"{% endif %}>{{ link.title | escape }}</a></li>
+            {%- endif -%}
+          {%- endfor -%}
         {%- endfor -%}
       </ul>
     </div>
@@ -58,8 +81,16 @@
         { "value": "light", "label": "Hell" }
       ],
       "default": "dark"
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky",
+      "label": "Beim Scrollen unter dem Header stehen lassen",
+      "default": false,
+      "info": "Für Seiten mit vielen Abschnitten wie Service: Die Leiste markiert dann den Abschnitt, den man gerade liest. Auf der Werkstatt-Seite aus lassen, sonst läge ein geöffneter Umbau unter der Leiste."
     }
   ],
+  "enabled_on": { "templates": ["page"] },
   "presets": [{ "name": "Service-Navigation" }]
 }
 {% endschema %}

@@ -39,27 +39,19 @@
 
 <section class="section showroom" aria-labelledby="showroom-title-{{ section.id }}" data-section-id="{{ section.id }}" data-showroom data-showroom-state="neu">
   <div class="container">
-    <div class="section-head">
-      <div class="showroom__tools">
-        <h2 id="showroom-title-{{ section.id }}">{{ section.settings.heading }}</h2>
-        {%- if bikes.size > 0 or request.design_mode -%}
-          <div class="segmented" role="group" aria-label="Fahrzeugzustand">
-            <button type="button" data-showroom-mode="neu" aria-pressed="true">Neu</button>
-            <button type="button" data-showroom-mode="gebraucht" aria-pressed="false">Gebraucht &amp; Vorführer</button>
-          </div>
-        {%- endif -%}
-      </div>
-      <div class="showroom__tools">
-        {%- if section.settings.collection != blank -%}
-          <a class="btn btn--text" href="{{ section.settings.collection.url }}">Alle Motorräder {% render 'icon', name: 'arrow-right' %}</a>
-        {%- endif -%}
-        {%- if bikes.size > 0 or request.design_mode -%}
-          <div class="rail-nav">
-            <button type="button" data-rail-prev="{{ rail_id }}" aria-label="Vorherige Bikes">{% render 'icon', name: 'chevron-left' %}</button>
-            <button type="button" data-rail-next="{{ rail_id }}" aria-label="Weitere Bikes">{% render 'icon', name: 'chevron-right' %}</button>
-          </div>
-        {%- endif -%}
-      </div>
+    {%- comment -%}
+      Kopf in der Reihenfolge des Handys: Titel, Neu / Gebraucht, Baureihen, dann „Alle Motorräder“ mit den Pfeilen direkt
+      über der Schiene. Ab 768 px rückt „Alle Motorräder“ mit den Pfeilen rechts neben den Titel, Umschalter und Baureihen
+      stehen darunter (Raster in home.css).
+    {%- endcomment -%}
+    <div class="section-head showroom__head">
+      <h2 class="showroom__title" id="showroom-title-{{ section.id }}">{{ section.settings.heading }}</h2>
+      {%- if bikes.size > 0 or request.design_mode -%}
+        <div class="segmented showroom__modes" role="group" aria-label="Fahrzeugzustand">
+          <button type="button" data-showroom-mode="neu" aria-pressed="true">Neu</button>
+          <button type="button" data-showroom-mode="gebraucht" aria-pressed="false">Gebraucht &amp; Vorführer</button>
+        </div>
+      {%- endif -%}
       {%- if used_categories != ' ' -%}
         {%- comment -%} Chips ohne Fahrzeug im gewählten Zustand blendet sections.js aus; war einer gewählt, gilt wieder „Alle“. {%- endcomment -%}
         <div class="chip-row showroom__cats" role="group" aria-label="Kategorie" data-showroom-cats>
@@ -74,6 +66,17 @@
           {%- endfor -%}
         </div>
       {%- endif -%}
+      <div class="showroom__nav">
+        {%- if section.settings.collection != blank -%}
+          <a class="btn btn--text" href="{{ section.settings.collection.url }}">Alle Motorräder {% render 'icon', name: 'arrow-right' %}</a>
+        {%- endif -%}
+        {%- if bikes.size > 0 or request.design_mode -%}
+          <div class="rail-nav">
+            <button type="button" data-rail-prev="{{ rail_id }}" aria-label="Vorherige Bikes">{% render 'icon', name: 'chevron-left' %}</button>
+            <button type="button" data-rail-next="{{ rail_id }}" aria-label="Weitere Bikes">{% render 'icon', name: 'chevron-right' %}</button>
+          </div>
+        {%- endif -%}
+      </div>
     </div>
 
     {%- if bikes.size > 0 -%}
@@ -96,10 +99,10 @@
     {%- else -%}
       {%- comment -%}
         Ohne Fahrzeuge bleibt der Abschnitt eine Einladung mit einer Handlung statt einer leeren Fläche. Die Handlung gibt es
-        nur, wenn ihr Ziel existiert: die Seite „service“ (Anker #probefahrt) oder die E-Mail-Adresse aus den Theme-Einstellungen.
+        nur, wenn ihr Ziel existiert: die Seite „dienstleistungen“ (Anker #probefahrt) oder die E-Mail-Adresse aus den Theme-Einstellungen.
         Ohne beides würde der Link auf einen toten Anker der Startseite zeigen.
       {%- endcomment -%}
-      {%- assign service_url = pages['service'].url -%}
+      {%- assign service_url = pages['dienstleistungen'].url -%}
       {%- assign bikes_url = collections['motorraeder'].url | default: routes.all_products_collection_url -%}
       <div class="showroom__empty">
         <p class="lead">Aktuelle Fahrzeuge zeigen wir dir gern im Showroom.</p>
