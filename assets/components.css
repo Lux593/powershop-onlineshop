@@ -244,9 +244,8 @@
 .facts .icon { width: 16px; height: 16px; color: var(--c-muted); }
 .bcard__price { margin-top: auto; padding-top: 8px; display: grid; gap: 2px; }
 .bcard__price strong { font-family: var(--f-head); font-size: 28px; font-weight: 700; }
-.bcard__actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.bcard__actions { display: grid; } /* nur „Details“, über die volle Breite der Karte */
 .bcard__actions .btn { padding: 0 12px; }
-.bcard__actions > :only-child { grid-column: 1 / -1; } /* ohne „Anfragen“ (keine Kontaktdaten) füllt „Details“ die Zeile */
 .bcard.is-reserved .bcard__media img { filter: grayscale(0.6) brightness(0.8); }
 
 /* ---------- Overlays: Dialog, Bottom-Sheet, Drawer ---------- */
