@@ -9,8 +9,6 @@
   assign film_poster = ''
   assign film_lead = ''
   assign film_label = ''
-  assign film_link_label = ''
-  assign film_link_url = ''
 
   case collection.handle
     when 'herren'
@@ -35,8 +33,6 @@
       assign film_poster = 'bikes-intro-poster.jpg'
       assign film_lead = 'Neue Maschinen, direkt vor der Tür. Aufsteigen und Probe fahren.'
       assign film_label = 'Ein Fahrer setzt den Helm auf und steigt auf ein Motorrad. Im Bild steht: Get a Harley.'
-      assign film_link_label = 'Probefahrt anfragen'
-      assign film_link_url = '/pages/dienstleistungen#probefahrt'
     when 'sale'
       assign banner_asset = 'banner-sale.jpg'
     else
@@ -69,9 +65,6 @@
         <h1>{{ collection.title | escape }}</h1>
         {%- if film_file != blank -%}
           <p class="film-banner__lead">{{ film_lead | escape }}</p>
-          {%- if film_link_label != blank -%}
-            <a class="film-banner__link" href="{{ film_link_url }}">{{ film_link_label | escape }}</a>
-          {%- endif -%}
         {%- elsif collection.description != blank -%}
           <p>{{ collection.description | strip_html | truncate: 240 }}</p>
         {%- endif -%}

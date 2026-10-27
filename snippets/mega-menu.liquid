@@ -200,7 +200,7 @@
 
     {%- if cta_block -%}
       <div class="mega__cta" {{ cta_block.shopify_attributes }}>
-        <p>{{ cta_block.settings.text }}</p>
+        {%- if cta_block.settings.text != blank -%}<p>{{ cta_block.settings.text }}</p>{%- endif -%}
         {%- if cta_block.settings.primary_label != blank and cta_block.settings.primary_url != blank -%}
           <a class="btn btn--primary btn--sm" href="{{ cta_block.settings.primary_url }}">{{ cta_block.settings.primary_label }}</a>
         {%- endif -%}

@@ -32,12 +32,6 @@
 .film-banner__frame.is-playing .film-banner__video { opacity: 1; }
 .page-banner--film .page-banner__text h1 { font-size: clamp(56px, 7vw, 88px); }
 .page-banner--film .film-banner__lead { max-width: 40ch; }
-.film-banner__link {
-  color: var(--c-orange); font-weight: 600; min-height: 44px;
-  display: inline-flex; align-items: center; width: fit-content;
-  text-decoration: underline; text-underline-offset: 3px;
-}
-.film-banner__link:hover { color: var(--c-white); }
 
 /* Pause: kleine Fläche unten rechts im Film (44px Trefferfläche) */
 .film-banner__toggle {

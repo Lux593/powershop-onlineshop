@@ -15,17 +15,6 @@
     "header": {
       "type": "header",
       "blocks": {
-        "cta_motorraeder": {
-          "type": "cta",
-          "settings": {
-            "parent": "Motorräder",
-            "text": "Persönliche Beratung, Probefahrt und Finanzierung – direkt bei uns im Showroom.",
-            "primary_label": "Probefahrt anfragen",
-            "primary_url": "/pages/dienstleistungen#probefahrt",
-            "secondary_label": "Finanzierung anfragen",
-            "secondary_url": "/pages/dienstleistungen#finanzierung"
-          }
-        },
         "tile_motorraeder_fahrzeuge": { "type": "tile", "settings": { "parent": "Motorräder", "group": "Fahrzeuge", "image_asset": "bento-motorraeder.jpg", "focus": "center" } },
         "tile_motorraeder_familien": { "type": "tile", "settings": { "parent": "Motorräder", "group": "Modellfamilien", "image_asset": "mega-motorraeder-familien.webp", "focus": "center" } },
         "tile_herren_bekleidung": { "type": "tile", "settings": { "parent": "Herren", "group": "Bekleidung", "image_asset": "mega-herren-bekleidung.webp", "focus": "center" } },
@@ -46,7 +35,6 @@
         "contact_service": { "type": "contact", "settings": { "parent": "Service", "title": "Direkter Draht" } }
       },
       "block_order": [
-        "cta_motorraeder",
         "tile_motorraeder_fahrzeuge",
         "tile_motorraeder_familien",
         "tile_herren_bekleidung",
