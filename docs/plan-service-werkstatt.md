@@ -26,9 +26,9 @@ Stand 2026-10-27.
 - **Menü „Service“** (im Shop umgestellt am 27.10., nachmittags): drei Bereiche, im Megamenü drei Foto-Kacheln.
   - **Werkstatt** (Link auf `/pages/werkstatt`)
   - **Dienstleistungen** (Gruppe, klappt auf): Probefahrt · Inzahlungnahme · Finanzierung · Versicherung, in dieser Reihenfolge
-    (Header-Einstellung „Gruppen in eigener Reihenfolge“). Heute zeigen Gruppe und Unterpunkte noch auf `/pages/service#…`,
-    beim Go-live auf `/pages/dienstleistungen` und `/pages/dienstleistungen#…`.
-  - **Über uns** (Link): heute noch auf `/pages/service#standort`, beim Go-live auf `/pages/ueber-uns`.
+    (Header-Einstellung „Gruppen in eigener Reihenfolge“). Die Gruppe zeigt auf die Seite `/pages/dienstleistungen`, die
+    Unterpunkte auf `/pages/dienstleistungen#…` (umgestellt am 27.10. abends nach dem Push).
+  - **Über uns** (Link) zeigt auf die Seite `/pages/ueber-uns`.
   - Events und Standort & Kontakt stehen nicht mehr im Menü. Events gibt es nur noch auf der Startseite (ohne „Alle Events“-Link,
     die Karten sind reine Infokarten).
   - Die Service-Leiste zeigt statt der Gruppe ihre Unterpunkte: Werkstatt · Probefahrt · Inzahlungnahme · Finanzierung ·
@@ -139,8 +139,8 @@ Aufbau: `docs/architecture.md`, Dateien: `docs/file-structure.md`.
 4. Go-live der eigenen Seiten, alles zusammen:
    - Seiten „Dienstleistungen“ (`dienstleistungen`, Vorlage `dienstleistungen`) und „Über uns“ (`ueber-uns`, Vorlage `ueber-uns`)
      sind am 27.10. angelegt und abends veröffentlicht (erledigt).
-   - Menü: Dienstleistungen auf die Seite, Unterpunkte auf `/pages/dienstleistungen#…`, Über uns auf die Seite.
-   - Theme auf `main` pushen. Die Reihenfolge ist egal, die Weiterleitung fängt alte Anker in beiden Richtungen ab.
+   - Theme auf `main` gepusht (`c47f358`, 27.10. abends, erledigt).
+   - Menü: Dienstleistungen auf die Seite, Unterpunkte auf `/pages/dienstleistungen#…`, Über uns auf die Seite (erledigt).
 5. Etappe 4: Footer-Menü, SEO-Titel und -Beschreibungen, Megamenü-Teaser, strukturierte Daten (`MotorcycleDealer`).
 
 ## 5. Was ich von dir brauche
