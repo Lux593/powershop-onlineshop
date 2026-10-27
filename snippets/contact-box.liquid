@@ -9,7 +9,7 @@
   @param {string} [anchor] - ID der Box, Standard "kontakt"
   @param {string} [title] - Überschrift, kompakt die Beschriftung der Zeile
   @param {string} [intro] - Kurzer Text unter der Überschrift
-  @param {string} [topics] - Themen, kommagetrennt: probefahrt, finanzierung, versicherung, inzahlungnahme, lieferung, reservierung, werkstatt, kompatibilitaet, einbau, frage
+  @param {string} [topics] - Themen, kommagetrennt: probefahrt, finanzierung, versicherung, inzahlungnahme, lieferung, reservierung, werkstatt, service, umbau, kompatibilitaet, einbau, sonstiges, frage
   @param {string} [topic] - Voreingestelltes Thema
   @param {string} [subject] - Fahrzeug oder Artikel, wird in die Nachricht eingesetzt
   @param {string} [ref] - Zusatzzeile in der Nachricht, z. B. Link zur Seite. Leer = Adresse der aktuellen Seite
@@ -132,10 +132,16 @@
                   assign topic_label = 'Reservierung'
                 when 'werkstatt'
                   assign topic_label = 'Werkstatt'
+                when 'service'
+                  assign topic_label = 'Service'
+                when 'umbau'
+                  assign topic_label = 'Umbau'
                 when 'kompatibilitaet'
                   assign topic_label = 'Passt es?'
                 when 'einbau'
                   assign topic_label = 'Einbau'
+                when 'sonstiges'
+                  assign topic_label = 'Sonstiges'
                 else
                   assign topic_label = 'Frage'
               endcase

@@ -228,6 +228,8 @@ html:has(.service-subnav--sticky) { --subnav-h: 57px; scroll-padding-top: calc(v
 @media (min-width: 1024px) {
   .workshop-services .service-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .workshop-services__grid:has(> .contact-box) { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); column-gap: 56px; align-items: start; }
+  /* Die Termin-Box reicht bis zur Unterkante der Kacheln; ihr Inhalt bleibt oben, der Rest ist weißer Grund */
+  .workshop-services__grid > .contact-box { align-self: stretch; align-content: start; }
 }
 
 /* ---------- Komm vorbei (sections/visit.liquid) ----------

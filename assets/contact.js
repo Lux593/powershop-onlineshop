@@ -13,8 +13,11 @@
     lieferung: { subj: 'Lieferung', text: function (x) { return 'ich interessiere mich für ' + (x ? 'die ' + x : 'ein Motorrad') + ' mit Lieferung. Lieferland: Deutschland / Schweiz / Frankreich, Ort: …'; } },
     reservierung: { subj: 'Reservierungsanfrage', text: function (x) { return 'ich möchte die ' + x + ' reservieren. Bitte schickt mir den Zahlungslink für die Reservierungsgebühr.'; } },
     werkstatt: { subj: 'Werkstatt-Termin', text: function () { return 'ich hätte gerne einen Werkstatt-Termin. Mein Bike: Modell …, Baujahr …, Anliegen: …'; } },
+    service: { subj: 'Service-Termin', text: function () { return 'ich hätte gerne einen Service-Termin. Mein Bike: Modell …, Baujahr …, km-Stand …, Anliegen: …'; } },
+    umbau: { subj: 'Umbau-Anfrage', text: function () { return 'ich interessiere mich für einen Umbau an meinem Bike. Mein Bike: Modell …, Baujahr …, Idee: …'; } },
     kompatibilitaet: { subj: 'Frage zur Kompatibilität', text: function (x) { return 'passt ' + x + ' an mein Motorrad? Modell …, Baujahr …'; } },
     einbau: { subj: 'Einbau-Anfrage', text: function (x) { return 'könnt ihr ' + x + ' bei mir einbauen? Mein Bike: Modell …, Baujahr …'; } },
+    sonstiges: { subj: 'Anfrage an die Werkstatt', text: function () { return 'ich habe ein Anliegen: …'; } },
     frage: { subj: 'Frage', text: function (x) { return 'ich habe eine Frage' + (x ? ' zur ' + x : '') + ': …'; } }
   };
 
