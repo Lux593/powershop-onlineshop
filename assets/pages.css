@@ -114,7 +114,7 @@
 .workshop-services__item > .icon { display: none; }
 .workshop-services__item h3 { font-size: var(--fs-h4); }
 .workshop-services__item p { max-width: 62ch; font-size: 15px; color: var(--c-muted); }
-@media (min-width: 1024px) { .workshop-services__grid { grid-template-columns: minmax(0, 1fr) 380px; align-items: start; gap: 64px; } }
+@media (min-width: 1024px) { .workshop-services__grid:has(> .contact-box) { grid-template-columns: minmax(0, 1fr) 380px; align-items: start; gap: 64px; } }
 @media (max-width: 1023px) {
   .workshop-services__list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--c-line); border: 1px solid var(--c-line); }
   .workshop-services__item { gap: 8px; padding: 24px 20px; border-bottom: 0; background: var(--c-white); }

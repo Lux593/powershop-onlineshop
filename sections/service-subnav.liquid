@@ -13,7 +13,6 @@
     endif
   endfor
   assign page_path = '/pages/' | append: page.handle
-  assign page_anchor = '#' | append: page.handle
 -%}
 
 {%- if parent and parent.links.size > 0 -%}
@@ -24,10 +23,13 @@
         {%- for link in parent.links -%}
           {%- liquid
             assign is_current = false
-            if link.current
-              assign is_current = true
-            elsif page.handle != blank
-              if link.url contains page_path or link.url contains page_anchor
+            assign link_parts = link.url | split: '#'
+            assign link_path = link_parts[0]
+            assign link_anchor = link_parts[1]
+            if page.handle != blank
+              if link_anchor == blank and link_path == page_path
+                assign is_current = true
+              elsif link_anchor == page.handle
                 assign is_current = true
               endif
             endif

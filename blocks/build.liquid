@@ -26,6 +26,14 @@
   endif
 
   assign spec_lines = block.settings.specs | newline_to_br | split: '<br />'
+
+  comment
+    Der Anfrage-Button führt zur Termin-Box; die erscheint wie überall im Theme nur mit gepflegten Händlerdaten.
+  endcomment
+  assign has_channel = request.design_mode
+  if settings.phone != blank or settings.whatsapp != blank or settings.email != blank
+    assign has_channel = true
+  endif
 -%}
 
 <article
@@ -90,7 +98,9 @@
       </dl>
       <div class="bb-actions">
         <button class="btn btn--outline-dark btn--block" type="button" data-bb-all>{% render 'icon', name: 'maximize-2' %}Alle Bilder ansehen</button>
-        <a class="btn btn--primary btn--block" href="{{ block.settings.cta_target | default: '#termin' }}">{{ block.settings.cta_label | default: 'Ähnlichen Umbau anfragen' | escape }}</a>
+        {%- if has_channel -%}
+          <a class="btn btn--primary btn--block" href="{{ block.settings.cta_target | default: '#termin' }}">{{ block.settings.cta_label | default: 'Ähnlichen Umbau anfragen' | escape }}</a>
+        {%- endif -%}
       </div>
     </div>
     <div class="bb-gallery" role="group" aria-label="Bilder {{ name | escape }}">

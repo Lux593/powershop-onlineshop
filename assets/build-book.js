@@ -10,6 +10,12 @@
      gleichmäßig (höchstens auf 62 %); reicht das nicht, wird die Box höher.
    ========================================================================== */
 (function () {
+  // Das Skript-Tag steht in der Section und läuft deshalb vor theme.js (beide defer). PS.on gibt es erst danach:
+  // spätestens bei DOMContentLoaded sind alle defer-Skripte gelaufen.
+  if (window.PS && window.PS.on) start();
+  else document.addEventListener('DOMContentLoaded', start, { once: true });
+
+  function start() {
   var PS = window.PS;
   if (!PS || !PS.on) return;
 
@@ -432,4 +438,5 @@
       if (e.target.contains(root)) ctrl.abort();
     }, sig);
   });
+  }
 })();
