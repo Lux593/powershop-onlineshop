@@ -12,11 +12,9 @@
             "image_alt": "Fahrer einer Road Glide mit Helm und Sonnenbrille in Nahaufnahme",
             "video_asset": "hero-loop",
             "poster_asset": "hero-poster.webp",
-            "price_text": "ab 31.500 €",
             "cta_label": "Road Glide ansehen",
-            "url": "/collections/motorraeder",
-            "secondary_label": "Probefahrt anfragen",
-            "secondary_url": "/pages/dienstleistungen#probefahrt"
+            "product": "road-glide-2026",
+            "url": "/collections/motorraeder"
           }
         },
         "sportster": {
@@ -28,11 +26,9 @@
             "image_alt": "Schwarzer Harley-Davidson-Helm in Nahaufnahme, Bäume im Hintergrund",
             "video_asset": "sportster-s",
             "poster_asset": "sportster-s-poster.webp",
-            "price_text": "ab 16.300 €",
             "cta_label": "Sportster S ansehen",
-            "url": "/collections/motorraeder",
-            "secondary_label": "Probefahrt anfragen",
-            "secondary_url": "/pages/dienstleistungen#probefahrt"
+            "product": "sportster-s-2026",
+            "url": "/collections/motorraeder"
           }
         },
         "cvo": {
@@ -42,11 +38,9 @@
             "blurb": "Die CVO-Ausstattung für die große Tour.",
             "image_asset": "hero-ride-cvo.jpg",
             "image_alt": "Fahrer auf einer grauen CVO Road Glide, unterwegs auf einer Landstraße",
-            "price_text": "ab 48.300 €",
             "cta_label": "CVO Road Glide ST ansehen",
-            "url": "/collections/motorraeder",
-            "secondary_label": "Probefahrt anfragen",
-            "secondary_url": "/pages/dienstleistungen#probefahrt"
+            "product": "cvo-road-glide-st-2026",
+            "url": "/collections/motorraeder"
           }
         }
       },
