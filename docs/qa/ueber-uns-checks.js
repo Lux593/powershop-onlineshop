@@ -384,6 +384,21 @@
     var spacer = sec().querySelector('.pin-spacer');
     if (!spacer) f.push('Kein .pin-spacer');
     else if (getComputedStyle(spacer).backgroundColor !== tokenColor('backgroundColor', '--c-black')) f.push('.pin-spacer hat ' + getComputedStyle(spacer).backgroundColor + ' statt --c-black');
+    // Teil 2 (Task 6): Die Kopfleiste bleibt bis zum Ende des Übergangs zum Team stehen, danach gilt wieder das normale Verhalten
+    var t = teamEl();
+    if (!t) {
+      f.push('Teil 2: [data-about-team] fehlt');
+    } else {
+      var end = toTeamEnd();
+      await go(st.end); await go((st.end + end) / 2); await wait(100);
+      if (away()) f.push('Halbe Strecke des Übergangs zum Team: Kopfleiste weggefahren');
+      await go(end + 200); await go(end + 400); await go(end + 600); await wait(100);
+      if (!away()) f.push('600 px unter dem Ende des Übergangs: Kopfleiste nicht weggefahren');
+      sec().querySelector('[data-jump]').click();
+      await wait(3000);
+      if (away()) f.push('Klick auf die erste Zahl: Kopfleiste nach 3 s weggefahren');
+      if (!near(st.progress, 0, .001)) f.push('Klick auf die erste Zahl: Fortschritt nach 3 s ' + st.progress.toFixed(3) + ' statt 0');
+    }
     await go(0);
     return f;
   }, function () {
@@ -418,6 +433,40 @@
     if (story().last !== n - 1) f.push('story().last ist ' + story().last + ' bei ' + n + ' Etappen');
     return f;
   }, function () { var s = sec(); return s && (s.querySelectorAll('.leaf').length === 1 || story()) ? '' : 'nur mit Bühne oder einer Etappe'; });
+
+  // ---- Task 6: Übergang von der Bühne zum Team ----
+  // Steht vor story:revert, damit UU.run('story') sie noch mit Bühne ausführt.
+  // Ende des Übergangs: Die Oberkante des Teams erreicht die Unterkante der stehenden Kopfleiste (--header-h).
+  var toTeamEnd = function () {
+    var hh = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 0;
+    return teamEl().getBoundingClientRect().top + window.scrollY - hh;
+  };
+  UU.add('story:toteam', async function () {
+    var f = [], s = sec(), st = story().st, t = teamEl();
+    if (!t) return ['[data-about-team] fehlt'];
+    var vp = s.querySelector('[data-viewport]'), stage = s.querySelector('[data-stage]'), rail = s.querySelector('[data-rail]');
+    var end = toTeamEnd(), mid = (st.end + end) / 2;
+    await go(st.end); await go(mid); await wait(100);
+    var sc = G(vp, 'scale'), y = G(vp, 'y'), cover = parseFloat(getComputedStyle(stage).getPropertyValue('--cover'));
+    if (!near(sc, .96, .01)) f.push('Halbe Strecke: Bühne bei scale ' + sc.toFixed(3) + ' statt 0,96');
+    if (!(y > 0)) f.push('Halbe Strecke: Bühne nicht nach unten versetzt (y = ' + y + ')');
+    if (!near(cover, .375, .02)) f.push('Halbe Strecke: --cover ' + cover + ' statt 0,375');
+    var rb = rect(rail).bottom, tt = rect(t).top;
+    if (!near(rb, tt, 1)) f.push('Halbe Strecke: Balken endet bei ' + rb.toFixed(1) + ', das Team beginnt bei ' + tt.toFixed(1));
+    var zr = getComputedStyle(rail).zIndex, zc = getComputedStyle(stage, '::after').zIndex, zt = getComputedStyle(t).zIndex;
+    if (zr !== '5') f.push('Balken mit z-index ' + zr + ' statt 5');
+    if (!(+zr > +zc)) f.push('Balken (z-index ' + zr + ') liegt nicht über der Abdunkelung (z-index ' + zc + ')');
+    if (zt !== '4') f.push('Team mit z-index ' + zt + ' statt 4');
+    // Unterkante der stehenden Kopfleiste, auf halber Strecke gemessen: Genau am Ende gibt guard sie frei, beim Weiterscrollen fährt sie weg.
+    // Ohne ihre 1-px-Linie unten (.site-header ist --header-h plus Linie hoch): Die Linie liegt über dem Inhalt darunter, wie beim Pinnen.
+    var hb = rect('.site-header').bottom - px('.site-header', 'borderBottomWidth');
+    await go(end); await frames(2);
+    rb = rect(rail).bottom;
+    if (!near(rb, hb, 1)) f.push('Ende: Balken endet bei ' + rb.toFixed(1) + ', die stehende Kopfleiste bei ' + hb.toFixed(1));
+    if (!near(G(vp, 'scale'), .92, .005)) f.push('Ende: Bühne bei scale ' + G(vp, 'scale').toFixed(3) + ' statt 0,92');
+    await go(0);
+    return f;
+  }, live);
 
   // Läuft als letzte (danach neu laden): so baut auch motion.js ab, wenn jemand zur Laufzeit reduzierte Bewegung einschaltet
   UU.add('story:revert', async function () {

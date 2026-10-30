@@ -76,6 +76,17 @@
   overflow: hidden;
   background: var(--c-black);
 }
+/* Übergang zum Team (assets/about-story.js): Die Bühne dunkelt ab, während das Team über sie hochfährt. --cover (0 bis 0,75) setzt
+   das Skript an der Section. Der Balken liegt darüber (z-index 5). */
+.about-story.is-live .about-story__stage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background: var(--c-black);
+  opacity: var(--cover, 0);
+  pointer-events: none;
+}
 .about-story.is-live .about-story__viewport { position: relative; flex: 1; min-height: 0; overflow: hidden; }
 .about-story.is-live .about-story__track { position: relative; height: 100%; }
 /* Spätere Etappen liegen oben (Reihenfolge im Markup). Der weiche Schatten an der linken Kante fällt auf die Etappe, über die sich die
@@ -115,7 +126,8 @@ html:has(.about-story.is-live) { scroll-behavior: auto; }
 
 /* Balken am Fuß der Bühne: Die Jahre stehen in gleich breiten Spalten (--count aus der Section). Die Linie läuft von der Mitte der
    ersten bis zur Mitte der letzten Spalte mittig durch sie hindurch und füllt sich mit den Etappen. Wo der orange Balken angekommen
-   ist, wird die Zahl orange (is-passed aus dem Skript). Der schwarze Grund hinter jeder Zahl unterbricht die Linie. */
+   ist, wird die Zahl orange (is-passed aus dem Skript). Der schwarze Grund hinter jeder Zahl unterbricht die Linie.
+   Im Übergang zum Team wirft er einen weichen Schatten auf die sinkende Etappe, so kräftig, wie sie abdunkelt (--cover). */
 .about-story.is-live .about-story__rail {
   position: relative;
   z-index: 5;
@@ -124,6 +136,7 @@ html:has(.about-story.is-live) { scroll-behavior: auto; }
   height: var(--rail-h);
   padding-block: var(--rail-pad);
   background: var(--c-black);
+  box-shadow: 0 -28px 56px -12px rgb(0 0 0 / calc(var(--cover, 0) * .95));
 }
 .about-story__steps { position: relative; }
 .about-story__rail ol { position: relative; display: grid; grid-template-columns: repeat(var(--count), minmax(0, 1fr)); justify-items: center; }

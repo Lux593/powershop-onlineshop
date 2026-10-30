@@ -8,7 +8,10 @@
    - Eine Bildschirmhöhe Scrollweg je Wechsel, eingerastet wird auf jeder Etappe, ohne Schwung.
    - Balken: Linie und Bar & Shield folgen der Lage der Etappen, nicht dem rohen Scrollwert. Die Zahlen sind Links, ein Klick
      scrollt zur Etappe, ohne unterwegs einzurasten.
-   - Kopfleiste: Ab 150 px vor dem Pinnen bis zu dessen Ende fährt sie ein und bleibt stehen (PS.headerHold aus header.js).
+   - Übergang zum Team: Folgt direkt die Team-Section (sections/about-team.liquid), schiebt sie sich nach „Heute“ über die Bühne.
+     Die Etappe sinkt halb so schnell, wird kleiner und dunkelt ab, der Balken fährt auf der Oberkante des Teams hinaus.
+   - Kopfleiste: Ab 150 px vor dem Pinnen bis zum Ende des Übergangs zum Team (ohne Team: bis zum Ende des Pinnens) fährt sie
+     ein und bleibt stehen (PS.headerHold aus header.js).
    Ohne Bewegung, im Theme-Editor und unter 600 px Höhe läuft nichts davon: Die Etappen stehen untereinander, die Zahlen sind Anker.
    Solange die Bühne läuft, trägt [data-story] die Klasse is-live und __story = { st, guard, last, revert } (Prüfungen, Übergang zum Team).
    Vorlage: entwuerfe/ueber-uns/h-vollbild.html (Skript am Ende), Spec: design-ueber-uns-h.md, Abschnitte 4.3 und 6.
@@ -32,6 +35,14 @@
   // Höhe der Kopfleiste aus dem Token (64 px, ab 1024 px 76 px). Der Start des Pinnens und --stage-h (CSS) rechnen mit derselben Größe.
   function hh() {
     return parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 0;
+  }
+
+  // Das Team für den Übergang: das erste [data-about-team] in der Section direkt nach der Geschichte, sonst null
+  function nextTeam(section) {
+    var host = section.closest('.shopify-section');
+    var next = host && host.nextElementSibling;
+    while (next && !next.classList.contains('shopify-section')) next = next.nextElementSibling;
+    return next ? next.querySelector('[data-about-team]') : null;
   }
 
   function stage(PS, section, gsap, ScrollTrigger) {
@@ -158,12 +169,38 @@
     slide.set({}, {}, last);
     var st = slide.scrollTrigger;
 
-    // Kopfleiste: fährt 150 px vor dem Pinnen ein und bleibt bis zu dessen Ende. Beim Abbau räumt der Aufräumer unten auf,
-    // denn beim Abbau durch matchMedia feuert onToggle nicht sicher.
+    /* ---------------- Übergang zum Team ----------------
+       Ist „Heute“ erreicht, endet das Pinnen und das Team (die nächste Section) schiebt sich von unten über die Bühne. Die Etappe
+       fährt dabei nur halb so schnell nach oben (sie sinkt um die halbe Bühnenhöhe), wird auf 0,92 kleiner und dunkelt bis 0,75 ab
+       (--cover, CSS). Der Balken sinkt nicht mit: Er sitzt auf der Oberkante des Teams und wird von ihm hinausgeschoben, über der
+       Abdunkelung und mit weichem Schatten auf der Etappe. Es bewegen sich nur Kinder der Bühne: ein transform auf der Bühne oder
+       ihren Eltern störte das Pinnen. Ende: Die Oberkante des Teams erreicht die Unterkante der stehenden Kopfleiste.
+       Ohne Team (keine Section [data-about-team] direkt danach) gibt es keinen Übergang. */
+    var team = nextTeam(section), toTeam = null;
+    if (team) {
+      toTeam = gsap.timeline({
+        scrollTrigger: {
+          trigger: team,
+          start: 'top bottom',
+          end: function () { return 'top top+=' + hh(); },
+          scrub: true,
+          invalidateOnRefresh: true
+        }
+      })
+        .fromTo(viewport, { y: 0, scale: 1 }, { y: function () { return stageEl.offsetHeight / 2; }, scale: 0.92, ease: 'none' }, 0)
+        .fromTo(section, { '--cover': 0 }, { '--cover': 0.75, ease: 'none' }, 0)
+        .scrollTrigger;
+    }
+
+    // Kopfleiste: fährt 150 px vor dem Pinnen ein und bleibt bis zum Ende des Übergangs zum Team (ohne Team bis zum Ende des
+    // Pinnens). Führe sie im Übergang weg, endete das Team 64 bzw. 76 px tiefer als gemessen, und zwei Bewegungen liefen zugleich.
+    // Das Ende kommt fertig gerechnet aus st bzw. toTeam (beide entstehen vorher und werden darum vorher neu gemessen): Mit dem Team
+    // als endTrigger fehlte der Weg des Pinnens, denn guard beginnt vor dem Pinnen und wird deshalb nicht mit verschoben.
+    // Beim Abbau räumt der Aufräumer unten auf, denn beim Abbau durch matchMedia feuert onToggle nicht sicher.
     var guard = ScrollTrigger.create({
       trigger: stageEl,
       start: function () { return 'top top+=' + (hh() + 150); },
-      end: function () { return st.end; },
+      end: function () { return (toTeam || st).end; },
       onToggle: function (self) { if (PS.headerHold) PS.headerHold(self.isActive); }
     });
 

@@ -159,3 +159,8 @@
   }
   .spot.is-ready .spot__roster { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
+
+/* ---------------- Übergang von der Bühne ----------------
+   Folgt das Team direkt auf die laufende Bühne der Geschichte (assets/about-story.js), schiebt es sich über sie: Das Team liegt über
+   der Bühne (z-index 4), nur der Balken der Bühne liegt darüber (5) und wird von der Oberkante des Teams hinausgeschoben. */
+.section-about-story:has(.about-story.is-live) + .section-about-team > .spot { z-index: 4; }
