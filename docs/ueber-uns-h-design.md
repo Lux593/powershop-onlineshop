@@ -62,10 +62,15 @@ Dienstleistungen sie auch haben. Der Entwurf zeigt sie nicht.
   Harley-Davidson-Vertragshändler in Weil am Rhein, in zweiter Generation.“
 - Rechts das Crew-Foto (`bilder/foto/crew-auf-bikes-quer.jpg`, Wunsch des Nutzers vom 30.10., vorher Hallenfoto `softail-licht.jpg`) bis an den rechten Rand. Seine linke Kante liegt genau über der Teilung der
   Etappen darunter (Spalten 1.08fr | 1fr, also `calc(108% / 2.08)`).
-- Höhe am Desktop `clamp(440px, 38vw, 640px)`, Überschrift `clamp(44px, 5.8vw, 92px)`.
-- Am Handy (unter 900 px) steht das Foto oben über die volle Breite (4:3, höchstens 52svh), darunter der Text. Die Überschrift ist dort
-  `clamp(44px, 12.8vw, 56px)` groß.
-- Beim Laden setzt sich das Foto aus 1,08 auf 1 (1,8 s, expo.out). Das ist die einzige Bewegung im Kopf.
+- Der Kopf füllt den ersten Bildschirm: Er endet beim Laden an der Unterkante des Fensters (Fenster minus Ankündigung, Kopfleiste und
+  Service-Leiste). Wunsch des Nutzers vom 30.10., vorher `clamp(440px, 38vw, 640px)`. Überschrift `clamp(44px, 5.8vw, 92px)`.
+- Am Handy (unter 900 px) steht das Foto oben über die volle Breite und nimmt den Platz über dem Text ein (mindestens 34svh), darunter
+  der Text. Die Überschrift ist dort `clamp(44px, 12.8vw, 56px)` groß.
+- Beim Laden setzt sich das Foto aus 1,08 auf 1 (1,8 s, expo.out).
+- Auftritt der Geschichte (Wunsch des Nutzers vom 30.10.): Beim Weiterscrollen öffnet sich die Bühne von unten nach oben wie ein
+  Rolltor. Ihr Inhalt steht schon an der Stelle, an der sie gleich pinnt, ihre Oberkante fährt mit dem Scrollen nach oben und deckt
+  zuerst den Balken, dann die erste Etappe von unten her auf. Jahreszahl und Text steigen dabei um 40 px auf und blenden ein. Der Kopf
+  sinkt halb so schnell und dunkelt bis 0,75 ab. Fotos zoomen dabei nicht.
 - Kein Bar & Shield und kein Power-Shop-Signet im Kopf.
 
 ### 4.3 Die Geschichte: vier Etappen auf einer Bühne

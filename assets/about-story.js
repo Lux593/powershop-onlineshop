@@ -9,13 +9,18 @@
      her (scrub) und rastet nicht ein. Lässt man los, bewegt sie sich nicht mehr von selbst.
    - Balken: Linie und Bar & Shield folgen der Lage der Etappen, nicht dem rohen Scrollwert. Die Zahlen sind Links, ein Klick
      scrollt weich zur Etappe.
+   - Auftritt aus dem Kopf: Steht direkt davor der Seitenkopf (sections/about-head.liquid), öffnet sich die Bühne beim Weiterscrollen
+     von unten nach oben wie ein Rolltor: Ihr Inhalt steht dabei schon an seinem Platz unter der Kopfleiste, die Oberkante der Bühne
+     fährt nach oben und deckt ihn auf, zuerst den Balken, dann die erste Etappe von unten her. Jahreszahl und Text steigen dabei
+     leicht auf. Der Kopf darüber sinkt halb so schnell und dunkelt ab.
    - Übergang zum Team: Folgt direkt die Team-Section (sections/about-team.liquid), schiebt sie sich nach „Heute“ über die Bühne.
      Die Etappe sinkt halb so schnell, wird kleiner und dunkelt ab, der Balken fährt auf der Oberkante des Teams hinaus.
    - Kopfleiste: Ab 150 px vor dem Pinnen bis eine Kopfleistenhöhe nach dem Ende des Übergangs zum Team (ohne Team: bis zum Ende
      des Pinnens) fährt sie ein und bleibt stehen (PS.headerHold aus header.js). Erst dann liegt nichts mehr von der Bühne hinter ihr.
    Ohne Bewegung, im Theme-Editor und unter 600 px Höhe läuft nichts davon: Die Etappen stehen untereinander, die Zahlen sind Anker.
    Fotogalerie je Etappe (ab zwei Fotos): siehe gallery() unten, läuft unabhängig von der Bühne, auch ohne Bewegung.
-   Solange die Bühne läuft, trägt [data-story] die Klasse is-live und __story = { st, guard, last, revert } (Prüfungen, Übergang zum Team).
+   Solange die Bühne läuft, trägt [data-story] die Klasse is-live und __story = { st, guard, fromHead, last, revert } (Prüfungen, Übergang
+   zum Team; fromHead ist der ScrollTrigger des Auftritts aus dem Kopf oder null).
    Kommt die Bühne nicht, obwohl html.has-motion steht (GSAP fehlt, der Aufbau bricht ab), setzt das Skript is-static: Das hebt die
    Vorstufe aus about-story.css auf, die Etappen stehen untereinander wie ohne Bewegung.
    Vorlage: entwuerfe/ueber-uns/h-vollbild.html (Skript am Ende), Spec: design-ueber-uns-h.md, Abschnitte 4.3 und 6.
@@ -184,6 +189,14 @@
     var next = host && host.nextElementSibling;
     while (next && !next.classList.contains('shopify-section')) next = next.nextElementSibling;
     return next ? next.querySelector('[data-about-team]') : null;
+  }
+
+  // Der Seitenkopf für den Auftritt: das [data-about-head] in der Section direkt vor der Geschichte, sonst null
+  function prevHead(section) {
+    var host = section.closest('.shopify-section');
+    var prev = host && host.previousElementSibling;
+    while (prev && !prev.classList.contains('shopify-section')) prev = prev.previousElementSibling;
+    return prev ? prev.querySelector('[data-about-head]') : null;
   }
 
   function stage(PS, section, gsap, ScrollTrigger) {
@@ -367,6 +380,36 @@
         .scrollTrigger;
     }
 
+    /* ---------------- Auftritt aus dem Kopf ----------------
+       Von dem Moment an, in dem die Oberkante der Bühne unten ins Fenster kommt (beim Laden, der Kopf füllt den ersten Bildschirm), bis
+       zum Beginn des Pinnens. Die Bühne selbst scrollt normal nach oben, ihr Inhalt (Etappen und Balken) fährt um genau diesen Weg
+       entgegen: Er steht still an der Stelle, an der die Bühne gleich pinnt, und die Oberkante der Bühne (overflow: clip) deckt ihn von
+       unten nach oben auf. Bewegt werden Spur und Balken, nicht das Fenster: Das verschiebt der Übergang zum Team. Jahreszahl und Text
+       der ersten Etappe steigen dabei um 40 px auf und blenden ein, von unten nach oben, wie die Kante sie erreicht.
+       Der Kopf sinkt halb so schnell (Text und Foto, er selbst bleibt im Fluss und schneidet mit overflow: clip an seiner Unterkante ab,
+       genau an der Oberkante der Bühne) und dunkelt bis 0,75 ab (--cover, about-head.css). scrub: true wie beim Team: Alles hängt fest
+       an der Scrollposition, sonst wackelte der stehende Inhalt.
+       Ohne Kopf direkt davor (andere Section oder keine) gibt es keinen Auftritt, die Bühne scrollt einfach herein. */
+    var hero = prevHead(section), fromHead = null;
+    if (hero) {
+      var heroParts = gsap.utils.toArray(hero.querySelectorAll('.about-head__text, .about-head__photo'));
+      var held = gsap.utils.toArray(section.querySelectorAll('.about-story__track, .about-story__rail'));
+      fromHead = gsap.timeline({
+        scrollTrigger: {
+          trigger: stageEl,
+          start: 'top bottom',
+          end: function () { return 'top top+=' + hh(); },
+          scrub: true,
+          invalidateOnRefresh: true
+        }
+      })
+        .fromTo(held, { y: function () { return hh() - window.innerHeight; } }, { y: 0, duration: 1, ease: 'none' }, 0)
+        .fromTo(heroParts, { y: 0 }, { y: function () { return hero.offsetHeight / 2; }, duration: 1, ease: 'none' }, 0)
+        .fromTo(hero, { '--cover': 0 }, { '--cover': 0.75, duration: 1, ease: 'none' }, 0)
+        .fromTo(bits[0], { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.35, stagger: { each: 0.08, from: 'end' }, ease: 'power2.out' }, 0.3)
+        .scrollTrigger;
+    }
+
     // Kopfleiste: fährt 150 px vor dem Pinnen ein und bleibt bis eine Kopfleistenhöhe nach dem Ende des Übergangs zum Team (ohne Team
     // bis zum Ende des Pinnens). Führe sie im Übergang weg, endete das Team 64 bzw. 76 px tiefer als gemessen, und zwei Bewegungen
     // liefen zugleich. Am Ende des Übergangs liegen Balken und abgedunkelte Etappe noch im Streifen hinter ihr; erst eine Kopfleisten-
@@ -402,7 +445,7 @@
     }
     section.addEventListener('click', onJump);
 
-    section.__story = { st: st, guard: guard, last: last, revert: revert };
+    section.__story = { st: st, guard: guard, fromHead: fromHead, last: last, revert: revert };
 
     return teardown;
 

@@ -63,11 +63,19 @@
 
   // Hält die Bühne an und setzt ihren Fortschritt auf p (0 bis 1). Werte danach lesen.
   // Die Bühne bleibt angehalten, bis UU.run sie freigibt (oder story().st.enable() aufgerufen wird).
+  // Den Auftritt aus dem Kopf (fromHead) setzt sie ans Ende, so wie er beim Pinnen steht: Sonst lägen Spur und erste Etappe bei
+  // scrollY 0 noch verschoben. UU.run stellt ihn danach wieder auf die Scrollposition (sync()).
   function at(p) {
     var st = stageTrigger();
     if (!st || !st.animation) throw new Error('at(): keine Bühne auf der Seite (kein [data-story] mit __story.st.animation)');
     st.disable(false, true);
     st.animation.progress(p);
+    var s = story();
+    if (s && s.fromHead) s.fromHead.animation.progress(1);
+  }
+  function sync() {
+    var s = story();
+    if (s && s.fromHead) s.fromHead.animation.progress(s.fromHead.progress);
   }
 
   // ---------------- Gerüst ----------------
@@ -103,6 +111,7 @@
         } finally {
           var st = stageTrigger();
           if (st && st.enable) st.enable();
+          sync();
         }
         console.log(res.skipped ? 'ÜBERSPRUNGEN ' + name + ' (' + res.skipped + ')'
           : res.fails.length ? 'FEHLER        ' + name + '\n  - ' + res.fails.join('\n  - ')
@@ -194,14 +203,20 @@
   var clamp = function (lo, v, hi) { return Math.min(hi, Math.max(lo, v)); };
   var near = function (a, b, tol) { return Math.abs(a - b) <= tol; };
 
-  UU.add('head:desktop', function () {
+  // Der Kopf füllt den ersten Bildschirm: Bei scrollY 0 endet er an der Unterkante des Fensters (about-head.css, --above)
+  var fillsScreen = function (head) {
+    var b = head.getBoundingClientRect().bottom;
+    return near(b, innerHeight, 2) ? [] : ['Kopf endet bei scrollY 0 bei ' + b.toFixed(1) + ' px, nicht an der Unterkante des Fensters (' + innerHeight + ')'];
+  };
+
+  UU.add('head:desktop', async function () {
     var f = [], head = document.querySelector('.about-head'), photo = document.querySelector('.about-head__photo');
     if (!head || !photo) return ['.about-head fehlt'];
+    await go(0);
     var r = photo.getBoundingClientRect(), left = cw() * 1.08 / 2.08;
     if (!near(r.left, left, 2)) f.push('Fotokante bei ' + r.left.toFixed(1) + ' px statt ' + left.toFixed(1));
     if (!near(r.right, cw(), 1)) f.push('Foto endet bei ' + r.right.toFixed(1) + ' px, nicht am rechten Rand (' + cw() + ')');
-    var h = head.getBoundingClientRect().height, hSoll = clamp(440, 38 * vw(), 640);
-    if (!near(h, hSoll, 1)) f.push('Höhe des Kopfs ' + h.toFixed(1) + ' px statt ' + hSoll.toFixed(1));
+    f = f.concat(fillsScreen(head));
     var h1 = document.querySelector('.about-head h1'), fs = px(h1, 'fontSize'), fsSoll = clamp(44, 5.8 * vw(), 92);
     if (!near(fs, fsSoll, .5)) f.push('h1 ist ' + fs.toFixed(1) + ' px groß statt ' + fsSoll.toFixed(1));
     var em = h1.querySelector('em'), probe = document.body.appendChild(document.createElement('i'));
@@ -212,13 +227,14 @@
     return f;
   }, function () { return cw() >= 900 ? '' : 'nur ab 900 px Breite'; });
 
-  UU.add('head:mobile', function () {
+  UU.add('head:mobile', async function () {
     var f = [], head = document.querySelector('.about-head'), photo = document.querySelector('.about-head__photo');
     if (!head || !photo) return ['.about-head fehlt'];
+    await go(0);
     var r = photo.getBoundingClientRect(), t = rect('.about-head__text');
     if (r.bottom > t.top + 1) f.push('Foto steht nicht über dem Text (Foto endet bei ' + r.bottom.toFixed(1) + ', Text beginnt bei ' + t.top.toFixed(1) + ')');
-    var soll = Math.min(r.width * .75, .52 * innerHeight);
-    if (!near(r.height, soll, 1)) f.push('Foto ist ' + r.width.toFixed(1) + ' × ' + r.height.toFixed(1) + ', Soll-Höhe ' + soll.toFixed(1) + ' (4 : 3, höchstens 52 % der Fensterhöhe)');
+    if (r.height < .34 * innerHeight - 1) f.push('Foto ist nur ' + r.height.toFixed(1) + ' px hoch, weniger als 34 % der Fensterhöhe');
+    f = f.concat(fillsScreen(head));
     var fs = px('.about-head h1', 'fontSize'), fsSoll = clamp(44, 12.8 * vw(), 56);
     if (!near(fs, fsSoll, .5)) f.push('h1 ist ' + fs.toFixed(1) + ' px groß statt ' + fsSoll.toFixed(1));
     if (innerWidth === 375 && !near(fs, 48, .5)) f.push('h1 bei 375 px nicht 48 px');
@@ -258,6 +274,34 @@
     var c = getComputedStyle(probe)[prop]; probe.remove();
     return c;
   };
+
+  // Auftritt aus dem Kopf (about-story.js, fromHead): Bei scrollY 0 liegt der Inhalt der Bühne (Spur und Balken) eine Fenster- minus
+  // Kopfleistenhöhe über ihr, also unsichtbar über ihrer Oberkante. Auf halbem Weg steht er schon an der Stelle des Pinnens (Oberkante
+  // auf der Kopfleiste), der Kopf ist halb abgedunkelt und gesunken. Am Ende des Wegs ist nichts mehr verschoben, alles eingeblendet.
+  UU.add('story:open', async function () {
+    var f = [], s = story(), fh = s.fromHead, hero = document.querySelector('[data-about-head]');
+    var track = document.querySelector('.about-story__track'), rail = document.querySelector('.about-story__rail');
+    var ty = function (e) { var t = getComputedStyle(e).transform; return t === 'none' ? 0 : new DOMMatrixReadOnly(t).m42; };
+    var cover = function () { return parseFloat(getComputedStyle(hero).getPropertyValue('--cover')) || 0; };
+    var bits0 = [leavesOf()[0].querySelector('.leaf__year')].concat(Array.prototype.slice.call(leavesOf()[0].querySelectorAll('.leaf__text > *')));
+    var hh = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 0;
+    if (!fh) return ['Kopf direkt vor der Geschichte, aber kein Auftritt (__story.fromHead fehlt)'];
+    await go(fh.start); await wait(100);
+    if (!near(ty(track), hh - innerHeight, 2)) f.push('Anfang: Spur um ' + ty(track).toFixed(1) + ' px verschoben statt ' + (hh - innerHeight).toFixed(1));
+    if (!near(ty(rail), hh - innerHeight, 2)) f.push('Anfang: Balken um ' + ty(rail).toFixed(1) + ' px verschoben');
+    if (cover() > .01) f.push('Anfang: Kopf schon abgedunkelt (--cover ' + cover() + ')');
+    await go((fh.start + fh.end) / 2); await wait(100);
+    var top = track.getBoundingClientRect().top;
+    if (!near(cover(), .375, .03)) f.push('Mitte: --cover ' + cover().toFixed(3) + ' statt 0,375');
+    var heroText = hero.querySelector('.about-head__text');
+    if (!(ty(heroText) > 0)) f.push('Mitte: Text im Kopf sinkt nicht (translateY ' + ty(heroText).toFixed(1) + ')');
+    if (!near(top, hh, 3)) f.push('Mitte: Spur beginnt bei ' + top.toFixed(1) + ' px, nicht an der Kopfleiste (' + hh + '), der Inhalt steht nicht still');
+    await go(fh.end); await wait(100);
+    if (Math.abs(ty(track)) > .5 || Math.abs(ty(rail)) > .5) f.push('Ende: Spur oder Balken noch verschoben (' + ty(track).toFixed(1) + ' / ' + ty(rail).toFixed(1) + ')');
+    bits0.forEach(function (b, k) { if (parseFloat(getComputedStyle(b).opacity) < .99) f.push('Ende: Teil ' + (k + 1) + ' der ersten Etappe nicht eingeblendet'); });
+    if (!near(cover(), .75, .01)) f.push('Ende: --cover ' + cover().toFixed(3) + ' statt 0,75');
+    return f;
+  }, function () { return motion() || (story() ? '' : 'nur mit Bühne'); });
 
   UU.add('story:static', function () {
     var f = [], s = sec();
@@ -680,7 +724,11 @@
   UU.add('story:revert', async function () {
     var f = [], s = sec(), L = leavesOf();
     await go(0); await wait(800); // st.enable() der vorigen Prüfung scrubbt noch zurück
-    var before = L[0].getBoundingClientRect();
+    // Bei scrollY 0 liegt die Spur für den Auftritt aus dem Kopf verschoben (fromHead), nach revert nicht mehr: Verglichen wird ohne sie
+    var track = s.querySelector('.about-story__track'), shift = getComputedStyle(track).transform;
+    shift = shift === 'none' ? 0 : new DOMMatrixReadOnly(shift).m42;
+    var r0 = L[0].getBoundingClientRect(), before = { top: r0.top - shift, height: r0.height };
+    var hero = document.querySelector('[data-about-head]');
     story().revert();
     await frames(2);
     if (s.classList.contains('is-live')) f.push('is-live nach revert');
@@ -693,6 +741,10 @@
         if (opacity(e) !== 1) f.push('Etappe ' + (i + 1) + ': ' + name + ' mit Deckkraft ' + opacity(e));
       });
     });
+    [track, s.querySelector('.about-story__rail')].concat(hero ? Array.prototype.slice.call(hero.querySelectorAll('.about-head__text, .about-head__photo')) : []).forEach(function (e) {
+      if (e && getComputedStyle(e).transform !== 'none') f.push((e.className || e.tagName) + ' hat nach revert noch transform');
+    });
+    if (hero && hero.style.getPropertyValue('--cover')) f.push('Kopf hat nach revert noch --cover');
     var after = L[0].getBoundingClientRect();
     if (!near(after.top, before.top, 1) || !near(after.height, before.height, 1)) {
       f.push('Etappe 1 vorher ' + before.top.toFixed(1) + ' / ' + before.height.toFixed(1) + ', nachher ' + after.top.toFixed(1) + ' / ' + after.height.toFixed(1) + ' (Oberkante / Höhe)');

@@ -67,15 +67,15 @@
 .leaf__media > img[aria-hidden="true"] { visibility: hidden; }
 .leaf__media > img.is-coming { z-index: 2; }
 
-/* Vorschau unter dem Text: ein Knopf je Foto, 3 : 2. Bildsprache wie die Namensliste im Team (about-team.css): nicht gewählt
+/* Vorschau unter dem Text: ein Knopf je Foto, 3 : 2, so breit, wie es Fensterbreite und -höhe hergeben (Desktop 72 bis 156 px). Bildsprache wie die Namensliste im Team (about-team.css): nicht gewählt
    schwarz-weiß, gewählt und beim Darüberfahren in der Bildfarbe, dazu ein orangener Strich an der Unterkante. Bei leaf--mono bleiben
    alle schwarz-weiß. Kommt beim Umblättern mit dem Text herein (Teil von bits im Skript). */
-.leaf__thumbs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: var(--s-3); }
+.leaf__thumbs { display: flex; flex-wrap: wrap; gap: 12px; margin-top: var(--s-3); }
 .leaf__thumb {
   position: relative;
   flex: none;
-  width: 72px;
-  height: 48px;
+  width: clamp(72px, min(9vw, 14vh), 156px);
+  aspect-ratio: 3 / 2;
   overflow: hidden;
   background: var(--c-anthracite);
   border-radius: var(--radius);
@@ -231,6 +231,13 @@ html:has(.about-story.is-live) { scroll-behavior: auto; }
   /* Am Desktop ist der Balken kräftiger: größere Zahlen, dickere Linie, größeres Zeichen, wächst mit breiten Bildschirmen mit */
   .about-story { --rail-pad: clamp(8px, .8vw, 14px); --rail-link: 52px; --rider-w: clamp(30px, 2.2vw, 40px); }
   .leaf { grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr); min-height: 640px; }
+  /* Text und Vorschau wachsen mit Breite und Höhe des Fensters: Die Bühne ist genau ein Fenster hoch, so bleibt bei wenig Höhe alles
+     auf der Etappe (1280 × 620: Überschrift 45 px, Text 16 px, Vorschau 87 × 58) und füllt bei viel Höhe die Textspalte
+     (1440 × 900: 63 px, 21 px, 126 × 84). */
+  .leaf h3 { max-width: 14ch; font-size: clamp(36px, min(4.4vw, 7.2vh), 76px); }
+  .leaf__text p { max-width: 40ch; font-size: clamp(16px, min(1.45vw, 2.4vh), 23px); }
+  .leaf__meta { font-size: clamp(14px, 1.05vw, 17px); }
+  .leaf__meta .icon { width: 1.15em; height: 1.15em; }
   .about-story__rail a { padding: 0 clamp(14px, 1.2vw, 22px); font-size: clamp(20px, 1.45vw, 26px); letter-spacing: 2px; }
   .about-story__line { height: 3px; margin-top: -1.5px; }
   .about-story__rider { box-shadow: 0 0 0 6px var(--c-black); }
@@ -244,15 +251,15 @@ html:has(.about-story.is-live) { scroll-behavior: auto; }
   .leaf h3 { font-size: clamp(26px, 7.4vw, 32px); }
   .leaf__text p { margin-top: 10px; font-size: 15px; line-height: 1.55; }
   .leaf__meta { margin-top: 12px; }
-  .leaf__thumbs { margin-top: 12px; }
-  .leaf__thumb { width: 66px; height: 44px; }
+  .leaf__thumbs { gap: 10px; margin-top: 12px; }
+  .leaf__thumb { width: clamp(66px, min(21vw, 9.5vh), 90px); }
   .about-story.is-live .about-story__hint { display: none; }
 }
 
 /* ---------------- Platz für die Vorschau bei wenig Höhe ----------------
    Auf der Bühne ist jede Etappe genau so hoch wie das Bühnenfenster, was nicht hineinpasst, schneidet sie ab. Bei 1280 × 620 steht der
    Ort von „Heute“ ohne Vorschau nur 6 px über der Kante, die Vorschau braucht gut 60 px mehr (gemessen, Task 9). Darum bekommen nur
-   Etappen mit Vorschau bei wenig Höhe kleinere Vorschaubilder (66 × 44, die Klickfläche bleibt 44 px hoch) und knappere Abstände:
+   Etappen mit Vorschau bei wenig Höhe knappere Abstände (die Vorschaubilder werden über ihre Breite mit der Fensterhöhe kleiner):
    Rand oben und unten mit der Fensterhöhe statt mit der Breite, engere Abstände zwischen Jahreszahl, Text, Ort und Vorschau. Der Ort
    steht dort als Block (flex statt inline-flex): Als Inline-Element zog er die Zeilenhöhe des Textes mit, gut 6 px Luft für nichts.
    Am Handy gibt zusätzlich das Foto Platz ab: 34 % statt 46 % der Etappe. Jahreszahl und Schriftgrößen bleiben.
@@ -260,11 +267,13 @@ html:has(.about-story.is-live) { scroll-behavior: auto; }
    nimmt das Foto 42 % ein.
    Ohne Bühne wachsen die Etappen mit dem Inhalt, dort ändern die Regeln nur Abstände und Fotohöhe. */
 @media (min-width: 900px) and (max-height: 800px) {
+  /* Überschrift und Vorschau wachsen hier weniger mit der Höhe (1280 × 620: 41 px und 74 × 50 statt 45 px und 87 × 58) */
+  .leaf--gallery h3 { font-size: clamp(36px, min(4.4vw, 6.6vh), 76px); }
+  .leaf--gallery .leaf__thumb { width: clamp(72px, min(9vw, 12vh), 156px); }
   .leaf--gallery .leaf__body { gap: 12px; padding-top: clamp(16px, 3vh, 40px); padding-bottom: clamp(16px, 3vh, 40px); }
   .leaf--gallery .leaf__text p { margin-top: 10px; }
   .leaf--gallery .leaf__meta { display: flex; margin-top: var(--s-2); }
   .leaf--gallery .leaf__thumbs { margin-top: 12px; }
-  .leaf--gallery .leaf__thumb { width: 66px; height: 44px; }
 }
 @media (max-width: 899.98px) and (max-height: 700px) {
   .leaf { grid-template-rows: minmax(0, 42%) minmax(0, 1fr); }

@@ -1,6 +1,6 @@
 {%- comment -%}
   Seitenkopf der Über-uns-Seite „Halle, dunkel“: schwarz, links Überschrift und Satz, rechts das Foto bis an den Rand, am
-  Handy das Foto oben. Die Überschrift ist die einzige h1 der Seite. Text zwischen zwei Sternen (*Familienhand.*) wird orange.
+  Handy das Foto oben. Füllt den ersten Bildschirm. Die Überschrift ist die einzige h1 der Seite. Text zwischen zwei Sternen (*Familienhand.*) wird orange.
   Das Foto setzt sich beim Laden aus einer leichten Vergrößerung (assets/about-head.css, nur mit Bewegung).
   Foto: Standarddatei ist die Crew auf ihren Bikes in der Halle (ueber-uns-crew-1600.jpg, Querformat), mit den kleineren Fassungen
   720 und 1280 im srcset; ein im Editor gewähltes Bild ersetzt sie. Wer unter „Standarddatei“ eine andere Datei einträgt, hat kein srcset.
@@ -42,7 +42,7 @@
 {%- endcapture -%}
 {%- assign photo = photo | strip -%}
 
-<section class="about-head on-dark" aria-labelledby="about-head-title-{{ section.id }}">
+<section class="about-head on-dark" data-about-head aria-labelledby="about-head-title-{{ section.id }}">
   <div class="about-head__text">
     <h1 id="about-head-title-{{ section.id }}">
       {%- for part in heading_parts -%}
