@@ -41,7 +41,7 @@
 /* ---------------- Text ---------------- */
 .about-visit__body { display: flex; flex-direction: column; gap: var(--s-4); min-width: 0; }
 .about-visit__title { font-weight: 800; font-size: clamp(56px, 16vw, 76px); line-height: .84; letter-spacing: -.01em; }
-.about-visit__title span { color: var(--c-orange-on-light); }
+.about-visit__title span { color: var(--c-orange); } /* Punkt im Akzent-Orange wie bei „HEUTE.“ (about-story.css) */
 .about-visit__info { display: flex; flex-direction: column; gap: var(--s-3); }
 .about-visit__address { font-style: normal; }
 .about-visit__street { display: block; font: 800 clamp(28px, 2.4vw, 36px)/.95 var(--f-head); text-transform: uppercase; letter-spacing: .01em; }

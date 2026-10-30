@@ -83,7 +83,13 @@ Dienstleistungen sie auch haben. Der Entwurf zeigt sie nicht.
 oben, Text unten). Es gibt keinen Fortschrittsbalken.
 
 **Mit Bewegung:** Die Bühne bleibt stehen (gepinnt), während man scrollt. Jede Etappe füllt die ganze Bühne.
-- Bühnenhöhe: Bildschirmhöhe minus Kopfleiste, mindestens 520 px.
+- Bühnenhöhe: Bildschirmhöhe minus Kopfleiste, mindestens 520 px. Am Handy reicht sie bis `100lvh`, also bis unter die eingeklappte
+  Leiste von Safari. Foto und Text jeder Etappe enden trotzdem an `100svh` (Innenabstand unten `100lvh - 100svh`), darunter bleibt
+  es weiß.
+- **Am Handy unten immer weiß (Meldung des Nutzers vom 30.10., „unten ist sehr viel schwarzer Leerraum“):** Safari 26 färbt den
+  Streifen hinter seiner Leiste nach dem festen Inhalt am unteren Rand, auf der gepinnten Bühne also nach Bühne und Etappe. Seiten-
+  und Abstandshalter-Farbe wirken dort nicht. Grund der Bühne und Abstandshalter des Pinnens sind am Handy darum weiß, am Desktop
+  schwarz. Im iOS-Simulator (iPhone 17 Pro) geprüft, eingeklappt wie ausgeklappt.
 - Scrollweg: eine Bildschirmhöhe pro Etappenwechsel.
 - Kein Einrasten (Wunsch des Nutzers vom 30.10., vorher snap auf 1/(Anzahl−1)). Die Lage der Etappen hängt nur vom Scrollen ab. Wer
   zwischen zwei Etappen anhält, bleibt dort stehen. Der Scrub (0,6) zieht nur hinter der Scrollposition her.
@@ -111,7 +117,8 @@ Kein Foto zoomt, wächst oder verschiebt sich im eigenen Rahmen.
   bewegt es sich von links nach rechts.
 - Ohne Bewegung, bei reduzierter Bewegung und im Editor wechselt das Foto sofort. Die Galerie hängt nicht an GSAP.
 
-**Fortschrittsbalken** am Fuß der Bühne:
+**Fortschrittsbalken** am Desktop am Fuß der Bühne, am Handy oben auf der Bühne direkt unter der Kopfleiste (Wunsch des Nutzers vom
+30.10.: „mach den Zeitstrahl in der mobilen Ansicht oben“). Unten verdeckte ihn sonst die ausgeklappte Leiste von Safari:
 - Schwarzer Balken mit den Jahren in gleich breiten Spalten (heute vier: 1985, 1991, 2016, Heute).
 - Eine graue Linie läuft von der Mitte der ersten bis zur Mitte der letzten Zahl. Sie füllt sich stufenlos orange und folgt dabei der
   Lage der Etappen, nicht dem rohen Scrollwert.
@@ -127,7 +134,12 @@ Kein Foto zoomt, wächst oder verschiebt sich im eigenen Rahmen.
 **Übergang zum Team:** Nach „Heute“ bleibt die Bühne gepinnt stehen, und der dunkle Team-Bereich schiebt sich von unten über sie, eine
 Bühnenhöhe Scrollweg lang. Das ist der Auftritt aus dem Kopf in umgekehrter Richtung. Dabei passiert Folgendes:
 - Die Etappe „Heute“ bleibt, wie sie ist. Sie wird nicht verkleinert und nicht hinausgeschoben, sie dunkelt nur bis 0,75 ab.
-- Das Team deckt zuerst den Fortschrittsbalken zu, dann die Etappe, und wirft dabei einen weichen Schatten auf sie.
+- Das Team deckt am Desktop zuerst den Fortschrittsbalken zu, dann die Etappe, und wirft dabei einen weichen Schatten auf sie. Am
+  Handy steht der Balken oben und wird als Letztes zugedeckt.
+- Am Handy steht während des Übergangs ein schwarzer Streifen fest am unteren Rand, ganz unter der Leiste von Safari
+  (`.about-story__edge`, vom Skript eingesetzt und nach dem Pinnen wieder entfernt). Sonst nähme Safari dort die weiße Etappe, und
+  unter dem schwarzen Team läge ein weißer Streifen. Den Grund der Bühne umzufärben wirkt nicht, die Etappe liegt darüber (im
+  iOS-Simulator geprüft, 30.10.). Nach dem Pinnen ist nichts mehr fest, Safari zeigt dann die Seite selbst hinter der Leiste.
 - Am Ende erreicht die Oberkante des Teams die Kopfleiste, das Pinnen endet, und die Bühne liegt genau hinter dem Team. Das Team ist
   dafür mindestens so hoch wie die Bühne, der Inhalt steht dann mittig.
 - Geschichte (Meldungen des Nutzers vom 30.10.): Bis dahin sank die Etappe halb so schnell, wie die Seite scrollte, und wurde auf 0,92
@@ -167,7 +179,7 @@ Aufgebaut wie eine Etappe.
 - **Links:** die dunkle Karte des Dreiländerecks (OpenStreetMap) mit orangem Pin. Am Pin hängt ein weißes Schild mit Bar & Shield und
   „Power Shop“. Der Pin landet einmal, wenn die Karte ins Bild kommt. Es gibt keinen auslaufenden Ring.
 - **Rechts auf Weiß:**
-  - „Komm vorbei.“, der Punkt in Orange.
+  - „Komm vorbei.“, der Punkt im Akzent-Orange `--c-orange` wie bei „HEUTE.“.
   - Adresse und der Satz „Im Stadtteil Haltingen, mitten im Dreiländereck.“
   - „Route planen“.
   - Drei Knöpfe: „Anrufen“ in Orange, ab 900 px mit Nummer, dazu WhatsApp und E-Mail mit 2 px schwarzer Kontur.
@@ -238,7 +250,7 @@ Alle Fakten stammen aus der alten Website oder vom Händler. Nichts davon wird e
 | 1985 | Gründung auf der Schusterinsel | Weil-Friedlingen | Gerhard Link (Teamfoto, schwarz-weiß) | |
 | 1991 | Ein eigenes Haus | Weil-Haltingen | altes Farbfoto `power-shop-frueher.jpg` | nur 678 × 510 px. Wo das Haus steht, ist nicht bestätigt, der Nutzer will es trotzdem hier. Nicht mehr nachfragen. |
 | 2016 | Die zweite Generation übernimmt | Umbau und neuer Showroom | Falk, Franziska und Richard Link auf dem Vorplatz (`vorplatz-team.jpg`, schwarz-weiß wie 1985) | Foto vom Nutzer am 30.10. |
-| Heute | Showroom trifft Werkstatt | Burghölzle 15, Weil am Rhein | Showroom-Theke | „Heute.“ mit orangem Punkt. Bis 30.10. stand hier die Crew, die jetzt im Kopf ist. |
+| Heute | Showroom trifft Werkstatt | Burghölzle 15, Weil am Rhein | Showroom-Theke | „HEUTE.“ in Versalien wie im Balken, der Punkt im Akzent-Orange `--c-orange` (#f26722, nicht das dunklere Orange für Text auf Hell). Wunsch des Nutzers vom 30.10. Bis 30.10. stand hier die Crew, die jetzt im Kopf ist. |
 
 Die Texte stehen wörtlich in `h-vollbild.html`.
 

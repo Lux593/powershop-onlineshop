@@ -297,10 +297,12 @@
     if (!near(restPx, hero.getBoundingClientRect().height, 3)) f.push('Weg des Auftritts ' + restPx.toFixed(1) + ' px statt der Kopfhöhe ' + hero.getBoundingClientRect().height.toFixed(1));
     await go(0); await wait(900);
     if (!near(stageEl.getBoundingClientRect().top, hero.getBoundingClientRect().top, 2)) f.push('Bei scrollY 0 beginnt die Bühne nicht hinter dem Kopf (' + stageEl.getBoundingClientRect().top.toFixed(1) + ' / ' + hero.getBoundingClientRect().top.toFixed(1) + ')');
-    // Am Handy liegt die Bühne ganz hinter dem Kopf, auch ihr Fuß mit dem Balken (dank des Saums): Safari zeigt die Seite dort auch unter
-    // seiner Leiste, bis zu 98 px unter der Fensterhöhe. Am Desktop ragt sie unter dem Bildrand hervor, das sieht niemand.
+    // Am Handy liegt die Bühne hinter dem Kopf, so weit man sieht: Safari zeigt die Seite auch unter seiner Leiste, bis zu 98 px unter der
+    // Fensterhöhe, der Kopf reicht mit seinem Saum darüber hinaus. Was die Bühne tiefer reicht (am Handy bis 100lvh, am iPhone
+    // 13 px), liegt außerhalb des Bildes. Am Desktop ragt sie unter dem Bildrand hervor, das sieht niemand.
     var sb = stageEl.getBoundingClientRect().bottom, kb = hero.getBoundingClientRect().bottom;
-    if (cw() < 900 ? sb > kb + 1 : kb < innerHeight - 1) f.push('Bei scrollY 0 liegt die Bühne unter dem Kopf frei (endet bei ' + sb.toFixed(1) + ', der Kopf bei ' + kb.toFixed(1) + ')');
+    var hs = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--about-head-skirt')) || 0;
+    if (cw() < 900 ? sb > kb + 1 && kb < innerHeight + hs - 1 : kb < innerHeight - 1) f.push('Bei scrollY 0 liegt die Bühne unter dem Kopf frei (endet bei ' + sb.toFixed(1) + ', der Kopf bei ' + kb.toFixed(1) + ')');
     // Vor dem Auftritt ist kein Teil der ersten Etappe sichtbar, keines erscheint zweimal (Fehler vom 30.10.: gestaffeltes fromTo)
     bits0.forEach(function (b, k) { if (opacity(b) !== 0) f.push('scrollY 0: Teil ' + (k + 1) + ' der ersten Etappe schon sichtbar (Deckkraft ' + opacity(b) + ')'); });
     if (+getComputedStyle(hero).zIndex <= 0) f.push('Kopf liegt nicht über der Bühne (z-index ' + getComputedStyle(hero).zIndex + ')');
@@ -309,7 +311,9 @@
     for (var k = 1; k <= 6; k++) { await go(pin.start + restPx * k / 7); tops.push(leaf.getBoundingClientRect().top); }
     var spread = Math.max.apply(null, tops) - Math.min.apply(null, tops);
     if (spread > .5) f.push('Erste Etappe bewegt sich während des Auftritts um ' + spread.toFixed(1) + ' px (' + tops.map(function (t) { return t.toFixed(1); }).join(', ') + ')');
-    if (!near(tops[0], hh, 2)) f.push('Erste Etappe steht während des Auftritts bei ' + tops[0].toFixed(1) + ' px statt an der Kopfleiste (' + hh + ')');
+    // Am Handy steht der Balken oben auf der Bühne (seit 30.10.), die Etappe darunter
+    var lt = hh + (cw() < 900 ? document.querySelector('[data-rail]').offsetHeight : 0);
+    if (!near(tops[0], lt, 2)) f.push('Erste Etappe steht während des Auftritts bei ' + tops[0].toFixed(1) + ' px statt an der Kopfleiste (' + lt + ', am Handy unter dem Balken)');
     await go(pin.start + restPx / 2); await wait(800);
     var hb = hero.getBoundingClientRect().bottom;
     if (!near(hb, hh + restPx / 2, 3)) f.push('Mitte: Kopf endet bei ' + hb.toFixed(1) + ' statt ' + (hh + restPx / 2).toFixed(1));
@@ -506,7 +510,8 @@
     if (away()) f.push('Gepinnt und nach unten gescrollt: Kopfleiste fährt weg');
     var spacer = sec().querySelector('.pin-spacer');
     if (!spacer) f.push('Kein .pin-spacer');
-    else if (getComputedStyle(spacer).backgroundColor !== tokenColor('backgroundColor', '--c-black')) f.push('.pin-spacer hat ' + getComputedStyle(spacer).backgroundColor + ' statt --c-black');
+    // Am Desktop schwarz wie die Bühne, am Handy weiß wie die Etappen (Leiste von Safari, story:railplace)
+    else if (cw() >= 900 && getComputedStyle(spacer).backgroundColor !== tokenColor('backgroundColor', '--c-black')) f.push('.pin-spacer hat ' + getComputedStyle(spacer).backgroundColor + ' statt --c-black');
     // Teil 2 (Task 6): Die Kopfleiste bleibt bis zum Ende des Übergangs zum Team stehen, danach gilt wieder das normale Verhalten
     var t = teamEl();
     if (!t) {
@@ -726,6 +731,35 @@
   // wie die Seite scrollte, und ruckelte am iPhone). Das Team beginnt an der Unterkante der Bühne, wenn das Umblättern endet, und
   // erreicht die Kopfleiste, wenn das Pinnen endet. Danach liegt die Bühne genau hinter ihm.
   var at2 = function (x, y) { var e = document.elementFromPoint(x, y); return e && teamEl().contains(e); };
+  // Lage des Balkens auf der gepinnten Bühne. Desktop: am Fuß, die Bühne endet am Fensterrand. Handy (seit 30.10., Rückmeldung vom
+  // iPhone): oben unter der Kopfleiste, die weiße Etappe reicht bis 100lvh, dahinter (unter der Leiste von Safari) liegt der weiße
+  // Abstandshalter. Foto und Text enden an der Fensterunterkante (ohne Leiste hier = 100svh).
+  UU.add('story:railplace', async function () {
+    var f = [], s = sec(), st = story().st;
+    var stage = s.querySelector('[data-stage]'), rail = s.querySelector('[data-rail]'), leaf = s.querySelector('.leaf');
+    await go(st.start + 2); await wait(100);
+    var r = rect(stage), rr = rect(rail), lr = rect(leaf);
+    if (!near(r.top, headerH(), 1)) f.push('Bühne steht bei ' + r.top.toFixed(1) + ' statt an der Kopfleiste (' + headerH() + ')');
+    if (cw() < 900) {
+      if (!near(rr.top, r.top, 1)) f.push('Handy: Balken beginnt bei ' + rr.top.toFixed(1) + ', nicht oben auf der Bühne (' + r.top.toFixed(1) + ')');
+      if (!near(lr.top, rr.bottom, 1)) f.push('Handy: Etappe beginnt bei ' + lr.top.toFixed(1) + ', nicht unter dem Balken (' + rr.bottom.toFixed(1) + ')');
+      if (!near(r.bottom, innerHeight, 2)) f.push('Handy: Bühne endet bei ' + r.bottom.toFixed(1) + ' statt am Fensterrand (' + innerHeight + ', ohne Leiste = 100lvh)');
+      var sp = stage.closest('.pin-spacer');
+      if (!sp || getComputedStyle(sp).backgroundColor !== 'rgb(255, 255, 255)') f.push('Handy: Abstandshalter des Pinnens nicht weiß (' + (sp ? getComputedStyle(sp).backgroundColor : 'fehlt') + '), hinter der Leiste von Safari läge Schwarz');
+      var sg = getComputedStyle(stage).backgroundColor;
+      if (sg !== 'rgb(255, 255, 255)') f.push('Handy: Grund der Bühne ' + sg + ' statt weiß, Safari färbte den Streifen hinter seiner Leiste danach');
+      if (document.querySelector('.about-story__edge')) f.push('Handy: Streifen für die Leiste von Safari steht schon während der Etappen');
+      if (!near(lr.bottom, r.bottom, 1)) f.push('Handy: Etappe endet bei ' + lr.bottom.toFixed(1) + ', nicht an der Unterkante der Bühne (' + r.bottom.toFixed(1) + ')');
+      var cb = lr.bottom - px(leaf, 'paddingBottom');
+      if (!near(cb, innerHeight, 2)) f.push('Handy: Foto und Text enden bei ' + cb.toFixed(1) + ' statt an der Fensterunterkante (' + innerHeight + ')');
+    } else {
+      if (!near(rr.bottom, r.bottom, 1)) f.push('Desktop: Balken endet bei ' + rr.bottom.toFixed(1) + ', nicht am Fuß der Bühne (' + r.bottom.toFixed(1) + ')');
+      if (!near(r.bottom, innerHeight, 2)) f.push('Desktop: Bühne endet bei ' + r.bottom.toFixed(1) + ' statt am Fensterrand (' + innerHeight + ')');
+    }
+    await go(0);
+    return f;
+  }, function () { return story() ? '' : '__story fehlt'; });
+
   UU.add('story:toteam', async function () {
     var f = [], s = sec(), st = story().st, pin = story().pin, t = teamEl();
     if (!t) return ['[data-about-team] fehlt'];
@@ -753,9 +787,21 @@
     if (sc !== 1 || getComputedStyle(vp).transform !== 'none') f.push('Halbe Strecke: Etappen verkleinert oder versetzt (scale ' + sc + ', transform ' + getComputedStyle(vp).transform + ')');
     if (!near(cover, .375, .02)) f.push('Halbe Strecke: --cover ' + cover + ' statt 0,375');
     if (!near(rect(t).top, hh + S / 2, 2)) f.push('Halbe Strecke: Team beginnt bei ' + rect(t).top.toFixed(1) + ' statt ' + (hh + S / 2).toFixed(1));
-    var rr = rect(rail);
-    if (!at2(innerWidth / 2, rr.top + rr.height / 2)) f.push('Halbe Strecke: Das Team deckt den Balken nicht zu');
+    // Am Desktop steht der Balken am Fuß der Bühne und ist hier schon zugedeckt, am Handy steht er oben und wird als Letztes zugedeckt (Ende)
+    var rr = rect(rail), railTop = cw() < 900;
+    if (!railTop && !at2(innerWidth / 2, rr.top + rr.height / 2)) f.push('Halbe Strecke: Das Team deckt den Balken nicht zu');
     if (at2(innerWidth / 2, hh + S / 4)) f.push('Halbe Strecke: Team schon über der oberen Hälfte der Bühne');
+    // Streifen für die Leiste von Safari: im Übergang da, am Handy fest am unteren Rand, voll breit, in der Farbe des Teams
+    var edge = document.querySelector('.about-story__edge');
+    if (!edge) f.push('Halbe Strecke: Streifen für die Leiste von Safari fehlt');
+    else if (railTop) {
+      var ground = t, gb = 'rgba(0, 0, 0, 0)';
+      while (ground && (gb = getComputedStyle(ground).backgroundColor) === 'rgba(0, 0, 0, 0)') ground = ground.parentElement;
+      var es = getComputedStyle(edge), er = rect(edge);
+      if (es.position !== 'fixed' || es.display === 'none') f.push('Halbe Strecke, Handy: Streifen nicht fest oder ausgeblendet (' + es.position + ', ' + es.display + ')');
+      if (!(er.top < innerHeight && er.bottom >= innerHeight) || er.height < 12 || er.width < innerWidth * .8) f.push('Halbe Strecke, Handy: Streifen nicht am unteren Rand oder zu klein (' + er.top.toFixed(1) + ' bis ' + er.bottom.toFixed(1) + ', ' + er.width + ' breit)');
+      if (es.backgroundColor !== gb) f.push('Halbe Strecke, Handy: Streifen ' + es.backgroundColor + ' statt wie das Team (' + gb + ')');
+    } else if (getComputedStyle(edge).display !== 'none') f.push('Halbe Strecke, Desktop: Streifen für die Leiste von Safari sichtbar');
     // Unterkante der stehenden Kopfleiste, auf halber Strecke gemessen. Am Ende steht sie noch: guard gibt sie erst eine Kopfleistenhöhe
     // später frei (toTeam.end + hh, story:header Teil 2).
     // Ohne ihre 1-px-Linie unten (.site-header ist --header-h plus Linie hoch): Die Linie liegt über dem Inhalt darunter, wie beim Pinnen.
@@ -766,10 +812,15 @@
     if (!near(rect(stage).top, rect(t).top, 1)) f.push('Ende: Bühne liegt nicht genau hinter dem Team (' + rect(stage).top.toFixed(1) + ' / ' + rect(t).top.toFixed(1) + ')');
     if (G(vp, 'scale') !== 1) f.push('Ende: Etappen bei scale ' + G(vp, 'scale') + ' statt 1');
     if (!near(parseFloat(getComputedStyle(stage).getPropertyValue('--cover')), .75, .01)) f.push('Ende: --cover nicht 0,75');
+    if (railTop) { rr = rect(rail); if (!at2(innerWidth / 2, rr.top + rr.height / 2)) f.push('Ende: Das Team deckt den Balken oben nicht zu'); }
+    // Danach ist nichts mehr fest, Safari zeigt hinter seiner Leiste die Seite selbst: Der Streifen ist weg
+    if (document.querySelector('.about-story__edge')) f.push('Ende: Streifen für die Leiste von Safari bleibt nach dem Pinnen stehen');
     await go(end + 300); await frames(2);
     rr = rect(rail);
     var cy = rr.top + rr.height / 2;
     if (cy > hh && cy < innerHeight && !at2(innerWidth / 2, cy)) f.push('300 px nach dem Übergang: Balken liegt frei');
+    await go(st.end - 2); await frames(2);
+    if (document.querySelector('.about-story__edge')) f.push('Zurück vor dem Übergang: Streifen für die Leiste von Safari bleibt stehen');
     await go(0);
     return f;
   }, live);
@@ -818,9 +869,10 @@
     var heights = function () { return L.map(function (l) { return l.getBoundingClientRect().height; }); };
     // Soll: die Höhen ohne Vorstufe (ohne about-story--stage greift sie nicht), synchron gemessen
     s.classList.remove('about-story--stage'); var soll = heights(); s.classList.add('about-story--stage');
-    // Vorbedingung: Die Vorstufe greift. Erkennbar am Rand unter Etappe 1 (Platz für den Balken, --rail-h). Die Höhe taugt dafür nicht:
-    // Bei 1440 × 900 ohne Scrollbalken ist die statische Etappe zufällig genauso hoch wie die Vorstufe (749 px).
-    if (!(px(L[0], 'marginBottom') > 0)) f.push('Vorbedingung: Etappe 1 ohne Rand unten, die Vorstufe greift nicht');
+    // Vorbedingung: Die Vorstufe greift. Erkennbar am Rand bei Etappe 1 (Platz für den Balken, --rail-h; am Handy oben, sonst unten). Die
+    // Höhe taugt dafür nicht: Bei 1440 × 900 ohne Scrollbalken ist die statische Etappe zufällig genauso hoch wie die Vorstufe (749 px).
+    var mside = cw() < 900 ? 'marginTop' : 'marginBottom';
+    if (!(px(L[0], mside) > 0)) f.push('Vorbedingung: Etappe 1 ohne Rand ' + (cw() < 900 ? 'oben' : 'unten') + ', die Vorstufe greift nicht');
     var src = await (await fetch(document.querySelector('script[src*="about-story.js"]').src, { cache: 'no-store' })).text();
     var added = 0;
     try {

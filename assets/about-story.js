@@ -21,7 +21,7 @@
    Ohne Bewegung, im Theme-Editor und unter 600 px Höhe läuft nichts davon: Die Etappen stehen untereinander, die Zahlen sind Anker.
    Fotogalerie je Etappe (ab zwei Fotos): siehe gallery() unten, läuft unabhängig von der Bühne, auch ohne Bewegung.
    Solange die Bühne läuft, trägt [data-story] die Klasse is-live und __story = { st, pin, guard, fromHead, last, revert } (Prüfungen,
-   Übergang zum Team). st ist das Umblättern, pin das Pinnen (mit dem Auftritt aus dem Kopf davor), fromHead der Auftritt oder null.
+   Übergang zum Team). Während des Übergangs zum Team steht am unteren Rand ein schwarzer Streifen für die Leiste von Safari (setEdge). st ist das Umblättern, pin das Pinnen (mit dem Auftritt aus dem Kopf davor), fromHead der Auftritt oder null.
    Kommt die Bühne nicht, obwohl html.has-motion steht (GSAP fehlt, der Aufbau bricht ab), setzt das Skript is-static: Das hebt die
    Vorstufe aus about-story.css auf, die Etappen stehen untereinander wie ohne Bewegung.
    Vorlage: entwuerfe/ueber-uns/h-vollbild.html (Skript am Ende), Spec: design-ueber-uns-h.md, Abschnitte 4.3 und 6.
@@ -389,6 +389,21 @@
        Scrollen nach unten und kam am iPhone nicht hinterher, es ruckelte; die Verkleinerung fand der Nutzer unnötig).
        Ende: Die Oberkante des Teams erreicht die Unterkante der stehenden Kopfleiste, im selben Moment endet das Pinnen, und die Bühne
        liegt genau hinter dem Team. Ohne Team (keine Section [data-about-team] direkt danach) gibt es keinen Übergang. */
+    // Leiste von Safari (iOS 26): Den Streifen hinter ihr färbt Safari nach dem obersten festen Inhalt am unteren Rand, auf der
+    // gepinnten Bühne ist das die weiße Etappe (der Grund der Bühne wirkt nicht, sie liegt darüber). Fährt das schwarze Team herein,
+    // bliebe dort Weiß. Solange es über der stehenden Bühne hochfährt, steht darum ein schwarzer Streifen am unteren Rand, ganz unter
+    // der Leiste (.about-story__edge, nur am Handy sichtbar). Nach dem Pinnen ist nichts mehr fest, Safari zeigt dann die Seite selbst.
+    // Im iOS-Simulator geprüft (30.10.): Mit dem Streifen wird es schwarz, ohne ihn wieder weiß, eingeklappt wie ausgeklappt.
+    var edge = null;
+    function setEdge(on) {
+      if (on === !!edge) return;
+      if (edge) { edge.remove(); edge = null; return; }
+      edge = document.createElement('div');
+      edge.className = 'about-story__edge';
+      edge.setAttribute('aria-hidden', 'true');
+      document.body.appendChild(edge);
+    }
+    var covered = function (self) { setEdge(self.progress > 0 && self.progress < 1); };
     var toTeam = null;
     if (team) {
       toTeam = gsap.timeline({
@@ -397,7 +412,9 @@
           start: function () { return pin.end - tail(); },
           end: function () { return pin.end; },
           scrub: true,
-          invalidateOnRefresh: true
+          invalidateOnRefresh: true,
+          onUpdate: covered,
+          onRefresh: covered
         }
       })
         .fromTo(section, { '--cover': 0 }, { '--cover': 0.75, ease: 'none' }, 0)
@@ -473,6 +490,7 @@
       if (section.__gallery) section.__gallery.finish();
       if (thumbs) thumbs.forEach(function (list) { list.forEach(function (b) { b.removeAttribute('tabindex'); }); });
       section.classList.remove('is-live');
+      setEdge(false);
       if (PS.headerHold) PS.headerHold(false);
       delete section.__story;
       fill.style.removeProperty('transform');

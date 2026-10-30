@@ -15,6 +15,13 @@
 /* Bühne: Fenster minus Kopfleiste, mindestens 520 px. Das Skript lässt das Pinnen mit derselben --header-h beginnen. Steht an html, weil
    about-team.css das Team um genau diese Höhe über die Bühne zieht (Übergang zum Team). */
 html:has(.about-story) { --stage-h: max(520px, calc(100svh - var(--header-h) - env(safe-area-inset-top, 0px))); }
+/* Am Handy steht der Balken oben unter der Kopfleiste, und unten läuft die weiße Etappe bis zum Bildrand. Safari am iPhone zeigt die
+   Seite auch hinter seiner Leiste. Am Fuß der Bühne stand der Balken je nach Leiste zu hoch über einem schwarzen Streifen oder
+   verschwand hinter ihr (Rückmeldung vom iPhone, 30.10.). Die Bühne reicht bis zur eingeklappten Leiste (100lvh), Foto und Text enden
+   über der ausgeklappten (100svh, Innenabstand der Etappe), hinter der Leiste liegt der weiße Abstandshalter (Handy, unten). */
+@media (max-width: 899.98px) {
+  html:has(.about-story) { --stage-h: max(520px, calc(100lvh - var(--header-h) - env(safe-area-inset-top, 0px))); }
+}
 
 .about-story {
   /* Balken: Link plus Rand oben und unten. Vor dem Skript halten die Etappen genau so viel Platz frei. */
@@ -40,8 +47,10 @@ html:has(.about-story) { --stage-h: max(520px, calc(100svh - var(--header-h) - e
   min-width: 0;
   padding: clamp(28px, 4.5vw, 72px) max(var(--gutter), calc((100vw - var(--container)) / 2 + var(--gutter))) clamp(28px, 4.5vw, 72px) clamp(28px, 4.5vw, 80px);
 }
-.leaf__year { font: 800 clamp(88px, 11vw, 210px)/.8 var(--f-head); letter-spacing: -.01em; color: var(--c-black); }
-.leaf__year span { color: var(--c-orange-on-light); }
+/* Versalien wie die Jahre im Balken („HEUTE.“). Der Punkt ist Schmuck in voller Größe, darum das Akzent-Orange und nicht das dunklere
+   für kleine Schrift auf Weiß (--c-orange-on-light). */
+.leaf__year { font: 800 clamp(88px, 11vw, 210px)/.8 var(--f-head); letter-spacing: -.01em; text-transform: uppercase; color: var(--c-black); }
+.leaf__year span { color: var(--c-orange); }
 .leaf__text { margin-top: auto; }
 .leaf h3 { max-width: 15ch; font-size: clamp(32px, 3.4vw, 58px); font-weight: 800; line-height: .92; }
 .leaf__text p { margin-top: 16px; max-width: 42ch; font-size: clamp(16px, 1.25vw, 19px); line-height: 1.6; color: var(--c-text-soft); }
@@ -116,6 +125,14 @@ html:has(.about-story) { --stage-h: max(520px, calc(100svh - var(--header-h) - e
      dort rest). Gilt schon vor dem Skript, damit beim Start nichts springt, und auch mit is-live. */
   .has-motion .section-about-head + .shopify-section .about-story--stage:not(.is-static) { margin-top: calc(-1 * var(--about-head-h, 0px)); }
 }
+/* Am Handy steht der Balken auf der Bühne oben (unten, Handy): Platz oben freihalten, unten derselbe Innenabstand wie auf der Bühne */
+@media (prefers-reduced-motion: no-preference) and (min-height: 600px) and (max-width: 899.98px) {
+  .has-motion .about-story--stage:not(.is-live):not(.is-static) .leaf:first-child {
+    margin-top: var(--rail-h);
+    margin-bottom: 0;
+    padding-bottom: calc(100lvh - 100svh);
+  }
+}
 
 /* ---------------- Live: Bühne steht, die Etappen liegen übereinander ----------------
    z-index 0: Die Bühne ist immer eine eigene Ebene, auch wenn sie nicht gepinnt ist. So bleibt der Balken (z-index 5) in ihr, und das
@@ -156,6 +173,8 @@ html:has(.about-story) { --stage-h: max(520px, calc(100svh - var(--header-h) - e
 .about-story.is-live .leaf__media { min-height: 0; }
 /* Der Abstandshalter des Pinnens ist schwarz wie die Bühne: Während die Kopfleiste einfährt, blitzt über der Bühne nichts Weißes auf */
 .about-story .pin-spacer { background: var(--c-black); }
+/* Streifen für die Leiste von Safari im Übergang zum Team (about-story.js), zu sehen nur am Handy (unten) */
+.about-story__edge { display: none; }
 /* ScrollTrigger setzt die Scrollposition beim Neuberechnen selbst. Mit dem weichen Scrollen aus base.css glitte sie dorthin. Der Sprung
    über den Balken scrollt ausdrücklich weich (about-story.js). */
 html:has(.about-story.is-live) { scroll-behavior: auto; }
@@ -262,6 +281,20 @@ html:has(.about-story.is-live) { scroll-behavior: auto; }
   .leaf__thumbs { gap: 10px; margin-top: 12px; }
   .leaf__thumb { width: clamp(66px, min(21vw, 9.5vh), 90px); }
   .about-story.is-live .about-story__hint { display: none; }
+  /* Balken oben, die Bühne reicht bis 100lvh (oben). Der Innenabstand unten ist der Teil unter 100svh: Foto und Text haben dieselbe
+     Höhe wie mit 100svh und enden über der ausgeklappten Leiste, darunter bleibt es weiß. */
+  .about-story.is-live .about-story__rail { order: -1; }
+  .about-story.is-live .leaf { padding-bottom: calc(100lvh - 100svh); }
+  /* Die Fläche hinter seiner Leiste färbt Safari 26 nach dem festen Inhalt am unteren Rand, hier der gepinnten Bühne mit der Etappe
+     (im iOS-Simulator geprüft, 30.10.: Seiten- und Abstandshalter-Farbe wirkten dort nicht). Am Handy ist ihr Grund darum weiß wie die
+     Etappe, der Balken oben hat seinen eigenen schwarzen Grund. Der Abstandshalter des Pinnens ist ebenfalls weiß, falls ein Browser
+     dort die Seite zeigt. Oben deckt ihn die stehende Kopfleiste. Im Übergang zum Team übernimmt ein schwarzer Streifen (unten). */
+  .has-motion .about-story.is-live .about-story__stage { background: var(--c-white); } /* so spezifisch wie die Vorstufe (oben) */
+  .about-story .pin-spacer { background: var(--c-white); }
+  /* Fährt das Team über die stehende Bühne hoch, setzt about-story.js diesen Streifen in body ein: Safari nimmt dann seine Farbe für den
+     Streifen hinter der Leiste, wie das Team schwarz, statt der weißen Etappe. Er liegt ganz unter der Leiste (eingeklappt wie
+     ausgeklappt), voll breit und 12 px im Bild, wie im iOS-Simulator geprüft (30.10.). */
+  .about-story__edge { display: block; position: fixed; left: 0; right: 0; bottom: -8px; z-index: 1; height: 20px; background: var(--c-black); pointer-events: none; }
 }
 
 /* ---------------- Platz für die Vorschau bei wenig Höhe ----------------
@@ -293,3 +326,4 @@ html:has(.about-story.is-live) { scroll-behavior: auto; }
   .leaf--gallery .leaf__meta { display: flex; margin-top: 10px; }
   .leaf--gallery .leaf__thumbs { margin-top: 10px; }
 }
+

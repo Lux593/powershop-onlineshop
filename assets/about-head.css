@@ -16,8 +16,9 @@
    Saum (--about-head-skirt, am Handy): schwarzer Rand unter dem Text. Safari am iPhone zeigt die Seite auch hinter seiner Leiste unten,
    beim Laden 98 px unter der gemeldeten Fensterhöhe (100svh, gemessen am 30.10. im iOS-Simulator, iPhone 17 Pro). Dort lag sonst die
    Bühne frei, die hinter dem Kopf beginnt und um Ankündigung und Service-Navigation (93 px, unter 360 px Breite 109 px) über ihn
-   hinausragt: Man sah unten die weiße Etappe und den Balken. 120 px decken beides. Keine Einheit misst diesen Streifen, 100lvh reicht
-   nur 40 px weiter. */
+   hinausragt: Man sah unten die weiße Etappe und den Balken. 120 px decken den Streifen. Keine Einheit misst ihn, 100lvh reicht nur
+   40 px weiter. Am Handy reicht die Bühne bis 100lvh (about-story.css), am iPhone also 13 px über den Kopf hinaus, aber außerhalb des
+   Bildes. */
 html:has(.about-head) {
   --about-head-skirt: 0px;
   --about-head-h: calc(100svh - var(--announce-h, 0px) - var(--header-h) - env(safe-area-inset-top, 0px) + var(--about-head-skirt));
