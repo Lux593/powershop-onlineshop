@@ -1,0 +1,80 @@
+{% doc %}
+  Karte des Dreiländerecks mit dem Pin auf Burghölzle 15 (.visit__map): vorskaliertes WebP der OpenStreetMap, dazu Länder,
+  Dreiländereck, Pin mit Schild „Power Shop“ und Quellenangabe. Pin, Länder und Dreiländereck stehen in Prozent der Kartendatei,
+  die Kartenebene (.visit__layer) hält sie bei jedem Seitenverhältnis im Bild. Styles in assets/pages.css.
+  Ohne Angaben gibt das Snippet genau die Karte aus, die sections/visit.liquid (Service, Kontakt) zeigt. Die Einrückung der Zeilen
+  ist Teil davon: Ein Vergleich vor und nach einem Umbau (docs/qa/karte-ausschneiden.py) soll Zeichen für Zeichen gleich bleiben.
+
+  @param {string} [sizes] - sizes-Attribut des Kartenbilds. Der Standard passt zur Karte in sections/visit.liquid.
+  @param {boolean} [ring] - false lässt den auslaufenden Ring um den Pin weg. Standard true.
+  @param {boolean} [logo] - true setzt das H-D Bar & Shield (hd-bar-shield.png) vor „Power Shop“ ins Schild.
+  @param {string} [reveal] - data-reveal der ganzen Karte, Standard "clip" (die Karte blendet ein, dann landet der Pin, siehe pages.css).
+    Leer = die Karte steht da (Klasse is-in von Anfang an, damit pages.css Punkt und Schild nicht versteckt), und der Pin trägt
+    data-reveal und landet allein, sobald er ins Bild kommt (motion.js).
+  @param {object} [address_lines] - Liste (Array) der Adresszeilen unter „Power Shop“ im Schild (Über uns, am Handy). Ohne Angabe steht dort keine Adresse.
+
+  @example
+  {% render 'visit-map' %}
+
+  @example
+  {% render 'visit-map', sizes: '(min-width: 900px) 100vw, 230vw', ring: false, logo: true, reveal: '', address_lines: lines %}
+{% enddoc %}
+{%- liquid
+  assign map_sizes = sizes | default: '(min-width: 1280px) 1300px, (min-width: 640px) 100vw, 160vw'
+  assign show_ring = true
+  if ring == false
+    assign show_ring = false
+  endif
+  comment
+    Nicht übergeben heißt „clip“, übergeben und leer heißt „kein Einblenden der Karte“: default würde beides gleich behandeln.
+  endcomment
+  assign map_reveal = 'clip'
+  if reveal != nil
+    assign map_reveal = reveal
+  endif
+  assign has_address = false
+  if address_lines.size > 0
+    assign has_address = true
+  endif
+-%}
+        <div class="visit__map{% if map_reveal == blank %} is-in{% endif %}"{% if map_reveal != blank %} data-reveal="{{ map_reveal | escape }}"{% endif %}>
+          <div class="visit__frame">
+            <div class="visit__layer">
+              {%- render 'media',
+                asset: 'karte-dreilaendereck-1600.webp',
+                srcset: 'karte-dreilaendereck-800.webp 800w, karte-dreilaendereck-1200.webp 1200w, karte-dreilaendereck-1600.webp 1600w',
+                sizes: map_sizes,
+                width: 1600,
+                height: 1000,
+                alt: 'Karte des Dreiländerecks mit Weil am Rhein, Basel und Saint-Louis. Markiert ist der Power Shop in Weil am Rhein-Haltingen.',
+                class: 'visit__img'
+              -%}
+              <span class="visit__label visit__label--end" style="--x: 83.95%; --y: 15.98%" aria-hidden="true">Deutschland</span>
+              <span class="visit__label" style="--x: 44.12%; --y: 44.67%" aria-hidden="true">Frankreich</span>
+              <span class="visit__label visit__label--south" style="--x: 71.93%; --y: 92%" aria-hidden="true">Schweiz</span>
+              <span class="visit__mark" style="--x: 55.98%; --y: 67.47%" aria-hidden="true"><i></i>Dreiländereck</span>
+              <span class="visit__pin" style="--x: 66.51%; --y: 39.97%"{% if map_reveal == blank %} data-reveal{% endif %} aria-hidden="true">
+                {%- if show_ring -%}<i class="visit__ring"></i>{%- endif -%}
+                <i class="visit__dot"></i>
+                {%- if logo or has_address -%}
+                  <span class="visit__tag"><span class="visit__name">
+                    {%- if logo -%}<img class="visit__logo" src="{{ 'hd-bar-shield.png' | asset_url }}" width="190" height="154" alt="" loading="lazy">{%- endif -%}
+                    Power Shop</span>
+                    {%- if has_address -%}
+                      <span class="visit__addr">
+                        {%- assign sep = '' -%}
+                        {%- for line in address_lines -%}
+                          {%- assign item = line | strip | strip_newlines -%}
+                          {%- if item != blank -%}{{ sep }}{{ item | escape }}{%- assign sep = '<br>' -%}{%- endif -%}
+                        {%- endfor -%}
+                      </span>
+                    {%- endif -%}
+                  </span>
+                {%- else -%}
+                  <span class="visit__tag">Power Shop</span>
+                {%- endif -%}
+              </span>
+            </div>
+          </div>
+          <a class="visit__credit" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">Karte © OpenStreetMap-Mitwirkende<span class="sr-only"> (öffnet neues Fenster)</span></a>
+        </div>

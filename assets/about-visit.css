@@ -1,0 +1,104 @@
+/* ==========================================================================
+   Power Shop – „Komm vorbei“ der Über-uns-Seite (sections/about-visit.liquid). Lädt nur mit der Section.
+   Aufgebaut wie eine Etappe: links die dunkle OSM-Karte mit orangem Pin auf Burghölzle 15, rechts auf hellem Grund die große
+   Überschrift, unten Adresse, Route und Kontakt. Am Handy steht die Überschrift oben, darunter die Karte über die volle Breite,
+   dann Route, Kontakt und Lieferhinweis.
+   Die Karte kommt aus dem Snippet visit-map und trägt deren Klassen (.visit__*, Grundstile in pages.css). Hier stehen nur die
+   Abweichungen, alle unter .about-visit, damit die Karte auf der Service-Seite unverändert bleibt:
+   - Pin mittig im Rahmen (--ax: 50) statt bei 66,5 % bzw. 55 % (pages.css), die Höhe richtet sich nach der Spalte;
+   - weißes Schild mit Bar & Shield, am Handy mit Adresse;
+   - kein Ring, kein Einblenden der Karte: der Pin landet allein (data-reveal am Pin, motion.js).
+   Vorlage: entwuerfe/ueber-uns/h-vollbild.html (.visit*, .map*, .pin*), dort mit anderen Klassennamen (siehe kontext im Plan).
+   ========================================================================== */
+
+.about-visit { position: relative; display: grid; background: var(--c-white); color: var(--c-black); }
+
+/* ---------------- Karte: Abweichungen von pages.css ---------------- */
+/* Die Kartenebene verhält sich wie ein cover-Bild, der Pin sitzt immer waagrecht in der Mitte des Rahmens.
+   150cqw, damit rechts vom Pin nichts frei bleibt; 160cqh füllt die Höhe. Was im schmalen Rahmen keinen Platz hat, blenden die
+   @container-Regeln aus (Container ist .visit__frame, absolut über die ganze Karte gelegt, siehe pages.css). */
+.about-visit .visit__map { height: auto; }
+.about-visit .visit__layer { --ax: 50; --mw: max(150cqw, 160cqh); }
+.about-visit .visit__label { font: 700 clamp(11px, 1.05vw, 15px)/1 var(--f-head); letter-spacing: .3em; }
+.about-visit .visit__mark { font: 500 13px/1 var(--f-body); }
+@container (aspect-ratio < 0.85) { .about-visit .visit__label:not(.visit__label--end, .visit__label--south) { display: none; } }   /* Frankreich liegt weit links vom Pin */
+@container (aspect-ratio < 0.6) { .about-visit .visit__label--end { display: none; } }
+
+/* Schild: weiß, mit Bar & Shield. Die Adresse darin zeigt nur das Handy. */
+.about-visit .visit__tag { padding: 8px 12px 7px; background: var(--c-white); color: var(--c-black); font: 700 15px/1 var(--f-head); transition: none; }
+.about-visit .visit__name { display: flex; align-items: center; gap: 8px; }
+.about-visit .visit__logo { width: auto; max-width: none; height: 18px; }
+.about-visit .visit__addr { display: none; }
+
+/* Landen: motion.js setzt is-in am Pin, sobald er ins Bild kommt, und nur einmal. Ohne Bewegung (kein has-motion) steht er schon da.
+   motion.css lässt data-reveal="" von unten kommen (32 px), hier kommt der Pin von oben herunter. */
+@keyframes about-visit-land { from { opacity: 0; translate: 0 -18px; } }
+@media (prefers-reduced-motion: no-preference) {
+  .has-motion .about-visit .visit__pin:not(.is-in) { translate: 0 -18px; }
+  .has-motion .about-visit .visit__pin.is-in { animation: about-visit-land 800ms var(--ease-out) backwards; }
+}
+
+/* ---------------- Text ---------------- */
+.about-visit__body { display: flex; flex-direction: column; gap: var(--s-4); min-width: 0; }
+.about-visit__title { font-weight: 800; font-size: clamp(56px, 16vw, 76px); line-height: .84; letter-spacing: -.01em; }
+.about-visit__title span { color: var(--c-orange-on-light); }
+.about-visit__info { display: flex; flex-direction: column; gap: var(--s-3); }
+.about-visit__address { font-style: normal; }
+.about-visit__street { display: block; font: 800 clamp(28px, 2.4vw, 36px)/.95 var(--f-head); text-transform: uppercase; letter-spacing: .01em; }
+.about-visit__city { display: block; margin-top: 6px; font-size: 17px; color: var(--c-steel); }
+.about-visit__where { margin-top: 4px; font-size: 15px; color: var(--c-muted); }
+.about-visit__route { width: 100%; min-height: 54px; margin-top: var(--s-2); }
+/* Kontakt als Knöpfe wie in der Kontakt-Box im Shop: Anrufen in Orange, WhatsApp und E-Mail mit schwarzer Kontur */
+.about-visit__contact { display: grid; gap: 8px; margin-top: var(--s-3); }
+.about-visit__phone { display: none; font-family: var(--f-body); font-weight: 600; letter-spacing: 0; text-transform: none; }
+.about-visit__foot { max-width: 48ch; font-size: 15px; line-height: 1.55; color: var(--c-text-soft); }
+
+/* Von 640 bis 899 px stehen alle Knöpfe nebeneinander (so viele Spalten wie Kanäle gepflegt sind) */
+@media (min-width: 640px) and (max-width: 899.98px) {
+  .about-visit__contact { grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
+}
+
+@media (min-width: 900px) {
+  .about-visit { grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr); min-height: clamp(640px, 92vh, 860px); }
+  .about-visit__body { padding: clamp(28px, 4.5vw, 72px) max(var(--gutter), calc((100vw - var(--container)) / 2 + var(--gutter))) clamp(28px, 4.5vw, 72px) clamp(28px, 4.5vw, 80px); }
+  .about-visit__title { font-size: clamp(64px, 6.4vw, 112px); }
+  .about-visit__info { margin-top: auto; }
+  .about-visit__route { width: auto; align-self: flex-start; padding-inline: 28px; }
+  /* wie „Schreib uns“ im Shop: Anrufen mit Nummer über die ganze Breite, darunter WhatsApp und E-Mail nebeneinander */
+  .about-visit__contact { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .about-visit__contact > [data-cb="tel"] { grid-column: 1 / -1; }
+  .about-visit__phone { display: inline; }
+}
+
+/* ---------------- Handy ---------------- */
+@media (max-width: 899.98px) {
+  /* Überschrift, darunter die Karte über die ganze Breite (die Adresse steht auf dem Schild am Pin), dann Route, Kontakt und
+     Lieferhinweis. Text- und Info-Block lösen sich dafür auf (display: contents), ihre Teile ordnen sich direkt im Raster an. */
+  .about-visit {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "title" "map" "route" "contact" "foot";
+    gap: 16px;
+    padding-block: 28px var(--s-8);
+    padding-inline: var(--gutter);
+  }
+  .about-visit__body, .about-visit__info { display: contents; }
+  .about-visit__title { grid-area: title; margin-bottom: 8px; }
+  /* randlos bis an den Bildschirmrand; feste Höhe, denn nur mit min-height rechnet Chrome cqh in der Karte als 0 */
+  .about-visit .visit__map { grid-area: map; height: clamp(300px, 88vw, 560px); margin-inline: calc(-1 * var(--gutter)); }
+  /* am schmalen Handy näher heran, damit das Schild mit Adresse nicht auf „Dreiländereck“ sitzt; ab etwa 520 px reicht wieder 150cqw */
+  .about-visit .visit__layer { --mw: max(min(230cqw, 780px), 150cqw, 160cqh); }
+  /* Die Adresse steht am Handy auf dem Schild in der Karte; für Screenreader bleibt sie hier */
+  .about-visit__place { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .about-visit__route { grid-area: route; margin-top: 0; }
+  .about-visit__contact { grid-area: contact; margin-top: 8px; }
+  .about-visit__foot { grid-area: foot; }
+  /* Nur Deutschland und Dreiländereck beschriftet (Frankreich und Schweiz lägen am Rand), Schild mit Adresse unter dem Pin */
+  .about-visit .visit__label:not(.visit__label--end), .about-visit .visit__label--south { display: none; }
+  .about-visit .visit__label { font-size: 10px; letter-spacing: .2em; }
+  .about-visit .visit__mark { font-size: 12px; }
+  .about-visit .visit__tag { left: 0; top: 20px; translate: -50% 0; padding: 12px 16px; font-size: 18px; text-align: center; }
+  .about-visit .visit__name { justify-content: center; gap: 10px; }
+  .about-visit .visit__logo { height: 24px; }
+  .about-visit .visit__addr { display: block; margin-top: 6px; font: 500 14px/1.3 var(--f-body); letter-spacing: 0; text-transform: none; }
+  .about-visit .visit__credit { left: 8px; right: 8px; bottom: 0; font-size: 10px; line-height: 1.25; text-align: right; }
+}

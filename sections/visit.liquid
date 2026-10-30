@@ -1,9 +1,11 @@
 {%- comment -%}
   „Komm vorbei“: Standort mit Karte des Dreiländerecks, Adresse, „Route planen“, Öffnungszeiten und Kontakt-Box. Eine
-  Sektion für Service (#standort, „Standort & Kontakt“), Über uns und die Kontakt-Seite. Adresse, Kanäle und Öffnungszeiten
+  Sektion für Service (#standort, „Standort & Kontakt“) und die Kontakt-Seite; die Über-uns-Seite hat mit sections/about-visit.liquid
+  ihre eigene Fassung. Adresse, Kanäle und Öffnungszeiten
   kommen aus den Theme-Einstellungen (Händlerdaten). Ohne jede Angabe erscheint die Sektion im Shop nicht.
-  Die Karte ist ein vorskaliertes WebP der OpenStreetMap mit Pin auf Burghölzle 15 (assets/karte-dreilaendereck-*.webp).
-  Pin, Länder und Dreiländereck stehen in Prozent der Kartendatei; pages.css hält sie bei jedem Seitenverhältnis im Bild.
+  Die Karte ist ein vorskaliertes WebP der OpenStreetMap mit Pin auf Burghölzle 15 (assets/karte-dreilaendereck-*.webp) und
+  steht im Snippet visit-map, das auch die Über-uns-Seite nutzt (sections/about-visit.liquid). Pin, Länder und Dreiländereck
+  stehen in Prozent der Kartendatei; pages.css hält sie bei jedem Seitenverhältnis im Bild.
   „Route planen“ öffnet Google Maps in einem neuen Fenster, eingebettet wird nichts. Die Öffnungszeiten stehen hier, die
   Kontakt-Box zeigt sie darum nicht noch einmal (hours: false). Styles in assets/pages.css.
 {%- endcomment -%}
@@ -28,27 +30,7 @@
       <h2 class="visit__title" id="visit-title-{{ section.id }}">{{ section.settings.heading | escape }}</h2>
 
       {%- if section.settings.show_map -%}
-        <div class="visit__map" data-reveal="clip">
-          <div class="visit__frame">
-            <div class="visit__layer">
-              {%- render 'media',
-                asset: 'karte-dreilaendereck-1600.webp',
-                srcset: 'karte-dreilaendereck-800.webp 800w, karte-dreilaendereck-1200.webp 1200w, karte-dreilaendereck-1600.webp 1600w',
-                sizes: '(min-width: 1280px) 1300px, (min-width: 640px) 100vw, 160vw',
-                width: 1600,
-                height: 1000,
-                alt: 'Karte des Dreiländerecks mit Weil am Rhein, Basel und Saint-Louis. Markiert ist der Power Shop in Weil am Rhein-Haltingen.',
-                class: 'visit__img'
-              -%}
-              <span class="visit__label visit__label--end" style="--x: 83.95%; --y: 15.98%" aria-hidden="true">Deutschland</span>
-              <span class="visit__label" style="--x: 44.12%; --y: 44.67%" aria-hidden="true">Frankreich</span>
-              <span class="visit__label visit__label--south" style="--x: 71.93%; --y: 92%" aria-hidden="true">Schweiz</span>
-              <span class="visit__mark" style="--x: 55.98%; --y: 67.47%" aria-hidden="true"><i></i>Dreiländereck</span>
-              <span class="visit__pin" style="--x: 66.51%; --y: 39.97%" aria-hidden="true"><i class="visit__ring"></i><i class="visit__dot"></i><span class="visit__tag">Power Shop</span></span>
-            </div>
-          </div>
-          <a class="visit__credit" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">Karte © OpenStreetMap-Mitwirkende<span class="sr-only"> (öffnet neues Fenster)</span></a>
-        </div>
+        {%- render 'visit-map' -%}
       {%- endif -%}
 
       <div class="visit__info">

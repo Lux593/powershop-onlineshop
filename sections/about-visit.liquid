@@ -1,0 +1,108 @@
+{%- comment -%}
+  „Komm vorbei“ der Über-uns-Seite, aufgebaut wie eine Etappe: links die dunkle Karte des Dreiländerecks mit dem Pin (Snippet visit-map,
+  am Schild Bar & Shield, am Handy mit Adresse), rechts auf Weiß die große Überschrift, Adresse, „Route planen“, Anrufen, WhatsApp,
+  E-Mail und der Lieferhinweis. Der Pin landet einmal, wenn er ins Bild kommt (data-reveal am Pin, motion.js). Keine Kontakt-Box mit
+  Themen-Chips und kein „Schreib uns“: das hat der Nutzer am 27.10. abgelehnt.
+  Adresse, Route, Telefon, WhatsApp und E-Mail kommen aus den Theme-Einstellungen (Händlerdaten), nie aus dem Markup. Die Links setzen
+  snippets/contact-href und assets/contact.js (WhatsApp und E-Mail mit Gruß an den Laden, wie in der Kontakt-Box). „Route planen“
+  öffnet Google Maps in einem neuen Fenster wie in sections/visit.liquid, eingebettet wird nichts. Fehlt jede Angabe, erscheint die
+  Section im Shop nicht; im Theme-Editor steht ein Hinweis.
+  Sie steht nur auf der Vorlage page.ueber-uns (enabled_on: page); die Service-Seite zeigt weiter sections/visit.liquid.
+  Entwurf: entwuerfe/ueber-uns/design-ueber-uns-h.md, Abschnitt 4.5 (Vorlage h-vollbild.html, dort .visit* statt .about-visit*).
+{%- endcomment -%}
+{%- liquid
+  assign has_channel = false
+  if settings.phone != blank or settings.whatsapp != blank or settings.email != blank
+    assign has_channel = true
+  endif
+  assign has_data = request.design_mode
+  if settings.address != blank or has_channel
+    assign has_data = true
+  endif
+  assign title_id = 'about-visit-title-' | append: section.id
+  assign address_lines = settings.address | newline_to_br | split: '<br />'
+  assign route_query = settings.address | newline_to_br | replace: '<br />', ', ' | strip_newlines | strip | url_encode
+-%}
+{%- if has_data -%}
+{{ 'about-visit.css' | asset_url | stylesheet_tag }}
+
+<section class="about-visit" id="besuch" aria-labelledby="{{ title_id }}">
+  {%- render 'visit-map',
+    sizes: '(min-width: 900px) 100vw, 230vw',
+    ring: false,
+    logo: true,
+    reveal: '',
+    address_lines: address_lines
+  -%}
+
+  <div class="about-visit__body">
+    <h2 class="about-visit__title" id="{{ title_id }}">{{ section.settings.heading | default: 'Komm vorbei' | escape }}<span>.</span></h2>
+
+    <div class="about-visit__info">
+      {%- if settings.address != blank or section.settings.where != blank -%}
+        {%- comment -%} Am Handy steht die Adresse auf dem Schild am Pin; dieser Block ist dann nur für Screenreader da. {%- endcomment -%}
+        <div class="about-visit__place">
+          {%- if settings.address != blank -%}
+            <address class="about-visit__address">
+              {%- for line in address_lines -%}
+                {%- assign item = line | strip | strip_newlines -%}
+                {%- if item != blank -%}
+                  <span class="{% if forloop.first %}about-visit__street{% else %}about-visit__city{% endif %}">{{ item | escape }}</span>
+                {%- endif -%}
+              {%- endfor -%}
+            </address>
+          {%- endif -%}
+          {%- if section.settings.where != blank -%}<p class="about-visit__where">{{ section.settings.where | escape }}</p>{%- endif -%}
+        </div>
+      {%- endif -%}
+
+      {%- if settings.address != blank -%}
+        <a class="btn btn--primary about-visit__route" href="https://www.google.com/maps/dir/?api=1&amp;destination={{ route_query }}" target="_blank" rel="noopener">
+          {%- render 'icon', name: 'route' -%}Route planen<span class="sr-only"> (Google Maps, öffnet neues Fenster)</span>
+        </a>
+      {%- elsif request.design_mode -%}
+        <p class="small" role="note"><strong>Adresse fehlt.</strong> Trage sie unter „Theme-Einstellungen &gt; Händlerdaten“ ein.</p>
+      {%- endif -%}
+
+      {%- if has_channel -%}
+        <div class="about-visit__contact" data-contact data-topic-default="frage">
+          {%- if settings.phone != blank -%}
+            <a class="btn btn--primary" data-cb="tel" href="{% render 'contact-href', kind: 'tel' %}">
+              {%- render 'icon', name: 'phone' -%}<span>Anrufen</span><span class="about-visit__phone">· {{ settings.phone | escape }}</span>
+            </a>
+          {%- endif -%}
+          {%- if settings.whatsapp != blank -%}
+            <a class="btn btn--outline-dark" data-cb="wa" href="{% render 'contact-href', kind: 'wa' %}" target="_blank" rel="noopener">
+              {%- render 'icon', name: 'message-circle' -%}WhatsApp<span class="sr-only"> (öffnet neues Fenster)</span>
+            </a>
+          {%- endif -%}
+          {%- if settings.email != blank -%}
+            <a class="btn btn--outline-dark" data-cb="mail" href="{% render 'contact-href', kind: 'mail' %}">
+              {%- render 'icon', name: 'mail' -%}E-Mail
+            </a>
+          {%- endif -%}
+        </div>
+      {%- elsif request.design_mode -%}
+        <p class="small" role="note"><strong>Händlerdaten fehlen.</strong> Trage Telefon, WhatsApp oder E-Mail unter „Theme-Einstellungen &gt; Händlerdaten“ ein.</p>
+      {%- endif -%}
+
+      {%- if section.settings.foot != blank -%}<p class="about-visit__foot">{{ section.settings.foot }}</p>{%- endif -%}
+    </div>
+  </div>
+</section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Komm vorbei",
+  "class": "section-about-visit",
+  "settings": [
+    { "type": "paragraph", "content": "Karte, Adresse, Route, Telefon, WhatsApp und E-Mail kommen aus den Theme-Einstellungen unter „Händlerdaten“." },
+    { "type": "text", "id": "heading", "label": "Überschrift", "default": "Komm vorbei", "info": "Der orange Punkt kommt von selbst dahinter." },
+    { "type": "text", "id": "where", "label": "Satz zum Ort", "default": "Im Stadtteil Haltingen, mitten im Dreiländereck.", "info": "Steht unter der Adresse." },
+    { "type": "inline_richtext", "id": "foot", "label": "Lieferhinweis", "default": "Zu weit für einen Besuch? Wir liefern Motorräder auf Wunsch in ganz Deutschland, in die Schweiz und nach Frankreich und übernehmen Export und Verzollung." }
+  ],
+  "enabled_on": { "templates": ["page"] },
+  "presets": [{ "name": "Komm vorbei" }]
+}
+{% endschema %}

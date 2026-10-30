@@ -730,4 +730,154 @@
     if (!card || getComputedStyle(card).visibility !== 'visible') f.push('Die Karte der Person ist nicht sichtbar');
     return f;
   }), function () { var t = teamEl(); return t && t.querySelectorAll('.spot__card').length === 1 ? '' : 'nur mit einer Person in der Vorlage'; });
+
+  // ---- Task 7: Komm vorbei ----
+  // Vergleich der Karte (Bash, kein Browser), damit der Umbau von sections/visit.liquid nichts ändert:
+  //   curl -s http://127.0.0.1:9293/pages/service | python3 -I docs/qa/karte-ausschneiden.py > "$Q/karte-nachher.html"
+  //   diff "$Q/karte-vorher.html" "$Q/karte-nachher.html"     (keine Ausgabe heißt gleich)
+  var visitEl = function () { return document.querySelector('.about-visit'); };
+  var V = function (fn) { return function () { var v = visitEl(); return v ? fn(v) : ['.about-visit fehlt']; }; };
+  var vq = function (v, sel) { return v.querySelector(sel); };
+  // Telefon, WhatsApp, E-Mail aus den Händlerdaten wie snippets/contact-href sie bereinigt
+  var shop = function () { return (window.PS && PS.shop) || {}; };
+  var telOf = function (x) { return 'tel:' + String(x || '').replace(/[ \-()\/.]/g, ''); };
+  var waOf = function (x) { return 'https://wa.me/' + encodeURIComponent(String(x || '').replace(/[ +\-()\/.]/g, '')); };
+  var mailOf = function (x) { return 'mailto:' + String(x || '').replace(/\s/g, ''); };
+
+  UU.add('visit:about', V(function (v) {
+    var f = [], map = vq(v, '.visit__map'), body = vq(v, '.about-visit__body'), route = vq(v, '.about-visit__route');
+    var tel = vq(v, '[data-cb="tel"]'), wa = vq(v, '[data-cb="wa"]'), mail = vq(v, '[data-cb="mail"]'), box = vq(v, '.about-visit__contact');
+    if (!map || !body || !route || !tel || !wa || !mail || !box) return ['Teile fehlen: ' + [!map && '.visit__map', !body && '.about-visit__body', !route && '.about-visit__route', !tel && 'Anrufen', !wa && 'WhatsApp', !mail && 'E-Mail', !box && '.about-visit__contact'].filter(Boolean).join(', ')];
+    var has = function (e, c) { return e.classList.contains(c); };
+    if (!has(route, 'btn--primary')) f.push('„Route planen“ ist nicht btn--primary');
+    if (!has(tel, 'btn--primary')) f.push('„Anrufen“ ist nicht btn--primary');
+    if (!has(wa, 'btn--outline-dark')) f.push('WhatsApp ist nicht btn--outline-dark');
+    if (!has(mail, 'btn--outline-dark')) f.push('E-Mail ist nicht btn--outline-dark');
+    if (squish(route.textContent).indexOf('Route planen') !== 0) f.push('Routenknopf heißt „' + squish(route.textContent) + '“');
+    if (squish(wa.textContent).indexOf('WhatsApp') !== 0) f.push('WhatsApp-Knopf heißt „' + squish(wa.textContent) + '“');
+    if (squish(mail.textContent) !== 'E-Mail') f.push('E-Mail-Knopf heißt „' + squish(mail.textContent) + '“');
+    var phone = String(shop().phone || '');
+    if (!phone) f.push('PS.shop.phone ist leer, die Nummer lässt sich nicht prüfen');
+    else if (squish(tel.textContent).indexOf(squish(phone)) < 0) f.push('„Anrufen“ enthält nicht die Nummer „' + phone + '“: „' + squish(tel.textContent) + '“');
+    // nicht gewollt: Ring, Einblenden der ganzen Karte, Kontakt-Box mit Themen
+    if (v.querySelector('.visit__ring')) f.push('.visit__ring vorhanden');
+    if (map.hasAttribute('data-reveal')) f.push('Karte hat data-reveal');
+    if (v.querySelector('.contact-box, .contact-box__topics, [data-topic], .chip')) f.push('Kontakt-Box oder Themen-Chips vorhanden');
+    if (/schreib uns/i.test(v.textContent)) f.push('„Schreib uns“ im Text');
+    var w = cw(), mr = map.getBoundingClientRect(), br = body.getBoundingClientRect(), tr = tel.getBoundingClientRect(), ar = box.getBoundingClientRect();
+    var n = rows(box.children);
+    if (w >= 900) {
+      if (mr.right > br.left + 1) f.push('Karte (bis ' + mr.right.toFixed(1) + ') und Text (ab ' + br.left.toFixed(1) + ') überlappen');
+      if (mr.left > 1) f.push('Karte beginnt bei ' + mr.left.toFixed(1) + ' px, nicht am linken Rand');
+      if (!near(tr.width, ar.width, 1)) f.push('„Anrufen“ ist ' + tr.width.toFixed(1) + ' px breit, die Knopfreihe ' + ar.width.toFixed(1));
+      if (n !== 2) f.push(n + ' Reihen Knöpfe statt 2 (Anrufen, darunter WhatsApp und E-Mail)');
+      else if (!near(wa.getBoundingClientRect().top, mail.getBoundingClientRect().top, 1)) f.push('WhatsApp und E-Mail stehen nicht nebeneinander');
+      if (!shown(vq(v, '.about-visit__phone'))) f.push('Nummer neben „Anrufen“ ab 900 px nicht sichtbar');
+      if (rect(route).left < br.left - 1) f.push('Routenknopf links vom Textblock');
+    } else if (w >= 640) {
+      if (n !== 1) f.push(n + ' Reihen Knöpfe statt 1 (Anrufen, WhatsApp und E-Mail in einer Reihe)');
+    } else if (n !== 3) {
+      f.push(n + ' Reihen Knöpfe statt 3 (untereinander)');
+    }
+    if (w < 900 && shown(vq(v, '.about-visit__phone'))) f.push('Nummer neben „Anrufen“ unter 900 px sichtbar');
+    return f;
+  }));
+
+  UU.add('visit:mobile', V(function (v) {
+    var f = [], map = vq(v, '.visit__map'), pin = vq(v, '.visit__pin'), tag = vq(v, '.visit__tag');
+    if (!map || !pin || !tag) return ['Karte, Pin oder Schild fehlt'];
+    var mr = map.getBoundingClientRect(), pr = pin.getBoundingClientRect(), w = cw();
+    if (!near(mr.width, w, 1) || mr.left > 1) f.push('Karte ' + mr.width.toFixed(1) + ' px breit ab ' + mr.left.toFixed(1) + ', nicht über die volle Breite (' + w + ')');
+    var soll = Math.min(560, Math.max(300, .88 * w));
+    if (!near(mr.height, soll, 1)) f.push('Karte ' + mr.height.toFixed(1) + ' px hoch statt ' + soll.toFixed(1));
+    var label = function (name) {
+      return Array.prototype.filter.call(v.querySelectorAll('.visit__label'), function (l) { return squish(l.textContent) === name; })[0];
+    };
+    ['Frankreich', 'Schweiz'].forEach(function (name) {
+      var l = label(name);
+      if (!l) f.push('Beschriftung „' + name + '“ fehlt im Markup');
+      else if (getComputedStyle(l).display !== 'none') f.push('„' + name + '“ ist nicht ausgeblendet');
+    });
+    var de = label('Deutschland');
+    if (!de || !shown(de)) f.push('„Deutschland“ nicht sichtbar');
+    var sizes = Array.prototype.filter.call(v.querySelectorAll('.visit__label'), shown).map(function (l) { return px(l, 'fontSize'); });
+    sizes.forEach(function (sz) { if (sz !== 10) f.push('Kartenschrift ' + sz + ' px statt 10'); });
+    var lines = Array.prototype.map.call(v.querySelectorAll('.about-visit__address > span'), function (s) { return squish(s.textContent); });
+    var addr = vq(tag, '.visit__addr'), text = squish(tag.textContent);
+    if (!lines.length) f.push('Adresse im Textblock fehlt');
+    if (!addr || !shown(addr)) f.push('Adresse im Schild nicht sichtbar');
+    lines.forEach(function (l) { if (text.indexOf(l) < 0) f.push('Schild enthält nicht „' + l + '“: „' + text + '“'); });
+    if (text.indexOf('Power Shop') < 0) f.push('Schild ohne „Power Shop“');
+    var logo = vq(tag, 'img.visit__logo');
+    if (!logo || !/hd-bar-shield/.test(logo.src)) f.push('Bar & Shield fehlt im Schild');
+    var cx = mr.left + mr.width / 2;
+    if (Math.abs(pr.left - cx) > 2) f.push('Pin bei x = ' + pr.left.toFixed(1) + ', Mitte der Karte ' + cx.toFixed(1));
+    // Der Textblock ist nur noch für Screenreader da, die Reihenfolge ist Überschrift, Karte, Route, Kontakt, Lieferhinweis
+    var place = vq(v, '.about-visit__place');
+    if (place && shown(place) && place.getBoundingClientRect().width > 2) f.push('Adressblock ist neben dem Schild noch sichtbar');
+    var tops = ['.about-visit__title', '.visit__map', '.about-visit__route', '.about-visit__contact', '.about-visit__foot'].map(function (sel) {
+      var e = vq(v, sel); return e ? e.getBoundingClientRect().top : NaN;
+    });
+    for (var i = 1; i < tops.length; i++) if (!(tops[i] >= tops[i - 1])) f.push('Reihenfolge am Handy: Teil ' + (i + 1) + ' steht über Teil ' + i);
+    return f;
+  }), hand);
+
+  UU.add('visit:land', V(async function (v) {
+    var f = [], pin = vq(v, '.visit__pin'), map = vq(v, '.visit__map');
+    if (!pin || !map) return ['Pin oder Karte fehlt'];
+    if (!pin.hasAttribute('data-reveal')) f.push('Pin hat kein data-reveal');
+    var fresh = !pin.classList.contains('is-in');
+    // Vorher: versetzt und unsichtbar (bei schon gelandetem Pin die Klasse kurz abnehmen und zurücksetzen)
+    if (!fresh) pin.classList.remove('is-in');
+    var cs = getComputedStyle(pin), op = cs.opacity, tr = cs.translate;
+    if (op !== '0') f.push('Pin vor dem Einblenden hat opacity ' + op + ' statt 0');
+    if (!tr || tr === 'none' || /^0(px)? 0(px)?$/.test(tr)) f.push('Pin vor dem Einblenden ist nicht versetzt (translate ' + tr + ')');
+    if (!fresh) { pin.classList.add('is-in'); await wait(1000); }
+    // Landen: genau eine Animation, auch wenn man weg- und zurückscrollt
+    var starts = 0, on = function (e) { if (e.target === pin) starts++; };
+    pin.addEventListener('animationstart', on);
+    try {
+      var top = function () { return pin.getBoundingClientRect().top + window.scrollY - innerHeight * .5; };
+      await go(top()); await wait(1300);
+      if (!pin.classList.contains('is-in')) f.push('Pin hat nach dem Hinscrollen kein is-in');
+      cs = getComputedStyle(pin);
+      if (cs.opacity !== '1') f.push('Pin nach dem Landen hat opacity ' + cs.opacity);
+      if (cs.translate !== 'none') f.push('Pin nach dem Landen ist noch versetzt (translate ' + cs.translate + ')');
+      var mr = map.getBoundingClientRect(), pr = pin.getBoundingClientRect();
+      if (Math.abs(pr.left - (mr.left + mr.width / 2)) > 2) f.push('Pin steht bei x = ' + pr.left.toFixed(1) + ' statt ' + (mr.left + mr.width / 2).toFixed(1));
+      if (Math.abs(pr.top - (mr.top + .3997 * mr.height)) > 2) f.push('Pin steht bei y = ' + pr.top.toFixed(1) + ' statt ' + (mr.top + .3997 * mr.height).toFixed(1));
+      await go(0); await wait(400);
+      await go(top()); await wait(1300);
+      var soll = fresh ? 1 : 0;
+      if (starts !== soll) f.push(starts + ' Landeanimationen statt ' + soll + (fresh ? '' : ' (der Pin war schon gelandet)'));
+      if (getComputedStyle(pin).opacity !== '1') f.push('Pin ist nach dem Zurückscrollen nicht sichtbar');
+    } finally {
+      pin.removeEventListener('animationstart', on);
+      await go(0);
+    }
+    return f;
+  }), motion);
+
+  UU.add('visit:data', V(function (v) {
+    var f = [], s = shop();
+    var tel = vq(v, '[data-cb="tel"]'), wa = vq(v, '[data-cb="wa"]'), mail = vq(v, '[data-cb="mail"]'), route = vq(v, '.about-visit__route');
+    var is = function (name, actual, soll) { if (actual !== soll) f.push(name + ': „' + actual + '“ statt „' + soll + '“'); };
+    if (!tel || !wa || !mail || !route) return ['Anrufen, WhatsApp, E-Mail oder Route fehlt'];
+    // contact-href gibt vor und nach der Adresse einen Zeilenumbruch aus (wie in der Kontakt-Box), ein Browser ignoriert ihn im href
+    is('Anrufen', String(tel.getAttribute('href')).trim(), telOf(s.phone));
+    // WhatsApp: contact.js hängt ?text=… an (assets/contact.js:38), davor steht die Adresse aus contact-href
+    var w = String(wa.getAttribute('href') || '').trim();
+    is('WhatsApp (vor ?text=)', w.split('?')[0], waOf(s.whatsapp));
+    if (w.indexOf('?text=') < 0) f.push('WhatsApp-Link ohne ?text= (contact.js hat ihn nicht gesetzt): „' + w + '“');
+    var m = String(mail.getAttribute('href') || '').trim();
+    is('E-Mail (vor ?subject=)', m.split('?')[0], mailOf(s.email));
+    if (m.indexOf('?subject=') < 0) f.push('E-Mail-Link ohne ?subject= (contact.js hat ihn nicht gesetzt): „' + m + '“');
+    var u = new URL(route.href), lines = Array.prototype.map.call(v.querySelectorAll('.about-visit__address > span'), function (e) { return squish(e.textContent); });
+    is('Route (Ziel)', u.searchParams.get('destination'), lines.join(', '));
+    if (u.origin + u.pathname !== 'https://www.google.com/maps/dir/') f.push('Route führt nach ' + u.origin + u.pathname);
+    if (u.searchParams.get('api') !== '1') f.push('Route ohne api=1');
+    if (route.target !== '_blank' || !/noopener/.test(route.rel)) f.push('Route öffnet nicht mit target=_blank und rel=noopener');
+    if (wa.target !== '_blank' || !/noopener/.test(wa.rel)) f.push('WhatsApp öffnet nicht mit target=_blank und rel=noopener');
+    return f;
+  }));
 })();
