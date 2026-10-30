@@ -143,7 +143,8 @@
       Skripte: Die Reihenfolge ist die Ausführungsreihenfolge (defer). Erst der Kern theme.js (PS.on), dann die Bibliotheken,
       dann motion.js vor header.js, weil PS.on dort sofort startet.
       GSAP und ScrollTrigger laden nur mit Setting „Animationen aktivieren“, nicht im Theme-Editor und nur auf der
-      Startseite: nur dort gibt es Scrub und Parallax (hero.js, home.js, data-parallax). Ohne sie läuft motion.js im Fallback.
+      Startseite und auf Über uns (Seitenvorlage mit Suffix ueber-uns): nur dort gibt es Scrub, Pinnen und Parallax (hero.js, home.js,
+      data-parallax, die Skripte der Über-uns-Sections). Ohne sie läuft motion.js im Fallback.
       Lenis (Setting „Weiches Scrollen“, nur index/collection/product) lädt das Head-Skript nach, nur für Maus und Trackpad
       (siehe oben); auf Kollektion und Produkt treibt es sich selbst per requestAnimationFrame, ohne GSAP.
       Restkosten (clientseitig erkennbar, serverseitig nicht): Nutzer mit prefers-reduced-motion oder saveData laden die
@@ -158,9 +159,11 @@
     {%- endcomment -%}
     <script src="{{ 'theme.js' | asset_url }}" defer></script>
     {%- unless request.design_mode -%}
-      {%- if settings.motion_enabled and template.name == 'index' -%}
-        <script src="{{ 'gsap.min.js' | asset_url }}" defer></script>
-        <script src="{{ 'ScrollTrigger.min.js' | asset_url }}" defer></script>
+      {%- if settings.motion_enabled -%}
+        {%- if template.name == 'index' or template.suffix == 'ueber-uns' -%}
+          <script src="{{ 'gsap.min.js' | asset_url }}" defer></script>
+          <script src="{{ 'ScrollTrigger.min.js' | asset_url }}" defer></script>
+        {%- endif -%}
       {%- endif -%}
     {%- endunless -%}
     <script src="{{ 'motion.js' | asset_url }}" defer onerror="document.documentElement.classList.remove('has-motion', 'has-smooth')"></script>

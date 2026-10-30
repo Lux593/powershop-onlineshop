@@ -119,4 +119,36 @@
 
   // ---------------- Prüfungen ----------------
   // Die Prüfungen der einzelnen Tasks kommen hierher: UU.add('bereich.was', function () { … return fehlertexte; }, wann?)
+
+  var motion = function () { return document.documentElement.classList.contains('has-motion') ? '' : 'nur mit has-motion'; };
+
+  // ---- Task 1: Grundlagen (Tokens, GSAP auf der Seite, Kopfleiste festhalten) ----
+  UU.add('base:gsap', function () {
+    return document.documentElement.classList.contains('has-motion') && !(window.gsap && PS.motion.scroll) ? ['GSAP fehlt auf Über uns'] : [];
+  });
+  UU.add('base:tokens', function () {
+    return ['--c-orange-on-light', '--c-hd-orange', '--photo-grade']
+      .filter(function (t) { return !getComputedStyle(document.documentElement).getPropertyValue(t).trim(); })
+      .map(function (t) { return 'Token fehlt: ' + t; });
+  });
+  // Die Seite ist am Anfang kürzer als der Bildschirm: die Prüfung macht sie kurz länger.
+  UU.add('base:hold', async function () {
+    if (typeof PS.headerHold !== 'function') return ['PS.headerHold fehlt'];
+    var wrap = document.querySelector('.site-header-wrap'), away = function () { return wrap.classList.contains('is-away'); }, f = [];
+    var pad = document.body.appendChild(Object.assign(document.createElement('div'), { style: 'height:4000px' }));
+    try {
+      await go(0); await go(1200); await go(1600);
+      if (!away()) f.push('Vorbedingung: Kopfleiste fährt beim Runterscrollen nicht weg');
+      PS.headerHold(true); await wait(400);
+      if (away()) f.push('Kopfleiste fährt bei Hold nicht ein');
+      await go(2200); await go(2800);
+      if (away()) f.push('Kopfleiste fährt trotz Hold weg');
+      PS.headerHold(false); await go(3400);
+      if (!away()) f.push('Kopfleiste fährt nach Hold nicht mehr weg');
+    } finally {
+      PS.headerHold(false); pad.remove(); await go(0);
+    }
+    return f;
+  }, motion);
+
 })();

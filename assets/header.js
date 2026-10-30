@@ -103,12 +103,16 @@
        is-solid: Header schwarz statt transparent über dem Hero (ab 40 px Scroll, bei offenem Menü); ob der Hero darunter liegt,
        entscheidet header.css. is-away: ab 400 px Tiefe beim Runterscrollen weggeschoben, --header-shown (1/0) lenkt die
        Sticky-Offsets. Nie bei Menü, Dialog oder Fokus im Header (WCAG 2.4.11), nicht während Tab-Sprung oder Anker scrollen
-       (der einfahrende Header verdeckte das Ziel). Ausblenden nur mit html.has-motion. */
+       (der einfahrende Header verdeckte das Ziel). Ausblenden nur mit html.has-motion. PS.headerHold(true) hält ihn eingefahren
+       (Über uns: solange die Bühne gepinnt ist). */
     var wrap = header.closest('.site-header-wrap') || header;
     var over = document.body.hasAttribute('data-header-overlay');
-    var shown = true, lastY = window.scrollY, quiet = 0, queued = false, accountOpen = false;
+    var shown = true, lastY = window.scrollY, quiet = 0, held = false, queued = false, accountOpen = false;
     // Gezieltes Scrollen aus anderen Modulen (z. B. Umbau-Buch am Handy): Header bleibt für ms so, wie er gerade ist
     PS.headerQuiet = function (ms) { quiet = Math.max(quiet, Date.now() + (ms || 1600)); };
+    // Festhalten (Über uns, solange die Bühne gepinnt ist): mit true fährt der Header ein und bleibt auch beim Runterscrollen, mit false
+    // gilt wieder das normale Verhalten. Kein Zähler: Das letzte Wort gilt, mehrfaches true ändert nichts.
+    PS.headerHold = function (on) { held = !!on; queue(); };
 
     function show(on) {
       if (on === shown) return;
@@ -121,7 +125,7 @@
       var y = window.scrollY, d = y - lastY;
       var menu = accountOpen || !!header.querySelector('.mainnav__item.is-open');
       header.classList.toggle('is-solid', over && (y >= 40 || menu));
-      if (!html.classList.contains('has-motion') || y < 400 || menu || document.body.classList.contains('is-locked') ||
+      if (!html.classList.contains('has-motion') || y < 400 || menu || held || document.body.classList.contains('is-locked') ||
           header.contains(document.activeElement)) {
         lastY = y;
         show(true);

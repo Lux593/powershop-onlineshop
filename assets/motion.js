@@ -1,7 +1,7 @@
 /* ==========================================================================
    Power Shop – Motion-Schicht: Reveals, Wort-Splitter, Count-up, Parallax, Smooth-Scroll.
-   Lädt auf allen Templates (defer, nach theme.js, vor header.js). GSAP und ScrollTrigger kommen nur auf der Startseite
-   dazu (nur dort gibt es Scrub und Parallax), nur mit Setting und nie im Theme-Editor. Lenis (weiches Scrollen) lädt
+   Lädt auf allen Templates (defer, nach theme.js, vor header.js). GSAP und ScrollTrigger kommen nur auf der Startseite und auf
+   Über uns dazu (nur dort gibt es Scrub, Pinnen und Parallax), nur mit Setting und nie im Theme-Editor. Lenis (weiches Scrollen) lädt
    nach, nur auf index, collection und product und nur für Maus und Trackpad. Ohne sie läuft die Schicht im
    Fallback (Reveals per IntersectionObserver, Count-up, Splitter).
 
@@ -99,7 +99,7 @@
   function onRm(e) { if (e.matches) teardown(); }
   if (rm.addEventListener) rm.addEventListener('change', onRm); else if (rm.addListener) rm.addListener(onRm);
 
-  /* ---------------- GSAP + ScrollTrigger (optional, nur Startseite) ---------------- */
+  /* ---------------- GSAP + ScrollTrigger (optional, nur Startseite und Über uns) ---------------- */
   try {
     if (window.gsap && window.ScrollTrigger) {
       window.gsap.registerPlugin(window.ScrollTrigger);

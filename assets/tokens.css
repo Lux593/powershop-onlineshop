@@ -21,6 +21,8 @@
      Orange-Flächen immer mit schwarzer Schrift; Orange als Textfarbe nur auf dunklem Grund. */
   --c-orange: #f26722;
   --c-orange-dark: #d9571a;
+  --c-orange-on-light: #a8430f; /* Orange als Textfarbe auf hellem Grund (Über uns: Etappen). Kontrast 6,0 : 1 auf Weiß (Grund der Etappen), 5,5 : 1 auf Offwhite, 5,1 : 1 auf Stone */
+  --c-hd-orange: #f3692b;       /* Farbe der Datei hd-bar-shield (H-D Bar & Shield): nur für das Logo, nie für Text oder Flächen (--c-orange bleibt der Akzent) */
   --c-stock-order: #b26a00;  /* „Auf Bestellung“ */
   --c-mark: #ffe1cf;         /* Trefferfarbe in der Suche */
 
@@ -94,6 +96,8 @@
   --t-fast: 160ms;
   --t-med: 320ms;
   --t-slow: 700ms;
+  /* Ein Farblook für Fotos, die zusammen stehen sollen (Über uns: Etappen und Team): etwas entsättigt, mehr Kontrast, leicht abgedunkelt */
+  --photo-grade: saturate(.8) contrast(1.07) brightness(.97);
 
   /* Raue Akzente: Körnung als Overlay für dunkle Sektionen.
      Der Alphakanal lässt nur die hellen Spitzen des Rauschens stehen (Schwelle 0,6). So liest sie sich
