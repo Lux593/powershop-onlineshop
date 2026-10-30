@@ -136,20 +136,24 @@
       .filter(function (t) { return !getComputedStyle(document.documentElement).getPropertyValue(t).trim(); })
       .map(function (t) { return 'Token fehlt: ' + t; });
   });
-  // Die Seite ist am Anfang kürzer als der Bildschirm: die Prüfung macht sie kurz länger.
+  // Ein Abstandshalter am Seitenende gibt Platz zum Scrollen. Geprüft wird unterhalb jedes Halte-Bereichs: Die Bühne hält die Kopfleiste
+  // selbst (guard, bis zum Ende des Übergangs zum Team), dort sagte die Prüfung nichts über headerHold. Ohne Bühne ab 0.
+  // headerHold zählt nicht mit: Nach zweimal true reicht einmal false, danach fährt die Kopfleiste wieder weg.
   UU.add('base:hold', async function () {
     if (typeof PS.headerHold !== 'function') return ['PS.headerHold fehlt'];
     var wrap = document.querySelector('.site-header-wrap'), away = function () { return wrap.classList.contains('is-away'); }, f = [];
-    var pad = document.body.appendChild(Object.assign(document.createElement('div'), { style: 'height:4000px' }));
+    var s = story(), y = s && s.guard ? Math.ceil(s.guard.end) + 200 : 0;
+    var pad = document.body.appendChild(Object.assign(document.createElement('div'), { style: 'height:' + (y + 4000) + 'px' }));
     try {
-      await go(0); await go(1200); await go(1600);
-      if (!away()) f.push('Vorbedingung: Kopfleiste fährt beim Runterscrollen nicht weg');
+      await go(y); await go(y + 1200); await go(y + 1600);
+      if (!away()) f.push('Vorbedingung: Kopfleiste fährt bei ' + (y + 1600) + ' px beim Runterscrollen nicht weg');
       PS.headerHold(true); await wait(400);
       if (away()) f.push('Kopfleiste fährt bei Hold nicht ein');
-      await go(2200); await go(2800);
+      PS.headerHold(true);
+      await go(y + 2200); await go(y + 2800);
       if (away()) f.push('Kopfleiste fährt trotz Hold weg');
-      PS.headerHold(false); await go(3400);
-      if (!away()) f.push('Kopfleiste fährt nach Hold nicht mehr weg');
+      PS.headerHold(false); await go(y + 3400);
+      if (!away()) f.push('Kopfleiste fährt nach zweimal true und einmal false nicht wieder weg');
     } finally {
       PS.headerHold(false); pad.remove(); await go(0);
     }
@@ -360,14 +364,23 @@
     return near(p, k / last, .005) ? [] : ['Fortschritt steht nach 2,5 s bei ' + p.toFixed(4) + ', kein Vielfaches von 1/' + last];
   }, live);
 
+  // Während des Sprungs ist das Einrasten aus (snapTo gibt den Wert unverändert zurück), danach wieder an. Unterwegs sinkt der
+  // Fortschritt nie und steht nie länger als 300 ms still, bevor er das Ziel erreicht (ein Halt hieße: dazwischen eingerastet).
   UU.add('story:jump', async function () {
-    var f = [], st = story().st, links = sec().querySelectorAll('[data-jump]');
+    var f = [], st = story().st, last = story().last, links = sec().querySelectorAll('[data-jump]'), snapTo = st.vars.snap.snapTo;
     await go(st.start); await wait(300);
     var seen = [st.progress];
     links[links.length - 1].click();
+    if (snapTo(0.4) !== 0.4) f.push('Direkt nach dem Klick rastet es ein: snapTo(0,4) = ' + snapTo(0.4));
     for (var t = 0; t < 30; t++) { await wait(100); seen.push(st.progress); }
+    var soll = Math.round(0.4 * last) / last;
+    if (snapTo(0.4) !== soll) f.push('3 s nach dem Klick rastet es nicht wieder ein: snapTo(0,4) = ' + snapTo(0.4) + ' statt ' + soll);
     for (var i = 1; i < seen.length; i++) {
       if (seen[i] < seen[i - 1] - .0005) { f.push('Fortschritt sinkt bei ' + (i * 100) + ' ms: ' + seen[i - 1].toFixed(3) + ' → ' + seen[i].toFixed(3)); break; }
+    }
+    for (var k = 1, run = 0; k < seen.length && seen[k] < 1 - .001; k++) {
+      run = near(seen[k], seen[k - 1], .0005) ? run + 1 : 0;
+      if (run >= 3) { f.push('Halt bei ' + (k * 100) + ' ms: Fortschritt steht seit 300 ms bei ' + seen[k].toFixed(3)); break; }
     }
     if (!near(seen[seen.length - 1], 1, .001)) f.push('Nach 3 s Fortschritt ' + seen[seen.length - 1].toFixed(3) + ' statt 1');
     return f;
@@ -494,6 +507,46 @@
     await go(0);
     return f;
   }, live);
+
+  // Rückfall ohne Bühne (Fix I1): Steht html.has-motion, kommt die Bühne aber nicht (GSAP fehlt, Skript lädt nicht oder bricht ab), hebt
+  // is-static die Vorstufe auf. Läuft nach story:revert, dann steht die Section wie vor dem Skript da. Die Prüfung führt about-story.js
+  // mit einem PS ohne ScrollTrigger aus (PS.motion.scroll falsch), wie auf einer Seite, auf der GSAP nicht geladen hat.
+  var STAGE_Q = '(prefers-reduced-motion: no-preference) and (min-height: 600px)';
+  UU.add('story:fallback', async function () {
+    var f = [], s = sec(), L = leavesOf(), stageEl = s.querySelector('[data-stage]');
+    var heights = function () { return L.map(function (l) { return l.getBoundingClientRect().height; }); };
+    // Soll: die Höhen ohne Vorstufe (ohne about-story--stage greift sie nicht), synchron gemessen
+    s.classList.remove('about-story--stage'); var soll = heights(); s.classList.add('about-story--stage');
+    var vorher = heights();
+    if (near(vorher[0], soll[0], 1)) f.push('Vorbedingung: Etappe 1 hat schon vor dem Rückfall ihre statische Höhe, die Vorstufe greift nicht');
+    var src = await (await fetch(document.querySelector('script[src*="about-story.js"]').src, { cache: 'no-store' })).text();
+    var added = 0;
+    try {
+      new Function('window', src)({ PS: { on: function (sel, init) { init(s); }, motion: { scroll: false, add: function () { added++; } } } });
+      if (!s.classList.contains('is-static')) f.push('about-story.js setzt ohne ScrollTrigger kein is-static');
+      if (added) f.push('PS.motion.add trotz PS.motion.scroll = false aufgerufen');
+      heights().forEach(function (h, i) {
+        if (!near(h, soll[i], 1)) f.push('Etappe ' + (i + 1) + ' ist ' + h.toFixed(1) + ' px hoch statt ' + soll[i].toFixed(1) + ' (statisch)');
+      });
+      if (px(L[0], 'marginBottom') !== 0) f.push('Etappe 1 hat unten ' + px(L[0], 'marginBottom') + ' px Abstand (schwarzer Streifen)');
+      if (getComputedStyle(stageEl).backgroundColor === tokenColor('backgroundColor', '--c-black')) f.push('Bühnengrund ist schwarz');
+      L.forEach(function (l, i) {
+        var r = l.getBoundingClientRect();
+        if (i && !near(r.top, L[i - 1].getBoundingClientRect().bottom, 1)) f.push('Etappe ' + (i + 1) + ' steht nicht direkt unter Etappe ' + i);
+        if (!(r.height > 0) || opacity(l) !== 1 || getComputedStyle(l).transform !== 'none') f.push('Etappe ' + (i + 1) + ' nicht sichtbar');
+      });
+      if (shown(s.querySelector('[data-rail]'))) f.push('Balken ist sichtbar');
+    } finally {
+      s.classList.remove('is-static');
+    }
+    return f;
+  }, function () {
+    var s = sec();
+    if (!s || !s.classList.contains('about-story--stage')) return 'nur mit about-story--stage';
+    if (story()) return 'nur ohne laufende Bühne (läuft nach story:revert)';
+    if (!document.documentElement.classList.contains('has-motion') || !matchMedia(STAGE_Q).matches) return 'nur mit Bewegung ab 600 px Fensterhöhe';
+    return '';
+  });
 
   // ---- Task 5: Team ----
   // Fehlt die Section, scheitern alle team:*-Prüfungen mit „[data-about-team] fehlt“ (nicht überspringen).

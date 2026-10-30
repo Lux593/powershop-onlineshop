@@ -14,6 +14,8 @@
      ein und bleibt stehen (PS.headerHold aus header.js).
    Ohne Bewegung, im Theme-Editor und unter 600 px Höhe läuft nichts davon: Die Etappen stehen untereinander, die Zahlen sind Anker.
    Solange die Bühne läuft, trägt [data-story] die Klasse is-live und __story = { st, guard, last, revert } (Prüfungen, Übergang zum Team).
+   Kommt die Bühne nicht, obwohl html.has-motion steht (GSAP fehlt, der Aufbau bricht ab), setzt das Skript is-static: Das hebt die
+   Vorstufe aus about-story.css auf, die Etappen stehen untereinander wie ohne Bewegung.
    Vorlage: entwuerfe/ueber-uns/h-vollbild.html (Skript am Ende), Spec: design-ueber-uns-h.md, Abschnitte 4.3 und 6.
    ========================================================================== */
 (function () {
@@ -26,8 +28,10 @@
     var PS = window.PS;
     if (!PS || !PS.on) return;
     PS.on('[data-story]', function (section) {
-      if (!section.classList.contains('about-story--stage')) return; // eine Etappe: keine Bühne
-      // Nur mit GSAP und ScrollTrigger (PS.motion.scroll), sonst ein No-op. Der Aufräumer gehört zur Section.
+      if (!section.classList.contains('about-story--stage')) return; // eine Etappe oder eine andere Seitenvorlage: keine Bühne
+      // Nur mit GSAP und ScrollTrigger (PS.motion.scroll). Ohne sie (Theme-Editor, ohne Bewegung, GSAP nicht geladen) statisch.
+      if (!PS.motion || !PS.motion.scroll) { section.classList.add('is-static'); return; }
+      // Der Aufräumer gehört zur Section
       PS.motion.add(section, function (gsap, ScrollTrigger) { return stage(PS, section, gsap, ScrollTrigger); });
     });
   }
@@ -57,7 +61,22 @@
     return revert;
   }
 
+  // Bricht der Aufbau ab, bleibt keine halbe Bühne stehen: Der Fehler steht in der Konsole, die Section wird statisch (is-static), und
+  // matchMedia setzt zurück, was schon entstanden ist (Zeitleisten, Pin, guard). Dabei ruft es den Aufräumer, den es hier zurückbekommt
+  // (is-live weg, Kopfleiste frei). Zurückgesetzt wird erst nach diesem Aufruf, nicht mitten in matchMedia.add.
   function build(PS, section, gsap, ScrollTrigger, revert) {
+    var own = {};
+    try {
+      return setup(PS, section, gsap, ScrollTrigger, revert, own);
+    } catch (err) {
+      console.error('Über uns, Geschichte: Die Bühne ließ sich nicht aufbauen, die Etappen stehen untereinander.', err);
+      section.classList.add('is-static');
+      setTimeout(revert, 0);
+      return own.teardown;
+    }
+  }
+
+  function setup(PS, section, gsap, ScrollTrigger, revert, own) {
     var stageEl = section.querySelector('[data-stage]');
     var viewport = section.querySelector('[data-viewport]');
     var leaves = gsap.utils.toArray('.leaf', section);
@@ -67,9 +86,10 @@
     var hint = section.querySelector('.about-story__hint');
     var last = leaves.length - 1;
     var alive = true, current = -1, jumping = false, jumpTimer = 0;
-    if (!stageEl || !viewport || !fill || !head || last < 1) return;
+    if (!stageEl || !viewport || !fill || !head || last < 1) { section.classList.add('is-static'); return; }
 
     section.classList.add('is-live');
+    own.teardown = teardown;
     // Wartende Etappen liegen rechts außerhalb des beschnittenen Fensters: mit lazy lüden ihre Fotos erst beim Hereinfahren
     section.querySelectorAll('.leaf__media img').forEach(function (img) { img.loading = 'eager'; });
 
@@ -237,9 +257,11 @@
 
     section.__story = { st: st, guard: guard, last: last, revert: revert };
 
-    // Abbau (reduzierte Bewegung, Fenster unter 600 px Höhe, Section entfernt): Zeitleiste, Pin und guard räumt matchMedia selbst
-    // zurück, hier der Rest
-    return function () {
+    return teardown;
+
+    // Abbau (reduzierte Bewegung, Fenster unter 600 px Höhe, Section entfernt, abgebrochener Aufbau): Zeitleiste, Pin und guard räumt
+    // matchMedia selbst zurück, hier der Rest
+    function teardown() {
       alive = false;
       ScrollTrigger.removeEventListener('refresh', remeasure);
       section.removeEventListener('click', onJump);
@@ -258,6 +280,6 @@
         else a.removeAttribute('aria-current');
       });
       if (hint) hint.classList.remove('is-gone');
-    };
+    }
   }
 })();

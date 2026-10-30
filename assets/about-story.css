@@ -1,7 +1,8 @@
 /* ==========================================================================
    Power Shop – Geschichte der Über-uns-Seite (sections/about-story.liquid). Lädt nur mit der Section.
    Drei Zustände:
-   - Ohne Bewegung, im Theme-Editor und unter 600 px Fensterhöhe: Die Etappen stehen untereinander (Desktop: Foto links, Text
+   - Ohne Bewegung, im Theme-Editor, unter 600 px Fensterhöhe und mit is-static (die Bühne kam nicht, siehe unten): Die Etappen
+     stehen untereinander (Desktop: Foto links, Text
      rechts; Handy: Foto oben), der Balken mit den Jahren ist ausgeblendet.
    - Mit Bewegung, bevor das Skript läuft: Die Section hat schon die Maße der Bühne. Etappe 1 ist so hoch wie das Bühnenfenster,
      darunter bleibt der Platz für den Balken frei, die übrigen Etappen stehen noch darunter. So springt beim Start der Bühne
@@ -55,16 +56,18 @@
 /* Balken und Hinweis gibt es nur auf der laufenden Bühne */
 .about-story__rail, .about-story__hint { display: none; }
 
-/* ---------------- Vor dem Skript: Maße der Bühne ---------------- */
+/* ---------------- Vor dem Skript: Maße der Bühne ----------------
+   about-story--stage gibt es nur, wo GSAP lädt (Section). Kommt die Bühne trotzdem nicht (GSAP fehlt, das Skript lädt nicht oder bricht
+   ab), setzt das Skript is-static: Dann gilt die Vorstufe nicht, die Etappen stehen wie ohne Bewegung untereinander. */
 @media (prefers-reduced-motion: no-preference) and (min-height: 600px) {
-  .has-motion .about-story--stage .about-story__stage { background: var(--c-black); }
-  .has-motion .about-story--stage:not(.is-live) .leaf:first-child {
+  .has-motion .about-story--stage:not(.is-static) .about-story__stage { background: var(--c-black); }
+  .has-motion .about-story--stage:not(.is-live):not(.is-static) .leaf:first-child {
     height: calc(var(--stage-h) - var(--rail-h));
     min-height: 0;
     margin-bottom: var(--rail-h);
     border-top: 0;
   }
-  .has-motion .about-story--stage:not(.is-live) .leaf:first-child .leaf__media { min-height: 0; }
+  .has-motion .about-story--stage:not(.is-live):not(.is-static) .leaf:first-child .leaf__media { min-height: 0; }
 }
 
 /* ---------------- Live: Bühne steht, die Etappen liegen übereinander ---------------- */

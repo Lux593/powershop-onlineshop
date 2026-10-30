@@ -160,7 +160,11 @@
     <script src="{{ 'theme.js' | asset_url }}" defer></script>
     {%- unless request.design_mode -%}
       {%- if settings.motion_enabled -%}
-        {%- if template.name == 'index' or template.suffix == 'ueber-uns' -%}
+        {%- comment -%}
+          Startseite und Über uns. sections/about-story.liquid baut seine Bühne nur unter derselben Bedingung für Über uns: ändert sich
+          eine, muss die andere mit. Liquid wertet von rechts aus, das heißt: index oder (page und Suffix ueber-uns).
+        {%- endcomment -%}
+        {%- if template.name == 'index' or template.name == 'page' and template.suffix == 'ueber-uns' -%}
           <script src="{{ 'gsap.min.js' | asset_url }}" defer></script>
           <script src="{{ 'ScrollTrigger.min.js' | asset_url }}" defer></script>
         {%- endif -%}
