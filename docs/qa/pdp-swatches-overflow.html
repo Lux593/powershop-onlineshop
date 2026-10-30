@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PDP Swatch overflow QA</title>
+  <link rel="stylesheet" href="../../assets/tokens.css">
+  <link rel="stylesheet" href="../../assets/base.css">
+  <link rel="stylesheet" href="../../assets/components.css">
+  <link rel="stylesheet" href="../../assets/shop.css">
+  <style>
+    .qa-shell { max-width: 100vw; padding: 16px; background: var(--c-offwhite); }
+    .qa-shell--broken .swatches { flex-wrap: nowrap; max-width: none; min-width: auto; }
+    .qa-label { font: 600 12px/1.2 system-ui; margin: 0 0 8px; color: #666; text-transform: uppercase; letter-spacing: 0.06em; }
+    .qa-block { margin-bottom: 32px; }
+  </style>
+</head>
+<body>
+  <div class="qa-shell" id="shell">
+    <div class="pdp">
+      <div class="pdp__info">
+        <h1 class="pdp__title">Harley-Davidson Power Shop Poker Chip</h1>
+        <div class="pdp__meta"><span>Harley-Davidson</span><span>Patches, Pins &amp; Aufkleber</span></div>
+        <form class="pdp-form">
+          <div class="pdp__row">
+            <div class="pdp__row-head"><span><strong>Farbe:</strong> <span>Variante 1</span></span></div>
+            <div class="swatches" role="group" aria-label="Farbe wählen" id="swatches"></div>
+          </div>
+          <div class="pdp__buy" style="margin-top:20px">
+            <div class="qty"><button type="button">−</button><input value="1" aria-label="Menge"><button type="button">+</button></div>
+            <button type="button" class="btn btn--primary">In den Warenkorb</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <script>
+    var names = [
+      'Vivid Black', 'Brilliant Red', 'Orange', 'White', 'Chrome',
+      'Dark Billiard Gray', 'Aurora Blue Denim', 'Sand', 'Bordeaux',
+      'Oliv', 'Design 10', 'Design 11', 'Design 12', 'Design 13',
+      'Design 14', 'Design 15', 'Design 16', 'Design 17'
+    ];
+    var colors = {
+      'vivid black': '#141414', 'brilliant red': '#b3262e', orange: '#f26722', white: '#f4f4f2',
+      chrome: '#c9ccd1', 'dark billiard gray': '#8a8a8a', 'aurora blue denim': '#3d5a80',
+      sand: '#c8b79a', bordeaux: '#7d1f24', oliv: '#5b5e3a'
+    };
+    var root = document.getElementById('swatches');
+    names.forEach(function (name, i) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'swatch-btn';
+      btn.setAttribute('aria-pressed', i === 0 ? 'true' : 'false');
+      btn.setAttribute('aria-label', name);
+      var span = document.createElement('span');
+      span.className = 'swatch';
+      var key = name.toLowerCase();
+      var hex = colors[key] || '#cccccc';
+      if (key.indexOf('black') >= 0) hex = '#141414';
+      else if (key.indexOf('red') >= 0) hex = '#b3262e';
+      span.style.background = hex;
+      span.title = name;
+      btn.appendChild(span);
+      root.appendChild(btn);
+    });
+    if (location.search.indexOf('broken=1') >= 0) {
+      document.getElementById('shell').classList.add('qa-shell--broken');
+    }
+  </script>
+</body>
+</html>

@@ -17,36 +17,60 @@
   if hex == blank
     assign key = name | downcase
     case key
-      when 'schwarz'
+      when 'schwarz', 'black', 'vivid black', 'gloss black', 'matte black'
         assign hex = '#141414'
-      when 'braun'
+      when 'braun', 'brown'
         assign hex = '#6b4226'
-      when 'grau'
+      when 'grau', 'gray', 'grey', 'dark billiard gray', 'billiard gray', 'silber', 'silver'
         assign hex = '#8a8a8a'
-      when 'oliv'
+      when 'oliv', 'olive'
         assign hex = '#5b5e3a'
-      when 'weiß'
-        assign hex = '#f4f4f2'
-      when 'weiss'
+      when 'weiß', 'weiss', 'white'
         assign hex = '#f4f4f2'
       when 'orange'
         assign hex = '#f26722'
-      when 'bordeaux'
+      when 'bordeaux', 'burgundy', 'wine'
         assign hex = '#7d1f24'
-      when 'rot'
+      when 'rot', 'red', 'brilliant red'
         assign hex = '#b3262e'
-      when 'denim'
+      when 'denim', 'aurora blue denim'
         assign hex = '#3d5a80'
-      when 'blau'
+      when 'blau', 'blue'
         assign hex = '#2f66a8'
-      when 'sand'
+      when 'sand', 'beige', 'tan'
         assign hex = '#c8b79a'
-      when 'chrom'
+      when 'chrom', 'chrome', 'polished chrome'
         assign hex = '#c9ccd1'
+      when 'gelb', 'yellow', 'gold'
+        assign hex = '#d4a017'
+      when 'grün', 'gruen', 'green'
+        assign hex = '#2d6a4f'
+      when 'lila', 'purple', 'violet'
+        assign hex = '#5c4d7d'
       else
-        assign hex = '#cccccc'
+        if key contains 'schwarz' or key contains 'black'
+          assign hex = '#141414'
+        elsif key contains 'orange'
+          assign hex = '#f26722'
+        elsif key contains 'rot' or key contains 'red'
+          assign hex = '#b3262e'
+        elsif key contains 'blau' or key contains 'blue'
+          assign hex = '#2f66a8'
+        elsif key contains 'grau' or key contains 'gray' or key contains 'grey'
+          assign hex = '#8a8a8a'
+        elsif key contains 'weiß' or key contains 'weiss' or key contains 'white'
+          assign hex = '#f4f4f2'
+        elsif key contains 'chrom' or key contains 'chrome'
+          assign hex = '#c9ccd1'
+        else
+          assign hex = '#cccccc'
+        endif
     endcase
+  endif
+  assign bg = hex
+  if swatch.image != blank
+    assign bg = 'url(' | append: swatch.image | image_url: width: 64 | append: ') center / cover'
   endif
   assign element = tag | default: 'li'
 -%}
-<{{ element }} class="swatch" style="background:{{ hex }}" title="{{ name | escape }}"></{{ element }}>
+<{{ element }} class="swatch" style="background:{{ bg }}" title="{{ name | escape }}"></{{ element }}>
