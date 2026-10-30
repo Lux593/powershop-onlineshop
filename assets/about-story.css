@@ -78,9 +78,40 @@
 }
 .about-story.is-live .about-story__viewport { position: relative; flex: 1; min-height: 0; overflow: hidden; }
 .about-story.is-live .about-story__track { position: relative; height: 100%; }
-/* Spätere Etappen liegen oben (Reihenfolge im Markup) */
-.about-story.is-live .leaf { position: absolute; inset: 0; min-height: 0; border-top: 0; }
+/* Spätere Etappen liegen oben (Reihenfolge im Markup). Der weiche Schatten an der linken Kante fällt auf die Etappe, über die sich die
+   neue schiebt. Wartende Etappen stehen 120 px weiter rechts (Skript), so ragt er in Ruhe nicht ins Bild. */
+.about-story.is-live .leaf {
+  position: absolute;
+  inset: 0;
+  min-height: 0;
+  border-top: 0;
+  will-change: transform;
+  box-shadow: -32px 0 64px -16px rgb(0 0 0 / .45);
+}
 .about-story.is-live .leaf__media { min-height: 0; }
+/* Der Abstandshalter des Pinnens ist schwarz wie die Bühne: Während die Kopfleiste einfährt, blitzt über der Bühne nichts Weißes auf */
+.about-story .pin-spacer { background: var(--c-black); }
+/* Das weiche Scrollen aus base.css ließe jeden Schritt des Einrastens selbst noch einmal gleiten */
+html:has(.about-story.is-live) { scroll-behavior: auto; }
+
+/* Hinweis „Weiterscrollen“ rechts unten auf der Bühne, verschwindet nach den ersten 3 % des Wegs (is-gone aus dem Skript), am Handy nie */
+.about-story.is-live .about-story__hint {
+  position: absolute;
+  z-index: 2;
+  right: max(var(--gutter), calc((100% - var(--container)) / 2 + var(--gutter)));
+  bottom: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font: 600 14px/1 var(--f-head);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--c-muted);
+  transition: opacity var(--t-med) var(--ease);
+}
+.about-story__hint .icon { width: 18px; height: 18px; color: var(--c-orange-on-light); animation: about-story-nudge 1.6s var(--ease) infinite; }
+.about-story__hint.is-gone { opacity: 0; }
+@keyframes about-story-nudge { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(6px); } }
 
 /* Balken am Fuß der Bühne: Die Jahre stehen in gleich breiten Spalten (--count aus der Section). Die Linie läuft von der Mitte der
    ersten bis zur Mitte der letzten Spalte mittig durch sie hindurch und füllt sich mit den Etappen. Wo der orange Balken angekommen
@@ -154,4 +185,5 @@
   .leaf h3 { font-size: clamp(26px, 7.4vw, 32px); }
   .leaf__text p { margin-top: 10px; font-size: 15px; line-height: 1.55; }
   .leaf__meta { margin-top: 12px; }
+  .about-story.is-live .about-story__hint { display: none; }
 }

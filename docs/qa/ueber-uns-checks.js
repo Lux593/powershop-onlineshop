@@ -50,17 +50,22 @@
     return frames(2);
   }
 
-  // Der ScrollTrigger der Bühne: das Element mit data-story trägt ihn als __story. Ohne Bühne auf der Seite undefined.
+  // Die laufende Bühne: das Element mit data-story trägt __story = { st, guard, last, revert } (assets/about-story.js).
+  // st pinnt und trägt die Zeitleiste als st.animation. Ohne Bühne auf der Seite undefined.
   function story() {
     var e = document.querySelector('[data-story]');
     return e ? e.__story : undefined;
   }
+  function stageTrigger() {
+    var s = story();
+    return s && s.st;
+  }
 
   // Hält die Bühne an und setzt ihren Fortschritt auf p (0 bis 1). Werte danach lesen.
-  // Die Bühne bleibt angehalten, bis UU.run sie freigibt (oder story().enable() aufgerufen wird).
+  // Die Bühne bleibt angehalten, bis UU.run sie freigibt (oder story().st.enable() aufgerufen wird).
   function at(p) {
-    var st = story();
-    if (!st || !st.animation) throw new Error('at(): keine Bühne auf der Seite (kein [data-story] mit __story.animation)');
+    var st = stageTrigger();
+    if (!st || !st.animation) throw new Error('at(): keine Bühne auf der Seite (kein [data-story] mit __story.st.animation)');
     st.disable(false, true);
     st.animation.progress(p);
   }
@@ -96,7 +101,7 @@
         } catch (e) {
           res.fails.push('Ausnahme: ' + (e && e.message ? e.message : e));
         } finally {
-          var st = story();
+          var st = stageTrigger();
           if (st && st.enable) st.enable();
         }
         console.log(res.skipped ? 'ÜBERSPRUNGEN ' + name + ' (' + res.skipped + ')'
@@ -263,4 +268,181 @@
     if (bg !== soll) f.push('Fotofläche hat ' + bg + ' statt --c-anthracite (' + soll + ')');
     return f;
   }, function () { return document.getElementById('etappe-ohne-foto') ? '' : 'nur mit Block „ohne-foto“ in der Vorlage'; });
+
+  // ---- Task 4: Geschichte, Bühne und Umblättern ----
+  // Alle außer story:short und story:count laufen nur mit Bühne. Den Fortschritt stellen sie mit at(p) ein und lesen sofort.
+  var live = function () { return story() ? '' : '__story fehlt'; };
+  var G = function (e, prop) { return window.gsap.getProperty(e, prop); };
+  var leavesOf = function () { return Array.prototype.slice.call(sec().querySelectorAll('.leaf')); };
+  var bitsOf = function (leaf) { return [leaf.querySelector('.leaf__year')].concat(Array.prototype.slice.call(leaf.querySelectorAll('.leaf__text > *'))); };
+  var opacity = function (e) { return parseFloat(getComputedStyle(e).opacity); };
+  var away = function () { return document.querySelector('.site-header-wrap').classList.contains('is-away'); };
+  // Fotos zoomen oder gleiten nie: weder das Bild noch sein Rahmen tragen einen transform
+  var photoMoves = function () {
+    return Array.prototype.slice.call(sec().querySelectorAll('.leaf__media, .leaf__media img')).filter(function (e) {
+      return getComputedStyle(e).transform !== 'none' || G(e, 'scale') !== 1;
+    }).length;
+  };
+
+  UU.add('story:turn', function () {
+    var f = [], L = leavesOf(), last = story().last;
+    if (last !== L.length - 1) f.push('story().last ist ' + last + ' bei ' + L.length + ' Etappen');
+    var moves = 0;
+    at(0); moves += photoMoves();
+    if (G(L[0], 'xPercent') !== 0) f.push('p = 0: Etappe 1 bei xPercent ' + G(L[0], 'xPercent'));
+    L.slice(1).forEach(function (l, i) {
+      if (G(l, 'xPercent') !== 100 || G(l, 'x') !== 120) f.push('p = 0: Etappe ' + (i + 2) + ' bei xPercent ' + G(l, 'xPercent') + ', x ' + G(l, 'x') + ' statt 100 / 120');
+    });
+    // halbe Strecke des ersten Wechsels (bei vier Etappen p = 0,1)
+    at(0.3 / last); moves += photoMoves();
+    if (!near(G(L[1], 'xPercent'), 50, 2)) f.push('p = ' + (0.3 / last).toFixed(3) + ': Etappe 2 bei xPercent ' + G(L[1], 'xPercent').toFixed(1) + ' statt 50');
+    if (opacity(L[1].querySelector('.leaf__year')) !== 0) f.push('p = ' + (0.3 / last).toFixed(3) + ': Jahreszahl von Etappe 2 schon sichtbar');
+    at(0.5 / last); moves += photoMoves();
+    at(1 / last); moves += photoMoves();
+    if (G(L[1], 'xPercent') !== 0 || G(L[1], 'x') !== 0) f.push('p = 1/' + last + ': Etappe 2 nicht bei 0');
+    bitsOf(L[1]).forEach(function (b, i) {
+      if (opacity(b) !== 1 || G(b, 'x') !== 0) f.push('p = 1/' + last + ': Textteil ' + (i + 1) + ' von Etappe 2 bei Deckkraft ' + opacity(b) + ', x ' + G(b, 'x'));
+    });
+    [0.6, 0.85, 1].forEach(function (p) { at(p); moves += photoMoves(); });
+    if (moves) f.push(moves + '-mal hatte ein Foto oder Fotorahmen einen transform (Zoom oder Gleiten)');
+    return f;
+  }, live);
+
+  UU.add('story:rail', function () {
+    var f = [], s = sec(), last = story().last, links = s.querySelectorAll('[data-jump]');
+    at(1 / last);
+    var sx = G(s.querySelector('[data-fill]'), 'scaleX');
+    if (!near(sx, 1 / last, .01)) f.push('p = 1/' + last + ': Balken bei scaleX ' + sx.toFixed(3) + ' statt ' + (1 / last).toFixed(3));
+    if (links[1].getAttribute('aria-current') !== 'step') f.push('p = 1/' + last + ': „' + links[1].textContent + '“ ohne aria-current="step"');
+    if (!links[1].classList.contains('is-passed')) f.push('p = 1/' + last + ': „' + links[1].textContent + '“ ohne is-passed');
+    if (s.querySelectorAll('[data-jump][aria-current]').length !== 1) f.push('p = 1/' + last + ': nicht genau eine Zahl mit aria-current');
+    at(1);
+    if (links[last].getAttribute('aria-current') !== 'step') f.push('p = 1: letzte Zahl ohne aria-current="step"');
+    Array.prototype.forEach.call(links, function (a) {
+      var h = a.getBoundingClientRect().height;
+      if (h < 44) f.push('Link „' + a.textContent + '“ ist ' + h.toFixed(1) + ' px hoch');
+    });
+    return f;
+  }, live);
+
+  UU.add('story:hint', function () {
+    var f = [], hint = sec().querySelector('.about-story__hint');
+    if (!hint) return ['.about-story__hint fehlt'];
+    if (cw() < 900) {
+      if (getComputedStyle(hint).display !== 'none') f.push('Hinweis unter 900 px Breite sichtbar');
+      return f;
+    }
+    at(0);
+    if (!shown(hint) || hint.classList.contains('is-gone')) f.push('p = 0: Hinweis nicht sichtbar');
+    at(0.05);
+    if (!hint.classList.contains('is-gone')) f.push('p = 0,05: Hinweis ohne is-gone');
+    return f;
+  }, live);
+
+  UU.add('story:eager', async function () {
+    var f = [], imgs = Array.prototype.slice.call(sec().querySelectorAll('.leaf__media img'));
+    imgs.forEach(function (img, i) {
+      if (img.getAttribute('loading') !== 'eager') f.push('Etappenfoto ' + (i + 1) + ' hat loading="' + img.getAttribute('loading') + '"');
+    });
+    var ok = function () { return imgs.every(function (img) { return img.complete && img.naturalWidth > 0; }); };
+    for (var t = 0; t < 50 && !ok(); t++) await wait(100);
+    imgs.forEach(function (img, i) {
+      if (!(img.complete && img.naturalWidth > 0)) f.push('Etappenfoto ' + (i + 1) + ' nach 5 s nicht geladen');
+    });
+    return f;
+  }, live);
+
+  UU.add('story:snap', async function () {
+    var st = story().st, last = story().last;
+    await go(st.start + (st.end - st.start) * 0.4 / last);
+    await wait(2500);
+    var p = st.progress, k = Math.round(p * last);
+    return near(p, k / last, .005) ? [] : ['Fortschritt steht nach 2,5 s bei ' + p.toFixed(4) + ', kein Vielfaches von 1/' + last];
+  }, live);
+
+  UU.add('story:jump', async function () {
+    var f = [], st = story().st, links = sec().querySelectorAll('[data-jump]');
+    await go(st.start); await wait(300);
+    var seen = [st.progress];
+    links[links.length - 1].click();
+    for (var t = 0; t < 30; t++) { await wait(100); seen.push(st.progress); }
+    for (var i = 1; i < seen.length; i++) {
+      if (seen[i] < seen[i - 1] - .0005) { f.push('Fortschritt sinkt bei ' + (i * 100) + ' ms: ' + seen[i - 1].toFixed(3) + ' → ' + seen[i].toFixed(3)); break; }
+    }
+    if (!near(seen[seen.length - 1], 1, .001)) f.push('Nach 3 s Fortschritt ' + seen[seen.length - 1].toFixed(3) + ' statt 1');
+    return f;
+  }, live);
+
+  UU.add('story:header', async function () {
+    var f = [], st = story().st, y = st.start - 170;
+    await go(0); await go(y / 3); await go(2 * y / 3); await go(y); await wait(100);
+    if (!away()) f.push('Vorbedingung: Kopfleiste bei ' + Math.round(y) + ' px nicht weggefahren');
+    await go(st.start - 100); await wait(400);
+    if (away()) f.push('150 px vor dem Pinnen: Kopfleiste nicht eingefahren');
+    await go(st.start + 600); await wait(100);
+    if (away()) f.push('Gepinnt und nach unten gescrollt: Kopfleiste fährt weg');
+    var spacer = sec().querySelector('.pin-spacer');
+    if (!spacer) f.push('Kein .pin-spacer');
+    else if (getComputedStyle(spacer).backgroundColor !== tokenColor('backgroundColor', '--c-black')) f.push('.pin-spacer hat ' + getComputedStyle(spacer).backgroundColor + ' statt --c-black');
+    await go(0);
+    return f;
+  }, function () {
+    var s = story();
+    if (!s) return '__story fehlt';
+    return s.st.start - 170 < 405 ? 'Bühne beginnt zu weit oben (header.js zeigt die Kopfleiste oberhalb von 400 px immer)' : '';
+  });
+
+  UU.add('story:short', async function () {
+    var f = [], s = sec();
+    if (s.classList.contains('is-live')) f.push('is-live unter 600 px Höhe');
+    if (s.querySelector('.pin-spacer')) f.push('pin-spacer unter 600 px Höhe');
+    leavesOf().forEach(function (l, i) {
+      bitsOf(l).forEach(function (b) { if (opacity(b) !== 1) f.push('Etappe ' + (i + 1) + ': Textteil mit Deckkraft ' + opacity(b)); });
+    });
+    await go(0); await go(500); await go(1000); await wait(100);
+    if (!away()) f.push('Nach 1000 px nach unten ist die Kopfleiste nicht weggefahren');
+    await go(0);
+    return f;
+  }, function () { return innerHeight < 600 ? '' : 'nur unter 600 px Fensterhöhe'; });
+
+  // Ablauf story:count: Vorlage auf 2, 5 und 1 Etappe ändern, je hochladen lassen, neu laden, story:count und story:snap
+  UU.add('story:count', function () {
+    var f = [], s = sec(), n = leavesOf().length, rail = s.querySelector('[data-rail]');
+    if (n === 1) {
+      if (s.classList.contains('is-live')) f.push('is-live bei einer Etappe');
+      if (shown(rail)) f.push('Balken sichtbar bei einer Etappe');
+      return f;
+    }
+    var cols = getComputedStyle(rail.querySelector('ol')).gridTemplateColumns.split(' ').length;
+    if (cols !== n) f.push('Balken hat ' + cols + ' Spalten bei ' + n + ' Etappen');
+    if (story().last !== n - 1) f.push('story().last ist ' + story().last + ' bei ' + n + ' Etappen');
+    return f;
+  }, function () { var s = sec(); return s && (s.querySelectorAll('.leaf').length === 1 || story()) ? '' : 'nur mit Bühne oder einer Etappe'; });
+
+  // Läuft als letzte (danach neu laden): so baut auch motion.js ab, wenn jemand zur Laufzeit reduzierte Bewegung einschaltet
+  UU.add('story:revert', async function () {
+    var f = [], s = sec(), L = leavesOf();
+    await go(0); await wait(800); // st.enable() der vorigen Prüfung scrubbt noch zurück
+    var before = L[0].getBoundingClientRect();
+    story().revert();
+    await frames(2);
+    if (s.classList.contains('is-live')) f.push('is-live nach revert');
+    if (s.querySelector('.pin-spacer')) f.push('pin-spacer nach revert');
+    if (story()) f.push('__story nach revert');
+    L.forEach(function (l, i) {
+      [l].concat(bitsOf(l)).forEach(function (e) {
+        var name = e.className || e.tagName.toLowerCase();
+        if (e.style.transform || getComputedStyle(e).transform !== 'none') f.push('Etappe ' + (i + 1) + ': ' + name + ' hat noch transform');
+        if (opacity(e) !== 1) f.push('Etappe ' + (i + 1) + ': ' + name + ' mit Deckkraft ' + opacity(e));
+      });
+    });
+    var after = L[0].getBoundingClientRect();
+    if (!near(after.top, before.top, 1) || !near(after.height, before.height, 1)) {
+      f.push('Etappe 1 vorher ' + before.top.toFixed(1) + ' / ' + before.height.toFixed(1) + ', nachher ' + after.top.toFixed(1) + ' / ' + after.height.toFixed(1) + ' (Oberkante / Höhe)');
+    }
+    await go(0); await go(600); await go(1200); await wait(100);
+    if (!away()) f.push('Nach revert fährt die Kopfleiste beim Runterscrollen nicht weg');
+    await go(0);
+    return f;
+  }, live);
 })();

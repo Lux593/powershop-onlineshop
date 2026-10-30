@@ -3,7 +3,7 @@
   Text rechts; Handy: Foto oben). Die große Jahreszahl ist aria-hidden, die Überschrift trägt das Jahr unsichtbar vorne („1985: …“).
   Ohne Bewegung stehen die Etappen untereinander, der Balken mit den Jahren ist ausgeblendet. Mit zwei und mehr Etappen bekommt
   die Section die Klasse about-story--stage: dann wird sie mit Bewegung zur Bühne, auf der die Etappen beim Scrollen umblättern.
-  Ohne Blöcke gibt die Section außerhalb des Editors nichts aus. Bei einer Etappe gibt es keinen Balken.
+  Ohne Blöcke gibt die Section außerhalb des Editors nichts aus. Bei einer Etappe gibt es keinen Balken und kein Skript.
   Fotos: ein im Editor gewähltes Bild oder eine Standarddatei aus assets/. Für die mitgelieferten Dateien kennt die Section Maße
   und kleinere Fassungen; eine andere Standarddatei steht ohne srcset und mit dem Seitenverhältnis 4 : 3 im Markup.
   Die Anker der Etappen heißen etappe-<Block-ID>, in der Vorlage also #etappe-1985 usw.
@@ -15,6 +15,10 @@
 -%}
 {%- if count > 0 or request.design_mode -%}
 {{ 'about-story.css' | asset_url | stylesheet_tag }}
+{%- comment -%} Bühne und Umblättern (nur mit Bewegung, siehe assets/about-story.js), erst ab zwei Etappen {%- endcomment -%}
+{%- if count > 1 -%}
+  <script src="{{ 'about-story.js' | asset_url }}" defer></script>
+{%- endif -%}
 
 {%- comment -%}
   H-D Bar & Shield als Kopf des Balkens. Nachgezogene Fassung von assets/hd-bar-shield.png, Form unverändert aus dem Entwurf.
