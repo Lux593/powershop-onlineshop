@@ -402,11 +402,15 @@
     if (!t) {
       f.push('Teil 2: [data-about-team] fehlt');
     } else {
-      var end = toTeamEnd();
+      // Sie hält eine Kopfleistenhöhe über das Ende des Übergangs hinaus: Bis dahin liegen Balken und Bühnenrest noch hinter ihr
+      var end = toTeamEnd(), hh = headerH(), rail = sec().querySelector('[data-rail]');
       await go(st.end); await go((st.end + end) / 2); await wait(100);
       if (away()) f.push('Halbe Strecke des Übergangs zum Team: Kopfleiste weggefahren');
-      await go(end + 200); await go(end + 400); await go(end + 600); await wait(100);
-      if (!away()) f.push('600 px unter dem Ende des Übergangs: Kopfleiste nicht weggefahren');
+      await go(end + hh / 2); await wait(100);
+      if (away()) f.push('Eine halbe Kopfleistenhöhe nach dem Ende des Übergangs: Kopfleiste weggefahren (Balken und Bühne lägen frei)');
+      await go(end + hh + 200); await go(end + hh + 400); await go(end + hh + 600); await wait(100);
+      if (!away()) f.push('600 px unter dem Ende des Haltens: Kopfleiste nicht weggefahren');
+      if (rect(rail).bottom > 0) f.push('600 px unter dem Ende des Haltens: Balken endet noch bei ' + rect(rail).bottom.toFixed(1) + ' px, im Bild');
       sec().querySelector('[data-jump]').click();
       await wait(3000);
       if (away()) f.push('Klick auf die erste Zahl: Kopfleiste nach 3 s weggefahren');
@@ -450,9 +454,9 @@
   // ---- Task 6: Übergang von der Bühne zum Team ----
   // Steht vor story:revert, damit UU.run('story') sie noch mit Bühne ausführt.
   // Ende des Übergangs: Die Oberkante des Teams erreicht die Unterkante der stehenden Kopfleiste (--header-h).
+  var headerH = function () { return parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 0; };
   var toTeamEnd = function () {
-    var hh = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 0;
-    return teamEl().getBoundingClientRect().top + window.scrollY - hh;
+    return teamEl().getBoundingClientRect().top + window.scrollY - headerH();
   };
   UU.add('story:toteam', async function () {
     var f = [], s = sec(), st = story().st, t = teamEl();
@@ -474,6 +478,7 @@
     // Ohne ihre 1-px-Linie unten (.site-header ist --header-h plus Linie hoch): Die Linie liegt über dem Inhalt darunter, wie beim Pinnen.
     var hb = rect('.site-header').bottom - px('.site-header', 'borderBottomWidth');
     await go(end); await frames(2);
+    if (away()) f.push('Ende des Übergangs (von oben kommend): Kopfleiste weggefahren');
     rb = rect(rail).bottom;
     if (!near(rb, hb, 1)) f.push('Ende: Balken endet bei ' + rb.toFixed(1) + ', die stehende Kopfleiste bei ' + hb.toFixed(1));
     if (!near(G(vp, 'scale'), .92, .005)) f.push('Ende: Bühne bei scale ' + G(vp, 'scale').toFixed(3) + ' statt 0,92');
@@ -587,8 +592,15 @@
   }));
 
   // Vor team:select und team:wide: Die laden Fotos selbst, danach sagte die Prüfung nichts mehr
+  // Gegenprobe zuerst: Oben, mehr als zwei Bildschirme vom Team entfernt, ist noch mindestens ein Foto lazy. Hat ein früherer Schritt
+  // das Team schon nahe gebracht, sind alle eager und die Prüfung bewiese nichts: dann übersprungen (nach dem Neuladen oben einzeln laufen lassen).
+  var imgsOf = function (t) { return Array.prototype.slice.call(t.querySelectorAll('img')); };
   UU.add('team:preload', T(async function (t) {
     var f = [];
+    await go(0); await wait(300);
+    var far = t.getBoundingClientRect().top + window.scrollY > 2 * innerHeight;
+    if (!far) f.push('Gegenprobe: Das Team liegt oben schon weniger als zwei Bildschirme entfernt');
+    else if (!imgsOf(t).some(function (img) { return img.getAttribute('loading') === 'lazy'; })) f.push('Gegenprobe: Oben, weit vom Team, ist kein Foto mehr lazy');
     await go(Math.max(0, t.getBoundingClientRect().top + window.scrollY - 1.5 * innerHeight));
     await wait(300);
     t.querySelectorAll('img').forEach(function (img, i) {
@@ -596,7 +608,11 @@
     });
     await go(0);
     return f;
-  }));
+  }), function () {
+    var t = teamEl();
+    return t && imgsOf(t).every(function (img) { return img.getAttribute('loading') === 'eager'; })
+      ? 'alle Fotos schon eager (das Team war schon nah), nach dem Neuladen oben einzeln laufen lassen' : '';
+  });
 
   UU.add('team:select', T(async function (t) {
     var f = [], picks = t.querySelectorAll('[data-pick]');

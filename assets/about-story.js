@@ -10,8 +10,8 @@
      scrollt zur Etappe, ohne unterwegs einzurasten.
    - Übergang zum Team: Folgt direkt die Team-Section (sections/about-team.liquid), schiebt sie sich nach „Heute“ über die Bühne.
      Die Etappe sinkt halb so schnell, wird kleiner und dunkelt ab, der Balken fährt auf der Oberkante des Teams hinaus.
-   - Kopfleiste: Ab 150 px vor dem Pinnen bis zum Ende des Übergangs zum Team (ohne Team: bis zum Ende des Pinnens) fährt sie
-     ein und bleibt stehen (PS.headerHold aus header.js).
+   - Kopfleiste: Ab 150 px vor dem Pinnen bis eine Kopfleistenhöhe nach dem Ende des Übergangs zum Team (ohne Team: bis zum Ende
+     des Pinnens) fährt sie ein und bleibt stehen (PS.headerHold aus header.js). Erst dann liegt nichts mehr von der Bühne hinter ihr.
    Ohne Bewegung, im Theme-Editor und unter 600 px Höhe läuft nichts davon: Die Etappen stehen untereinander, die Zahlen sind Anker.
    Solange die Bühne läuft, trägt [data-story] die Klasse is-live und __story = { st, guard, last, revert } (Prüfungen, Übergang zum Team).
    Kommt die Bühne nicht, obwohl html.has-motion steht (GSAP fehlt, der Aufbau bricht ab), setzt das Skript is-static: Das hebt die
@@ -212,15 +212,17 @@
         .scrollTrigger;
     }
 
-    // Kopfleiste: fährt 150 px vor dem Pinnen ein und bleibt bis zum Ende des Übergangs zum Team (ohne Team bis zum Ende des
-    // Pinnens). Führe sie im Übergang weg, endete das Team 64 bzw. 76 px tiefer als gemessen, und zwei Bewegungen liefen zugleich.
+    // Kopfleiste: fährt 150 px vor dem Pinnen ein und bleibt bis eine Kopfleistenhöhe nach dem Ende des Übergangs zum Team (ohne Team
+    // bis zum Ende des Pinnens). Führe sie im Übergang weg, endete das Team 64 bzw. 76 px tiefer als gemessen, und zwei Bewegungen
+    // liefen zugleich. Am Ende des Übergangs liegen Balken und abgedunkelte Etappe noch im Streifen hinter ihr; erst eine Kopfleisten-
+    // höhe weiter sind sie hinausgescrollt, dann darf sie wegfahren, ohne etwas aufzudecken.
     // Das Ende kommt fertig gerechnet aus st bzw. toTeam (beide entstehen vorher und werden darum vorher neu gemessen): Mit dem Team
     // als endTrigger fehlte der Weg des Pinnens, denn guard beginnt vor dem Pinnen und wird deshalb nicht mit verschoben.
     // Beim Abbau räumt der Aufräumer unten auf, denn beim Abbau durch matchMedia feuert onToggle nicht sicher.
     var guard = ScrollTrigger.create({
       trigger: stageEl,
       start: function () { return 'top top+=' + (hh() + 150); },
-      end: function () { return (toTeam || st).end; },
+      end: function () { return toTeam ? toTeam.end + hh() : st.end; },
       onToggle: function (self) { if (PS.headerHold) PS.headerHold(self.isActive); }
     });
 

@@ -67,8 +67,7 @@
           if b.image_wide != blank
             assign w960 = b.image_wide | image_url: width: 960
             assign w1600 = b.image_wide | image_url: width: 1600
-            assign w2400 = b.image_wide | image_url: width: 2400
-            assign wide_srcset = w960 | append: ' 960w, ' | append: w1600 | append: ' 1600w, ' | append: w2400 | append: ' 2400w'
+            assign wide_srcset = w960 | append: ' 960w, ' | append: w1600 | append: ' 1600w'
             assign wide_h = 1600 | divided_by: b.image_wide.aspect_ratio | round
           elsif b.asset_wide != blank
             capture hidden_wide
