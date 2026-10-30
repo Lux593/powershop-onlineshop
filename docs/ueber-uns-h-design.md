@@ -67,10 +67,11 @@ Dienstleistungen sie auch haben. Der Entwurf zeigt sie nicht.
 - Am Handy (unter 900 px) steht das Foto oben über die volle Breite und nimmt den Platz über dem Text ein (mindestens 34svh), darunter
   der Text. Die Überschrift ist dort `clamp(44px, 12.8vw, 56px)` groß.
 - Beim Laden setzt sich das Foto aus 1,08 auf 1 (1,8 s, expo.out).
-- Auftritt der Geschichte (Wunsch des Nutzers vom 30.10.): Beim Weiterscrollen öffnet sich die Bühne von unten nach oben wie ein
-  Rolltor. Ihr Inhalt steht schon an der Stelle, an der sie gleich pinnt, ihre Oberkante fährt mit dem Scrollen nach oben und deckt
-  zuerst den Balken, dann die erste Etappe von unten her auf. Jahreszahl und Text steigen dabei um 40 px auf und blenden ein. Der Kopf
-  sinkt halb so schnell und dunkelt bis 0,75 ab. Fotos zoomen dabei nicht.
+- Auftritt der Geschichte (Wunsch des Nutzers vom 30.10.): Die Bühne liegt von Anfang an hinter dem Kopf und pinnt an der
+  Kopfleiste. Der Kopf scrollt über ihr weg, seine Unterkante deckt sie von unten nach oben auf wie ein Rolltor: zuerst den Balken,
+  dann die erste Etappe. Jahreszahl und Text steigen dabei um 40 px auf und blenden ein, der Kopf dunkelt bis 0,75 ab. Erst danach
+  blättert die Bühne um. Die Bühne steht dabei wirklich still (Pin). Eine erste Fassung führte sie per Skript der Scrollposition nach,
+  sie sprang dabei bei jedem Scrollen auf und ab. Fotos zoomen nicht.
 - Kein Bar & Shield und kein Power-Shop-Signet im Kopf.
 
 ### 4.3 Die Geschichte: vier Etappen auf einer Bühne

@@ -9,18 +9,19 @@
      her (scrub) und rastet nicht ein. Lässt man los, bewegt sie sich nicht mehr von selbst.
    - Balken: Linie und Bar & Shield folgen der Lage der Etappen, nicht dem rohen Scrollwert. Die Zahlen sind Links, ein Klick
      scrollt weich zur Etappe.
-   - Auftritt aus dem Kopf: Steht direkt davor der Seitenkopf (sections/about-head.liquid), öffnet sich die Bühne beim Weiterscrollen
-     von unten nach oben wie ein Rolltor: Ihr Inhalt steht dabei schon an seinem Platz unter der Kopfleiste, die Oberkante der Bühne
-     fährt nach oben und deckt ihn auf, zuerst den Balken, dann die erste Etappe von unten her. Jahreszahl und Text steigen dabei
-     leicht auf. Der Kopf darüber sinkt halb so schnell und dunkelt ab.
+   - Auftritt aus dem Kopf: Steht direkt davor der Seitenkopf (sections/about-head.liquid), liegt die Bühne von Anfang an hinter ihm
+     (about-story.css zieht sie um seine Höhe hoch, der Kopf liegt darüber). Sie pinnt, sobald sie die Kopfleiste erreicht, und der Kopf
+     scrollt über ihr weg: Seine Unterkante fährt nach oben und deckt die Bühne von unten nach oben auf wie ein Rolltor, zuerst den
+     Balken, dann die erste Etappe. Jahreszahl und Text steigen dabei leicht auf, der Kopf dunkelt ab. Erst danach blättert die Bühne um.
+     Die Bühne steht dabei wirklich (Pin), nichts wird gegen das Scrollen verschoben: So springt nichts.
    - Übergang zum Team: Folgt direkt die Team-Section (sections/about-team.liquid), schiebt sie sich nach „Heute“ über die Bühne.
      Die Etappe sinkt halb so schnell, wird kleiner und dunkelt ab, der Balken fährt auf der Oberkante des Teams hinaus.
    - Kopfleiste: Ab 150 px vor dem Pinnen bis eine Kopfleistenhöhe nach dem Ende des Übergangs zum Team (ohne Team: bis zum Ende
      des Pinnens) fährt sie ein und bleibt stehen (PS.headerHold aus header.js). Erst dann liegt nichts mehr von der Bühne hinter ihr.
    Ohne Bewegung, im Theme-Editor und unter 600 px Höhe läuft nichts davon: Die Etappen stehen untereinander, die Zahlen sind Anker.
    Fotogalerie je Etappe (ab zwei Fotos): siehe gallery() unten, läuft unabhängig von der Bühne, auch ohne Bewegung.
-   Solange die Bühne läuft, trägt [data-story] die Klasse is-live und __story = { st, guard, fromHead, last, revert } (Prüfungen, Übergang
-   zum Team; fromHead ist der ScrollTrigger des Auftritts aus dem Kopf oder null).
+   Solange die Bühne läuft, trägt [data-story] die Klasse is-live und __story = { st, pin, guard, fromHead, last, revert } (Prüfungen,
+   Übergang zum Team). st ist das Umblättern, pin das Pinnen (mit dem Auftritt aus dem Kopf davor), fromHead der Auftritt oder null.
    Kommt die Bühne nicht, obwohl html.has-motion steht (GSAP fehlt, der Aufbau bricht ab), setzt das Skript is-static: Das hebt die
    Vorstufe aus about-story.css auf, die Etappen stehen untereinander wie ohne Bewegung.
    Vorlage: entwuerfe/ueber-uns/h-vollbild.html (Skript am Ende), Spec: design-ueber-uns-h.md, Abschnitte 4.3 und 6.
@@ -329,6 +330,19 @@
       return sum / last;
     }
 
+    /* ---------------- Pinnen ----------------
+       Ein eigener ScrollTrigger hält die Bühne unter der Kopfleiste fest: erst für den Auftritt aus dem Kopf (rest, so weit die Bühne
+       unter den Kopf gezogen ist, about-story.css), dann eine Bildschirmhöhe Scrollweg je Etappe. Das Umblättern (st) läuft nur im
+       zweiten Teil, ohne eigenes Pinnen. Ohne Kopf davor ist rest 0, dann decken sich beide. */
+    var rest = function () { return Math.max(0, -parseFloat(getComputedStyle(section).marginTop) || 0); };
+    var pin = ScrollTrigger.create({
+      trigger: stageEl,
+      start: function () { return 'top top+=' + hh(); },
+      end: function () { return '+=' + (rest() + last * window.innerHeight); },
+      pin: true,
+      invalidateOnRefresh: true
+    });
+
     var slide = gsap.timeline({
       // Aktive Zahl und Hinweis folgen dem Fortschritt der Zeitleiste, egal wer ihn setzt
       onUpdate: function () {
@@ -340,9 +354,8 @@
       },
       scrollTrigger: {
         trigger: stageEl,
-        start: function () { return 'top top+=' + hh(); },
-        end: function () { return '+=' + last * window.innerHeight; }, // eine Bildschirmhöhe Scrollweg je Etappe
-        pin: true,
+        start: function () { return pin.start + rest(); },
+        end: function () { return pin.end; }, // eine Bildschirmhöhe Scrollweg je Etappe
         // Nachziehen hinter der Scrollposition, keine Eigenbewegung: Ohne snap bleibt die Bühne stehen, wo man aufhört zu scrollen
         scrub: 0.6,
         invalidateOnRefresh: true
@@ -381,30 +394,20 @@
     }
 
     /* ---------------- Auftritt aus dem Kopf ----------------
-       Von dem Moment an, in dem die Oberkante der Bühne unten ins Fenster kommt (beim Laden, der Kopf füllt den ersten Bildschirm), bis
-       zum Beginn des Pinnens. Die Bühne selbst scrollt normal nach oben, ihr Inhalt (Etappen und Balken) fährt um genau diesen Weg
-       entgegen: Er steht still an der Stelle, an der die Bühne gleich pinnt, und die Oberkante der Bühne (overflow: clip) deckt ihn von
-       unten nach oben auf. Bewegt werden Spur und Balken, nicht das Fenster: Das verschiebt der Übergang zum Team. Jahreszahl und Text
-       der ersten Etappe steigen dabei um 40 px auf und blenden ein, von unten nach oben, wie die Kante sie erreicht.
-       Der Kopf sinkt halb so schnell (Text und Foto, er selbst bleibt im Fluss und schneidet mit overflow: clip an seiner Unterkante ab,
-       genau an der Oberkante der Bühne) und dunkelt bis 0,75 ab (--cover, about-head.css). scrub: true wie beim Team: Alles hängt fest
-       an der Scrollposition, sonst wackelte der stehende Inhalt.
-       Ohne Kopf direkt davor (andere Section oder keine) gibt es keinen Auftritt, die Bühne scrollt einfach herein. */
+       Solange der Kopf über der gepinnten Bühne wegscrollt (pin.start bis st.start): Der Kopf dunkelt bis 0,75 ab (--cover,
+       about-head.css), Jahreszahl und Text der ersten Etappe steigen um 40 px auf und blenden ein, von unten nach oben, wie die
+       Kante sie erreicht. Ohne Kopf direkt davor (rest 0) gibt es nichts davon. */
     var hero = prevHead(section), fromHead = null;
-    if (hero) {
-      var heroParts = gsap.utils.toArray(hero.querySelectorAll('.about-head__text, .about-head__photo'));
-      var held = gsap.utils.toArray(section.querySelectorAll('.about-story__track, .about-story__rail'));
+    if (hero && rest() > 0) {
       fromHead = gsap.timeline({
         scrollTrigger: {
           trigger: stageEl,
-          start: 'top bottom',
-          end: function () { return 'top top+=' + hh(); },
-          scrub: true,
+          start: function () { return pin.start; },
+          end: function () { return pin.start + rest(); },
+          scrub: 0.6,
           invalidateOnRefresh: true
         }
       })
-        .fromTo(held, { y: function () { return hh() - window.innerHeight; } }, { y: 0, duration: 1, ease: 'none' }, 0)
-        .fromTo(heroParts, { y: 0 }, { y: function () { return hero.offsetHeight / 2; }, duration: 1, ease: 'none' }, 0)
         .fromTo(hero, { '--cover': 0 }, { '--cover': 0.75, duration: 1, ease: 'none' }, 0)
         .fromTo(bits[0], { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.35, stagger: { each: 0.08, from: 'end' }, ease: 'power2.out' }, 0.3)
         .scrollTrigger;
@@ -419,7 +422,7 @@
     // Beim Abbau räumt der Aufräumer unten auf, denn beim Abbau durch matchMedia feuert onToggle nicht sicher.
     var guard = ScrollTrigger.create({
       trigger: stageEl,
-      start: function () { return 'top top+=' + (hh() + 150); },
+      start: function () { return pin.start - 150; },
       end: function () { return toTeam ? toTeam.end + hh() : st.end; },
       onToggle: function (self) { if (PS.headerHold) PS.headerHold(self.isActive); }
     });
@@ -445,7 +448,7 @@
     }
     section.addEventListener('click', onJump);
 
-    section.__story = { st: st, guard: guard, fromHead: fromHead, last: last, revert: revert };
+    section.__story = { st: st, pin: pin, guard: guard, fromHead: fromHead, last: last, revert: revert };
 
     return teardown;
 

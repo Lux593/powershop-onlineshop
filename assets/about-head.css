@@ -3,11 +3,19 @@
    Lädt nur mit der Section. Schwarz wie Kopfleiste und Bühne: links Überschrift und Satz, rechts das Crew-Foto bis an den rechten
    Rand, am Handy das Foto oben über die volle Breite. Kein Bar & Shield und kein Signet im Kopf.
    Der Kopf füllt das Fenster unter der Kopfleiste ganz aus.
-   Bewegung (nur mit html.has-motion, ohne reduzierte Bewegung): Das Foto setzt sich beim Laden aus einer leichten Vergrößerung. Beim
-   Weiterscrollen schiebt sich die Geschichte von unten über den Kopf: Text und Foto sinken dabei halb so schnell und dunkeln ab
-   (--cover setzt assets/about-story.js an .about-head, nur mit laufender Bühne).
+   Bewegung (nur mit html.has-motion, ohne reduzierte Bewegung): Das Foto setzt sich beim Laden aus einer leichten Vergrößerung. Mit
+   der Bühne der Geschichte liegt diese hinter dem Kopf (about-story.css), der Kopf scrollt über ihr weg wie ein Rolltor und dunkelt
+   dabei ab (--cover setzt assets/about-story.js an .about-head).
    Vorlage: entwuerfe/ueber-uns/h-vollbild.html (.page-head*), dort mit .page-head statt .about-head.
    ========================================================================== */
+
+/* Höhe des Kopfs: der Rest des ersten Bildschirms, Fenster minus das, was beim Laden darüber steht (Ankündigung, Kopfleiste, dazu
+   die Service-Navigation, 56 px plus Linie wie --subnav-h in pages.css; sie steht in der Vorlage über dem Kopf). Steht an html, weil
+   about-story.css die Bühne um genau diese Höhe unter den Kopf zieht. :has lässt sich nicht verschachteln, darum ohne Nachbarschaft. */
+html:has(.about-head) { --about-head-h: calc(100svh - var(--announce-h, 0px) - var(--header-h) - env(safe-area-inset-top, 0px)); }
+html:has(.about-head):has(.service-subnav) {
+  --about-head-h: calc(100svh - var(--announce-h, 0px) - var(--header-h) - 57px - env(safe-area-inset-top, 0px));
+}
 
 /* Spalten wie die Etappen darunter: Die Fotokante sitzt genau über deren Teilung. Die Inhaltsbreite (zwei Hälften zu
    container/2 - gutter) entspricht der von .container. */
@@ -15,10 +23,10 @@
   position: relative;
   display: grid;
   overflow: clip;
-  /* Der Kopf füllt den Rest des ersten Bildschirms: Fenster minus das, was beim Laden darüber steht (Ankündigung, Kopfleiste, dazu
-     die Service-Navigation, wenn sie direkt davor steht, siehe unten). Seine Unterkante ist die Unterkante des Fensters. */
-  --above: calc(var(--announce-h, 0px) + var(--header-h));
-  min-height: calc(100svh - var(--above) - env(safe-area-inset-top, 0px));
+  /* Der Kopf füllt den Rest des ersten Bildschirms, seine Unterkante ist die Unterkante des Fensters. z-index: Er liegt über der
+     Bühne, die mit Bewegung hinter ihm beginnt. */
+  z-index: 2;
+  min-height: var(--about-head-h);
   grid-template-columns:
     [full-start] minmax(var(--gutter), 1fr)
     [content-start] minmax(0, calc(var(--container) / 2 - var(--gutter)))
@@ -45,10 +53,7 @@
 /* absolut: das Querformat des Fotos bestimmt nicht die Höhe */
 .about-head__photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 72%; }
 
-/* Service-Navigation direkt davor (sections/service-subnav.liquid): 56 px plus Linie, wie --subnav-h in pages.css */
-.shopify-section:has(.service-subnav) + .section-about-head .about-head { --above: calc(var(--announce-h, 0px) + var(--header-h) + 57px); }
-
-/* Abdunkeln, während die Geschichte darüberfährt (0 bis 0,75, about-story.js). Liegt über Text und Foto. */
+/* Abdunkeln, während der Kopf über der Bühne wegscrollt (0 bis 0,75, about-story.js). Liegt über Text und Foto. */
 .about-head::after {
   content: "";
   position: absolute;

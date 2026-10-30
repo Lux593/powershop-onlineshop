@@ -109,6 +109,10 @@
     border-top: 0;
   }
   .has-motion .about-story--stage:not(.is-live):not(.is-static) .leaf:first-child .leaf__media { min-height: 0; }
+  /* Steht der Seitenkopf direkt davor, beginnt die Bühne hinter ihm (er liegt mit z-index darüber, about-head.css): um seine Höhe
+     hochgezogen. Das Skript pinnt sie, sobald sie die Kopfleiste erreicht, und der Kopf scrollt über ihr weg (Auftritt, about-story.js,
+     dort rest). Gilt schon vor dem Skript, damit beim Start nichts springt, und auch mit is-live. */
+  .has-motion .section-about-head + .shopify-section .about-story--stage:not(.is-static) { margin-top: calc(-1 * var(--about-head-h, 0px)); }
 }
 
 /* ---------------- Live: Bühne steht, die Etappen liegen übereinander ---------------- */

@@ -275,31 +275,38 @@
     return c;
   };
 
-  // Auftritt aus dem Kopf (about-story.js, fromHead): Bei scrollY 0 liegt der Inhalt der Bühne (Spur und Balken) eine Fenster- minus
-  // Kopfleistenhöhe über ihr, also unsichtbar über ihrer Oberkante. Auf halbem Weg steht er schon an der Stelle des Pinnens (Oberkante
-  // auf der Kopfleiste), der Kopf ist halb abgedunkelt und gesunken. Am Ende des Wegs ist nichts mehr verschoben, alles eingeblendet.
+  // Auftritt aus dem Kopf (about-story.js): Die Bühne beginnt hinter dem Kopf (gleiche Oberkante), pinnt an der Kopfleiste, und der Kopf
+  // scrollt über ihr weg. Solange er das tut, steht die erste Etappe still (der Fehler vom 30.10.: Sie sprang bei jedem Scrollen auf und
+  // ab, weil das Skript sie der Scrollposition nachführte). Auf halbem Weg endet der Kopf auf halber Strecke und ist halb abgedunkelt.
+  // Am Ende des Wegs beginnt das Umblättern, Kopf weg, alles eingeblendet.
   UU.add('story:open', async function () {
-    var f = [], s = story(), fh = s.fromHead, hero = document.querySelector('[data-about-head]');
-    var track = document.querySelector('.about-story__track'), rail = document.querySelector('.about-story__rail');
-    var ty = function (e) { var t = getComputedStyle(e).transform; return t === 'none' ? 0 : new DOMMatrixReadOnly(t).m42; };
+    var f = [], s = story(), fh = s.fromHead, pin = s.pin, st = s.st, hero = document.querySelector('[data-about-head]');
+    var stageEl = sec().querySelector('[data-stage]'), leaf = leavesOf()[0];
     var cover = function () { return parseFloat(getComputedStyle(hero).getPropertyValue('--cover')) || 0; };
-    var bits0 = [leavesOf()[0].querySelector('.leaf__year')].concat(Array.prototype.slice.call(leavesOf()[0].querySelectorAll('.leaf__text > *')));
+    var bits0 = [leaf.querySelector('.leaf__year')].concat(Array.prototype.slice.call(leaf.querySelectorAll('.leaf__text > *')));
     var hh = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 0;
-    if (!fh) return ['Kopf direkt vor der Geschichte, aber kein Auftritt (__story.fromHead fehlt)'];
-    await go(fh.start); await wait(100);
-    if (!near(ty(track), hh - innerHeight, 2)) f.push('Anfang: Spur um ' + ty(track).toFixed(1) + ' px verschoben statt ' + (hh - innerHeight).toFixed(1));
-    if (!near(ty(rail), hh - innerHeight, 2)) f.push('Anfang: Balken um ' + ty(rail).toFixed(1) + ' px verschoben');
-    if (cover() > .01) f.push('Anfang: Kopf schon abgedunkelt (--cover ' + cover() + ')');
-    await go((fh.start + fh.end) / 2); await wait(100);
-    var top = track.getBoundingClientRect().top;
-    if (!near(cover(), .375, .03)) f.push('Mitte: --cover ' + cover().toFixed(3) + ' statt 0,375');
-    var heroText = hero.querySelector('.about-head__text');
-    if (!(ty(heroText) > 0)) f.push('Mitte: Text im Kopf sinkt nicht (translateY ' + ty(heroText).toFixed(1) + ')');
-    if (!near(top, hh, 3)) f.push('Mitte: Spur beginnt bei ' + top.toFixed(1) + ' px, nicht an der Kopfleiste (' + hh + '), der Inhalt steht nicht still');
-    await go(fh.end); await wait(100);
-    if (Math.abs(ty(track)) > .5 || Math.abs(ty(rail)) > .5) f.push('Ende: Spur oder Balken noch verschoben (' + ty(track).toFixed(1) + ' / ' + ty(rail).toFixed(1) + ')');
+    if (!fh || !pin) return ['Kopf direkt vor der Geschichte, aber kein Auftritt (__story.fromHead oder pin fehlt)'];
+    var restPx = st.start - pin.start;
+    if (!near(restPx, hero.getBoundingClientRect().height, 3)) f.push('Weg des Auftritts ' + restPx.toFixed(1) + ' px statt der Kopfhöhe ' + hero.getBoundingClientRect().height.toFixed(1));
+    await go(0); await wait(100);
+    if (!near(stageEl.getBoundingClientRect().top, hero.getBoundingClientRect().top, 2)) f.push('Bei scrollY 0 beginnt die Bühne nicht hinter dem Kopf (' + stageEl.getBoundingClientRect().top.toFixed(1) + ' / ' + hero.getBoundingClientRect().top.toFixed(1) + ')');
+    if (+getComputedStyle(hero).zIndex <= 0) f.push('Kopf liegt nicht über der Bühne (z-index ' + getComputedStyle(hero).zIndex + ')');
+    // Stillstand: an mehreren Stellen des Wegs dieselbe Lage, in einzelnen Schritten wie mit dem Mausrad
+    var tops = [];
+    for (var k = 1; k <= 6; k++) { await go(pin.start + restPx * k / 7); tops.push(leaf.getBoundingClientRect().top); }
+    var spread = Math.max.apply(null, tops) - Math.min.apply(null, tops);
+    if (spread > .5) f.push('Erste Etappe bewegt sich während des Auftritts um ' + spread.toFixed(1) + ' px (' + tops.map(function (t) { return t.toFixed(1); }).join(', ') + ')');
+    if (!near(tops[0], hh, 2)) f.push('Erste Etappe steht während des Auftritts bei ' + tops[0].toFixed(1) + ' px statt an der Kopfleiste (' + hh + ')');
+    await go(pin.start + restPx / 2); await wait(800);
+    var hb = hero.getBoundingClientRect().bottom;
+    if (!near(hb, hh + restPx / 2, 3)) f.push('Mitte: Kopf endet bei ' + hb.toFixed(1) + ' statt ' + (hh + restPx / 2).toFixed(1));
+    if (!near(cover(), .375, .04)) f.push('Mitte: --cover ' + cover().toFixed(3) + ' statt 0,375');
+    if (!near(st.progress, 0, .0001)) f.push('Mitte: Umblättern läuft schon (' + st.progress.toFixed(4) + ')');
+    await go(st.start); await wait(900);
+    if (hero.getBoundingClientRect().bottom > hh + 1) f.push('Ende: Kopf noch sichtbar (endet bei ' + hero.getBoundingClientRect().bottom.toFixed(1) + ')');
     bits0.forEach(function (b, k) { if (parseFloat(getComputedStyle(b).opacity) < .99) f.push('Ende: Teil ' + (k + 1) + ' der ersten Etappe nicht eingeblendet'); });
     if (!near(cover(), .75, .01)) f.push('Ende: --cover ' + cover().toFixed(3) + ' statt 0,75');
+    await go(0);
     return f;
   }, function () { return motion() || (story() ? '' : 'nur mit Bühne'); });
 
@@ -465,11 +472,18 @@
   }, live);
 
   UU.add('story:header', async function () {
-    var f = [], st = story().st, y = st.start - 170;
-    await go(0); await go(y / 3); await go(2 * y / 3); await go(y); await wait(100);
-    if (!away()) f.push('Vorbedingung: Kopfleiste bei ' + Math.round(y) + ' px nicht weggefahren');
-    await go(st.start - 100); await wait(400);
-    if (away()) f.push('150 px vor dem Pinnen: Kopfleiste nicht eingefahren');
+    // Gepinnt wird ab pin.start (mit Kopf davor beginnt dort der Auftritt, das Umblättern st erst danach)
+    var f = [], st = story().st, p0 = (story().pin || st).start, y = p0 - 170;
+    if (y >= 405) {
+      await go(0); await go(y / 3); await go(2 * y / 3); await go(y); await wait(100);
+      if (!away()) f.push('Vorbedingung: Kopfleiste bei ' + Math.round(y) + ' px nicht weggefahren');
+      await go(p0 - 100); await wait(400);
+      if (away()) f.push('150 px vor dem Pinnen: Kopfleiste nicht eingefahren');
+    } else {
+      // Die Bühne pinnt gleich nach dem Laden (Kopf davor): Die Kopfleiste steht während des Auftritts
+      await go(0); await go(p0 + 200); await go(p0 + 400); await wait(100);
+      if (away()) f.push('Während des Auftritts aus dem Kopf: Kopfleiste fährt weg');
+    }
     await go(st.start + 600); await wait(100);
     if (away()) f.push('Gepinnt und nach unten gescrollt: Kopfleiste fährt weg');
     var spacer = sec().querySelector('.pin-spacer');
@@ -497,11 +511,7 @@
     }
     await go(0);
     return f;
-  }, function () {
-    var s = story();
-    if (!s) return '__story fehlt';
-    return s.st.start - 170 < 405 ? 'Bühne beginnt zu weit oben (header.js zeigt die Kopfleiste oberhalb von 400 px immer)' : '';
-  });
+  }, function () { return story() ? '' : '__story fehlt'; });
 
   UU.add('story:short', async function () {
     var f = [], s = sec();
