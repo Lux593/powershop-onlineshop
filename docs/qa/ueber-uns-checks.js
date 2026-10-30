@@ -151,4 +151,64 @@
     return f;
   }, motion);
 
+  // ---- Task 2: Seitenkopf „Halle, dunkel“ ----
+  // Breite des Inhalts ohne Scrollbalken. vw-Werte in CSS rechnen dagegen mit innerWidth (Scrollbalken zählt mit).
+  var cw = function () { return document.documentElement.clientWidth; };
+  var vw = function () { return window.innerWidth / 100; };
+  var clamp = function (lo, v, hi) { return Math.min(hi, Math.max(lo, v)); };
+  var near = function (a, b, tol) { return Math.abs(a - b) <= tol; };
+
+  UU.add('head:desktop', function () {
+    var f = [], head = document.querySelector('.about-head'), photo = document.querySelector('.about-head__photo');
+    if (!head || !photo) return ['.about-head fehlt'];
+    var r = photo.getBoundingClientRect(), left = cw() * 1.08 / 2.08;
+    if (!near(r.left, left, 2)) f.push('Fotokante bei ' + r.left.toFixed(1) + ' px statt ' + left.toFixed(1));
+    if (!near(r.right, cw(), 1)) f.push('Foto endet bei ' + r.right.toFixed(1) + ' px, nicht am rechten Rand (' + cw() + ')');
+    var h = head.getBoundingClientRect().height, hSoll = clamp(440, 38 * vw(), 640);
+    if (!near(h, hSoll, 1)) f.push('Höhe des Kopfs ' + h.toFixed(1) + ' px statt ' + hSoll.toFixed(1));
+    var h1 = document.querySelector('.about-head h1'), fs = px(h1, 'fontSize'), fsSoll = clamp(44, 5.8 * vw(), 92);
+    if (!near(fs, fsSoll, .5)) f.push('h1 ist ' + fs.toFixed(1) + ' px groß statt ' + fsSoll.toFixed(1));
+    var em = h1.querySelector('em'), probe = document.body.appendChild(document.createElement('i'));
+    probe.style.color = 'var(--c-orange)';
+    var orange = getComputedStyle(probe).color; probe.remove();
+    if (!em) f.push('Kein em in der h1');
+    else if (getComputedStyle(em).color !== orange) f.push('em in der h1 hat ' + getComputedStyle(em).color + ' statt --c-orange (' + orange + ')');
+    return f;
+  }, function () { return cw() >= 900 ? '' : 'nur ab 900 px Breite'; });
+
+  UU.add('head:mobile', function () {
+    var f = [], head = document.querySelector('.about-head'), photo = document.querySelector('.about-head__photo');
+    if (!head || !photo) return ['.about-head fehlt'];
+    var r = photo.getBoundingClientRect(), t = rect('.about-head__text');
+    if (r.bottom > t.top + 1) f.push('Foto steht nicht über dem Text (Foto endet bei ' + r.bottom.toFixed(1) + ', Text beginnt bei ' + t.top.toFixed(1) + ')');
+    var soll = Math.min(r.width * .75, .52 * innerHeight);
+    if (!near(r.height, soll, 1)) f.push('Foto ist ' + r.width.toFixed(1) + ' × ' + r.height.toFixed(1) + ', Soll-Höhe ' + soll.toFixed(1) + ' (4 : 3, höchstens 52 % der Fensterhöhe)');
+    var fs = px('.about-head h1', 'fontSize'), fsSoll = clamp(44, 12.8 * vw(), 56);
+    if (!near(fs, fsSoll, .5)) f.push('h1 ist ' + fs.toFixed(1) + ' px groß statt ' + fsSoll.toFixed(1));
+    if (innerWidth === 375 && !near(fs, 48, .5)) f.push('h1 bei 375 px nicht 48 px');
+    return f;
+  }, function () { return cw() < 900 ? '' : 'nur unter 900 px Breite'; });
+
+  UU.add('head:settle', function () {
+    var img = document.querySelector('.about-head__photo img'), html = document.documentElement, f = [];
+    if (!img) return ['Foto im Kopf fehlt'];
+    var name = function () { return getComputedStyle(img).animationName; };
+    if (html.classList.contains('has-motion')) {
+      if (name() !== 'about-head-settle') f.push('Mit has-motion fehlt die Animation about-head-settle (animation-name: ' + name() + ')');
+      html.classList.remove('has-motion');
+      if (name() !== 'none') f.push('Ohne has-motion läuft trotzdem eine Animation: ' + name());
+      html.classList.add('has-motion');
+    } else if (name() !== 'none') {
+      f.push('Ohne has-motion läuft eine Animation: ' + name());
+    }
+    return f;
+  });
+
+  UU.add('head:a11y', function () {
+    var f = [], h1s = document.querySelectorAll('h1'), img = document.querySelector('.about-head__photo img');
+    if (h1s.length !== 1) f.push(h1s.length + ' h1 auf der Seite statt 1');
+    if (!img) f.push('Foto im Kopf fehlt');
+    else if (!(img.getAttribute('alt') || '').trim()) f.push('Foto im Kopf ohne Alt-Text');
+    return f;
+  });
 })();

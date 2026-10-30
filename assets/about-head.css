@@ -1,0 +1,55 @@
+/* ==========================================================================
+   Power Shop – Seitenkopf „Halle, dunkel“ der Über-uns-Seite (sections/about-head.liquid).
+   Lädt nur mit der Section. Schwarz wie Kopfleiste und Bühne: links Überschrift und Satz, rechts das Hallenfoto bis an den rechten
+   Rand, am Handy das Foto oben über die volle Breite. Kein Bar & Shield und kein Signet im Kopf.
+   Einzige Bewegung: Das Foto setzt sich beim Laden aus einer leichten Vergrößerung (nur mit html.has-motion, ohne reduzierte Bewegung).
+   Vorlage: entwuerfe/ueber-uns/h-vollbild.html (.page-head*), dort mit .page-head statt .about-head.
+   ========================================================================== */
+
+/* Spalten wie die Etappen darunter: Die Fotokante sitzt genau über deren Teilung. Die Inhaltsbreite (zwei Hälften zu
+   container/2 - gutter) entspricht der von .container. */
+.about-head {
+  position: relative;
+  display: grid;
+  overflow: clip;
+  min-height: clamp(440px, 38vw, 640px);
+  grid-template-columns:
+    [full-start] minmax(var(--gutter), 1fr)
+    [content-start] minmax(0, calc(var(--container) / 2 - var(--gutter)))
+    [mid] minmax(0, calc(var(--container) / 2 - var(--gutter)))
+    [content-end] minmax(var(--gutter), 1fr) [full-end];
+}
+.about-head h1 { max-width: 11ch; font-size: clamp(44px, 5.8vw, 92px); font-weight: 800; line-height: .88; }
+.about-head h1 em { font-style: normal; color: var(--c-orange); }
+.about-head p { margin-top: var(--s-3); max-width: 50ch; font-size: clamp(17px, 1.35vw, 20px); color: var(--c-on-dark); }
+
+.about-head__text {
+  position: relative;
+  z-index: 1;
+  grid-column: content-start / mid;
+  grid-row: 1;
+  align-self: center;
+  min-width: 0;
+  padding-block: clamp(56px, 6vw, 104px);
+  padding-right: clamp(24px, 4vw, 64px);
+}
+
+/* Die Fotokante sitzt genau über der Teilung der Etappen darunter (Spalten 1.08fr | 1fr): oben Text | Foto, darunter Foto | Text */
+.about-head__photo { position: absolute; inset: 0 0 0 calc(108% / 2.08); margin: 0; overflow: hidden; background: var(--c-black); }
+/* absolut: das Hochformat bestimmt nicht die Höhe */
+.about-head__photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 72%; }
+
+/* Setzen beim Laden: eine Animation statt eines Übergangs, denn ohne Zustandswechsel liefe ein Übergang nie. has-motion setzt das
+   Head-Skript vor dem ersten Bild (layout/theme.liquid), sie startet also mit der Seite. backwards hält das Foto in der Verzögerung bei 1,08. */
+@keyframes about-head-settle { from { transform: scale(1.08); } to { transform: scale(1); } }
+@media (prefers-reduced-motion: no-preference) {
+  .has-motion .about-head__photo img { animation: about-head-settle 1.8s var(--ease-out) .1s backwards; }
+}
+
+/* Handy: das Foto über die volle Breite oben, darunter der Text */
+@media (max-width: 899.98px) {
+  .about-head { min-height: 0; }
+  .about-head h1 { font-size: clamp(44px, 12.8vw, 56px); }
+  .about-head__photo { position: relative; inset: auto; grid-column: full; grid-row: 1; aspect-ratio: 4 / 3; max-height: 52svh; }
+  .about-head__text { grid-column: content-start / content-end; grid-row: 2; padding: 28px 0 40px; }
+}

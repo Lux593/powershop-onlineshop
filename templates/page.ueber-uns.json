@@ -9,18 +9,18 @@
         "sticky": false
       }
     },
-    "main": {
-      "type": "service-page",
+    "head": {
+      "type": "about-head",
       "settings": {
-        "heading": "Über uns",
-        "intro": "",
-        "parent_page": "service",
-        "numbered": false
+        "heading": "Seit 1985 in *Familienhand.*",
+        "text": "Offizieller Harley-Davidson-Vertragshändler in Weil am Rhein, in zweiter Generation.",
+        "asset": "ueber-uns-halle-1257.jpg",
+        "alt": "Harley mit Flammen-Lackierung in der Halle, der Scheinwerfer leuchtet, dahinter orange Neonröhren"
       }
     }
   },
   "order": [
     "subnav",
-    "main"
+    "head"
   ]
 }

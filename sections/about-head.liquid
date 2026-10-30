@@ -1,0 +1,71 @@
+{%- comment -%}
+  Seitenkopf der Über-uns-Seite „Halle, dunkel“: schwarz, links Überschrift und Satz, rechts das Hallenfoto bis an den Rand, am
+  Handy das Foto oben. Die Überschrift ist die einzige h1 der Seite. Text zwischen zwei Sternen (*Familienhand.*) wird orange.
+  Das Foto setzt sich beim Laden aus einer leichten Vergrößerung (assets/about-head.css, nur mit Bewegung).
+  Hallenfoto: Standarddatei ueber-uns-halle-1257.jpg mit der kleineren Fassung ueber-uns-halle-720.jpg im srcset; ein im Editor
+  gewähltes Bild ersetzt beide. Wer unter „Standarddatei“ eine andere Datei einträgt, hat kein srcset.
+  Entwurf: entwuerfe/ueber-uns/design-ueber-uns-h.md, Abschnitt 4.2.
+{%- endcomment -%}
+{{ 'about-head.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  comment
+    Die Überschrift aus dem Editor ist schon HTML-sicher (inline_richtext), der Titel der Seite als Ersatz noch nicht.
+  endcomment
+  assign page_title = page.title | escape
+  assign heading = section.settings.heading | default: page_title
+  assign heading_parts = heading | split: '*'
+
+  comment
+    Kleinere Fassung nur für die mitgelieferte Datei: für eine andere Standarddatei wäre sie falsch.
+  endcomment
+  assign photo_srcset = ''
+  if section.settings.asset == 'ueber-uns-halle-1257.jpg'
+    assign photo_srcset = 'ueber-uns-halle-720.jpg 720w, ueber-uns-halle-1257.jpg 1257w'
+  endif
+-%}
+{%- capture photo -%}
+  {%- render 'media',
+    image: section.settings.image,
+    asset: section.settings.asset,
+    srcset: photo_srcset,
+    width: 1257,
+    height: 1280,
+    alt: section.settings.alt,
+    sizes: '(min-width: 900px) 48vw, 100vw',
+    loading: 'eager',
+    fetchpriority: 'high'
+  -%}
+{%- endcapture -%}
+{%- assign photo = photo | strip -%}
+
+<section class="about-head on-dark" aria-labelledby="about-head-title-{{ section.id }}">
+  <div class="about-head__text">
+    <h1 id="about-head-title-{{ section.id }}">
+      {%- for part in heading_parts -%}
+        {%- assign inside = forloop.index0 | modulo: 2 -%}
+        {%- if inside == 1 -%}<em>{{ part }}</em>{%- else -%}{{ part }}{%- endif -%}
+      {%- endfor -%}
+    </h1>
+    {%- if section.settings.text != blank -%}<p>{{ section.settings.text | escape }}</p>{%- endif -%}
+  </div>
+  {%- if photo != blank -%}
+    <figure class="about-head__photo">{{ photo }}</figure>
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "Seitenkopf Über uns",
+  "class": "section-about-head",
+  "settings": [
+    { "type": "inline_richtext", "id": "heading", "label": "Überschrift", "default": "Seit 1985 in *Familienhand.*", "info": "Text zwischen zwei Sternen wird orange, z. B. *Familienhand.* Leer = Titel der Seite. Die einzige Überschrift 1 der Seite." },
+    { "type": "textarea", "id": "text", "label": "Satz darunter", "default": "Offizieller Harley-Davidson-Vertragshändler in Weil am Rhein, in zweiter Generation." },
+    { "type": "image_picker", "id": "image", "label": "Foto (Hochformat)", "info": "Steht rechts, am Handy oben. Am besten im Format 1257 × 1280 oder ähnlich, der Ausschnitt ist auf den unteren Teil des Bildes gelegt." },
+    { "type": "text", "id": "asset", "label": "Standard-Foto im Theme", "default": "ueber-uns-halle-1257.jpg", "info": "Datei in assets/, wenn oben kein Foto gewählt ist." },
+    { "type": "text", "id": "alt", "label": "Bildbeschreibung", "default": "Harley mit Flammen-Lackierung in der Halle, der Scheinwerfer leuchtet, dahinter orange Neonröhren" }
+  ],
+  "presets": [{ "name": "Seitenkopf Über uns" }],
+  "enabled_on": { "templates": ["page"] }
+}
+{% endschema %}
