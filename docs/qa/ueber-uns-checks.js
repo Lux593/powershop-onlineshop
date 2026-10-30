@@ -343,10 +343,12 @@
     return f;
   }, live);
 
+  // Das erste Foto jeder Etappe und die Vorschaubilder (Task 9) laden sofort. Weitere große Fotos der Galerie erst, wenn ihre Etappe die
+  // aktuelle wird oder ein Knopf Hover oder Fokus bekommt (story:gallery lädt sie selbst).
   UU.add('story:eager', async function () {
-    var f = [], imgs = Array.prototype.slice.call(sec().querySelectorAll('.leaf__media img'));
+    var f = [], imgs = Array.prototype.slice.call(sec().querySelectorAll('.leaf__media > img:first-child, .leaf__thumb img'));
     imgs.forEach(function (img, i) {
-      if (img.getAttribute('loading') !== 'eager') f.push('Etappenfoto ' + (i + 1) + ' hat loading="' + img.getAttribute('loading') + '"');
+      if (img.getAttribute('loading') !== 'eager') f.push('Etappenfoto ' + (i + 1) + ' (' + img.src.split('/').pop().split('?')[0] + ') hat loading="' + img.getAttribute('loading') + '"');
     });
     var ok = function () { return imgs.every(function (img) { return img.complete && img.naturalWidth > 0; }); };
     for (var t = 0; t < 50 && !ok(); t++) await wait(100);
@@ -454,6 +456,129 @@
     if (story().last !== n - 1) f.push('story().last ist ' + story().last + ' bei ' + n + ' Etappen');
     return f;
   }, function () { var s = sec(); return s && (s.querySelectorAll('.leaf').length === 1 || story()) ? '' : 'nur mit Bühne oder einer Etappe'; });
+
+  // ---- Task 9: Fotogalerie je Etappe ----
+  // Ablauf: Vorlage vorübergehend ändern (1985 bekommt per „assets_more“ zwei weitere vorhandene Dateien, z. B.
+  // "ueber-uns-vorplatz-1280.jpg | Vorplatz\nueber-uns-theke-1280.jpg | Theke"), hochladen lassen, neu laden, prüfen, danach
+  // git restore templates/page.ueber-uns.json. Ohne Etappe mit zwei und mehr Fotos werden die Prüfungen übersprungen.
+  var galleries = function () { return Array.prototype.slice.call(sec().querySelectorAll('.leaf--gallery')); };
+  var withGallery = function () {
+    var s = sec();
+    return s && s.querySelector('.leaf__thumbs') ? '' : 'nur mit einer Etappe mit zwei und mehr Fotos (Vorlage vorübergehend ändern)';
+  };
+  // Große Fotos einer Etappe in der Reihenfolge der Vorschau
+  var shotsOf = function (leaf) {
+    return Array.prototype.filter.call(leaf.querySelector('.leaf__media').children, function (e) { return e.tagName === 'IMG'; });
+  };
+  var shownShot = function (img) { return !img.hidden && img.getAttribute('aria-hidden') !== 'true' && getComputedStyle(img).visibility === 'visible'; };
+  // Waagerechte Verschiebung aus dem berechneten transform (WAAPI-Animationen stehen nicht im style-Attribut)
+  var tx = function (e) { var t = getComputedStyle(e).transform; return t === 'none' ? 0 : new DOMMatrixReadOnly(t).m41; };
+  // Etappe k auf der Bühne zeigen (mit Bühne), Werte danach lesen
+  var showLeaf = function (leaf) { var s = story(); if (s) at(leavesOf().indexOf(leaf) / s.last); };
+
+  // Vorschau nur ab zwei Fotos, ein Knopf je Foto, genau einer gewählt, 44 px Klickfläche, nichts ragt aus der Etappe. Die Maße bei
+  // 1440 × 900 und 1280 × 620, am Handy bei 375 × 812 und 320 × 640 prüfen (resize_window, neu laden).
+  UU.add('story:thumbs', function () {
+    var f = [];
+    leavesOf().forEach(function (leaf, i) {
+      var shots = shotsOf(leaf), box = leaf.querySelector('.leaf__thumbs'), btns = leaf.querySelectorAll('.leaf__thumb'), n = 'Etappe ' + (i + 1);
+      if (shots.length < 2) {
+        if (box || btns.length) f.push(n + ': Vorschau bei ' + shots.length + ' Foto');
+        if (leaf.classList.contains('leaf--gallery')) f.push(n + ': leaf--gallery bei ' + shots.length + ' Foto');
+        return;
+      }
+      if (!box) { f.push(n + ': ' + shots.length + ' Fotos, aber keine Vorschau'); return; }
+      if (!leaf.classList.contains('leaf--gallery')) f.push(n + ': ohne leaf--gallery');
+      if (box.getAttribute('role') !== 'group' || !/^Fotos zu /.test(box.getAttribute('aria-label') || '')) f.push(n + ': .leaf__thumbs ohne role="group" und aria-label „Fotos zu …“');
+      if (box.parentElement !== leaf.querySelector('.leaf__text') || box !== box.parentElement.lastElementChild) f.push(n + ': Vorschau steht nicht am Ende von .leaf__text');
+      if (btns.length !== shots.length) f.push(n + ': ' + btns.length + ' Knöpfe bei ' + shots.length + ' Fotos');
+      if (leaf.querySelectorAll('.leaf__thumb[aria-pressed="true"]').length !== 1) f.push(n + ': nicht genau ein Knopf mit aria-pressed="true"');
+      var visible = shots.filter(shownShot);
+      if (visible.length !== 1) f.push(n + ': ' + visible.length + ' große Fotos sichtbar statt 1');
+      shots.forEach(function (img, k) {
+        if (!img.hasAttribute('alt')) f.push(n + ': großes Foto ' + (k + 1) + ' ohne alt');
+        if (k && !img.hidden && !shownShot(img)) f.push(n + ': weiteres Foto ' + (k + 1) + ' weder hidden noch sichtbar');
+      });
+      showLeaf(leaf);
+      var lr = leaf.getBoundingClientRect();
+      Array.prototype.forEach.call(btns, function (b, k) {
+        var r = b.getBoundingClientRect(), img = b.querySelector('img');
+        if (b.type !== 'button') f.push(n + ': Knopf ' + (k + 1) + ' ohne type="button"');
+        if (!new RegExp('^Foto ' + (k + 1) + ' von ' + btns.length + '(: |$)').test(b.getAttribute('aria-label') || '')) f.push(n + ': Knopf ' + (k + 1) + ' heißt „' + b.getAttribute('aria-label') + '“');
+        if (!img || img.getAttribute('alt') !== '') f.push(n + ': Vorschaubild ' + (k + 1) + ' ohne alt=""');
+        if (r.height < 44) f.push(n + ': Knopf ' + (k + 1) + ' ist ' + r.height.toFixed(1) + ' px hoch');
+        if (!near(r.width / r.height, 1.5, .02)) f.push(n + ': Knopf ' + (k + 1) + ' ist ' + r.width.toFixed(1) + ' × ' + r.height.toFixed(1) + ' statt 3 : 2');
+      });
+      var br = box.getBoundingClientRect();
+      if (br.bottom > lr.bottom + .5) f.push(n + ': Vorschau endet bei ' + br.bottom.toFixed(1) + ', die Etappe bei ' + lr.bottom.toFixed(1) + ' (' + innerWidth + ' × ' + innerHeight + ')');
+      if (br.right > lr.right + .5) f.push(n + ': Vorschau ragt rechts aus der Etappe (' + innerWidth + ' × ' + innerHeight + ')');
+    });
+    return f;
+  }, withGallery);
+
+  // Klick auf Foto 3 (rechts vom gewählten): Es kommt von links (translateX < 0). Klick zurück auf Foto 1 (links): Es kommt von rechts
+  // (translateX > 0). Nach 700 ms kein transform mehr, aria-pressed umgesprungen, das alte Foto ausgeblendet. Ein Klick während des
+  // Schiebens beendet das laufende sofort. scrollY bleibt. Ohne has-motion wechselt das Foto sofort.
+  UU.add('story:gallery', async function () {
+    var f = [], leaf = galleries().filter(function (l) { return shotsOf(l).length >= 3; })[0];
+    if (!leaf) return ['Keine Etappe mit drei Fotos (Vorlage: 1985 mit zwei weiteren Dateien)'];
+    var btns = leaf.querySelectorAll('.leaf__thumb'), shots = shotsOf(leaf), html = document.documentElement;
+    var pressed = function (k) { return btns[k].getAttribute('aria-pressed') === 'true'; };
+    showLeaf(leaf);
+    // Alle Fotos vorher laden, sonst wartet der Wechsel aufs Dekodieren und die 100 ms stimmen nicht
+    shots.forEach(function (img) { img.loading = 'eager'; });
+    await Promise.all(shots.map(function (img) { return img.decode().catch(function () {}); }));
+    if (!pressed(0)) { btns[0].click(); await wait(800); }
+    var y = window.scrollY;
+    try {
+      btns[2].click(); await wait(100);
+      var t = tx(shots[2]);
+      if (!(t < 0)) f.push('100 ms nach Klick auf Foto 3: translateX ' + t.toFixed(1) + ', erwartet < 0 (von links)');
+      if (!shownShot(shots[0])) f.push('Während des Schiebens ist Foto 1 nicht mehr sichtbar (soll stehen bleiben)');
+      await wait(600);
+      if (getComputedStyle(shots[2]).transform !== 'none') f.push('700 ms nach Klick auf Foto 3: transform ' + getComputedStyle(shots[2]).transform);
+      if (!pressed(2) || pressed(0)) f.push('700 ms nach Klick auf Foto 3: aria-pressed nicht umgesprungen');
+      if (!shownShot(shots[2]) || shownShot(shots[0])) f.push('700 ms nach Klick auf Foto 3: Foto 3 nicht allein sichtbar');
+      btns[0].click(); await wait(100);
+      t = tx(shots[0]);
+      if (!(t > 0)) f.push('100 ms nach Klick auf Foto 1: translateX ' + t.toFixed(1) + ', erwartet > 0 (von rechts)');
+      await wait(600);
+      if (getComputedStyle(shots[0]).transform !== 'none') f.push('700 ms nach Klick auf Foto 1: transform ' + getComputedStyle(shots[0]).transform);
+      if (!pressed(0) || pressed(2)) f.push('700 ms nach Klick auf Foto 1: aria-pressed nicht umgesprungen');
+      if (!shots[2].hidden) f.push('700 ms nach Klick auf Foto 1: Foto 3 nicht hidden');
+      // Klick während des Schiebens: Das laufende springt sofort ans Ende
+      btns[1].click(); await wait(100);
+      btns[2].click();
+      if (getComputedStyle(shots[1]).transform !== 'none' || shots[1].getAnimations().length) f.push('Zweiter Klick während des Schiebens: Foto 2 läuft weiter');
+      await wait(700);
+      if (!pressed(2) || !shownShot(shots[2]) || shownShot(shots[1])) f.push('Nach zwei schnellen Klicks steht nicht Foto 3');
+      if (!near(window.scrollY, y, .5)) f.push('scrollY nach den Klicks ' + window.scrollY + ' statt ' + y);
+      // Ohne has-motion: sofort, ohne transform
+      html.classList.remove('has-motion');
+      btns[0].click();
+      if (!pressed(0) || !shownShot(shots[0]) || shownShot(shots[2])) f.push('Ohne has-motion: Foto 1 nicht sofort da');
+      if (getComputedStyle(shots[0]).transform !== 'none') f.push('Ohne has-motion: Foto 1 mit transform');
+    } finally {
+      html.classList.add('has-motion');
+      if (!pressed(0)) { btns[0].click(); await wait(800); }
+    }
+    return f;
+  }, function () {
+    return motion() || withGallery() || (matchMedia('(prefers-reduced-motion: reduce)').matches ? 'nur ohne reduzierte Bewegung' : '');
+  });
+
+  // Mit laufender Bühne sind nur die Vorschauknöpfe der aktuellen Etappe per Tab erreichbar (tabindex -1 an allen übrigen)
+  UU.add('story:thumbs-tab', function () {
+    var f = [], L = leavesOf(), last = story().last;
+    galleries().forEach(function (leaf) {
+      var k = L.indexOf(leaf), other = k < last ? k + 1 : k - 1, btns = Array.prototype.slice.call(leaf.querySelectorAll('.leaf__thumb'));
+      at(other / last);
+      if (btns.some(function (b) { return b.tabIndex >= 0; })) f.push('Aktuelle Etappe ' + (other + 1) + ': Vorschauknöpfe von Etappe ' + (k + 1) + ' per Tab erreichbar');
+      at(k / last);
+      if (btns.some(function (b) { return b.tabIndex < 0; })) f.push('Aktuelle Etappe ' + (k + 1) + ': eigene Vorschauknöpfe nicht per Tab erreichbar');
+    });
+    return f;
+  }, function () { return live() || withGallery(); });
 
   // ---- Task 6: Übergang von der Bühne zum Team ----
   // Steht vor story:revert, damit UU.run('story') sie noch mit Bühne ausführt.

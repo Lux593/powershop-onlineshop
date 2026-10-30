@@ -14,6 +14,7 @@
    - Kopfleiste: Ab 150 px vor dem Pinnen bis eine Kopfleistenhöhe nach dem Ende des Übergangs zum Team (ohne Team: bis zum Ende
      des Pinnens) fährt sie ein und bleibt stehen (PS.headerHold aus header.js). Erst dann liegt nichts mehr von der Bühne hinter ihr.
    Ohne Bewegung, im Theme-Editor und unter 600 px Höhe läuft nichts davon: Die Etappen stehen untereinander, die Zahlen sind Anker.
+   Fotogalerie je Etappe (ab zwei Fotos): siehe gallery() unten, läuft unabhängig von der Bühne, auch ohne Bewegung.
    Solange die Bühne läuft, trägt [data-story] die Klasse is-live und __story = { st, guard, last, revert } (Prüfungen, Übergang zum Team).
    Kommt die Bühne nicht, obwohl html.has-motion steht (GSAP fehlt, der Aufbau bricht ab), setzt das Skript is-static: Das hebt die
    Vorstufe aus about-story.css auf, die Etappen stehen untereinander wie ohne Bewegung.
@@ -29,12 +30,131 @@
     var PS = window.PS;
     if (!PS || !PS.on) return;
     PS.on('[data-story]', function (section) {
+      gallery(PS, section); // Fotogalerie der Etappen: unabhängig von der Bühne, auch statisch und auf anderen Seitenvorlagen
       if (!section.classList.contains('about-story--stage')) return; // eine Etappe oder eine andere Seitenvorlage: keine Bühne
       // Nur mit GSAP und ScrollTrigger (PS.motion.scroll). Ohne sie (Theme-Editor, ohne Bewegung, GSAP nicht geladen) statisch.
       if (!PS.motion || !PS.motion.scroll) { section.classList.add('is-static'); return; }
       // Der Aufräumer gehört zur Section
       PS.motion.add(section, function (gsap, ScrollTrigger) { return stage(PS, section, gsap, ScrollTrigger); });
     });
+  }
+
+  /* ---------------- Fotogalerie je Etappe ----------------
+     Etappen mit zwei und mehr Fotos (.leaf--gallery, sections/about-story.liquid) haben unter dem Text eine Vorschau, ein Knopf je Foto.
+     Ein Klick zeigt das große Foto dazu: Es schiebt sich über das bisherige, das stehen bleibt, danach wird das alte ausgeblendet
+     (hidden, beim ersten Foto aria-hidden, siehe about-story.css). Nur translateX, kein Zoom, 0,6 s wie das Umblättern. Ohne GSAP, mit
+     der Web Animations API: Die Galerie läuft auch ohne Bühne und auf anderen Seitenvorlagen.
+     - Vor dem Schieben wartet der Wechsel, bis das Foto dekodiert ist (höchstens 600 ms). Kommt in der Zeit ein neuer Klick, entfällt er
+       (seq, wie im Team). Ein Klick während des Schiebens beendet das laufende sofort (finish), dann startet das neue.
+     - Ohne html.has-motion, mit reduzierter Bewegung (bei jedem Klick neu abgefragt) und im Theme-Editor wechselt das Foto sofort.
+     - Ein Klick ändert nie die Scrollposition und bewegt die Bühne nicht.
+     - Laden: Weitere große Fotos sind lazy und hidden. Sie laden, sobald ein Knopf Hover oder Fokus bekommt, spätestens beim Klick. Mit
+       Bühne lädt sie setup() außerdem, wenn ihre Etappe die aktuelle wird.
+     section.__gallery = { finish } beendet laufende Wechsel (Abbau der Bühne). */
+
+  // Richtung beim Schieben, so wie der Nutzer sie will (nicht die übliche Karussell-Richtung): Liegt das neue Foto in der Vorschau links
+  // vom bisher gewählten, kommt es von der rechten Kante und bewegt sich nach links (Start translateX(100%)). Liegt es rechts davon,
+  // kommt es von links (Start translateX(-100%)). -1 dreht beides um.
+  var SLIDE_FROM = 1;
+  var SLIDE = { duration: 600, easing: 'cubic-bezier(.65, 0, .35, 1)' }; // wie das Umblättern (power2.inOut)
+
+  function gallery(PS, section) {
+    if (section.__gallery) return; // schon gestartet (die Prüfung story:fallback führt das Skript ein zweites Mal aus)
+    var all = [];
+    Array.prototype.forEach.call(section.querySelectorAll('.leaf'), function (leaf) {
+      var media = leaf.querySelector('.leaf__media');
+      var thumbs = Array.prototype.slice.call(leaf.querySelectorAll('.leaf__thumb'));
+      var shots = media ? Array.prototype.filter.call(media.children, function (e) { return e.tagName === 'IMG'; }) : [];
+      if (thumbs.length < 2 || shots.length !== thumbs.length) return;
+      all.push(photos(PS, thumbs, shots));
+    });
+    if (!all.length) return;
+    section.__gallery = { finish: function () { all.forEach(function (g) { g.finish(); }); } };
+  }
+
+  function photos(PS, thumbs, shots) {
+    var cur = 0;       // gezeigtes Foto
+    var seq = 0;       // Zähler der Wechsel: Wartet einer noch aufs Dekodieren, während der nächste kommt, entfällt er
+    var anim = null;   // laufendes Schieben
+    var coming = null, leaving = null;
+
+    function calm() {
+      var reduce = PS.prefersReducedMotion ? PS.prefersReducedMotion() : window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      return !document.documentElement.classList.contains('has-motion') || reduce ||
+        !!(window.Shopify && window.Shopify.designMode) || typeof shots[0].animate !== 'function';
+    }
+    function load(i) { if (shots[i].loading === 'lazy') shots[i].loading = 'eager'; }
+    // Das erste Foto steht im Fluss und gibt der Fläche die Höhe: Es wird nur unsichtbar (aria-hidden, CSS), die weiteren hidden
+    function showShot(i, on) {
+      var img = shots[i];
+      if (i === 0) {
+        if (on) img.removeAttribute('aria-hidden');
+        else img.setAttribute('aria-hidden', 'true');
+      } else {
+        img.hidden = !on;
+      }
+    }
+    function mark(i) {
+      thumbs.forEach(function (b, k) { b.setAttribute('aria-pressed', k === i ? 'true' : 'false'); });
+    }
+    // Wartet, bis das Foto dekodiert ist, höchstens 600 ms (Muster about-team.js). Ein lazy Foto lädt dafür sofort.
+    function ready(img) {
+      return new Promise(function (resolve) {
+        var t = setTimeout(resolve, 600);
+        function done() { clearTimeout(t); resolve(); }
+        if (!img.decode) { done(); return; }
+        img.decode().then(done, done);
+      });
+    }
+    // Beendet ein laufendes Schieben sofort und räumt auf: kein transform bleibt hängen, das alte Foto ist ausgeblendet
+    function finish() {
+      if (!anim) return;
+      var a = anim;
+      anim = null;
+      a.onfinish = null;
+      a.finish(); // ohne fill wirkt sie nach dem Ende nicht mehr, kein transform bleibt stehen
+      if (coming) coming.classList.remove('is-coming');
+      if (leaving !== null && leaving !== cur) showShot(leaving, false);
+      coming = null;
+      leaving = null;
+    }
+    function swap(i) {
+      var from = cur;
+      cur = i;
+      showShot(i, true);
+      showShot(from, false);
+    }
+    function slide(i) {
+      var from = cur, img = shots[i];
+      var dir = (i < from ? 1 : -1) * SLIDE_FROM;
+      cur = i;
+      coming = img;
+      leaving = from;
+      img.classList.add('is-coming');
+      showShot(i, true);
+      anim = img.animate([{ transform: 'translateX(' + dir * 100 + '%)' }, { transform: 'translateX(0)' }], SLIDE);
+      anim.onfinish = finish;
+    }
+    function show(i) {
+      finish();
+      var token = ++seq;
+      mark(i);
+      if (i === cur) return;
+      load(i);
+      if (calm()) { swap(i); return; }
+      ready(shots[i]).then(function () {
+        if (token !== seq || i === cur) return;
+        if (calm()) swap(i); else slide(i);
+      });
+    }
+
+    thumbs.forEach(function (b, k) {
+      b.addEventListener('click', function () { show(k); });
+      // Vorladen, sobald jemand auf den Knopf zeigt oder ihn per Tab erreicht
+      b.addEventListener('pointerenter', function () { load(k); });
+      b.addEventListener('focus', function () { load(k); });
+    });
+    return { finish: finish };
   }
 
   // Höhe der Kopfleiste aus dem Token (64 px, ab 1024 px 76 px). Der Start des Pinnens und --stage-h (CSS) rechnen mit derselben Größe.
@@ -91,9 +211,15 @@
 
     section.classList.add('is-live');
     own.teardown = teardown;
-    // Wartende Etappen liegen rechts außerhalb des beschnittenen Fensters: mit lazy lüden ihre Fotos erst beim Hereinfahren
-    section.querySelectorAll('.leaf__media img').forEach(function (img) { img.loading = 'eager'; });
+    // Wartende Etappen liegen rechts außerhalb des beschnittenen Fensters: mit lazy lüden ihre Fotos erst beim Hereinfahren. Das gilt
+    // für das erste Foto jeder Etappe und die Vorschaubilder. Weitere große Fotos der Galerie laden, wenn ihre Etappe die aktuelle wird
+    // (setActive) oder ein Knopf Hover oder Fokus bekommt (gallery).
+    section.querySelectorAll('.leaf__media > img:first-child, .leaf__thumb img').forEach(function (img) { img.loading = 'eager'; });
+    var thumbs = leaves.map(function (leaf) { return gsap.utils.toArray(leaf.querySelectorAll('.leaf__thumb')); });
 
+    // Aktuelle Etappe: Zahl im Balken (aria-current), weitere Fotos laden. Nur ihre Vorschauknöpfe sind per Tab erreichbar, die der
+    // übrigen Etappen (verdeckt oder rechts außerhalb des Bilds) bekommen tabindex -1. Sonst sorgt die Bühne für nichts dergleichen:
+    // Wartende Etappen tragen weder inert noch aria-hidden, sie haben außer den Vorschauknöpfen nichts Fokussierbares.
     function setActive(i) {
       if (i === current) return;
       current = i;
@@ -101,6 +227,13 @@
         if (k === i) a.setAttribute('aria-current', 'step');
         else a.removeAttribute('aria-current');
       });
+      thumbs.forEach(function (list, k) {
+        list.forEach(function (b) {
+          if (k === i) b.removeAttribute('tabindex');
+          else b.setAttribute('tabindex', '-1');
+        });
+      });
+      leaves[i].querySelectorAll('.leaf__media > img').forEach(function (img) { img.loading = 'eager'; });
     }
 
     /* ---------------- Balken ----------------
@@ -143,7 +276,8 @@
 
     /* ---------------- Umblättern ----------------
        Je Etappe eine Zeiteinheit: Etappe k steht bei k/last ganz da, genau zwischen zwei Umblätterungen. 0 bis 0,6: Die Etappe
-       schiebt sich herein. Ab 0,5: Jahreszahl und Text gleiten nach, 22 % der Bühnenbreite weiter rechts gestartet, am Handy 40 %.
+       schiebt sich herein. Ab 0,5: Jahreszahl, Text, Ort und Fotovorschau gleiten nacheinander nach (bits: alle Kinder von .leaf__text),
+       22 % der Bühnenbreite weiter rechts gestartet, am Handy 40 %. Die Vorschau fährt als Ganzes, die Bilder darin nicht für sich.
        Die 120 px schieben wartende Etappen samt ihrem Schatten ganz aus dem Bild (der weiche Schatten reicht gut 80 px nach links). */
     var push = function () { return viewport.clientWidth * (window.innerWidth < 900 ? 0.4 : 0.22); };
     var bits = leaves.map(function (leaf) {
@@ -250,6 +384,9 @@
       alive = false;
       ScrollTrigger.removeEventListener('refresh', remeasure);
       section.removeEventListener('click', onJump);
+      // Galerie: Die Wahl bleibt, ein laufendes Schieben springt ans Ende, die Vorschauknöpfe sind wieder alle per Tab erreichbar
+      if (section.__gallery) section.__gallery.finish();
+      if (thumbs) thumbs.forEach(function (list) { list.forEach(function (b) { b.removeAttribute('tabindex'); }); });
       section.classList.remove('is-live');
       if (PS.headerHold) PS.headerHold(false);
       delete section.__story;

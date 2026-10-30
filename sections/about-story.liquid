@@ -8,6 +8,10 @@
   es keinen Balken und kein Skript.
   Fotos: ein im Editor gewähltes Bild oder eine Standarddatei aus assets/. Für die mitgelieferten Dateien kennt die Section Maße
   und kleinere Fassungen; eine andere Standarddatei steht ohne srcset und mit dem Seitenverhältnis 4 : 3 im Markup.
+  Fotogalerie: Hat eine Etappe mindestens zwei Fotos (das Foto oben, dazu „Weiteres Foto 2–4“ oder sonst „Weitere Fotos im Theme“,
+  zusammen höchstens vier), stehen die großen Fotos gestapelt in der Fotofläche und unter dem Text eine Vorschau mit je einem Knopf.
+  Ein Klick schiebt das gewählte Foto herein (assets/about-story.js). Mit einem Foto bleibt das Markup ohne Vorschau. Das Skript lädt
+  mit Bühne oder Galerie, auch auf anderen Seitenvorlagen.
   Die Anker der Etappen heißen etappe-<Block-ID>, in der Vorlage also #etappe-1985 usw.
   Entwurf: entwuerfe/ueber-uns/design-ueber-uns-h.md, Abschnitt 4.3 (Vorlage h-vollbild.html, dort .full* statt .about-story*).
 {%- endcomment -%}
@@ -19,6 +23,7 @@
     ändert sich eine, muss die andere mit. Setting und Theme-Editor prüft hier niemand: Ohne sie fehlt html.has-motion, die Vorstufe
     (about-story.css) greift dann ohnehin nicht, und das Skript lässt die Section statisch.
   endcomment
+  assign has_gallery = false
   assign stage = false
   if count > 1 and template.name == 'page' and template.suffix == 'ueber-uns'
     assign stage = true
@@ -26,14 +31,6 @@
 -%}
 {%- if count > 0 or request.design_mode -%}
 {{ 'about-story.css' | asset_url | stylesheet_tag }}
-{%- comment -%}
-  Bühne und Umblättern (nur mit Bewegung, siehe assets/about-story.js), erst ab zwei Etappen. Lädt das Skript nicht, hebt onerror die
-  Vorstufe auf (is-static, about-story.css), sonst bliebe Etappe 1 bühnenhoch mit schwarzem Streifen darunter stehen.
-{%- endcomment -%}
-{%- if stage -%}
-  <script src="{{ 'about-story.js' | asset_url }}" defer onerror="document.querySelectorAll('.about-story--stage').forEach(function (s) { s.classList.add('is-static'); })"></script>
-{%- endif -%}
-
 {%- comment -%}
   H-D Bar & Shield als Kopf des Balkens. Nachgezogene Fassung von assets/hd-bar-shield.png, Form unverändert aus dem Entwurf.
   Kommt die offizielle SVG aus dem Händlerportal, ersetzt sie diesen Pfad.
@@ -60,48 +57,165 @@
         {%- for block in section.blocks -%}
           {%- liquid
             assign b = block.settings
-            comment
-              Maße und kleinere Fassungen der mitgelieferten Standarddateien. Eine andere Datei steht als 4 : 3 im Markup
-              (nur für das Seitenverhältnis vor dem Laden, das Foto füllt seine Fläche ohnehin per object-fit).
-            endcomment
-            assign img_w = 1200
-            assign img_h = 900
-            assign img_srcset = ''
-            case b.asset
-              when 'ueber-uns-team-gerhard.jpg'
-                assign img_w = 720
-                assign img_h = 720
-              when 'ueber-uns-1991-678.jpg'
-                assign img_w = 678
-                assign img_h = 510
-              when 'ueber-uns-vorplatz-1280.jpg'
-                assign img_w = 1280
-                assign img_h = 720
-                assign img_srcset = 'ueber-uns-vorplatz-720.jpg 720w, ueber-uns-vorplatz-1280.jpg 1280w'
-              when 'ueber-uns-theke-1280.jpg'
-                assign img_w = 1280
-                assign img_h = 960
-                assign img_srcset = 'ueber-uns-theke-720.jpg 720w, ueber-uns-theke-1280.jpg 1280w'
-            endcase
             assign focus = b.focus | default: '50% 50%'
             assign year = b.year | escape
+
+            comment
+              Die Fotos der Etappe als Schlüssel, in dieser Reihenfolge: „main“ (das Foto oben: gewähltes Bild oder Standarddatei),
+              dann „i2“ bis „i4“ (Weiteres Foto 2–4), nur wenn keins davon gewählt ist „a0“, „a1“ … (Zeilen aus „Weitere Fotos im
+              Theme“, die Zahl ist die Zeile). Nur Fotos, die etwas zeigen: keine leere Zeile, keine Standarddatei aus der
+              Platzhalterliste (die zeigt snippets/media.liquid ohnehin nicht). Jeder Schlüssel endet mit einem Komma, split verwirft das
+              letzte, leere Stück.
+            endcomment
+            assign keys = ''
+            if b.image != blank
+              assign keys = 'main,'
+            elsif b.asset != blank
+              capture ph
+                render 'is-placeholder', asset: b.asset
+              endcapture
+              if ph == blank
+                assign keys = 'main,'
+              endif
+            endif
+            assign more_lines = ''
+            if b.image_2 != blank or b.image_3 != blank or b.image_4 != blank
+              for n in (2..4)
+                assign setting_id = 'image_' | append: n
+                if b[setting_id] != blank
+                  assign keys = keys | append: 'i' | append: n | append: ','
+                endif
+              endfor
+            elsif b.assets_more != blank
+              assign more_lines = b.assets_more | newline_to_br | split: '<br />'
+              for line in more_lines
+                assign file = line | split: '|' | first | strip
+                if file != blank
+                  capture ph
+                    render 'is-placeholder', asset: file
+                  endcapture
+                  if ph == blank
+                    assign keys = keys | append: 'a' | append: forloop.index0 | append: ','
+                  endif
+                endif
+              endfor
+            endif
+            assign shots = keys | split: ','
+            assign shot_count = shots.size | at_most: 4
+            assign gallery = false
+            if shot_count > 1
+              assign gallery = true
+              assign has_gallery = true
+            endif
+            assign thumbs_html = ''
           -%}
           <li
-            class="leaf{% if b.mono %} leaf--mono{% endif %}"
+            class="leaf{% if b.mono %} leaf--mono{% endif %}{% if gallery %} leaf--gallery{% endif %}"
             id="etappe-{{ block.id }}"
             {{ block.shopify_attributes }}
           >
             <figure class="leaf__media" style="--focus: {{ focus | escape }}">
-              {%- render 'media',
-                image: b.image,
-                asset: b.asset,
-                srcset: img_srcset,
-                width: img_w,
-                height: img_h,
-                alt: b.alt,
-                sizes: '(min-width: 900px) 52vw, 100vw',
-                loading: 'lazy'
-              -%}
+              {%- for key in shots limit: 4 -%}
+                {%- liquid
+                  assign img = nil
+                  assign file = ''
+                  assign alt = ''
+                  if key == 'main'
+                    assign img = b.image
+                    assign file = b.asset
+                    assign alt = b.alt
+                  elsif key == 'i2' or key == 'i3' or key == 'i4'
+                    assign setting_id = key | replace_first: 'i', 'image_'
+                    assign img = b[setting_id]
+                    assign alt = img.alt
+                  else
+                    assign line_index = key | remove_first: 'a' | plus: 0
+                    assign line = more_lines[line_index]
+                    assign line_parts = line | split: '|'
+                    assign file = line_parts.first | strip
+                    assign alt = line | remove_first: line_parts.first | remove_first: '|' | strip
+                  endif
+
+                  comment
+                    Maße und kleinere Fassungen der mitgelieferten Standarddateien. Eine weitere Datei aus assets/, die auf -1280.jpg
+                    (oder .webp …) endet, bekommt die 720er-Fassung gleichen Namens dazu. Jede andere Datei steht ohne srcset als 4 : 3 im
+                    Markup (nur für das Seitenverhältnis vor dem Laden, das Foto füllt seine Fläche ohnehin per object-fit).
+                  endcomment
+                  assign img_w = 1200
+                  assign img_h = 900
+                  assign img_srcset = ''
+                  case file
+                    when 'ueber-uns-team-gerhard.jpg'
+                      assign img_w = 720
+                      assign img_h = 720
+                    when 'ueber-uns-1991-678.jpg'
+                      assign img_w = 678
+                      assign img_h = 510
+                    when 'ueber-uns-vorplatz-1280.jpg'
+                      assign img_w = 1280
+                      assign img_h = 720
+                      assign img_srcset = 'ueber-uns-vorplatz-720.jpg 720w, ueber-uns-vorplatz-1280.jpg 1280w'
+                    when 'ueber-uns-theke-1280.jpg'
+                      assign img_w = 1280
+                      assign img_h = 960
+                      assign img_srcset = 'ueber-uns-theke-720.jpg 720w, ueber-uns-theke-1280.jpg 1280w'
+                    else
+                      if key != 'main' and file contains '-1280.'
+                        assign img_w = 1280
+                        assign img_h = 960
+                        assign file_small = file | replace: '-1280.', '-720.'
+                        assign img_srcset = file_small | append: ' 720w, ' | append: file | append: ' 1280w'
+                      endif
+                  endcase
+
+                  comment
+                    Großes Foto: Das erste steht wie bei einem Foto im Fluss. Die weiteren (leaf__more) liegen darüber, bis zur Wahl hidden.
+                  endcomment
+                  if forloop.first
+                    render 'media', image: img, asset: file, srcset: img_srcset, width: img_w, height: img_h, alt: alt, sizes: '(min-width: 900px) 52vw, 100vw', loading: 'lazy'
+                  else
+                    capture shot_html
+                      render 'media', image: img, asset: file, srcset: img_srcset, width: img_w, height: img_h, alt: alt, sizes: '(min-width: 900px) 52vw, 100vw', loading: 'lazy', class: 'leaf__more'
+                    endcapture
+                    echo shot_html | replace_first: '<img', '<img hidden'
+                  endif
+
+                  comment
+                    Vorschau: 240 px breit aus dem CDN, bei Standarddateien die kleinste Fassung aus dem srcset (sonst die Datei selbst).
+                    Das kleine Bild hat alt="", die Beschreibung trägt der Knopf.
+                  endcomment
+                  if gallery
+                    if img != blank
+                      assign thumb_src = img | image_url: width: 240
+                    else
+                      assign thumb_file = file
+                      if img_srcset != blank
+                        assign thumb_file = img_srcset | split: ' ' | first
+                      endif
+                      assign thumb_src = thumb_file | asset_url
+                    endif
+                    assign thumb_label = 'Foto ' | append: forloop.index | append: ' von ' | append: shot_count
+                    if alt != blank
+                      assign thumb_label = thumb_label | append: ': ' | append: alt
+                    endif
+                    capture thumb_html
+                      echo '<button type="button" class="leaf__thumb" aria-pressed="'
+                      if forloop.first
+                        echo 'true'
+                      else
+                        echo 'false'
+                      endif
+                      echo '" aria-label="'
+                      echo thumb_label | escape
+                      echo '"><img src="'
+                      echo thumb_src | escape
+                      echo '" alt="" width="240" height="160" loading="lazy">'
+                      echo '</button>'
+                    endcapture
+                    assign thumbs_html = thumbs_html | append: thumb_html
+                  endif
+                -%}
+              {%- endfor -%}
             </figure>
             <div class="leaf__body">
               <p class="leaf__year" aria-hidden="true">
@@ -113,6 +227,11 @@
                 {%- if b.text != blank -%}<p>{{ b.text | escape }}</p>{%- endif -%}
                 {%- if b.meta != blank -%}
                   <span class="leaf__meta">{% render 'icon', name: 'map-pin' %}{{ b.meta | escape }}</span>
+                {%- endif -%}
+                {%- if gallery -%}
+                  <div class="leaf__thumbs" role="group" aria-label="Fotos zu {{ year }}">
+                    {{- thumbs_html -}}
+                  </div>
                 {%- endif -%}
               </div>
             </div>
@@ -144,6 +263,15 @@
     {%- endif -%}
   </div>
 </section>
+
+{%- comment -%}
+  Bühne und Umblättern (nur mit Bewegung, siehe assets/about-story.js), erst ab zwei Etappen, dazu die Fotogalerie der Etappen (überall,
+  wo eine Etappe zwei und mehr Fotos hat). Lädt das Skript nicht, hebt onerror die Vorstufe auf (is-static, about-story.css), sonst bliebe
+  Etappe 1 bühnenhoch mit schwarzem Streifen darunter stehen. Die Galerie zeigt dann das erste Foto, ohne Wechsel.
+{%- endcomment -%}
+{%- if stage or has_gallery -%}
+  <script src="{{ 'about-story.js' | asset_url }}" defer onerror="document.querySelectorAll('.about-story--stage').forEach(function (s) { s.classList.add('is-static'); })"></script>
+{%- endif -%}
 {%- endif -%}
 
 {% schema %}
@@ -156,7 +284,7 @@
       "type": "stage",
       "name": "Etappe",
       "settings": [
-        { "type": "paragraph", "content": "Eine Etappe der Geschichte: große Jahreszahl, Überschrift, Text, Ort und Foto. Mit Bewegung schieben sich die Etappen beim Scrollen von rechts übereinander, darunter läuft ein Balken mit allen Jahren. Höchstens sechs, damit die Jahre am Handy in eine Zeile passen." },
+        { "type": "paragraph", "content": "Eine Etappe der Geschichte: große Jahreszahl, Überschrift, Text, Ort und Foto. Mit Bewegung schieben sich die Etappen beim Scrollen von rechts übereinander, darunter läuft ein Balken mit allen Jahren. Höchstens sechs, damit die Jahre am Handy in eine Zeile passen. Bis zu drei weitere Fotos je Etappe stehen als Vorschau unter dem Text." },
         { "type": "text", "id": "year", "label": "Jahr", "default": "1985", "info": "Kurz halten, z. B. „1985“ oder „Heute“. Steht groß auf der Etappe und im Balken." },
         { "type": "checkbox", "id": "dot", "label": "Orangen Punkt hinter dem Jahr", "default": false, "info": "Wie bei „Heute.“" },
         { "type": "text", "id": "title", "label": "Überschrift", "default": "Überschrift der Etappe" },
@@ -165,8 +293,14 @@
         { "type": "image_picker", "id": "image", "label": "Foto", "info": "Füllt die linke Hälfte, am Handy den oberen Teil. Querformat, mindestens 1280 px breit." },
         { "type": "text", "id": "asset", "label": "Standard-Foto im Theme", "info": "Datei in assets/, wenn oben kein Foto gewählt ist. Beides leer = dunkle Fläche." },
         { "type": "text", "id": "alt", "label": "Bildbeschreibung" },
-        { "type": "text", "id": "focus", "label": "Bildausschnitt", "default": "50% 50%", "info": "Welcher Punkt des Fotos sichtbar bleibt, waagerecht und senkrecht in Prozent, z. B. „50% 30%“." },
-        { "type": "checkbox", "id": "mono", "label": "Schwarz-weiß", "default": false, "info": "Wie das Foto von 1985." }
+        { "type": "text", "id": "focus", "label": "Bildausschnitt", "default": "50% 50%", "info": "Welcher Punkt des Fotos sichtbar bleibt, waagerecht und senkrecht in Prozent, z. B. „50% 30%“. Gilt nur für das Foto oben, weitere Fotos zeigen ihre Mitte." },
+        { "type": "checkbox", "id": "mono", "label": "Schwarz-weiß", "default": false, "info": "Wie das Foto von 1985. Gilt für alle Fotos der Etappe." },
+        { "type": "header", "content": "Weitere Fotos" },
+        { "type": "paragraph", "content": "Ab zwei Fotos steht unter dem Text eine Vorschau, durch die man sich klicken kann. Höchstens vier Fotos je Etappe, das Foto oben zählt mit." },
+        { "type": "image_picker", "id": "image_2", "label": "Weiteres Foto 2", "info": "Die Bildbeschreibung kommt aus dem Alt-Text des Bildes in Shopify." },
+        { "type": "image_picker", "id": "image_3", "label": "Weiteres Foto 3" },
+        { "type": "image_picker", "id": "image_4", "label": "Weiteres Foto 4" },
+        { "type": "textarea", "id": "assets_more", "label": "Weitere Fotos im Theme", "placeholder": "ueber-uns-theke-1280.jpg | Holztheke im Showroom", "info": "Eine Zeile je Foto: Dateiname in assets/, dann | und die Bildbeschreibung. Wird nur genutzt, wenn oben keine weiteren Fotos gewählt sind." }
       ]
     }
   ],
