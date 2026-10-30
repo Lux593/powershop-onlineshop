@@ -127,6 +127,33 @@
 
   var motion = function () { return document.documentElement.classList.contains('has-motion') ? '' : 'nur mit has-motion'; };
 
+  // ---- Task 5: Team, Vorladen (steht vor allen anderen Prüfungen) ----
+  // Im Gesamtlauf zuerst: base:hold, die Bühne und team:select/team:wide scrollen am Team vorbei oder laden seine Fotos selbst, danach
+  // sagte die Prüfung nichts mehr. teamEl, T und imgsOf stehen deshalb hier und nicht bei den übrigen Team-Prüfungen.
+  // Gegenprobe zuerst: Oben, mehr als zwei Bildschirme vom Team entfernt, ist noch mindestens ein Foto lazy. Hat ein früherer Schritt
+  // das Team schon nahe gebracht, sind alle eager und die Prüfung bewiese nichts: dann übersprungen (nach dem Neuladen oben einzeln laufen lassen).
+  var teamEl = function () { return document.querySelector('[data-about-team]'); };
+  var T = function (fn) { return function () { var t = teamEl(); return t ? fn(t) : ['[data-about-team] fehlt']; }; };
+  var imgsOf = function (t) { return Array.prototype.slice.call(t.querySelectorAll('img')); };
+  UU.add('team:preload', T(async function (t) {
+    var f = [];
+    await go(0); await wait(300);
+    var far = t.getBoundingClientRect().top + window.scrollY > 2 * innerHeight;
+    if (!far) f.push('Gegenprobe: Das Team liegt oben schon weniger als zwei Bildschirme entfernt');
+    else if (!imgsOf(t).some(function (img) { return img.getAttribute('loading') === 'lazy'; })) f.push('Gegenprobe: Oben, weit vom Team, ist kein Foto mehr lazy');
+    await go(Math.max(0, t.getBoundingClientRect().top + window.scrollY - 1.5 * innerHeight));
+    await wait(300);
+    t.querySelectorAll('img').forEach(function (img, i) {
+      if (img.getAttribute('loading') !== 'eager') f.push('Foto ' + (i + 1) + ' (' + img.src.split('/').pop().split('?')[0] + ') hat loading="' + img.getAttribute('loading') + '"');
+    });
+    await go(0);
+    return f;
+  }), function () {
+    var t = teamEl();
+    return t && imgsOf(t).every(function (img) { return img.getAttribute('loading') === 'eager'; })
+      ? 'alle Fotos schon eager (das Team war schon nah), nach dem Neuladen oben einzeln laufen lassen' : '';
+  });
+
   // ---- Task 1: Grundlagen (Tokens, GSAP auf der Seite, Kopfleiste festhalten) ----
   UU.add('base:gsap', function () {
     return document.documentElement.classList.contains('has-motion') && !(window.gsap && PS.motion.scroll) ? ['GSAP fehlt auf Über uns'] : [];
@@ -409,7 +436,8 @@
       f.push('Teil 2: [data-about-team] fehlt');
     } else {
       // Sie hält eine Kopfleistenhöhe über das Ende des Übergangs hinaus: Bis dahin liegen Balken und Bühnenrest noch hinter ihr
-      var end = toTeamEnd(), hh = headerH(), rail = sec().querySelector('[data-rail]');
+      var end = toTeamEnd(), hh = headerH(), rail = sec().querySelector('[data-rail]'), gEnd = story().guard.end;
+      if (!(Math.abs(gEnd - (end + hh)) < 1)) f.push('guard endet bei ' + gEnd.toFixed(1) + ' statt ' + (end + hh).toFixed(1) + ' (Ende des Übergangs plus Kopfleistenhöhe)');
       await go(st.end); await go((st.end + end) / 2); await wait(100);
       if (away()) f.push('Halbe Strecke des Übergangs zum Team: Kopfleiste weggefahren');
       await go(end + hh / 2); await wait(100);
@@ -603,7 +631,8 @@
     if (zr !== '5') f.push('Balken mit z-index ' + zr + ' statt 5');
     if (!(+zr > +zc)) f.push('Balken (z-index ' + zr + ') liegt nicht über der Abdunkelung (z-index ' + zc + ')');
     if (zt !== '4') f.push('Team mit z-index ' + zt + ' statt 4');
-    // Unterkante der stehenden Kopfleiste, auf halber Strecke gemessen: Genau am Ende gibt guard sie frei, beim Weiterscrollen fährt sie weg.
+    // Unterkante der stehenden Kopfleiste, auf halber Strecke gemessen. Am Ende steht sie noch: guard gibt sie erst eine Kopfleistenhöhe
+    // später frei (toTeam.end + hh, story:header Teil 2).
     // Ohne ihre 1-px-Linie unten (.site-header ist --header-h plus Linie hoch): Die Linie liegt über dem Inhalt darunter, wie beim Pinnen.
     var hb = rect('.site-header').bottom - px('.site-header', 'borderBottomWidth');
     await go(end); await frames(2);
@@ -651,8 +680,9 @@
     var heights = function () { return L.map(function (l) { return l.getBoundingClientRect().height; }); };
     // Soll: die Höhen ohne Vorstufe (ohne about-story--stage greift sie nicht), synchron gemessen
     s.classList.remove('about-story--stage'); var soll = heights(); s.classList.add('about-story--stage');
-    var vorher = heights();
-    if (near(vorher[0], soll[0], 1)) f.push('Vorbedingung: Etappe 1 hat schon vor dem Rückfall ihre statische Höhe, die Vorstufe greift nicht');
+    // Vorbedingung: Die Vorstufe greift. Erkennbar am Rand unter Etappe 1 (Platz für den Balken, --rail-h). Die Höhe taugt dafür nicht:
+    // Bei 1440 × 900 ohne Scrollbalken ist die statische Etappe zufällig genauso hoch wie die Vorstufe (749 px).
+    if (!(px(L[0], 'marginBottom') > 0)) f.push('Vorbedingung: Etappe 1 ohne Rand unten, die Vorstufe greift nicht');
     var src = await (await fetch(document.querySelector('script[src*="about-story.js"]').src, { cache: 'no-store' })).text();
     var added = 0;
     try {
@@ -684,8 +714,6 @@
 
   // ---- Task 5: Team ----
   // Fehlt die Section, scheitern alle team:*-Prüfungen mit „[data-about-team] fehlt“ (nicht überspringen).
-  var teamEl = function () { return document.querySelector('[data-about-team]'); };
-  var T = function (fn) { return function () { var t = teamEl(); return t ? fn(t) : ['[data-about-team] fehlt']; }; };
   var TEAM = ['Richard Link', 'Falk Link', 'Franziska Link', 'Gerhard Link', 'Ingrid Link', 'Jean-Nicolas Kibler', 'Aaron Klosterhuber', 'Jürgen Scheurer'];
   var squish = function (s) { return String(s == null ? '' : s).replace(/\s+/g, ' ').trim(); };
   var cardsOf = function (t) { return Array.prototype.slice.call(t.querySelectorAll('.spot__card')); };
@@ -719,29 +747,6 @@
     if (!t.classList.contains('is-ready')) f.push('is-ready fehlt');
     return f;
   }));
-
-  // Vor team:select und team:wide: Die laden Fotos selbst, danach sagte die Prüfung nichts mehr
-  // Gegenprobe zuerst: Oben, mehr als zwei Bildschirme vom Team entfernt, ist noch mindestens ein Foto lazy. Hat ein früherer Schritt
-  // das Team schon nahe gebracht, sind alle eager und die Prüfung bewiese nichts: dann übersprungen (nach dem Neuladen oben einzeln laufen lassen).
-  var imgsOf = function (t) { return Array.prototype.slice.call(t.querySelectorAll('img')); };
-  UU.add('team:preload', T(async function (t) {
-    var f = [];
-    await go(0); await wait(300);
-    var far = t.getBoundingClientRect().top + window.scrollY > 2 * innerHeight;
-    if (!far) f.push('Gegenprobe: Das Team liegt oben schon weniger als zwei Bildschirme entfernt');
-    else if (!imgsOf(t).some(function (img) { return img.getAttribute('loading') === 'lazy'; })) f.push('Gegenprobe: Oben, weit vom Team, ist kein Foto mehr lazy');
-    await go(Math.max(0, t.getBoundingClientRect().top + window.scrollY - 1.5 * innerHeight));
-    await wait(300);
-    t.querySelectorAll('img').forEach(function (img, i) {
-      if (img.getAttribute('loading') !== 'eager') f.push('Foto ' + (i + 1) + ' (' + img.src.split('/').pop().split('?')[0] + ') hat loading="' + img.getAttribute('loading') + '"');
-    });
-    await go(0);
-    return f;
-  }), function () {
-    var t = teamEl();
-    return t && imgsOf(t).every(function (img) { return img.getAttribute('loading') === 'eager'; })
-      ? 'alle Fotos schon eager (das Team war schon nah), nach dem Neuladen oben einzeln laufen lassen' : '';
-  });
 
   UU.add('team:select', T(async function (t) {
     var f = [], picks = t.querySelectorAll('[data-pick]');

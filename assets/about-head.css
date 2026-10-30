@@ -36,7 +36,7 @@
 
 /* Die Fotokante sitzt genau über der Teilung der Etappen darunter (Spalten 1.08fr | 1fr): oben Text | Foto, darunter Foto | Text */
 .about-head__photo { position: absolute; inset: 0 0 0 calc(108% / 2.08); margin: 0; overflow: hidden; background: var(--c-black); }
-/* absolut: das Hochformat bestimmt nicht die Höhe */
+/* absolut: das Querformat des Fotos bestimmt nicht die Höhe */
 .about-head__photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 72%; }
 
 /* Setzen beim Laden: eine Animation statt eines Übergangs, denn ohne Zustandswechsel liefe ein Übergang nie. has-motion setzt das

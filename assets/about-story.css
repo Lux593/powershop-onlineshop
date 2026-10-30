@@ -248,20 +248,28 @@ html:has(.about-story.is-live) { scroll-behavior: auto; }
 
 /* ---------------- Platz für die Vorschau bei wenig Höhe ----------------
    Auf der Bühne ist jede Etappe genau so hoch wie das Bühnenfenster, was nicht hineinpasst, schneidet sie ab. Bei 1280 × 620 steht der
-   Ort von „Heute“ ohne Vorschau nur 6 px über der Kante, die Vorschau braucht gut 70 px mehr. Darum bekommen nur Etappen mit Vorschau
-   bei wenig Höhe kleinere Vorschaubilder (66 × 44, die Klickfläche bleibt 44 px hoch) und knappere Abstände: Rand oben und unten
-   mit der Fensterhöhe statt mit der Breite, engere Abstände zwischen Text, Ort und Vorschau. Am Handy (unter 760 px Höhe, z. B.
-   320 × 640) gibt zusätzlich das Foto Platz ab: 38 % statt 46 % der Etappe. Jahreszahl und Schriftgrößen bleiben. Ohne Bühne
-   wachsen die Etappen mit dem Inhalt, dort ändern die Regeln nur Abstände. */
+   Ort von „Heute“ ohne Vorschau nur 6 px über der Kante, die Vorschau braucht gut 60 px mehr (gemessen, Task 9). Darum bekommen nur
+   Etappen mit Vorschau bei wenig Höhe kleinere Vorschaubilder (66 × 44, die Klickfläche bleibt 44 px hoch) und knappere Abstände:
+   Rand oben und unten mit der Fensterhöhe statt mit der Breite, engere Abstände zwischen Jahreszahl, Text, Ort und Vorschau. Der Ort
+   steht dort als Block (flex statt inline-flex): Als Inline-Element zog er die Zeilenhöhe des Textes mit, gut 6 px Luft für nichts.
+   Am Handy gibt zusätzlich das Foto Platz ab: 34 % statt 46 % der Etappe. Jahreszahl und Schriftgrößen bleiben.
+   Ohne Vorschau: Am kleinen Handy (unter 700 px Höhe, z. B. 320 × 640) ragte schon der Ort von „Heute“ 14 px über die Kante, dort
+   nimmt das Foto 42 % ein.
+   Ohne Bühne wachsen die Etappen mit dem Inhalt, dort ändern die Regeln nur Abstände und Fotohöhe. */
 @media (min-width: 900px) and (max-height: 800px) {
-  .leaf--gallery .leaf__body { padding-top: clamp(20px, 4vh, 40px); padding-bottom: clamp(20px, 4vh, 40px); }
-  .leaf--gallery .leaf__text p { margin-top: 12px; }
-  .leaf--gallery .leaf__meta, .leaf--gallery .leaf__thumbs { margin-top: var(--s-2); }
+  .leaf--gallery .leaf__body { gap: 12px; padding-top: clamp(16px, 3vh, 40px); padding-bottom: clamp(16px, 3vh, 40px); }
+  .leaf--gallery .leaf__text p { margin-top: 10px; }
+  .leaf--gallery .leaf__meta { display: flex; margin-top: var(--s-2); }
+  .leaf--gallery .leaf__thumbs { margin-top: 12px; }
   .leaf--gallery .leaf__thumb { width: 66px; height: 44px; }
 }
+@media (max-width: 899.98px) and (max-height: 700px) {
+  .leaf { grid-template-rows: minmax(0, 42%) minmax(0, 1fr); }
+}
 @media (max-width: 899.98px) and (max-height: 760px) {
-  .leaf--gallery { grid-template-rows: minmax(0, 38%) minmax(0, 1fr); }
-  .leaf--gallery .leaf__body { padding-top: 14px; padding-bottom: 16px; }
+  .leaf--gallery { grid-template-rows: minmax(0, 34%) minmax(0, 1fr); }
+  .leaf--gallery .leaf__body { gap: 8px; padding-top: 14px; padding-bottom: 16px; }
   .leaf--gallery .leaf__text p { margin-top: 8px; }
-  .leaf--gallery .leaf__meta, .leaf--gallery .leaf__thumbs { margin-top: 10px; }
+  .leaf--gallery .leaf__meta { display: flex; margin-top: 10px; }
+  .leaf--gallery .leaf__thumbs { margin-top: 10px; }
 }
