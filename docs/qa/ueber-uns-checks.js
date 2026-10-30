@@ -445,4 +445,171 @@
     await go(0);
     return f;
   }, live);
+
+  // ---- Task 5: Team ----
+  // Fehlt die Section, scheitern alle team:*-Prüfungen mit „[data-about-team] fehlt“ (nicht überspringen).
+  var teamEl = function () { return document.querySelector('[data-about-team]'); };
+  var T = function (fn) { return function () { var t = teamEl(); return t ? fn(t) : ['[data-about-team] fehlt']; }; };
+  var TEAM = ['Richard Link', 'Falk Link', 'Franziska Link', 'Gerhard Link', 'Ingrid Link', 'Jean-Nicolas Kibler', 'Aaron Klosterhuber', 'Jürgen Scheurer'];
+  var squish = function (s) { return String(s == null ? '' : s).replace(/\s+/g, ' ').trim(); };
+  var cardsOf = function (t) { return Array.prototype.slice.call(t.querySelectorAll('.spot__card')); };
+  // Name auf der sichtbaren Karte (genau eine darf sichtbar sein)
+  var shownName = function (t) {
+    var vis = cardsOf(t).filter(function (c) { return getComputedStyle(c).visibility === 'visible'; });
+    return vis.length === 1 ? squish(vis[0].querySelector('h3').textContent) : vis.length + ' Karten sichtbar';
+  };
+  // Person i wählen und den Wechsel abwarten (Foto 0,75 s, Text bis 1 s, davor bis 400 ms aufs Dekodieren)
+  var pickAt = async function (t, i) {
+    var b = t.querySelectorAll('[data-pick]')[i];
+    if (b && !b.hasAttribute('aria-current')) { b.click(); await wait(1500); }
+  };
+  var desk = function () { return cw() >= 900 ? '' : 'nur ab 900 px Breite'; };
+  var hand = function () { return cw() < 900 ? '' : 'nur unter 900 px Breite'; };
+  var rows = function (els) {
+    return new Set(Array.prototype.map.call(els, function (e) { return Math.round(e.getBoundingClientRect().top); })).size;
+  };
+
+  UU.add('team:markup', T(function (t) {
+    var f = [], picks = t.querySelectorAll('.spot__pick');
+    if (picks.length !== 8) f.push(picks.length + ' .spot__pick statt 8');
+    Array.prototype.forEach.call(picks, function (b, i) {
+      var name = squish(b.getAttribute('aria-label'));
+      if (b.getAttribute('data-pick') !== String(i)) f.push('Knopf ' + (i + 1) + ' hat data-pick="' + b.getAttribute('data-pick') + '"');
+      if (TEAM[i] && name !== TEAM[i]) f.push('Knopf ' + (i + 1) + ' heißt „' + name + '“ statt „' + TEAM[i] + '“');
+    });
+    if (picks[0] && !picks[0].hasAttribute('aria-current')) f.push('Erster Knopf ohne aria-current');
+    var text = squish(t.textContent);
+    TEAM.forEach(function (name) { if (text.indexOf(name) < 0) f.push('„' + name + '“ fehlt im Text der Section'); });
+    if (!t.classList.contains('is-ready')) f.push('is-ready fehlt');
+    return f;
+  }));
+
+  // Vor team:select und team:wide: Die laden Fotos selbst, danach sagte die Prüfung nichts mehr
+  UU.add('team:preload', T(async function (t) {
+    var f = [];
+    await go(Math.max(0, t.getBoundingClientRect().top + window.scrollY - 1.5 * innerHeight));
+    await wait(300);
+    t.querySelectorAll('img').forEach(function (img, i) {
+      if (img.getAttribute('loading') !== 'eager') f.push('Foto ' + (i + 1) + ' (' + img.src.split('/').pop().split('?')[0] + ') hat loading="' + img.getAttribute('loading') + '"');
+    });
+    await go(0);
+    return f;
+  }));
+
+  UU.add('team:select', T(async function (t) {
+    var f = [], picks = t.querySelectorAll('[data-pick]');
+    try {
+      picks[2].click();
+      await wait(1000);
+      if (shownName(t).indexOf('Franziska') < 0) f.push('Sichtbare Karte nach 1 s: ' + shownName(t));
+      var st = squish(t.querySelector('[data-status]').textContent);
+      if (st.indexOf('Franziska Link') < 0) f.push('[data-status]: „' + st + '“');
+      if (!picks[2].hasAttribute('aria-current')) f.push('Dritter Knopf ohne aria-current');
+      if (t.querySelectorAll('[data-pick][aria-current]').length !== 1) f.push('Nicht genau ein Knopf mit aria-current');
+    } finally {
+      await pickAt(t, 0);
+    }
+    return f;
+  }));
+
+  UU.add('team:arrows', T(async function (t) {
+    var f = [], next = t.querySelector('[data-next]'), prev = t.querySelector('[data-prev]');
+    if (!next || !prev) return ['Pfeile fehlen'];
+    if (cw() < 900) return shown(next) || shown(prev) ? ['Pfeile unter 900 px sichtbar'] : [];
+    if (!shown(next) || !shown(prev)) f.push('Pfeile ab 900 px nicht sichtbar');
+    try {
+      await pickAt(t, 0);
+      next.click(); await wait(1500);
+      if (shownName(t) !== 'Falk Link') f.push('[data-next] führt von Richard zu „' + shownName(t) + '“');
+      await pickAt(t, 0);
+      prev.click(); await wait(1500);
+      if (shownName(t) !== 'Jürgen Scheurer') f.push('[data-prev] führt von Richard zu „' + shownName(t) + '“');
+    } finally {
+      await pickAt(t, 0);
+    }
+    return f;
+  }));
+
+  UU.add('team:wide', T(async function (t) {
+    var f = [];
+    await pickAt(t, 0);
+    await go(t.getBoundingClientRect().top + window.scrollY - 100);
+    var shot = t.querySelector('.spot__shot.is-active'), img = shot && shot.querySelector('img');
+    if (!img || getComputedStyle(shot).visibility !== 'visible') return ['Kein sichtbares Foto'];
+    for (var k = 0; k < 50 && !(img.complete && img.currentSrc); k++) await wait(100);
+    if (!/breit/.test(img.currentSrc)) f.push('Foto von Richard: currentSrc „' + img.currentSrc.split('/').pop() + '“ ohne „breit“');
+    var g = t.querySelector('.spot__grid'), right = g.getBoundingClientRect().right - px(g, 'paddingRight'), r = rect(t.querySelector('.spot__photo'));
+    if (!near(r.width / r.height, 1.5, .01)) f.push('Fotofeld ' + r.width.toFixed(1) + ' × ' + r.height.toFixed(1) + ' (' + (r.width / r.height).toFixed(3) + ') statt 3 : 2');
+    if (r.right > right + 1) f.push('Fotofeld endet bei ' + r.right.toFixed(1) + ' px, der Container bei ' + right.toFixed(1));
+    await go(0);
+    return f;
+  }), desk);
+
+  UU.add('team:nowide', T(function (t) {
+    var i = cardsOf(t).findIndex(function (c) { return squish(c.textContent).indexOf('Ingrid') === 0; });
+    var shot = t.querySelectorAll('.spot__shot')[i], img = shot && shot.querySelector('img'), f = [];
+    if (!img) return ['Foto von Ingrid fehlt'];
+    if (shot.querySelector('source')) f.push('Ingrid hat einen breiten Ausschnitt (source)');
+    if (getComputedStyle(img).objectFit !== 'contain') f.push('Foto von Ingrid mit object-fit ' + getComputedStyle(img).objectFit + ' statt contain');
+    return f;
+  }), desk);
+
+  UU.add('team:layout', T(function (t) {
+    var f = [], roster = t.querySelector('.spot__roster'), photo = t.querySelector('.spot__photo'), nav = t.querySelector('.spot__nav');
+    if (!roster) return ['.spot__roster fehlt'];
+    var cols = getComputedStyle(roster).gridTemplateColumns.split(' ').length, n = rows(t.querySelectorAll('.spot__pick'));
+    var rr = rect(roster), pr = rect(photo), grid = cols + ' × ' + n;
+    if (cw() >= 1280) {
+      if (grid !== '4 × 2') f.push('Raster ' + grid + ' statt 4 × 2');
+      if (rr.top < rect(nav).bottom - 1) f.push('Raster beginnt bei ' + rr.top.toFixed(1) + ', die Pfeile enden bei ' + rect(nav).bottom.toFixed(1));
+      if (rr.right > pr.left + 1) f.push('Raster ragt ins Foto');
+    } else if (cw() >= 900) {
+      if (grid !== '8 × 1') f.push('Raster ' + grid + ' statt 8 × 1');
+      if (rr.top < pr.bottom - 1) f.push('Raster beginnt bei ' + rr.top.toFixed(1) + ', das Foto endet bei ' + pr.bottom.toFixed(1));
+    } else {
+      if (grid !== '4 × 2') f.push('Raster ' + grid + ' statt 4 × 2');
+      if (!near(pr.width, pr.height, 1)) f.push('Foto ' + pr.width.toFixed(1) + ' × ' + pr.height.toFixed(1) + ' nicht quadratisch');
+      if (rr.top < pr.bottom - 1) f.push('Raster steht nicht unter dem Foto');
+    }
+    if (cw() >= 900) {
+      var s = t.querySelectorAll('.spot__card.is-active h3 span');
+      if (s.length !== 2) f.push('Name der Karte hat ' + s.length + ' span statt 2');
+      else if (s[1].getBoundingClientRect().top < s[0].getBoundingClientRect().bottom - 1) f.push('Nachname steht nicht unter dem Vornamen');
+    }
+    return f;
+  }));
+
+  UU.add('team:swipe', T(async function (t) {
+    var f = [], photo = t.querySelector('.spot__photo');
+    try {
+      await pickAt(t, 0);
+      photo.dispatchEvent(new PointerEvent('pointerdown', { clientX: 300, bubbles: true }));
+      photo.dispatchEvent(new PointerEvent('pointerup', { clientX: 200, bubbles: true }));
+      await wait(1500);
+      if (shownName(t) !== 'Falk Link') f.push('Nach dem Wischen nach links sichtbar: „' + shownName(t) + '“');
+      if (getComputedStyle(photo).touchAction !== 'pan-y') f.push('.spot__photo mit touch-action ' + getComputedStyle(photo).touchAction);
+    } finally {
+      await pickAt(t, 0);
+    }
+    return f;
+  }), hand);
+
+  // Auf Wunsch des Nutzers entfernt: Zähler „01 / 08“, WhatsApp-Knopf „Nachricht an …“, Notiz zum Team
+  UU.add('team:gone', T(function (t) {
+    var f = [], text = t.textContent, m = text.match(/\d+\s*\/\s*\d+/);
+    if (m) f.push('Zähler im Text: „' + m[0] + '“');
+    if (/whatsapp/i.test(text) || t.querySelector('a[href*="wa.me"], a[href*="whatsapp"], [data-wa]')) f.push('WhatsApp-Knopf in der Section');
+    if (t.querySelector('a')) f.push('Link in der Section');
+    if (t.querySelector('[class*="note"], [class*="notiz"]')) f.push('Notiz in der Section');
+    return f;
+  }));
+
+  // Ablauf team:one: Vorlage auf eine Person kürzen, hochladen lassen, neu laden, team:one, Konsole ohne Fehler, Vorlage zurück
+  UU.add('team:one', T(function (t) {
+    var f = [], card = t.querySelector('.spot__card');
+    if (t.querySelector('[data-prev], [data-next]')) f.push('Pfeile bei einer Person');
+    if (t.querySelector('.spot__roster, [data-pick]')) f.push('Raster bei einer Person');
+    if (!card || getComputedStyle(card).visibility !== 'visible') f.push('Die Karte der Person ist nicht sichtbar');
+    return f;
+  }), function () { var t = teamEl(); return t && t.querySelectorAll('.spot__card').length === 1 ? '' : 'nur mit einer Person in der Vorlage'; });
 })();

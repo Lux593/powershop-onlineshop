@@ -85,11 +85,114 @@
         "heute"
       ],
       "settings": {}
+    },
+    "team": {
+      "type": "about-team",
+      "blocks": {
+        "richard": {
+          "type": "person",
+          "settings": {
+            "first_name": "Richard",
+            "last_name": "Link",
+            "role": "Geschäftsführer · Werkstattmeister",
+            "text": "Richard führt den Power Shop zusammen mit Franziska und Falk. Als Werkstattmeister ist er für die Werkstatt verantwortlich.",
+            "asset": "ueber-uns-team-richard.jpg",
+            "asset_wide": "ueber-uns-team-richard-breit-1600.jpg"
+          }
+        },
+        "falk": {
+          "type": "person",
+          "settings": {
+            "first_name": "Falk",
+            "last_name": "Link",
+            "role": "Geschäftsführer · Werkstattmeister",
+            "text": "Falk führt den Power Shop zusammen mit Franziska und Richard. Als Werkstattmeister weiß er, was dein Motorrad braucht.",
+            "asset": "ueber-uns-team-falk.jpg",
+            "asset_wide": "ueber-uns-team-falk-breit-1600.jpg"
+          }
+        },
+        "franziska": {
+          "type": "person",
+          "settings": {
+            "first_name": "Franziska",
+            "last_name": "Link",
+            "role": "Geschäftsführerin",
+            "text": "Franziska führt den Power Shop zusammen mit Richard und Falk. Als Geschäftsführerin hält sie im Laden die Fäden zusammen.",
+            "asset": "ueber-uns-team-franziska.jpg",
+            "asset_wide": "ueber-uns-team-franziska-breit-1600.jpg"
+          }
+        },
+        "gerhard": {
+          "type": "person",
+          "settings": {
+            "first_name": "Gerhard",
+            "last_name": "Link",
+            "role": "Gründer",
+            "text": "Gerhard hat den Power Shop 1985 auf der Schusterinsel in Weil-Friedlingen gegründet.",
+            "asset": "ueber-uns-team-gerhard.jpg",
+            "asset_wide": "ueber-uns-team-gerhard-breit-1600.jpg"
+          }
+        },
+        "ingrid": {
+          "type": "person",
+          "settings": {
+            "first_name": "Ingrid",
+            "last_name": "Link",
+            "role": "Sekretärin",
+            "text": "Ingrid ist seit der allerersten Stunde dabei. Heute kümmert sie sich um alle Terminanfragen und die Verwaltung.",
+            "asset": "ueber-uns-team-ingrid.jpg"
+          }
+        },
+        "jean": {
+          "type": "person",
+          "settings": {
+            "first_name": "Jean-Nicolas",
+            "last_name": "Kibler",
+            "role": "Zweiradmechatroniker",
+            "text": "Jean-Nicolas arbeitet als Zweiradmechatroniker in unserer Werkstatt. Wartung und Reparatur an deinem Motorrad gehen über seine Werkbank.",
+            "asset": "ueber-uns-team-jean.jpg"
+          }
+        },
+        "aaron": {
+          "type": "person",
+          "settings": {
+            "first_name": "Aaron",
+            "last_name": "Klosterhuber",
+            "role": "Zweiradmechatroniker",
+            "text": "Aaron ist Zweiradmechatroniker in unserer Werkstatt. Er kümmert sich um Inspektionen und Reparaturen.",
+            "asset": "ueber-uns-team-aaron.jpg"
+          }
+        },
+        "juergen": {
+          "type": "person",
+          "settings": {
+            "first_name": "Jürgen",
+            "last_name": "Scheurer",
+            "role": "Motorradaufbereitung",
+            "text": "Jürgen ist bei uns für die Motorradaufbereitung zuständig. Er sorgt dafür, dass die Motorräder gepflegt dastehen.",
+            "asset": "ueber-uns-team-juergen.jpg"
+          }
+        }
+      },
+      "block_order": [
+        "richard",
+        "falk",
+        "franziska",
+        "gerhard",
+        "ingrid",
+        "jean",
+        "aaron",
+        "juergen"
+      ],
+      "settings": {
+        "heading": "Das Team"
+      }
     }
   },
   "order": [
     "subnav",
     "head",
-    "story"
+    "story",
+    "team"
   ]
 }

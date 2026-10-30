@@ -1,0 +1,194 @@
+{%- comment -%}
+  Team der Über-uns-Seite als Spotlight (Blöcke „Person“): Titel, großes Foto, Name, Rolle und Text der gewählten Person, darunter
+  das ganze Team als Vorschau-Knöpfe, am Desktop dazu zwei Pfeile. Desktop ab 900 px: Titel hochkant links, daneben der Text, rechts
+  das Foto im Querformat 3 : 2 (breiter Ausschnitt mit dem ganzen Motorrad; ohne ihn steht das Quadrat ganz darin, auf Schwarz).
+  Handy: Titel, quadratisches Foto, Raster 4 × 2, Text; gewechselt wird per Vorschau oder Wischen auf dem Foto.
+  Liquid rendert alle Personen vollständig. Ohne Skript stehen sie untereinander, je Foto und Text. assets/about-team.js setzt
+  is-ready, zeigt dann nur die gewählte Person und wechselt (Foto senkrecht, aus 1,12 auf 1, nur mit Bewegung).
+  Ohne Blöcke gibt die Section außerhalb des Editors nichts aus. Bei einer Person gibt es keine Pfeile und kein Raster.
+  Fotos: ein im Editor gewähltes Bild oder eine Standarddatei aus assets/. Für die mitgelieferten breiten Ausschnitte
+  (ueber-uns-team-<id>-breit-1600.jpg) kennt die Section die kleinere Fassung -960.
+  Entwurf: entwuerfe/ueber-uns/design-ueber-uns-h.md, Abschnitt 4.4 (Vorlage h-vollbild.html und shared/team-spotlight.js).
+{%- endcomment -%}
+{%- liquid
+  assign count = section.blocks.size
+  assign title_id = 'about-team-title-' | append: section.id
+  assign heading = section.settings.heading | default: 'Das Team'
+-%}
+{%- if count > 0 or request.design_mode -%}
+{{ 'about-team.css' | asset_url | stylesheet_tag }}
+{%- if count > 0 -%}
+  <script src="{{ 'about-team.js' | asset_url }}" defer></script>
+{%- endif -%}
+
+<section class="spot on-dark textured" id="team" data-about-team aria-labelledby="{{ title_id }}">
+  <div class="container spot__grid">
+    <h2 class="spot__title" id="{{ title_id }}">{{ heading | escape }}</h2>
+    {%- if count == 0 -%}
+      <p class="spot__empty">Noch keine Personen. Links unter „Team“ Blöcke „Person“ hinzufügen.</p>
+    {%- endif -%}
+
+    {%- if count > 1 -%}
+      <div class="spot__roster" role="group" aria-label="Ganzes Team">
+        {%- for block in section.blocks -%}
+          {%- assign full_name = block.settings.first_name | append: ' ' | append: block.settings.last_name | strip -%}
+          <button
+            class="spot__pick"
+            type="button"
+            data-pick="{{ forloop.index0 }}"
+            aria-label="{{ full_name | escape }}"
+            {% if forloop.first %}aria-current="true"{% endif %}
+          >
+            {%- render 'media',
+              image: block.settings.image,
+              asset: block.settings.asset,
+              width: 720,
+              height: 720,
+              alt: '',
+              sizes: '(min-width: 900px) 120px, 25vw',
+              loading: 'lazy'
+            -%}
+          </button>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+    {%- comment -%} Das Foto ist dekorativ, der Name steht im Text {%- endcomment -%}
+    <div class="spot__photo" aria-hidden="true" data-photo>
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign b = block.settings
+          comment
+            Breiter Ausschnitt nur ab 900 px. Ohne ihn bleibt es beim Quadrat (am Desktop ganz im Rahmen, contain).
+          endcomment
+          assign wide_srcset = ''
+          assign wide_w = 1600
+          assign wide_h = 1067
+          if b.image_wide != blank
+            assign w960 = b.image_wide | image_url: width: 960
+            assign w1600 = b.image_wide | image_url: width: 1600
+            assign w2400 = b.image_wide | image_url: width: 2400
+            assign wide_srcset = w960 | append: ' 960w, ' | append: w1600 | append: ' 1600w, ' | append: w2400 | append: ' 2400w'
+            assign wide_h = 1600 | divided_by: b.image_wide.aspect_ratio | round
+          elsif b.asset_wide != blank
+            capture hidden_wide
+              render 'is-placeholder', asset: b.asset_wide
+            endcapture
+            if hidden_wide == blank
+              case b.asset_wide
+                when 'ueber-uns-team-gerhard-breit-1600.jpg', 'ueber-uns-team-richard-breit-1600.jpg', 'ueber-uns-team-falk-breit-1600.jpg', 'ueber-uns-team-franziska-breit-1600.jpg'
+                  assign w960 = b.asset_wide | replace: '-1600.jpg', '-960.jpg' | asset_url
+                  assign w1600 = b.asset_wide | asset_url
+                  assign wide_srcset = w960 | append: ' 960w, ' | append: w1600 | append: ' 1600w'
+                else
+                  assign wide_srcset = b.asset_wide | asset_url
+              endcase
+            endif
+          endif
+        -%}
+        <picture
+          class="spot__shot{% if wide_srcset == blank %} spot__shot--quadrat{% endif %}{% if forloop.first %} is-active{% endif %}"
+          style="--o: {{ forloop.index0 | times: 2 | plus: 1 }}"
+        >
+          {%- if wide_srcset != blank -%}
+            <source
+              media="(min-width: 900px)"
+              srcset="{{ wide_srcset }}"
+              sizes="(min-width: 1440px) 820px, 58vw"
+              width="{{ wide_w }}"
+              height="{{ wide_h }}"
+            >
+          {%- endif -%}
+          {%- render 'media',
+            image: b.image,
+            asset: b.asset,
+            width: 720,
+            height: 720,
+            alt: '',
+            sizes: '(min-width: 900px) 40vw, 100vw',
+            loading: 'lazy'
+          -%}
+        </picture>
+      {%- endfor -%}
+    </div>
+
+    <div class="spot__copy" data-copy>
+      {%- for block in section.blocks -%}
+        {%- assign b = block.settings -%}
+        <div
+          class="spot__card{% if forloop.first %} is-active{% endif %}"
+          style="--o: {{ forloop.index0 | times: 2 | plus: 2 }}"
+          {{ block.shopify_attributes }}
+        >
+          {%- comment -%} Vor- und Nachname getrennt: Am Desktop rückt der Nachname in eine eigene Zeile {%- endcomment -%}
+          <h3>
+            {%- if b.first_name != blank -%}<span>{{ b.first_name | escape }}</span>{%- endif -%}
+            {%- if b.first_name != blank and b.last_name != blank -%}{{ ' ' }}{%- endif -%}
+            {%- if b.last_name != blank -%}<span>{{ b.last_name | escape }}</span>{%- endif -%}
+          </h3>
+          {%- if b.role != blank -%}<p class="spot__role">{{ b.role | escape }}</p>{%- endif -%}
+          {%- if b.text != blank -%}<p class="spot__text">{{ b.text | escape }}</p>{%- endif -%}
+        </div>
+      {%- endfor -%}
+    </div>
+
+    {%- if count > 1 -%}
+      <div class="spot__nav">
+        <button class="spot__arrow" type="button" data-prev aria-label="Vorherige Person">
+          {%- render 'icon', name: 'arrow-right' -%}
+        </button>
+        <button class="spot__arrow spot__arrow--solid" type="button" data-next aria-label="Nächste Person">
+          {%- render 'icon', name: 'arrow-right' -%}
+        </button>
+      </div>
+      <p class="sr-only" aria-live="polite" data-status></p>
+    {%- endif -%}
+  </div>
+</section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Team",
+  "class": "section-about-team",
+  "max_blocks": 8,
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Überschrift", "default": "Das Team", "info": "Steht am Desktop hochkant links." }
+  ],
+  "blocks": [
+    {
+      "type": "person",
+      "name": "Person",
+      "settings": [
+        { "type": "paragraph", "content": "Eine Person im Team: Name, Rolle, kurzer Text und Foto. Höchstens acht, das Raster der Vorschauen ist für 4 × 2 und 8 × 1 gebaut." },
+        { "type": "text", "id": "first_name", "label": "Vorname", "default": "Vorname" },
+        { "type": "text", "id": "last_name", "label": "Nachname", "default": "Nachname", "info": "Steht am Desktop in einer eigenen Zeile unter dem Vornamen." },
+        { "type": "text", "id": "role", "label": "Rolle", "info": "Steht orange unter dem Namen, z. B. „Geschäftsführerin“." },
+        { "type": "textarea", "id": "text", "label": "Text" },
+        { "type": "header", "content": "Foto, quadratisch" },
+        { "type": "image_picker", "id": "image", "label": "Foto (1 : 1)", "info": "Für das Handy und die Vorschau, am Desktop auch das große Foto, wenn kein breiter Ausschnitt gewählt ist. Mindestens 720 × 720 px." },
+        { "type": "text", "id": "asset", "label": "Standard-Foto im Theme", "info": "Datei in assets/, wenn oben kein Foto gewählt ist. Beides leer = dunkle Fläche." },
+        { "type": "header", "content": "Breiter Ausschnitt (optional)" },
+        { "type": "image_picker", "id": "image_wide", "label": "Foto (3 : 2)", "info": "Nur am Desktop ab 900 px, als großes Foto, z. B. mit dem ganzen Motorrad. Mindestens 1600 × 1067 px." },
+        { "type": "text", "id": "asset_wide", "label": "Standard-Ausschnitt im Theme", "info": "Datei in assets/, wenn oben kein Ausschnitt gewählt ist. Beides leer = das quadratische Foto steht ganz im Querformat, auf Schwarz." }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Team",
+      "blocks": [
+        { "type": "person", "settings": { "first_name": "Richard", "last_name": "Link", "role": "Geschäftsführer · Werkstattmeister", "text": "Richard führt den Power Shop zusammen mit Franziska und Falk. Als Werkstattmeister ist er für die Werkstatt verantwortlich.", "asset": "ueber-uns-team-richard.jpg", "asset_wide": "ueber-uns-team-richard-breit-1600.jpg" } },
+        { "type": "person", "settings": { "first_name": "Falk", "last_name": "Link", "role": "Geschäftsführer · Werkstattmeister", "text": "Falk führt den Power Shop zusammen mit Franziska und Richard. Als Werkstattmeister weiß er, was dein Motorrad braucht.", "asset": "ueber-uns-team-falk.jpg", "asset_wide": "ueber-uns-team-falk-breit-1600.jpg" } },
+        { "type": "person", "settings": { "first_name": "Franziska", "last_name": "Link", "role": "Geschäftsführerin", "text": "Franziska führt den Power Shop zusammen mit Richard und Falk. Als Geschäftsführerin hält sie im Laden die Fäden zusammen.", "asset": "ueber-uns-team-franziska.jpg", "asset_wide": "ueber-uns-team-franziska-breit-1600.jpg" } },
+        { "type": "person", "settings": { "first_name": "Gerhard", "last_name": "Link", "role": "Gründer", "text": "Gerhard hat den Power Shop 1985 auf der Schusterinsel in Weil-Friedlingen gegründet.", "asset": "ueber-uns-team-gerhard.jpg", "asset_wide": "ueber-uns-team-gerhard-breit-1600.jpg" } },
+        { "type": "person", "settings": { "first_name": "Ingrid", "last_name": "Link", "role": "Sekretärin", "text": "Ingrid ist seit der allerersten Stunde dabei. Heute kümmert sie sich um alle Terminanfragen und die Verwaltung.", "asset": "ueber-uns-team-ingrid.jpg" } },
+        { "type": "person", "settings": { "first_name": "Jean-Nicolas", "last_name": "Kibler", "role": "Zweiradmechatroniker", "text": "Jean-Nicolas arbeitet als Zweiradmechatroniker in unserer Werkstatt. Wartung und Reparatur an deinem Motorrad gehen über seine Werkbank.", "asset": "ueber-uns-team-jean.jpg" } },
+        { "type": "person", "settings": { "first_name": "Aaron", "last_name": "Klosterhuber", "role": "Zweiradmechatroniker", "text": "Aaron ist Zweiradmechatroniker in unserer Werkstatt. Er kümmert sich um Inspektionen und Reparaturen.", "asset": "ueber-uns-team-aaron.jpg" } },
+        { "type": "person", "settings": { "first_name": "Jürgen", "last_name": "Scheurer", "role": "Motorradaufbereitung", "text": "Jürgen ist bei uns für die Motorradaufbereitung zuständig. Er sorgt dafür, dass die Motorräder gepflegt dastehen.", "asset": "ueber-uns-team-juergen.jpg" } }
+      ]
+    }
+  ],
+  "enabled_on": { "templates": ["page"] }
+}
+{% endschema %}
