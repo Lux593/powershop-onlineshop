@@ -112,7 +112,7 @@
                   data-src="{{ color_image | image_url: width: 1200 }}"
                   data-srcset="{{ color_image | image_url: width: 400 }} 400w, {{ color_image | image_url: width: 600 }} 600w, {{ color_image | image_url: width: 800 }} 800w, {{ color_image | image_url: width: 1200 }} 1200w"
                 {%- endif %}
-              >{% render 'swatch', name: value_name, swatch: value.swatch, variant_image: color_image, tag: 'span' %}</button>
+              >{% render 'swatch', name: value_name, swatch: value.swatch, tag: 'span' %}</button>
             {%- endfor -%}
             {%- if color_option.values.size > 6 -%}
               <a class="bcard__more caption" href="{{ product.url }}" aria-label="Alle {{ colors_label }}: {{ product.title | escape }}">+{{ color_option.values.size | minus: 6 }}</a>
@@ -121,16 +121,7 @@
         {%- else -%}
           {%- assign value = color_option.values.first -%}
           <div class="bcard__swatches" aria-hidden="true">
-            {%- liquid
-              assign solo_variant = product.selected_or_first_available_variant
-              assign solo_image = blank
-              if solo_variant.featured_media != blank and solo_variant.featured_media.preview_image != blank
-                assign solo_image = solo_variant.featured_media.preview_image
-              elsif solo_variant.featured_image != blank
-                assign solo_image = solo_variant.featured_image
-              endif
-            -%}
-            <span class="bcard__swatch">{% render 'swatch', name: active_color, swatch: value.swatch, variant_image: solo_image, tag: 'span' %}</span>
+            <span class="bcard__swatch">{% render 'swatch', name: active_color, swatch: value.swatch, tag: 'span' %}</span>
           </div>
         {%- endif -%}
         <span class="bcard__color caption muted" data-bcard-color data-default="{{ colors_label }}">{{ active_color | default: colors_label | escape }}</span>

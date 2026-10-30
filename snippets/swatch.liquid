@@ -1,10 +1,9 @@
 {% doc %}
-  Farbfeld für eine Farb-Option. Reihenfolge: natives Shopify-Swatch (Farbe/Bild), Variantenbild der ersten
-  passenden Variante, Metaobjekt Farbe (Handle = Name), Farbname (inkl. „ / “-Kombinationen), sonst grau.
+  Farbfeld für eine Farb-Option. Reihenfolge: natives Shopify-Swatch (Farbe/Bild), Metaobjekt Farbe (Handle = Name),
+  Farbname (inkl. „ / “ als geteilter Kreis via conic-gradient), sonst grau.
 
   @param {string} name - Farbname, z. B. „Schwarz“ oder „Weiß / Rot / Blau“
   @param {object} [swatch] - Swatch des Optionswerts (value.swatch)
-  @param {image} [variant_image] - Produktbild der ersten Variante mit diesem Wert
   @param {string} [tag] - „li“ (Standard) oder „span“
 {% enddoc %}
 
@@ -15,10 +14,6 @@
     assign bg = 'url(' | append: swatch.image | image_url: width: 128 | append: ') center / cover'
   elsif swatch.color != blank
     assign bg = swatch.color
-  endif
-
-  if bg == blank and variant_image != blank
-    assign bg = 'url(' | append: variant_image | image_url: width: 128 | append: ') center / cover'
   endif
 
   if bg == blank
@@ -34,21 +29,22 @@
     if combo.size > 1
       assign stops = ''
       assign n = combo.size
+      assign slice = 360 | divided_by: n
       for part in combo
         capture part_hex
           render 'swatch-hex', label: part
         endcapture
         assign part_hex = part_hex | strip
-        assign i = forloop.index0
-        assign start_pct = i | times: 100 | divided_by: n
-        assign end_pct = forloop.index | times: 100 | divided_by: n
+        assign start_deg = forloop.index0 | times: slice
+        assign end_deg = forloop.index | times: slice
+        assign stop = part_hex | append: ' ' | append: start_deg | append: 'deg ' | append: end_deg | append: 'deg'
         if forloop.first
-          assign stops = part_hex | append: ' ' | append: start_pct | append: '% ' | append: end_pct | append: '%'
+          assign stops = stop
         else
-          assign stops = stops | append: ', ' | append: part_hex | append: ' ' | append: start_pct | append: '% ' | append: end_pct | append: '%'
+          assign stops = stops | append: ', ' | append: stop
         endif
       endfor
-      assign bg = 'linear-gradient(90deg, ' | append: stops | append: ')'
+      assign bg = 'conic-gradient(' | append: stops | append: ')'
     else
       capture single_hex
         render 'swatch-hex', label: name
