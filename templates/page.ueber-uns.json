@@ -32,7 +32,8 @@
             "asset": "ueber-uns-team-gerhard.jpg",
             "alt": "Porträt von Gerhard Link, Gründer des Power Shop",
             "focus": "50% 30%",
-            "mono": true
+            "mono": true,
+            "assets_more": "ueber-uns-1991-678.jpg | Altes Farbfoto: weißes Haus mit großem Power-Shop-Schriftzug und Harley-Davidson-Schild, davor Motorräder und ein rotes Auto"
           }
         },
         "1991": {
@@ -46,7 +47,8 @@
             "asset": "ueber-uns-1991-678.jpg",
             "alt": "Altes Farbfoto: weißes Haus mit großem Power-Shop-Schriftzug und Harley-Davidson-Schild, davor Motorräder und ein rotes Auto",
             "focus": "50% 50%",
-            "mono": false
+            "mono": false,
+            "assets_more": "ueber-uns-gebaeude-744.jpg | Zeichnung eines Hauses mit Harley-Davidson-Schriftzug über den Schaufenstern"
           }
         },
         "2016": {
@@ -60,7 +62,8 @@
             "asset": "ueber-uns-vorplatz-1280.jpg",
             "alt": "Falk, Franziska und Richard Link (von links) in weißen Harley-Davidson-Shirts auf dem Vorplatz, dahinter eine Reihe Motorräder",
             "focus": "10% 50%",
-            "mono": true
+            "mono": true,
+            "assets_more": "ueber-uns-hog-1280.jpg | Gruppenfoto mit H.O.G.-Chapter-Banner auf einer Wiese vor einem Steintor"
           }
         },
         "heute": {
@@ -74,7 +77,8 @@
             "asset": "ueber-uns-theke-1280.jpg",
             "alt": "Holztheke und Merchandise-Regal im Showroom des Power Shop",
             "focus": "50% 58%",
-            "mono": false
+            "mono": false,
+            "assets_more": "ueber-uns-werkstatt-1280.jpg | Werkstatt mit schwarzen Werkbänken, orangefarbener Wand und einer Harley-Davidson auf der Hebebühne"
           }
         }
       },

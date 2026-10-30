@@ -547,13 +547,14 @@
     return f;
   }, withGallery);
 
-  // Klick auf Foto 3 (rechts vom gewählten): Es kommt von links (translateX < 0). Klick zurück auf Foto 1 (links): Es kommt von rechts
+  // Klick auf das letzte Foto (rechts vom gewählten): Es kommt von links (translateX < 0). Klick zurück auf Foto 1 (links): Es kommt von rechts
   // (translateX > 0). Nach 700 ms kein transform mehr, aria-pressed umgesprungen, das alte Foto ausgeblendet. Ein Klick während des
   // Schiebens beendet das laufende sofort. scrollY bleibt. Ohne has-motion wechselt das Foto sofort.
   UU.add('story:gallery', async function () {
-    var f = [], leaf = galleries().filter(function (l) { return shotsOf(l).length >= 3; })[0];
-    if (!leaf) return ['Keine Etappe mit drei Fotos (Vorlage: 1985 mit zwei weiteren Dateien)'];
+    var f = [], leaf = galleries().filter(function (l) { return shotsOf(l).length >= 2; })[0];
+    if (!leaf) return ['Keine Etappe mit mindestens zwei Fotos'];
     var btns = leaf.querySelectorAll('.leaf__thumb'), shots = shotsOf(leaf), html = document.documentElement;
+    var z = shots.length - 1;
     var pressed = function (k) { return btns[k].getAttribute('aria-pressed') === 'true'; };
     // Alle Fotos vorher laden, sonst wartet der Wechsel aufs Dekodieren und die 100 ms stimmen nicht
     shots.forEach(function (img) { img.loading = 'eager'; });
@@ -574,32 +575,33 @@
     if (!pressed(0)) { btns[0].click(); await wait(800); }
     var y = window.scrollY;
     try {
-      btns[2].click(); await wait(100);
-      var t = tx(shots[2]);
-      if (!(t < 0)) f.push('100 ms nach Klick auf Foto 3: translateX ' + t.toFixed(1) + ', erwartet < 0 (von links)');
+      btns[z].click(); await wait(100);
+      var t = tx(shots[z]);
+      if (!(t < 0)) f.push('100 ms nach Klick aufs letzte Foto: translateX ' + t.toFixed(1) + ', erwartet < 0 (von links)');
       if (!shownShot(shots[0])) f.push('Während des Schiebens ist Foto 1 nicht mehr sichtbar (soll stehen bleiben)');
       await wait(600);
-      if (getComputedStyle(shots[2]).transform !== 'none') f.push('700 ms nach Klick auf Foto 3: transform ' + getComputedStyle(shots[2]).transform);
-      if (!pressed(2) || pressed(0)) f.push('700 ms nach Klick auf Foto 3: aria-pressed nicht umgesprungen');
-      if (!shownShot(shots[2]) || shownShot(shots[0])) f.push('700 ms nach Klick auf Foto 3: Foto 3 nicht allein sichtbar');
+      if (getComputedStyle(shots[z]).transform !== 'none') f.push('700 ms nach Klick aufs letzte Foto: transform ' + getComputedStyle(shots[z]).transform);
+      if (!pressed(z) || pressed(0)) f.push('700 ms nach Klick aufs letzte Foto: aria-pressed nicht umgesprungen');
+      if (!shownShot(shots[z]) || shownShot(shots[0])) f.push('700 ms nach Klick aufs letzte Foto: das letzte Foto nicht allein sichtbar');
       btns[0].click(); await wait(100);
       t = tx(shots[0]);
       if (!(t > 0)) f.push('100 ms nach Klick auf Foto 1: translateX ' + t.toFixed(1) + ', erwartet > 0 (von rechts)');
       await wait(600);
       if (getComputedStyle(shots[0]).transform !== 'none') f.push('700 ms nach Klick auf Foto 1: transform ' + getComputedStyle(shots[0]).transform);
-      if (!pressed(0) || pressed(2)) f.push('700 ms nach Klick auf Foto 1: aria-pressed nicht umgesprungen');
-      if (!shots[2].hidden) f.push('700 ms nach Klick auf Foto 1: Foto 3 nicht hidden');
+      if (!pressed(0) || pressed(z)) f.push('700 ms nach Klick auf Foto 1: aria-pressed nicht umgesprungen');
+      if (!shots[z].hidden) f.push('700 ms nach Klick auf Foto 1: das letzte Foto nicht hidden');
       // Klick während des Schiebens: Das laufende springt sofort ans Ende
-      btns[1].click(); await wait(100);
-      btns[2].click();
-      if (getComputedStyle(shots[1]).transform !== 'none' || shots[1].getAnimations().length) f.push('Zweiter Klick während des Schiebens: Foto 2 läuft weiter');
+      btns[z].click(); await wait(100);
+      btns[0].click();
+      if (getComputedStyle(shots[z]).transform !== 'none' || shots[z].getAnimations().length) f.push('Zweiter Klick während des Schiebens: das letzte Foto läuft weiter');
       await wait(700);
-      if (!pressed(2) || !shownShot(shots[2]) || shownShot(shots[1])) f.push('Nach zwei schnellen Klicks steht nicht Foto 3');
+      if (!pressed(0) || !shownShot(shots[0]) || shownShot(shots[z])) f.push('Nach zwei schnellen Klicks steht nicht Foto 1');
       if (!near(window.scrollY, y, .5)) f.push('scrollY nach den Klicks ' + window.scrollY + ' statt ' + y);
       // Ohne has-motion: sofort, ohne transform
       html.classList.remove('has-motion');
+      btns[z].click();
       btns[0].click();
-      if (!pressed(0) || !shownShot(shots[0]) || shownShot(shots[2])) f.push('Ohne has-motion: Foto 1 nicht sofort da');
+      if (!pressed(0) || !shownShot(shots[0]) || shownShot(shots[z])) f.push('Ohne has-motion: Foto 1 nicht sofort da');
       if (getComputedStyle(shots[0]).transform !== 'none') f.push('Ohne has-motion: Foto 1 mit transform');
     } finally {
       html.classList.add('has-motion');
