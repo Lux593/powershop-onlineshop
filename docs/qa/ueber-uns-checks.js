@@ -356,25 +356,29 @@
     return f;
   }, live);
 
-  UU.add('story:snap', async function () {
-    var st = story().st, last = story().last;
-    await go(st.start + (st.end - st.start) * 0.4 / last);
-    await wait(2500);
-    var p = st.progress, k = Math.round(p * last);
-    return near(p, k / last, .005) ? [] : ['Fortschritt steht nach 2,5 s bei ' + p.toFixed(4) + ', kein Vielfaches von 1/' + last];
+  // Kein Einrasten (Task 9): Mitten zwischen zwei Etappen anhalten. Danach bewegt sich nichts mehr von selbst: Scrollposition und
+  // Fortschritt bleiben stehen, und die Zeitleiste zieht nur bis zum Fortschritt nach (scrub), nicht weiter zu einer Etappe.
+  UU.add('story:nosnap', async function () {
+    var f = [], st = story().st, last = story().last, k = Math.min(1, last - 1), soll = (k + 0.4) / last;
+    if (st.vars.snap) f.push('Der pinnende ScrollTrigger hat noch snap');
+    await go(st.start + (st.end - st.start) * soll); await wait(100);
+    var y = window.scrollY, p = st.progress;
+    await wait(1500);
+    if (!near(window.scrollY, y, 1)) f.push('scrollY nach 1,5 s ' + window.scrollY + ' statt ' + y);
+    if (!near(st.progress, p, .005)) f.push('Fortschritt nach 1,5 s ' + st.progress.toFixed(4) + ' statt ' + p.toFixed(4));
+    var a = st.animation.progress();
+    if (!near(a, p, .005)) f.push('Zeitleiste nach 1,5 s bei ' + a.toFixed(4) + ', Fortschritt ' + p.toFixed(4) + ' (eingerastet?)');
+    return f;
   }, live);
 
-  // Während des Sprungs ist das Einrasten aus (snapTo gibt den Wert unverändert zurück), danach wieder an. Unterwegs sinkt der
-  // Fortschritt nie und steht nie länger als 300 ms still, bevor er das Ziel erreicht (ein Halt hieße: dazwischen eingerastet).
+  // Der Sprung über den Balken erreicht das Ziel ohne Halt: Unterwegs sinkt der Fortschritt nie und steht nie länger als 300 ms still,
+  // bevor er das Ziel erreicht. Am Ziel bleibt er stehen.
   UU.add('story:jump', async function () {
-    var f = [], st = story().st, last = story().last, links = sec().querySelectorAll('[data-jump]'), snapTo = st.vars.snap.snapTo;
+    var f = [], st = story().st, links = sec().querySelectorAll('[data-jump]');
     await go(st.start); await wait(300);
     var seen = [st.progress];
     links[links.length - 1].click();
-    if (snapTo(0.4) !== 0.4) f.push('Direkt nach dem Klick rastet es ein: snapTo(0,4) = ' + snapTo(0.4));
     for (var t = 0; t < 30; t++) { await wait(100); seen.push(st.progress); }
-    var soll = Math.round(0.4 * last) / last;
-    if (snapTo(0.4) !== soll) f.push('3 s nach dem Klick rastet es nicht wieder ein: snapTo(0,4) = ' + snapTo(0.4) + ' statt ' + soll);
     for (var i = 1; i < seen.length; i++) {
       if (seen[i] < seen[i - 1] - .0005) { f.push('Fortschritt sinkt bei ' + (i * 100) + ' ms: ' + seen[i - 1].toFixed(3) + ' → ' + seen[i].toFixed(3)); break; }
     }
@@ -437,7 +441,7 @@
     return f;
   }, function () { return innerHeight < 600 ? '' : 'nur unter 600 px Fensterhöhe'; });
 
-  // Ablauf story:count: Vorlage auf 2, 5 und 1 Etappe ändern, je hochladen lassen, neu laden, story:count und story:snap
+  // Ablauf story:count: Vorlage auf 2, 5 und 1 Etappe ändern, je hochladen lassen, neu laden, story:count und story:nosnap
   UU.add('story:count', function () {
     var f = [], s = sec(), n = leavesOf().length, rail = s.querySelector('[data-rail]');
     if (n === 1) {

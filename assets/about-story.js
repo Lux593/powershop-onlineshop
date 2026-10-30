@@ -5,9 +5,10 @@
    - Die nächste Etappe schiebt sich als Ganzes von rechts über die aktuelle, die liegen bleibt. Ihr Foto kommt zuerst und fährt über
      Jahreszahl und Text der aktuellen Etappe, dahinter folgt ihre weiße Textspalte, noch leer. Ist sie angekommen, gleiten
      Jahreszahl, Überschrift, Text und Ort nacheinander von rechts herein. Fotos zoomen und gleiten dabei nie im eigenen Rahmen.
-   - Eine Bildschirmhöhe Scrollweg je Wechsel, eingerastet wird auf jeder Etappe, ohne Schwung.
+   - Eine Bildschirmhöhe Scrollweg je Wechsel. Die Lage hängt nur vom Scrollen ab: Die Bühne zieht 0,6 s hinter der Scrollposition
+     her (scrub) und rastet nicht ein. Lässt man los, bewegt sie sich nicht mehr von selbst.
    - Balken: Linie und Bar & Shield folgen der Lage der Etappen, nicht dem rohen Scrollwert. Die Zahlen sind Links, ein Klick
-     scrollt zur Etappe, ohne unterwegs einzurasten.
+     scrollt weich zur Etappe.
    - Übergang zum Team: Folgt direkt die Team-Section (sections/about-team.liquid), schiebt sie sich nach „Heute“ über die Bühne.
      Die Etappe sinkt halb so schnell, wird kleiner und dunkelt ab, der Balken fährt auf der Oberkante des Teams hinaus.
    - Kopfleiste: Ab 150 px vor dem Pinnen bis eine Kopfleistenhöhe nach dem Ende des Übergangs zum Team (ohne Team: bis zum Ende
@@ -85,7 +86,7 @@
     var head = section.querySelector('[data-head]');
     var hint = section.querySelector('.about-story__hint');
     var last = leaves.length - 1;
-    var alive = true, current = -1, jumping = false, jumpTimer = 0;
+    var alive = true, current = -1;
     if (!stageEl || !viewport || !fill || !head || last < 1) { section.classList.add('is-static'); return; }
 
     section.classList.add('is-live');
@@ -141,7 +142,7 @@
     }
 
     /* ---------------- Umblättern ----------------
-       Je Etappe eine Zeiteinheit, damit das Einrasten auf 1/last genau zwischen zwei Umblätterungen liegt. 0 bis 0,6: Die Etappe
+       Je Etappe eine Zeiteinheit: Etappe k steht bei k/last ganz da, genau zwischen zwei Umblätterungen. 0 bis 0,6: Die Etappe
        schiebt sich herein. Ab 0,5: Jahreszahl und Text gleiten nach, 22 % der Bühnenbreite weiter rechts gestartet, am Handy 40 %.
        Die 120 px schieben wartende Etappen samt ihrem Schatten ganz aus dem Bild (der weiche Schatten reicht gut 80 px nach links). */
     var push = function () { return viewport.clientWidth * (window.innerWidth < 900 ? 0.4 : 0.22); };
@@ -168,15 +169,8 @@
         start: function () { return 'top top+=' + hh(); },
         end: function () { return '+=' + last * window.innerHeight; }, // eine Bildschirmhöhe Scrollweg je Etappe
         pin: true,
+        // Nachziehen hinter der Scrollposition, keine Eigenbewegung: Ohne snap bleibt die Bühne stehen, wo man aufhört zu scrollen
         scrub: 0.6,
-        // Während ein Klick auf eine Zahl zur Etappe scrollt, rastet nichts dazwischen ein
-        snap: {
-          snapTo: function (v) { return jumping ? v : Math.round(v * last) / last; },
-          inertia: false,
-          duration: { min: 0.25, max: 0.7 },
-          delay: 0.06,
-          ease: 'power2.inOut'
-        },
         invalidateOnRefresh: true
       }
     });
@@ -237,25 +231,14 @@
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(remeasure);
 
     /* ---------------- Sprung über den Balken ----------------
-       Mit Bühne führt der Anker nicht zur Etappe (sie liegt auf der Bühne), sondern zur passenden Scroll-Stelle.
-       jumping gilt vom Klick bis 200 ms nach dem letzten scroll-Ereignis. */
-    function jumpEnd() { jumping = false; }
-    function onScroll() {
-      if (!jumping) return;
-      clearTimeout(jumpTimer);
-      jumpTimer = setTimeout(jumpEnd, 200);
-    }
+       Mit Bühne führt der Anker nicht zur Etappe (sie liegt auf der Bühne), sondern weich zur passenden Scroll-Stelle. */
     function onJump(e) {
       var a = e.target.closest && e.target.closest('[data-jump]');
       if (!a || !section.contains(a)) return;
       e.preventDefault();
-      jumping = true;
-      clearTimeout(jumpTimer);
-      jumpTimer = setTimeout(jumpEnd, 200);
       window.scrollTo({ top: st.start + (st.end - st.start) * (+a.getAttribute('data-jump') / last), behavior: 'smooth' });
     }
     section.addEventListener('click', onJump);
-    window.addEventListener('scroll', onScroll, { passive: true });
 
     section.__story = { st: st, guard: guard, last: last, revert: revert };
 
@@ -267,9 +250,6 @@
       alive = false;
       ScrollTrigger.removeEventListener('refresh', remeasure);
       section.removeEventListener('click', onJump);
-      window.removeEventListener('scroll', onScroll);
-      clearTimeout(jumpTimer);
-      jumping = false;
       section.classList.remove('is-live');
       if (PS.headerHold) PS.headerHold(false);
       delete section.__story;

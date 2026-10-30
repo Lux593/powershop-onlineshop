@@ -105,7 +105,8 @@
 .about-story.is-live .leaf__media { min-height: 0; }
 /* Der Abstandshalter des Pinnens ist schwarz wie die Bühne: Während die Kopfleiste einfährt, blitzt über der Bühne nichts Weißes auf */
 .about-story .pin-spacer { background: var(--c-black); }
-/* Das weiche Scrollen aus base.css ließe jeden Schritt des Einrastens selbst noch einmal gleiten */
+/* ScrollTrigger setzt die Scrollposition beim Neuberechnen selbst. Mit dem weichen Scrollen aus base.css glitte sie dorthin. Der Sprung
+   über den Balken scrollt ausdrücklich weich (about-story.js). */
 html:has(.about-story.is-live) { scroll-behavior: auto; }
 
 /* Hinweis „Weiterscrollen“ rechts unten auf der Bühne, verschwindet nach den ersten 3 % des Wegs (is-gone aus dem Skript), am Handy nie */
