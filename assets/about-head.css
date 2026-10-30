@@ -1,6 +1,6 @@
 /* ==========================================================================
    Power Shop – Seitenkopf „Halle, dunkel“ der Über-uns-Seite (sections/about-head.liquid).
-   Lädt nur mit der Section. Schwarz wie Kopfleiste und Bühne: links Überschrift und Satz, rechts das Hallenfoto bis an den rechten
+   Lädt nur mit der Section. Schwarz wie Kopfleiste und Bühne: links Überschrift und Satz, rechts das Crew-Foto bis an den rechten
    Rand, am Handy das Foto oben über die volle Breite. Kein Bar & Shield und kein Signet im Kopf.
    Einzige Bewegung: Das Foto setzt sich beim Laden aus einer leichten Vergrößerung (nur mit html.has-motion, ohne reduzierte Bewegung).
    Vorlage: entwuerfe/ueber-uns/h-vollbild.html (.page-head*), dort mit .page-head statt .about-head.

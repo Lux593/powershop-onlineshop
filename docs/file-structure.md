@@ -1,6 +1,6 @@
 # Dateistruktur: Service-Bereich
 
-Wer welche Datei verantwortet. Plan: [`plan-service-werkstatt.md`](plan-service-werkstatt.md).
+Wer welche Datei verantwortet. Plan: [`plan-service-werkstatt.md`](plan-service-werkstatt.md), für Etappe 3 [`plan-ueber-uns-h.md`](plan-ueber-uns-h.md).
 
 ## Etappe 1: Werkstatt-Seite (live)
 
@@ -55,3 +55,23 @@ Wer welche Datei verantwortet. Plan: [`plan-service-werkstatt.md`](plan-service-
 Ebenfalls lokal offen, aber nicht Teil von Etappe 2: Farbfelder der Motorrad-Karten und die Links auf die Werkstatt-Seite
 (`snippets/bike-card.liquid`, `sections/header-group.json`, `templates/index.json`, `sections/statement.liquid`, `sections/service-tiles.liquid`,
 `sections/product.liquid`, `assets/components.css`, `assets/sections.js`, `assets/theme.css`).
+
+## Etappe 3: Über uns, Entwurf H (gebaut in `claude/ueber-uns-h`, nicht gepusht)
+
+| Datei | Neu / geändert | Inhalt |
+|---|---|---|
+| `templates/page.ueber-uns.json` | neu | Vorlage: `subnav`, `head`, `story` (vier Etappen), `team` (acht Personen), `visit` |
+| `sections/about-head.liquid`, `assets/about-head.css` | neu | Seitenkopf „Halle, dunkel“ mit Crew-Foto; das Foto setzt sich beim Laden |
+| `sections/about-story.liquid`, `assets/about-story.css` | neu | Geschichte: Blöcke „Etappe“, Balken mit Bar & Shield, Vorstufe und Rückfall der Bühne |
+| `assets/about-story.js` | neu | Bühne: pinnen, umblättern, Balken, Einrasten, Übergang zum Team, Kopfleiste halten |
+| `sections/about-team.liquid`, `assets/about-team.css`, `assets/about-team.js` | neu | Team-Spotlight: Blöcke „Person“, Foto-Wechsel, Raster, Pfeile, Wischen |
+| `sections/about-visit.liquid`, `assets/about-visit.css` | neu | „Komm vorbei“ als Etappe: Karte, Adresse, Route, Anrufen, WhatsApp, E-Mail, Lieferhinweis |
+| `snippets/visit-map.liquid` | neu | Karte des Dreiländerecks mit Pin und Schild, aus `sections/visit.liquid` herausgelöst (dort unverändert im Ergebnis); Parameter `sizes`, `ring`, `logo`, `reveal`, `address_lines` |
+| `sections/visit.liquid` | geändert | Karte über `{% render 'visit-map' %}`, Ausgabe Zeichen für Zeichen gleich |
+| `assets/header.js` | geändert | `PS.headerHold(on)` neben `PS.headerQuiet` |
+| `assets/tokens.css` | geändert | `--c-orange-on-light`, `--c-hd-orange`, `--photo-grade` |
+| `layout/theme.liquid` | geändert | GSAP und ScrollTrigger auch auf `page` mit Suffix `ueber-uns` |
+| `assets/ueber-uns-*.jpg` (24 Dateien) | neu | Kopf (Crew), Etappen (1985 Gerhard, 1991 Haus, 2016 Vorplatz, Heute Theke), acht Teamfotos, vier breite Teamausschnitte, Herkunft in `bildliste.md` |
+| `docs/ueber-uns-h-design.md`, `docs/plan-ueber-uns-h.md` | neu | Spec (Kopie von `entwuerfe/ueber-uns/design-ueber-uns-h.md`) und Plan |
+| `docs/qa/ueber-uns-checks.js`, `docs/qa/karte-ausschneiden.py` | neu | Prüfgerüst für die Vorschau (`UU.run`) und Vergleich der Karte vor und nach dem Umbau des Snippets. Werden nicht ausgeliefert |
+| `docs/architecture.md`, `docs/motion-api.md`, `docs/file-structure.md`, `docs/bildliste.md` | geändert | Etappe 3, Skript-Tabelle und `PS.headerHold`, diese Tabelle, Bildliste |

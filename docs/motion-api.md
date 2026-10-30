@@ -6,7 +6,7 @@ Die Datei selbst enthält nur einen Verweis hierher, damit der Vertragstext nich
 ```text
 Power Shop – Motion-Schicht: Reveals, Wort-Splitter, Count-up, Parallax, Smooth-Scroll.
 Lädt auf allen Templates (defer, nach theme.js, vor header.js). GSAP und ScrollTrigger kommen nur auf der Startseite
-dazu (nur dort gibt es Scrub und Parallax), nur mit Setting und nie im Theme-Editor. Lenis (weiches Scrollen) lädt
+und auf der Über-uns-Seite (Vorlage page.ueber-uns) dazu (nur dort gibt es Scrub, Parallax und die Bühne), nur mit Setting und nie im Theme-Editor. Lenis (weiches Scrollen) lädt
 nach, nur auf index, collection und product und nur für Maus und Trackpad. Ohne sie läuft die Schicht im
 Fallback (Reveals per IntersectionObserver, Count-up, Splitter).
 
@@ -28,7 +28,7 @@ Zustand
                        oder auf langsamer Leitung erst nach 3,5 s, starten die Filme später statt gar nicht. Einblendungen,
                        Scrub und Tab-Animationen bleiben an PS.motion.enabled (sonst stünde Text unsichtbar). Unabhängig
                        davon startet der Hero bei saveData oder 2G (navigator.connection) pausiert, nicht mehr bei 3G.
-  PS.motion.scroll     true, wenn GSAP + ScrollTrigger laufen (nur auf der Startseite). Nur dann Scrub/Parallax bauen.
+  PS.motion.scroll     true, wenn GSAP + ScrollTrigger laufen (Startseite und Über uns). Nur dann Scrub/Parallax/Bühne bauen.
   PS.motion.*          theme.js legt einen No-op-Stub an: Aufrufe sind immer harmlos, kein Existenztest nötig.
   PS.lenis             Lenis-Instanz oder null (Setting, pointer:fine und hover:hover, ohne reduced-motion). Lenis lädt
                        nach motion.js (Head-Skript setzt PS.lenisSrc und lädt vor), daher immer lazy prüfen:
@@ -70,6 +70,23 @@ Hilfs-API (Aufräumen pro Section bei shopify:section:unload, beim Entfernen des
       Nur mit PS.motion.scroll. Rückgabe (Funktion, {kill}, {disconnect} oder Array) wird der Section zugeordnet.
   PS.motion.track(el, cleanup)   Dasselbe für eigene Observer/Listener, auch ohne GSAP.
   PS.motion.refresh()            ScrollTrigger neu messen (nach Layoutänderungen).
+
+Kopfleiste festhalten (assets/header.js, Über uns)
+  PS.headerHold(on)  Mit true fährt die Kopfleiste ein und bleibt eingefahren, auch beim Runterscrollen. Mit false gilt wieder das normale
+                     Verhalten (ab 400 px Tiefe beim Runterscrollen weg). Kein Zähler: Das letzte Wort gilt, mehrfaches true ändert nichts.
+                     Wie PS.headerQuiet(ms) für gezielte Skripte gedacht: assets/about-story.js ruft es von einem eigenen ScrollTrigger
+                     („guard“) aus, ab 150 px vor dem Pinnen der Bühne bis eine Kopfleistenhöhe nach dem Übergang zum Team (ohne Team bis zum
+                     Ende des Pinnens). Wer es setzt, nimmt es im Aufräumer auch wieder zurück (PS.headerHold(false)).
+
+Seiten-Einstellungen von Über uns (assets/about-story.js, about-story.css)
+  ScrollTrigger.config({ ignoreMobileResize: true })
+                     Die Adressleiste am Handy ändert die Fensterhöhe beim Scrollen: kein Neumessen mitten im Umblättern. Es gilt, sobald die Bühne gebaut
+                     ist, global für ScrollTrigger und bleibt nach ihrem Abbau stehen. Wer auf Über uns weitere ScrollTrigger baut, erbt es.
+  html { scroll-behavior: auto }   (about-story.css, html:has(.about-story.is-live))
+                     base.css setzt scroll-behavior: smooth. Solange die Bühne läuft, scrollt der Browser sonst weich zu einem Anker, und
+                     das Einrasten (snap, ohne Schwung) griffe dazwischen. Ohne laufende Bühne gilt wieder smooth.
+  Die Bühne pinnt nur mit  gsap.matchMedia('(prefers-reduced-motion: no-preference) and (min-height: 600px)'). Team-Fotowechsel und das
+  Landen des Pins in „Komm vorbei“ (data-reveal am Pin) laufen unabhängig davon.
 ```
 
 ## Verträge der Shop-Schicht
@@ -219,11 +236,13 @@ Alle laden mit `defer` am Seitenende von `layout/theme.liquid`, die Reihenfolge 
 | Skript | Lädt auf | Zweck |
 |---|---|---|
 | `theme.js` | überall | Kern: `PS.on`, Dialoge, Tabs, Toast |
-| `gsap.min.js`, `ScrollTrigger.min.js` | nur index, nur mit Setting, nie im Theme-Editor | Scrub, Parallax, Takt für Lenis |
+| `gsap.min.js`, `ScrollTrigger.min.js` | index und die Vorlage `page.ueber-uns` (`template.name == 'page' and template.suffix == 'ueber-uns'`), nur mit Setting, nie im Theme-Editor. `sections/about-story.liquid` prüft für die Bühne dieselbe Bedingung: ändert sich eine, muss die andere mit | Scrub, Parallax, Takt für Lenis (index), Bühne der Geschichte (Über uns) |
 | `lenis.min.js` | index, collection, product, nur mit „Weiches Scrollen“ und nur für Maus/Trackpad (`pointer: fine`, `hover: hover`). Kein `<script>` am Seitenende: das Head-Skript lädt es vor, `motion.js` hängt es an. Touch-Geräte laden es nie | Weiches Scrollen |
 | `motion.js` | überall (vor `header.js`) | diese Schicht |
 | `header.js`, `cart.js`, `sections.js` | überall | Header, Warenkorb und Drawer, Showroom und Quick-Add |
 | `contact.js` | product, page, im Theme-Editor immer | Kontakt-Box und Anfrage-Zeile (`compact`, festes Thema über `data-topic-default`): Thema wählen, WhatsApp-/E-Mail-Link, Öffnungsstatus |
+| `about-story.js` | page mit Suffix ueber-uns, aus `sections/about-story.liquid` (`<script defer>` in der Section, läuft deshalb vor `theme.js`), nur ab zwei Etappen | Bühne der Geschichte: pinnen, umblättern, Balken, Einrasten, Übergang zum Team, `PS.headerHold`. Ohne GSAP setzt es `is-static` |
+| `about-team.js` | wo die Section `about-team` steht, aus der Section | Team-Spotlight: Foto-Wechsel, Raster, Pfeile, Wischen, Live-Region. Läuft auch ohne GSAP (dann wechselt alles sofort) |
 | `pages.js` | page (alle Seitenvorlagen) | Scrub der Partner-Aussagen (nur mit Bewegung); Service-Leiste: Scrollspy mit `aria-current="location"` und Verlauf am Rand, läuft auch ohne Bewegung |
 | `search.js` | beim ersten Öffnen des Such-Dialogs (`data-lazy-script`) | Vorschläge der Suche |
 | `collection.js` | collection, search | AJAX-Filter, Sortierung, Seitenwechsel |
@@ -246,7 +265,8 @@ Die Regeln und Module liegen nach Bereich getrennt (früher alles in `sections.c
 | `assets/shop.css` | Kategorieseite (Banner, Film-Intro, Filter), Produktseite, Warenkorb und Drawer, Bewegung der Shop-Seiten (Megamenü, Karten, View Transitions) |
 | `snippets/search-dialog.liquid` | Markup des Such-Dialogs, aus `sections/header.liquid` per `{% render %}` |
 | `assets/sections.css` | geteilte Reste: Events (Raster und Karten), eine `min-width`-Regel für Grid-Kinder mehrerer Bereiche |
-| `assets/pages.css`, `assets/pages.js` | nur Seitenvorlagen: Service-Seite (Türen, Kaufweg mit Schritt-Nummern, Events), Partner-Abschnitte, Service-Leiste (klebend, Scrollspy), „Komm vorbei“ mit Karte (`sections/visit.liquid`). Leiste und „Komm vorbei“ sind per `enabled_on` auf Seiten beschränkt |
+| `assets/about-head.css`, `about-story.css`/`.js`, `about-team.css`/`.js`, `about-visit.css` | Über-uns-Seite, je eine Datei je Section, laden nur mit ihrer Section (`stylesheet_tag` in der Section). `about-visit.css` überschreibt nur unter `.about-visit` die Kartenstile aus `pages.css` |
+| `assets/pages.css`, `assets/pages.js` | nur Seitenvorlagen: Service-Seite (Türen, Kaufweg mit Schritt-Nummern, Events), Partner-Abschnitte, Service-Leiste (klebend, Scrollspy), „Komm vorbei“ mit Karte (`sections/visit.liquid`, Karte im Snippet `visit-map`). Leiste und „Komm vorbei“ sind per `enabled_on` auf Seiten beschränkt |
 | `assets/theme.css` | Shopify-Ergänzungen; am Ende der Block `@media (forced-colors: active)` für gewählte Zustände (Umschalter, Chips, Farbfelder, Hero-Tabs, Spalten-Wahl), auch für Klassen aus `shop.css`/`hero.css` (dort mit einer Stufe mehr Spezifität). Der Tab-Indikator der Produkt-Tabs steht in `home.css`. |
 | `assets/sections.js` | globale Section-Module: Showroom, Quick-Toggle der Produktkarte (`PS.quick`), Escape für Tooltips |
 

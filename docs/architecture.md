@@ -16,7 +16,7 @@ Das Theme ist ein Shopify-Liquid-Theme ohne Build-Step. Es gilt dieselbe Bauweis
 
 Neu ist nur, dass erstmals **Theme-Blöcke** (`blocks/`) genutzt werden. Ein Umbau enthält beliebig viele Bild-Blöcke, und das geht nur mit verschachtelten Theme-Blöcken (https://shopify.dev/docs/storefronts/themes/architecture/blocks/theme-blocks/schema).
 
-Keine Bibliothek: Die Seitenvorlagen laden kein GSAP. Bewegung läuft über CSS-Übergänge und die Web Animations API, und zwar nur über `transform` und `opacity`. Die Box-Paneele verschieben sich, statt ihre Breite zu ändern, denn die Breiten-Animation fiel bei 3440 × 1440 auf 50 fps.
+Keine Bibliothek: Die Seitenvorlagen Werkstatt und Service laden kein GSAP (nur die Startseite und die Über-uns-Seite, siehe Etappe 3). Bewegung läuft über CSS-Übergänge und die Web Animations API, und zwar nur über `transform` und `opacity`. Die Box-Paneele verschieben sich, statt ihre Breite zu ändern, denn die Breiten-Animation fiel bei 3440 × 1440 auf 50 fps.
 
 ## Bausteine
 
@@ -110,5 +110,85 @@ templates/page.contact.json
 | Kein Skript | Alles sichtbar, die Leiste wischt, nur die Markierung des aktuellen Abschnitts fehlt. |
 | Theme-Editor | Beim Neuladen der Leiste räumt `shopify:section:unload` Listener und Markierung ab. |
 | Alte Links | Alle Anker `/pages/service#…` bestehen weiter, `#werkstatt` ist die ID der Werkstatt-Tür. |
+
+## Etappe 3: Über uns (Entwurf H)
+
+Stand 2026-10-30, gebaut in `claude/ueber-uns-h`, noch nicht gepusht. Entwurf, Spec und Plan: [`ueber-uns-h-design.md`](ueber-uns-h-design.md),
+[`plan-ueber-uns-h.md`](plan-ueber-uns-h.md). Gleiche Bauweise wie bisher (Sections, `PS.on`, Tokens), dazu erstmals **Section-Blöcke** für
+Etappen und Personen (keine Theme-Blöcke: Balken und Bühne lesen dieselben Blöcke zweimal, Theme-Blöcke nutzt das Theme nur zum Verschachteln)
+und als zweite Seite nach der Startseite **GSAP und ScrollTrigger** für die Bühne.
+
+```
+templates/page.ueber-uns.json
+├─ sections/service-subnav.liquid      Unternavigation (Untermenü „Service“)
+├─ sections/about-head.liquid          Seitenkopf „Halle, dunkel“: h1, Satz, Crew-Foto bis an den Rand
+├─ sections/about-story.liquid         Geschichte, Blöcke „Etappe“ (stage): Foto, große Jahreszahl, Titel, Text, Ort.
+│                                      Ab zwei Etappen auf dieser Vorlage Bühne (Klasse about-story--stage), dazu der Balken mit den
+│                                      Jahren und das Symbol Bar & Shield (symbol i-barshield, nachgezogen aus assets/hd-bar-shield.png)
+├─ sections/about-team.liquid          Team als Spotlight, Blöcke „Person“ (person, höchstens acht)
+└─ sections/about-visit.liquid         „Komm vorbei“ als Etappe: Karte, Adresse, Route, Anrufen, WhatsApp, E-Mail, Lieferhinweis
+    └─ snippets/visit-map.liquid       Karte des Dreiländerecks mit Pin und Schild, auch von sections/visit.liquid benutzt
+
+assets/about-head.css                  Kopf, Setzen des Fotos beim Laden (Animation, nur mit Bewegung)
+assets/about-story.css, about-story.js Etappen, Vorstufe der Bühne, Bühne (pinnen, umblättern, Balken, Einrasten, Übergang zum Team)
+assets/about-team.css, about-team.js   Spotlight: Foto, Text, Vorschau-Raster, Pfeile, Wischen
+assets/about-visit.css                 „Komm vorbei“ und die Abweichungen der Karte unter .about-visit (kein Skript)
+assets/header.js                       + PS.headerHold(on): hält die Kopfleiste eingefahren (siehe motion-api.md)
+assets/tokens.css                      + --c-orange-on-light, --c-hd-orange, --photo-grade
+```
+
+**Datenfluss**
+- **Inhalte** liegen in `templates/page.ueber-uns.json` als Section- und Block-Einstellungen. Der Händler pflegt sie im Theme-Editor:
+  Etappen und Personen hinzufügen, verschieben, ändern. Die Teamtexte außer Gerhard und Ingrid sind Platzhalter, bis der Händler sie liefert.
+- **Händlerdaten** (Adresse, Telefon, WhatsApp, E-Mail) kommen nur aus den Theme-Einstellungen. Links setzen `snippets/contact-href.liquid` und
+  `assets/contact.js` (WhatsApp und E-Mail mit Gruß an den Laden); die Route baut `about-visit.liquid` wie `visit.liquid` aus der Adresse.
+  Nichts davon steht fest im Markup.
+- **Fotos:**
+  - Gewählt im Bildfeld: CDN mit `image_url`.
+  - Sonst die Standarddatei aus `assets/` (`ueber-uns-*.jpg`, Herkunft in `bildliste.md`). Das CDN skaliert sie nicht, darum gibt es vorab
+    skalierte Fassungen. Die Sections kennen Maße und srcset der mitgelieferten Dateien, eine andere Standarddatei steht ohne srcset.
+  - Team: ein quadratisches Foto je Person (Handy, Vorschau) und optional ein breiter Ausschnitt 3 : 2 für den Desktop.
+- **Liquid → JS:** Liquid rendert alles vollständig, ohne Skript steht die Seite untereinander. Das Skript der Geschichte (`data-story`,
+  `data-stage`, `data-viewport`, `data-rail`) und das des Teams (`data-about-team`, `data-pick`, `data-prev`, `data-next`) lesen nur dieses
+  Markup. Sie starten wie `assets/build-book.js`: sofort, wenn `PS.on` da ist, sonst bei `DOMContentLoaded` (ein Skript in der Section läuft
+  vor `theme.js`).
+- **Zustand:** Nur im JS und in Klassen: `about-story--stage` (Liquid, Bühne vorgesehen), `is-live` (Bühne läuft), `is-static` (Rückfall),
+  `is-ready` (Team ist ein Spotlight), `is-in` am Pin (gelandet). Die Bühne hängt `__story = { st, guard, last, revert }` an `[data-story]`.
+- **Kopfleiste:** Die Bühne ruft `PS.headerHold(true)` ab 150 px vor dem Pinnen bis eine Kopfleistenhöhe nach dem Übergang zum Team (ohne Team:
+  bis zum Ende des Pinnens), danach `PS.headerHold(false)`. Dazwischen fährt die Leiste nicht weg.
+- **GSAP:** `layout/theme.liquid` lädt `gsap.min.js` und `ScrollTrigger.min.js` auf `index` und auf `page` mit Suffix `ueber-uns`, nie im
+  Theme-Editor und nur mit dem Setting „Animationen aktivieren“. `sections/about-story.liquid` prüft dieselbe Bedingung für `about-story--stage`:
+  ändert sich eine, muss die andere mit.
+- **Karte:** Das Snippet `visit-map` gibt die Karte aus. Ohne Parameter ist es genau die Karte von `sections/visit.liquid` (Zeichen für Zeichen
+  gleich, Vergleich mit `docs/qa/karte-ausschneiden.py`). `about-visit.liquid` ruft es mit `ring: false, logo: true, reveal: ''` und den
+  Adresszeilen auf. Dann hat die Karte kein `data-reveal`, kein Ring läuft aus, im Schild steht Bar & Shield (und am Handy die Adresse),
+  und der Pin trägt `data-reveal`: `motion.js` setzt `is-in`, sobald er ins Bild kommt, und er landet einmal (`about-visit.css`).
+  Alle Abweichungen von `pages.css` stehen unter `.about-visit`, so bleibt die Karte auf der Service-Seite unverändert.
+
+**Randfälle**
+
+| Fall | Verhalten |
+|---|---|
+| Kein Skript, GSAP lädt nicht, Aufbau der Bühne bricht ab | Das Skript setzt `is-static`, ein `onerror` am Skript-Tag tut es bei einem Ladefehler: Die Vorstufe aus `about-story.css` fällt weg, die Etappen stehen untereinander, kein schwarzer Streifen. |
+| `prefers-reduced-motion`, Setting aus, Theme-Editor | Keine Bühne und keine Fahrten, alles steht untereinander und ist sichtbar. Der Balken ist ausgeblendet, die Jahreszahlen sind Anker (`#etappe-<Block-ID>`). Der Pin landet nicht, er steht schon da. Team-Fotos wechseln sofort. |
+| Fenster niedriger als 600 px (Handy quer) | Die Bühne wird nicht gepinnt (`gsap.matchMedia`: reduzierte Bewegung ausgenommen, mindestens 600 px Höhe), die Etappen stehen untereinander. 600 = Kopfleiste (bis 77 px) plus 520 px Mindesthöhe der Bühne. Team-Fotowechsel und der Pin gelten für jede Höhe. |
+| Eine Etappe | Keine Bühne, kein Balken, kein Skript. |
+| Mehr oder weniger Etappen | Der Balken teilt sich auf die Anzahl auf, Einrasten und Scrollweg rechnen mit ihr (eine Bildschirmhöhe je Wechsel). Ohne Etappen steht außerhalb des Editors nichts da. |
+| Team folgt nicht direkt auf die Geschichte | Kein Übergang zum Team, die Kopfleiste wird bis zum Ende des Pinnens gehalten. |
+| Eine Person im Team | Keine Pfeile und kein Raster, die Karte steht da. Höchstens acht Personen (Raster 4 × 2 bzw. 8 × 1). |
+| Person ohne Foto oder ohne breiten Ausschnitt | Ohne Foto eine dunkle Fläche. Ohne breiten Ausschnitt steht das quadratische Foto am Desktop ganz und mittig im Rahmen (`contain`). |
+| Team weniger als einen Bildschirm entfernt | Alle Teamfotos laden sofort (`eager`), ein Wechsel wartet auf das Dekodieren, höchstens 400 ms. |
+| Keine Händlerdaten | „Komm vorbei“ erscheint im Shop nicht, im Editor steht ein Hinweis. Ohne Adresse fehlt „Route planen“, ohne einen Kanal der zugehörige Knopf. |
+| Adressleiste am Handy | `ScrollTrigger.config({ ignoreMobileResize: true })`: kein Neumessen mitten im Umblättern. |
+| Anker und Klick auf eine Jahreszahl | Solange die Bühne läuft, steht `html` auf `scroll-behavior: auto` (`about-story.css`), sonst scrollte der Browser weich und das Einrasten griffe dazwischen. Ein Klick scrollt zur Etappe, ohne unterwegs einzurasten. |
+| Theme-Editor | Immer statisch. Ein gewählter Teamblock zeigt seine Person sofort. |
+| Tastatur | Die Reihenfolge ist Balken, Team, Kontakt. Die Pfeiltasten wechseln die Person nur, solange der Fokus auf einem Knopf des Teams liegt. Der Fokusrahmen folgt dem Theme (`base.css` blendet ihn auf Wunsch des Händlers aus, offen in `freigaben.md`). |
+
+**Fitness Functions**
+
+1. **Neue Etappe oder Person:** Kein Code, nur ein Block im Theme-Editor.
+2. **Externe API:** Keine. Karte und Kontaktwege kommen aus dem Theme und den Händlerdaten.
+3. **Neues Aussehen:** je Section eine CSS-Datei und `assets/tokens.css`.
+4. **Isoliert testbar:** Jede Section rendert für sich. Die Prüfungen laufen mit `docs/qa/ueber-uns-checks.js` in der Vorschau.
 
 CONFIDENCE: 8/10

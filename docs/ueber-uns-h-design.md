@@ -60,7 +60,7 @@ Dienstleistungen sie auch haben. Der Entwurf zeigt sie nicht.
 
 - Schwarz (`on-dark`). Links die Überschrift „Seit 1985 in *Familienhand.*“ („Familienhand.“ orange) und der Satz „Offizieller
   Harley-Davidson-Vertragshändler in Weil am Rhein, in zweiter Generation.“
-- Rechts das Hallenfoto (`bilder/foto/softail-licht.jpg`) bis an den rechten Rand. Seine linke Kante liegt genau über der Teilung der
+- Rechts das Crew-Foto (`bilder/foto/crew-auf-bikes-quer.jpg`, Wunsch des Nutzers vom 30.10., vorher Hallenfoto `softail-licht.jpg`) bis an den rechten Rand. Seine linke Kante liegt genau über der Teilung der
   Etappen darunter (Spalten 1.08fr | 1fr, also `calc(108% / 2.08)`).
 - Höhe am Desktop `clamp(440px, 38vw, 640px)`, Überschrift `clamp(44px, 5.8vw, 92px)`.
 - Am Handy (unter 900 px) steht das Foto oben über die volle Breite (4:3, höchstens 52svh), darunter der Text. Die Überschrift ist dort
@@ -76,7 +76,8 @@ oben, Text unten). Es gibt keinen Fortschrittsbalken.
 **Mit Bewegung:** Die Bühne bleibt stehen (gepinnt), während man scrollt. Jede Etappe füllt die ganze Bühne.
 - Bühnenhöhe: Bildschirmhöhe minus Kopfleiste, mindestens 520 px.
 - Scrollweg: eine Bildschirmhöhe pro Etappenwechsel.
-- Jede Etappe rastet ein (snap auf 1/(Anzahl−1), 0,25 bis 0,7 s, power2.inOut). Zwischen zwei Etappen bleibt man nie stehen.
+- Kein Einrasten (Wunsch des Nutzers vom 30.10., vorher snap auf 1/(Anzahl−1)). Die Lage der Etappen hängt nur vom Scrollen ab. Wer
+  zwischen zwei Etappen anhält, bleibt dort stehen. Der Scrub (0,6) zieht nur hinter der Scrollposition her.
 
 **Umblättern (Version 36, Idee des Nutzers):** Die Etappen liegen übereinander, spätere oben. Pro Wechsel eine Zeiteinheit:
 1. 0 bis 0,6: Die nächste Etappe schiebt sich als Ganzes von rechts über die aktuelle (power2.inOut). Die aktuelle bleibt stehen. Am
@@ -89,6 +90,15 @@ oben, Text unten). Es gibt keinen Fortschrittsbalken.
 4. Rückwärts läuft alles genau umgekehrt.
 
 Kein Foto zoomt, wächst oder verschiebt sich im eigenen Rahmen.
+
+**Fotogalerie je Etappe (Wunsch des Nutzers vom 30.10.):**
+- Eine Etappe kann bis zu vier Fotos haben: das Hauptfoto und bis zu drei weitere. Die weiteren liefert der Nutzer.
+- Ab zwei Fotos steht unter dem Text (nach dem Ort) eine Reihe kleiner Vorschaubilder, 3 : 2. Nicht gewählte sind schwarz-weiß, das gewählte
+  ist farbig und hat einen orangen Strich unten, wie die Namensliste im Team.
+- Ein Klick schiebt das große Foto über das bisherige, das stehen bleibt (0,6 s, power2.inOut, nur waagerecht, kein Zoom).
+- Richtung laut Nutzer: Liegt das neue Foto in der Vorschau links vom bisherigen, bewegt es sich von rechts nach links. Liegt es rechts,
+  bewegt es sich von links nach rechts.
+- Ohne Bewegung, bei reduzierter Bewegung und im Editor wechselt das Foto sofort. Die Galerie hängt nicht an GSAP.
 
 **Fortschrittsbalken** am Fuß der Bühne:
 - Schwarzer Balken mit den Jahren in gleich breiten Spalten (heute vier: 1985, 1991, 2016, Heute).
@@ -197,8 +207,7 @@ heißt das:
 5. **Niedrige Bildschirme:** Ist das Fenster weniger als 600 px hoch (Handy quer), wird die Bühne nicht gepinnt. Die Etappen stehen
    untereinander wie ohne Bewegung. Sonst wäre die Bühne (mindestens 520 px plus Kopfleiste) höher als der Bildschirm, und Balken und
    Textende lägen außerhalb (Kopfleiste bis 77 px plus 520 px ergibt 597 px). Das Theme macht es bei der Service-Leiste ähnlich (klebt nicht unter 540 px Höhe). **Claudes Entscheidung.**
-6. **Einrasten ohne Überschwingen:** Einrasten ohne Schwung (`inertia: false`). Während ein Klick auf eine Jahreszahl zur Etappe
-   scrollt, rastet nichts dazwischen ein. Beides ist in V37 noch nicht so. **Claudes Entscheidung**, sichtbar nur als ruhigeres Einrasten.
+6. **Einrasten:** entfällt seit dem 30.10. (siehe 4.3). Vorher: Einrasten ohne Schwung, kein Einrasten während eines Sprungs.
 7. **Bar & Shield:** Der Reiter auf dem Balken ist im Entwurf eine nachgezogene Vektorfassung von `assets/hd-bar-shield.png`. Laut
    Briefing soll das Logo unverändert aus dem Händlerportal kommen. Die Form bleibt deshalb unverändert. Kommt die offizielle SVG,
    ersetzt sie die nachgezogene Fassung.
@@ -213,8 +222,8 @@ Alle Fakten stammen aus der alten Website oder vom Händler. Nichts davon wird e
 |---|---|---|---|---|
 | 1985 | Gründung auf der Schusterinsel | Weil-Friedlingen | Gerhard Link (Teamfoto, schwarz-weiß) | |
 | 1991 | Ein eigenes Haus | Weil-Haltingen | altes Farbfoto `power-shop-frueher.jpg` | nur 678 × 510 px. Wo das Haus steht, ist nicht bestätigt, der Nutzer will es trotzdem hier. Nicht mehr nachfragen. |
-| 2016 | Die zweite Generation übernimmt | Umbau und neuer Showroom | Showroom-Theke | |
-| Heute | Showroom trifft Werkstatt | Burghölzle 15, Weil am Rhein | Crew auf den Bikes (quer) | „Heute.“ mit orangem Punkt |
+| 2016 | Die zweite Generation übernimmt | Umbau und neuer Showroom | Falk, Franziska und Richard Link auf dem Vorplatz (`vorplatz-team.jpg`, schwarz-weiß wie 1985) | Foto vom Nutzer am 30.10. |
+| Heute | Showroom trifft Werkstatt | Burghölzle 15, Weil am Rhein | Showroom-Theke | „Heute.“ mit orangem Punkt. Bis 30.10. stand hier die Crew, die jetzt im Kopf ist. |
 
 Die Texte stehen wörtlich in `h-vollbild.html`.
 
@@ -225,7 +234,7 @@ Die Texte stehen wörtlich in `h-vollbild.html`.
 - **Die Texte sind bis auf Gerhard und Ingrid Platzhalter**, nur aus Rolle und Zeitleiste abgeleitet. Der Nutzer will sie selbst noch
   verfeinern. Sie gehen so in die Vorlage, dass er sie im Editor ändern kann.
 
-**Fotos, die neu ins Theme kommen:** Hallenfoto, die vier Etappenfotos, acht Teamfotos, vier breite Teamausschnitte. Die Karte
+**Fotos, die neu ins Theme kommen:** Crew-Foto für den Kopf, die vier Etappenfotos, acht Teamfotos, vier breite Teamausschnitte. Die Karte
 (`karte-dreilaendereck-*.webp`) und `hd-bar-shield.png` liegen schon in `assets/`. Neue Dateien kommen mit Herkunft in
 `docs/bildliste.md`.
 
