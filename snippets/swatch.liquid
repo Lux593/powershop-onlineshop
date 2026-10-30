@@ -1,52 +1,62 @@
 {% doc %}
-  Farbfeld für eine Farb-Option. Reihenfolge: Shopify-Swatch-Farbe der verknüpften Option, dann der Farbeintrag mit
-  gleichem Namen unter Inhalte > Metaobjekte > Farbe (Handle = Name als Handle, z. B. "vivid-black"),
-  sonst eine Zuordnung nach Farbname.
+  Farbfeld für eine Farb-Option. Reihenfolge: natives Shopify-Swatch (Farbe/Bild), Metaobjekt Farbe (Handle = Name),
+  Farbname (inkl. „ / “ als geteilter Kreis via conic-gradient), sonst grau.
 
-  @param {string} name - Farbname, z. B. "Schwarz"
+  @param {string} name - Farbname, z. B. „Schwarz“ oder „Weiß / Rot / Blau“
   @param {object} [swatch] - Swatch des Optionswerts (value.swatch)
-  @param {string} [tag] - "li" (Standard) oder "span"
+  @param {string} [tag] - „li“ (Standard) oder „span“
 {% enddoc %}
 
 {%- liquid
-  assign hex = swatch.color
-  if hex == blank
+  assign bg = blank
+
+  if swatch.image != blank
+    assign bg = 'url(' | append: swatch.image | image_url: width: 128 | append: ') center / cover'
+  elsif swatch.color != blank
+    assign bg = swatch.color
+  endif
+
+  if bg == blank
     assign entry_handle = name | handleize
-    assign hex = metaobjects['shopify--color-pattern'][entry_handle].color.value
+    assign meta_hex = metaobjects['shopify--color-pattern'][entry_handle].color.value
+    if meta_hex != blank
+      assign bg = meta_hex
+    endif
   endif
-  if hex == blank
-    assign key = name | downcase
-    case key
-      when 'schwarz'
-        assign hex = '#141414'
-      when 'braun'
-        assign hex = '#6b4226'
-      when 'grau'
-        assign hex = '#8a8a8a'
-      when 'oliv'
-        assign hex = '#5b5e3a'
-      when 'weiß'
-        assign hex = '#f4f4f2'
-      when 'weiss'
-        assign hex = '#f4f4f2'
-      when 'orange'
-        assign hex = '#f26722'
-      when 'bordeaux'
-        assign hex = '#7d1f24'
-      when 'rot'
-        assign hex = '#b3262e'
-      when 'denim'
-        assign hex = '#3d5a80'
-      when 'blau'
-        assign hex = '#2f66a8'
-      when 'sand'
-        assign hex = '#c8b79a'
-      when 'chrom'
-        assign hex = '#c9ccd1'
-      else
-        assign hex = '#cccccc'
-    endcase
+
+  if bg == blank
+    assign combo = name | split: ' / '
+    if combo.size > 1
+      assign stops = ''
+      assign n = combo.size
+      assign slice = 360 | divided_by: n
+      for part in combo
+        capture part_hex
+          render 'swatch-hex', label: part
+        endcapture
+        assign part_hex = part_hex | strip
+        assign start_deg = forloop.index0 | times: slice
+        assign end_deg = forloop.index | times: slice
+        assign stop = part_hex | append: ' ' | append: start_deg | append: 'deg ' | append: end_deg | append: 'deg'
+        if forloop.first
+          assign stops = stop
+        else
+          assign stops = stops | append: ', ' | append: stop
+        endif
+      endfor
+      assign bg = 'conic-gradient(' | append: stops | append: ')'
+    else
+      capture single_hex
+        render 'swatch-hex', label: name
+      endcapture
+      assign bg = single_hex | strip
+    endif
   endif
+
+  if bg == blank
+    assign bg = '#cccccc'
+  endif
+
   assign element = tag | default: 'li'
 -%}
-<{{ element }} class="swatch" style="background:{{ hex }}" title="{{ name | escape }}"></{{ element }}>
+<{{ element }} class="swatch" style="background:{{ bg }}" title="{{ name | escape }}"></{{ element }}>

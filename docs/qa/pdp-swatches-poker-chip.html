@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Poker Chip — Farb-Swatches QA</title>
+  <link rel="stylesheet" href="../../assets/tokens.css">
+  <link rel="stylesheet" href="../../assets/base.css">
+  <link rel="stylesheet" href="../../assets/components.css">
+  <link rel="stylesheet" href="../../assets/shop.css">
+  <style>.qa-shell { padding: 16px; background: var(--c-offwhite); }</style>
+</head>
+<body>
+  <div class="qa-shell">
+    <div class="pdp"><div class="pdp__info">
+      <h1 class="pdp__title">Harley-Davidson Power Shop Poker Chip</h1>
+      <div class="pdp__row">
+        <div class="pdp__row-head"><span><strong>Farbe:</strong> Grün</span></div>
+        <div class="swatches" id="swatches"></div>
+      </div>
+    </div></div>
+  </div>
+  <script>
+    var names = [
+      'Grün', 'Orange', 'Türkis', 'Dunkelblau', 'Grau / Orange', 'Weiß / Schwarz',
+      'Weiß / Rot / Blau', 'Gelb', 'Hellblau', 'Schwarz / Orange'
+    ];
+    var map = {
+      schwarz: '#141414', black: '#141414', grau: '#8a8a8a', gray: '#8a8a8a',
+      orange: '#f26722', rot: '#b3262e', red: '#b3262e', blau: '#2f66a8', blue: '#2f66a8',
+      dunkelblau: '#1e3a5f', hellblau: '#7ec8e3', grün: '#2d6a4f', gruen: '#2d6a4f',
+      türkis: '#2aa9a1', tuerkis: '#2aa9a1', gelb: '#d4a017', weiß: '#f4f4f2', weiss: '#f4f4f2', white: '#f4f4f2'
+    };
+    function hexFor(part) {
+      var k = part.trim().toLowerCase();
+      if (map[k]) return map[k];
+      if (k.indexOf('schwarz') >= 0 || k.indexOf('black') >= 0) return '#141414';
+      if (k.indexOf('dunkelblau') >= 0) return '#1e3a5f';
+      if (k.indexOf('hellblau') >= 0) return '#7ec8e3';
+      if (k.indexOf('türkis') >= 0 || k.indexOf('tuerkis') >= 0) return '#2aa9a1';
+      if (k.indexOf('grün') >= 0 || k.indexOf('gruen') >= 0) return '#2d6a4f';
+      if (k.indexOf('orange') >= 0) return '#f26722';
+      if (k.indexOf('rot') >= 0 || k.indexOf('red') >= 0) return '#b3262e';
+      if (k.indexOf('blau') >= 0 || k.indexOf('blue') >= 0) return '#2f66a8';
+      if (k.indexOf('grau') >= 0 || k.indexOf('gray') >= 0) return '#8a8a8a';
+      if (k.indexOf('gelb') >= 0) return '#d4a017';
+      if (k.indexOf('weiß') >= 0 || k.indexOf('weiss') >= 0 || k.indexOf('white') >= 0) return '#f4f4f2';
+      return '#cccccc';
+    }
+    function bgFor(name) {
+      var parts = name.split(' / ');
+      if (parts.length === 1) return hexFor(name);
+      var n = parts.length, slice = 360 / n, stops = [];
+      parts.forEach(function (p, i) {
+        stops.push(hexFor(p) + ' ' + (i * slice) + 'deg ' + ((i + 1) * slice) + 'deg');
+      });
+      return 'conic-gradient(' + stops.join(', ') + ')';
+    }
+    var root = document.getElementById('swatches');
+    names.forEach(function (name, i) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'swatch-btn';
+      btn.setAttribute('aria-pressed', i === 0 ? 'true' : 'false');
+      btn.setAttribute('aria-label', name);
+      var span = document.createElement('span');
+      span.className = 'swatch';
+      span.title = name;
+      span.style.background = bgFor(name);
+      btn.appendChild(span);
+      root.appendChild(btn);
+    });
+  </script>
+</body>
+</html>

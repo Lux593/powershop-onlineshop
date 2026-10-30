@@ -92,7 +92,14 @@
                 if color_variant == blank
                   assign color_variant = color_variants.first
                 endif
-                assign color_image = color_variant.featured_image
+                assign color_image = blank
+                if color_variant != blank
+                  if color_variant.featured_media != blank and color_variant.featured_media.preview_image != blank
+                    assign color_image = color_variant.featured_media.preview_image
+                  elsif color_variant.featured_image != blank
+                    assign color_image = color_variant.featured_image
+                  endif
+                endif
               -%}
               <button
                 class="bcard__swatch"

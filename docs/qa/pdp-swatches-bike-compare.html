@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Street Bob 2026 — Farb-Swatches QA</title>
+  <link rel="stylesheet" href="../../assets/tokens.css">
+  <link rel="stylesheet" href="../../assets/base.css">
+  <link rel="stylesheet" href="../../assets/components.css">
+  <link rel="stylesheet" href="../../assets/shop.css">
+  <style>.qa-shell { padding: 16px; background: var(--c-offwhite); }</style>
+</head>
+<body>
+  <div class="qa-shell">
+    <div class="pdp pdp--bike"><div class="pdp__info">
+      <h1 class="pdp__title">Street Bob 2026</h1>
+      <div class="bike-options">
+        <div class="pdp__row">
+          <div class="pdp__row-head"><span><strong>Farbe:</strong> Vivid Black</span></div>
+          <div class="bcard__swatches" id="swatches"></div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+  <script>
+    var names = [
+      'Aurora Blue Denim', 'Brilliant Red', 'Dark Billiard Gray', 'Vivid Black'
+    ];
+    var map = {
+      'aurora blue denim': '#3d5a80', 'brilliant red': '#b3262e', 'dark billiard gray': '#8a8a8a', 'vivid black': '#141414'
+    };
+    function bgFor(name) {
+      var k = name.toLowerCase();
+      if (map[k]) return map[k];
+      if (k.indexOf('black') >= 0) return '#141414';
+      if (k.indexOf('red') >= 0) return '#b3262e';
+      if (k.indexOf('gray') >= 0 || k.indexOf('grey') >= 0) return '#8a8a8a';
+      if (k.indexOf('denim') >= 0 || k.indexOf('blue') >= 0) return '#3d5a80';
+      return '#cccccc';
+    }
+    var root = document.getElementById('swatches');
+    names.forEach(function (name, i) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'bcard__swatch';
+      btn.setAttribute('aria-pressed', i === 0 ? 'true' : 'false');
+      btn.setAttribute('aria-label', name);
+      var span = document.createElement('span');
+      span.className = 'swatch';
+      span.title = name;
+      span.style.background = bgFor(name);
+      btn.appendChild(span);
+      root.appendChild(btn);
+    });
+  </script>
+</body>
+</html>
