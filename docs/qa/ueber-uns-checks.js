@@ -211,4 +211,56 @@
     else if (!(img.getAttribute('alt') || '').trim()) f.push('Foto im Kopf ohne Alt-Text');
     return f;
   });
+
+  // ---- Task 3: Geschichte, statisch ----
+  var sec = function () { return document.querySelector('[data-story]'); };
+  var shown = function (e) { return !!e && getComputedStyle(e).display !== 'none' && e.getBoundingClientRect().height > 0; };
+  // Farbe eines Tokens, so wie der Browser sie ausrechnet (zum Vergleich mit berechneten Werten)
+  var tokenColor = function (prop, token) {
+    var probe = document.body.appendChild(document.createElement('i'));
+    probe.style[prop] = 'var(' + token + ')';
+    var c = getComputedStyle(probe)[prop]; probe.remove();
+    return c;
+  };
+
+  UU.add('story:static', function () {
+    var f = [], s = sec();
+    if (!s) return ['.about-story fehlt'];
+    var leaves = s.querySelectorAll('ol > li.leaf');
+    if (leaves.length !== 4) f.push(leaves.length + ' li.leaf in einem ol statt 4');
+    s.querySelectorAll('.leaf__year').forEach(function (y, i) {
+      if (y.getAttribute('aria-hidden') !== 'true') f.push('Jahreszahl ' + (i + 1) + ' ohne aria-hidden="true"');
+    });
+    s.querySelectorAll('.leaf h3').forEach(function (h, i) {
+      var first = h.firstElementChild, year = (s.querySelectorAll('.leaf__year')[i] || {}).textContent || '';
+      year = year.replace(/\.$/, '').trim();
+      if (!first || !first.classList.contains('sr-only') || h.firstChild !== first) f.push('h3 ' + (i + 1) + ' beginnt nicht mit .sr-only');
+      else if (first.textContent.indexOf(year + ':') !== 0) f.push('h3 ' + (i + 1) + ': .sr-only ist „' + first.textContent + '“, erwartet „' + year + ': “');
+    });
+    var h2 = s.querySelector('h2');
+    if (!h2 || h2.textContent.trim() !== 'Unsere Geschichte' || !h2.classList.contains('sr-only')) f.push('h2 „Unsere Geschichte“ (.sr-only) fehlt');
+    if (shown(s.querySelector('[data-rail]'))) f.push('Balken ist sichtbar');
+    if (cw() >= 900) {
+      leaves.forEach(function (li, i) {
+        var m = li.querySelector('.leaf__media').getBoundingClientRect(), b = li.querySelector('.leaf__body').getBoundingClientRect();
+        var share = m.width / li.getBoundingClientRect().width * 100;
+        if (!(m.right <= b.left + 1)) f.push('Etappe ' + (i + 1) + ': Foto steht nicht links vom Text');
+        if (!near(share, 108 / 2.08, .5)) f.push('Etappe ' + (i + 1) + ': Fotospalte ' + share.toFixed(1) + ' % statt 51,9 %');
+      });
+    }
+    s.querySelectorAll('.leaf__media img').forEach(function (img, i) {
+      if (img.getAttribute('loading') !== 'lazy') f.push('Etappenfoto ' + (i + 1) + ' hat loading="' + img.getAttribute('loading') + '"');
+    });
+    return f;
+  }, function () { var s = sec(); return s && s.classList.contains('is-live') ? 'nur ohne is-live' : ''; });
+
+  // Ablauf: Vorlage um einen Block mit dem Schlüssel „ohne-foto“ ohne Bild und ohne Standarddatei ergänzen, hochladen lassen, neu laden
+  UU.add('story:noimage', function () {
+    var f = [], li = document.getElementById('etappe-ohne-foto'), media = li && li.querySelector('.leaf__media');
+    if (!media) return ['Etappe ohne Foto hat keine Fotofläche'];
+    if (media.querySelector('img')) f.push('Etappe ohne Foto rendert ein img-Element');
+    var bg = getComputedStyle(media).backgroundColor, soll = tokenColor('backgroundColor', '--c-anthracite');
+    if (bg !== soll) f.push('Fotofläche hat ' + bg + ' statt --c-anthracite (' + soll + ')');
+    return f;
+  }, function () { return document.getElementById('etappe-ohne-foto') ? '' : 'nur mit Block „ohne-foto“ in der Vorlage'; });
 })();

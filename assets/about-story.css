@@ -1,0 +1,157 @@
+/* ==========================================================================
+   Power Shop – Geschichte der Über-uns-Seite (sections/about-story.liquid). Lädt nur mit der Section.
+   Drei Zustände:
+   - Ohne Bewegung, im Theme-Editor und unter 600 px Fensterhöhe: Die Etappen stehen untereinander (Desktop: Foto links, Text
+     rechts; Handy: Foto oben), der Balken mit den Jahren ist ausgeblendet.
+   - Mit Bewegung, bevor das Skript läuft: Die Section hat schon die Maße der Bühne. Etappe 1 ist so hoch wie das Bühnenfenster,
+     darunter bleibt der Platz für den Balken frei, die übrigen Etappen stehen noch darunter. So springt beim Start der Bühne
+     im ersten Bildschirm nichts.
+   - .is-live (setzt assets/about-story.js, solange die Bühne läuft): Die Etappen liegen übereinander auf der gepinnten Bühne,
+     am Fuß steht der Balken.
+   Vorlage: entwuerfe/ueber-uns/h-vollbild.html, dort mit .full* statt .about-story* und .meta statt .leaf__meta.
+   ========================================================================== */
+
+.about-story {
+  /* Bühne: Fenster minus Kopfleiste, mindestens 520 px. Das Skript lässt das Pinnen mit derselben --header-h beginnen. */
+  --stage-h: max(520px, calc(100svh - var(--header-h) - env(safe-area-inset-top, 0px)));
+  /* Balken: Link plus Rand oben und unten. Vor dem Skript halten die Etappen genau so viel Platz frei. */
+  --rail-pad: 2px;
+  --rail-link: 44px;
+  --rail-h: calc(var(--rail-link) + 2 * var(--rail-pad));
+  --rider-w: 20px;
+  background: var(--c-white);
+}
+.about-story__empty { padding: var(--s-4) var(--gutter); color: var(--c-muted); }
+
+/* ---------------- Etappen ---------------- */
+.leaf { position: relative; display: grid; overflow: hidden; background: var(--c-white); border-top: 1px solid var(--c-line); }
+.leaf__media { position: relative; overflow: hidden; min-height: 320px; margin: 0; background: var(--c-anthracite); }
+.leaf__media > img { width: 100%; height: 100%; object-fit: cover; object-position: var(--focus, 50% 50%); filter: var(--photo-grade); }
+.leaf--mono .leaf__media > img { filter: grayscale(1) contrast(1.12) brightness(.98); }
+.leaf__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  min-width: 0;
+  padding: clamp(28px, 4.5vw, 72px) max(var(--gutter), calc((100vw - var(--container)) / 2 + var(--gutter))) clamp(28px, 4.5vw, 72px) clamp(28px, 4.5vw, 80px);
+}
+.leaf__year { font: 800 clamp(88px, 11vw, 210px)/.8 var(--f-head); letter-spacing: -.01em; color: var(--c-black); }
+.leaf__year span { color: var(--c-orange-on-light); }
+.leaf__text { margin-top: auto; }
+.leaf h3 { max-width: 15ch; font-size: clamp(32px, 3.4vw, 58px); font-weight: 800; line-height: .92; }
+.leaf__text p { margin-top: 16px; max-width: 42ch; font-size: clamp(16px, 1.25vw, 19px); line-height: 1.6; color: var(--c-text-soft); }
+.leaf__meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: var(--s-3);
+  font: 600 14px/1.2 var(--f-head);
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--c-orange-on-light);
+}
+.leaf__meta .icon { width: 16px; height: 16px; }
+
+/* Balken und Hinweis gibt es nur auf der laufenden Bühne */
+.about-story__rail, .about-story__hint { display: none; }
+
+/* ---------------- Vor dem Skript: Maße der Bühne ---------------- */
+@media (prefers-reduced-motion: no-preference) and (min-height: 600px) {
+  .has-motion .about-story--stage .about-story__stage { background: var(--c-black); }
+  .has-motion .about-story--stage:not(.is-live) .leaf:first-child {
+    height: calc(var(--stage-h) - var(--rail-h));
+    min-height: 0;
+    margin-bottom: var(--rail-h);
+    border-top: 0;
+  }
+  .has-motion .about-story--stage:not(.is-live) .leaf:first-child .leaf__media { min-height: 0; }
+}
+
+/* ---------------- Live: Bühne steht, die Etappen liegen übereinander ---------------- */
+.about-story.is-live .about-story__stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: var(--stage-h);
+  overflow: hidden;
+  background: var(--c-black);
+}
+.about-story.is-live .about-story__viewport { position: relative; flex: 1; min-height: 0; overflow: hidden; }
+.about-story.is-live .about-story__track { position: relative; height: 100%; }
+/* Spätere Etappen liegen oben (Reihenfolge im Markup) */
+.about-story.is-live .leaf { position: absolute; inset: 0; min-height: 0; border-top: 0; }
+.about-story.is-live .leaf__media { min-height: 0; }
+
+/* Balken am Fuß der Bühne: Die Jahre stehen in gleich breiten Spalten (--count aus der Section). Die Linie läuft von der Mitte der
+   ersten bis zur Mitte der letzten Spalte mittig durch sie hindurch und füllt sich mit den Etappen. Wo der orange Balken angekommen
+   ist, wird die Zahl orange (is-passed aus dem Skript). Der schwarze Grund hinter jeder Zahl unterbricht die Linie. */
+.about-story.is-live .about-story__rail {
+  position: relative;
+  z-index: 5;
+  display: block;
+  flex: none;
+  height: var(--rail-h);
+  padding-block: var(--rail-pad);
+  background: var(--c-black);
+}
+.about-story__steps { position: relative; }
+.about-story__rail ol { position: relative; display: grid; grid-template-columns: repeat(var(--count), minmax(0, 1fr)); justify-items: center; }
+.about-story__rail a {
+  display: flex;
+  align-items: center;
+  min-height: var(--rail-link);
+  padding: 0 6px;
+  background: color-mix(in srgb, var(--c-black) calc(var(--show, 1) * 100%), transparent);
+  font: 700 15px/1 var(--f-head);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--c-white);
+  transition: color var(--t-fast) var(--ease);
+}
+.about-story__rail a.is-passed { color: var(--c-orange); }
+.about-story__rail a > span { opacity: var(--show, 1); }
+.about-story__line {
+  position: absolute;
+  top: 50%;
+  left: calc(50% / var(--count));
+  right: calc(50% / var(--count));
+  height: 2px;
+  margin-top: -1px;
+  background: var(--c-steel);
+}
+.about-story__fill { position: absolute; inset: 0; background: var(--c-orange); transform-origin: 0 50%; transform: scaleX(0); }
+/* Das Bar & Shield fährt als Kopf der Linie mit, mittig auf der Spitze des orangen Balkens, in der Farbe der Originaldatei. Der schwarze
+   Grund unterbricht die Linie, damit sie nicht durch die offene Kontur scheint. Erreicht es eine Zahl, blendet die Zahl samt ihrem
+   schwarzen Grund aus (--show aus dem Skript), groß steht sie in dem Moment ohnehin auf der Etappe. */
+.about-story__head { position: absolute; z-index: 1; inset: 0; will-change: transform; }
+.about-story__rider {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: var(--rider-w);
+  height: auto;
+  transform: translate(-50%, -50%);
+  fill: var(--c-hd-orange);
+  background: var(--c-black);
+  box-shadow: 0 0 0 4px var(--c-black);
+}
+
+/* ---------------- Desktop ---------------- */
+@media (min-width: 900px) {
+  /* Am Desktop ist der Balken kräftiger: größere Zahlen, dickere Linie, größeres Zeichen, wächst mit breiten Bildschirmen mit */
+  .about-story { --rail-pad: clamp(8px, .8vw, 14px); --rail-link: 52px; --rider-w: clamp(30px, 2.2vw, 40px); }
+  .leaf { grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr); min-height: 640px; }
+  .about-story__rail a { padding: 0 clamp(14px, 1.2vw, 22px); font-size: clamp(20px, 1.45vw, 26px); letter-spacing: 2px; }
+  .about-story__line { height: 3px; margin-top: -1.5px; }
+  .about-story__rider { box-shadow: 0 0 0 6px var(--c-black); }
+}
+
+/* ---------------- Handy: Foto oben, Text darunter ---------------- */
+@media (max-width: 899.98px) {
+  .leaf { grid-template-rows: minmax(0, 46%) minmax(0, 1fr); min-height: 640px; }
+  .leaf__body { gap: 10px; padding: 18px var(--gutter) 22px; }
+  .leaf__year { font-size: clamp(56px, 16vw, 76px); }
+  .leaf h3 { font-size: clamp(26px, 7.4vw, 32px); }
+  .leaf__text p { margin-top: 10px; font-size: 15px; line-height: 1.55; }
+  .leaf__meta { margin-top: 12px; }
+}
