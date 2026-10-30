@@ -203,10 +203,17 @@
   var clamp = function (lo, v, hi) { return Math.min(hi, Math.max(lo, v)); };
   var near = function (a, b, tol) { return Math.abs(a - b) <= tol; };
 
-  // Der Kopf füllt den ersten Bildschirm: Bei scrollY 0 endet er an der Unterkante des Fensters (about-head.css, --above)
+  // Der Kopf füllt den ersten Bildschirm: Bei scrollY 0 endet sein Inhalt an der Unterkante des Fensters, darunter folgt der Saum
+  // (--about-head-skirt, am Handy 120 px, sonst 0) bis unter die Leiste von Safari (about-head.css)
   var fillsScreen = function (head) {
-    var b = head.getBoundingClientRect().bottom;
-    return near(b, innerHeight, 2) ? [] : ['Kopf endet bei scrollY 0 bei ' + b.toFixed(1) + ' px, nicht an der Unterkante des Fensters (' + innerHeight + ')'];
+    var f = [], b = head.getBoundingClientRect().bottom, t = rect('.about-head__text').bottom;
+    var skirt = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--about-head-skirt')) || 0;
+    var want = cw() < 900 ? 120 : 0;
+    if (skirt !== want) f.push('Saum ' + skirt + ' px statt ' + want);
+    if (!near(b, innerHeight + skirt, 2)) f.push('Kopf endet bei scrollY 0 bei ' + b.toFixed(1) + ' px statt ' + (innerHeight + skirt) + ' (Fensterhöhe plus Saum)');
+    // Am Handy steht der Text unten im Kopf, über dem Saum (am Desktop mittig neben dem Foto)
+    if (skirt && !near(t, innerHeight, 2)) f.push('Text im Kopf endet bei ' + t.toFixed(1) + ' px, nicht an der Unterkante des Fensters (' + innerHeight + ')');
+    return f;
   };
 
   UU.add('head:desktop', async function () {
@@ -288,8 +295,14 @@
     if (!fh || !pin) return ['Kopf direkt vor der Geschichte, aber kein Auftritt (__story.fromHead oder pin fehlt)'];
     var restPx = st.start - pin.start;
     if (!near(restPx, hero.getBoundingClientRect().height, 3)) f.push('Weg des Auftritts ' + restPx.toFixed(1) + ' px statt der Kopfhöhe ' + hero.getBoundingClientRect().height.toFixed(1));
-    await go(0); await wait(100);
+    await go(0); await wait(900);
     if (!near(stageEl.getBoundingClientRect().top, hero.getBoundingClientRect().top, 2)) f.push('Bei scrollY 0 beginnt die Bühne nicht hinter dem Kopf (' + stageEl.getBoundingClientRect().top.toFixed(1) + ' / ' + hero.getBoundingClientRect().top.toFixed(1) + ')');
+    // Am Handy liegt die Bühne ganz hinter dem Kopf, auch ihr Fuß mit dem Balken (dank des Saums): Safari zeigt die Seite dort auch unter
+    // seiner Leiste, bis zu 98 px unter der Fensterhöhe. Am Desktop ragt sie unter dem Bildrand hervor, das sieht niemand.
+    var sb = stageEl.getBoundingClientRect().bottom, kb = hero.getBoundingClientRect().bottom;
+    if (cw() < 900 ? sb > kb + 1 : kb < innerHeight - 1) f.push('Bei scrollY 0 liegt die Bühne unter dem Kopf frei (endet bei ' + sb.toFixed(1) + ', der Kopf bei ' + kb.toFixed(1) + ')');
+    // Vor dem Auftritt ist kein Teil der ersten Etappe sichtbar, keines erscheint zweimal (Fehler vom 30.10.: gestaffeltes fromTo)
+    bits0.forEach(function (b, k) { if (opacity(b) !== 0) f.push('scrollY 0: Teil ' + (k + 1) + ' der ersten Etappe schon sichtbar (Deckkraft ' + opacity(b) + ')'); });
     if (+getComputedStyle(hero).zIndex <= 0) f.push('Kopf liegt nicht über der Bühne (z-index ' + getComputedStyle(hero).zIndex + ')');
     // Stillstand: an mehreren Stellen des Wegs dieselbe Lage, in einzelnen Schritten wie mit dem Mausrad
     var tops = [];
@@ -379,7 +392,12 @@
     // halbe Strecke des ersten Wechsels (bei vier Etappen p = 0,1)
     at(0.3 / last); moves += photoMoves();
     if (!near(G(L[1], 'xPercent'), 50, 2)) f.push('p = ' + (0.3 / last).toFixed(3) + ': Etappe 2 bei xPercent ' + G(L[1], 'xPercent').toFixed(1) + ' statt 50');
-    if (opacity(L[1].querySelector('.leaf__year')) !== 0) f.push('p = ' + (0.3 / last).toFixed(3) + ': Jahreszahl von Etappe 2 schon sichtbar');
+    // Alle Teile, nicht nur die Jahreszahl: Am 30.10. standen Überschrift, Text, Ort und Vorschau schon da, verschwanden und kamen wieder
+    L.slice(1).forEach(function (l, i) {
+      bitsOf(l).forEach(function (b, n) {
+        if (opacity(b) !== 0) f.push('p = ' + (0.3 / last).toFixed(3) + ': Textteil ' + (n + 1) + ' von Etappe ' + (i + 2) + ' schon sichtbar (Deckkraft ' + opacity(b) + ')');
+      });
+    });
     at(0.5 / last); moves += photoMoves();
     at(1 / last); moves += photoMoves();
     if (G(L[1], 'xPercent') !== 0 || G(L[1], 'x') !== 0) f.push('p = 1/' + last + ': Etappe 2 nicht bei 0');
@@ -503,7 +521,10 @@
       if (away()) f.push('Eine halbe Kopfleistenhöhe nach dem Ende des Übergangs: Kopfleiste weggefahren (Balken und Bühne lägen frei)');
       await go(end + hh + 200); await go(end + hh + 400); await go(end + hh + 600); await wait(100);
       if (!away()) f.push('600 px unter dem Ende des Haltens: Kopfleiste nicht weggefahren');
-      if (rect(rail).bottom > 0) f.push('600 px unter dem Ende des Haltens: Balken endet noch bei ' + rect(rail).bottom.toFixed(1) + ' px, im Bild');
+      // Die Bühne liegt nach dem Übergang hinter dem Team: Der Balken darf noch im Bild stehen, aber nur zugedeckt
+      // Gemessen in der Mitte des Balkens, sofern sie unter der Kopfleiste im Bild liegt (darüber deckt ihn die Kopfleiste)
+      var rr = rect(rail), cy = rr.top + rr.height / 2;
+      if (cy > hh && cy < innerHeight && !at2(innerWidth / 2, cy)) f.push('600 px unter dem Ende des Haltens: Balken liegt frei im Bild (endet bei ' + rr.bottom.toFixed(1) + ' px)');
       sec().querySelector('[data-jump]').click();
       await wait(3000);
       if (away()) f.push('Klick auf die erste Zahl: Kopfleiste nach 3 s weggefahren');
@@ -701,31 +722,54 @@
   var toTeamEnd = function () {
     return teamEl().getBoundingClientRect().top + window.scrollY - headerH();
   };
+  // Die Bühne bleibt im Übergang gepinnt stehen, das Team schiebt sich darüber (seit 30.10.: vorher sank die Etappe halb so schnell,
+  // wie die Seite scrollte, und ruckelte am iPhone). Das Team beginnt an der Unterkante der Bühne, wenn das Umblättern endet, und
+  // erreicht die Kopfleiste, wenn das Pinnen endet. Danach liegt die Bühne genau hinter ihm.
+  var at2 = function (x, y) { var e = document.elementFromPoint(x, y); return e && teamEl().contains(e); };
   UU.add('story:toteam', async function () {
-    var f = [], s = sec(), st = story().st, t = teamEl();
+    var f = [], s = sec(), st = story().st, pin = story().pin, t = teamEl();
     if (!t) return ['[data-about-team] fehlt'];
     var vp = s.querySelector('[data-viewport]'), stage = s.querySelector('[data-stage]'), rail = s.querySelector('[data-rail]');
-    var end = toTeamEnd(), mid = (st.end + end) / 2;
-    await go(st.end); await go(mid); await wait(100);
-    var sc = G(vp, 'scale'), y = G(vp, 'y'), cover = parseFloat(getComputedStyle(stage).getPropertyValue('--cover'));
-    if (!near(sc, .96, .01)) f.push('Halbe Strecke: Bühne bei scale ' + sc.toFixed(3) + ' statt 0,96');
-    if (!(y > 0)) f.push('Halbe Strecke: Bühne nicht nach unten versetzt (y = ' + y + ')');
-    if (!near(cover, .375, .02)) f.push('Halbe Strecke: --cover ' + cover + ' statt 0,375');
-    var rb = rect(rail).bottom, tt = rect(t).top;
-    if (!near(rb, tt, 1)) f.push('Halbe Strecke: Balken endet bei ' + rb.toFixed(1) + ', das Team beginnt bei ' + tt.toFixed(1));
-    var zr = getComputedStyle(rail).zIndex, zc = getComputedStyle(stage, '::after').zIndex, zt = getComputedStyle(t).zIndex;
+    var end = toTeamEnd(), hh = headerH(), S = stage.offsetHeight, mid = (st.end + end) / 2;
+    if (!near(end - st.end, S, 2)) f.push('Weg des Übergangs ' + (end - st.end).toFixed(1) + ' px statt der Bühnenhöhe ' + S);
+    if (!near(pin.end, end, 2)) f.push('Pinnen endet bei ' + pin.end.toFixed(1) + ', nicht am Ende des Übergangs (' + end.toFixed(1) + ')');
+    var zr = getComputedStyle(rail).zIndex, zc = getComputedStyle(stage, '::after').zIndex, zt = getComputedStyle(t).zIndex, zs = getComputedStyle(stage).zIndex;
     if (zr !== '5') f.push('Balken mit z-index ' + zr + ' statt 5');
     if (!(+zr > +zc)) f.push('Balken (z-index ' + zr + ') liegt nicht über der Abdunkelung (z-index ' + zc + ')');
     if (zt !== '4') f.push('Team mit z-index ' + zt + ' statt 4');
+    if (zs !== '0') f.push('Bühne mit z-index ' + zs + ' statt 0 (eigene Ebene, sonst läge der Balken über dem Team)');
+    if (t.offsetHeight < S) f.push('Team ' + t.offsetHeight + ' px hoch, niedriger als die Bühne (' + S + '): Sie ragte nach dem Übergang unten heraus');
+    await go(st.end); await wait(100);
+    var tt = rect(t).top;
+    if (!near(tt, rect(stage).bottom, 2)) f.push('Ende des Umblätterns: Team beginnt bei ' + tt.toFixed(1) + ' statt an der Unterkante der Bühne (' + rect(stage).bottom.toFixed(1) + ')');
+    // Stillstand: Die Bühne steht während des ganzen Übergangs an der Kopfleiste, nichts an ihr wird nach unten versetzt
+    var tops = [];
+    for (var k = 1; k <= 6; k++) { await go(st.end + S * k / 7); tops.push(rect(stage).top); if (G(vp, 'y') !== 0) f.push('Übergang: Etappen um y = ' + G(vp, 'y') + ' versetzt'); }
+    var spread = Math.max.apply(null, tops) - Math.min.apply(null, tops);
+    if (spread > .5 || !near(tops[0], hh, 1)) f.push('Bühne steht im Übergang nicht still an der Kopfleiste (' + tops.map(function (v) { return v.toFixed(1); }).join(', ') + ')');
+    await go(mid); await wait(100);
+    // Keine Verkleinerung (seit 30.10.), die Etappe dunkelt nur ab
+    var sc = G(vp, 'scale'), cover = parseFloat(getComputedStyle(stage).getPropertyValue('--cover'));
+    if (sc !== 1 || getComputedStyle(vp).transform !== 'none') f.push('Halbe Strecke: Etappen verkleinert oder versetzt (scale ' + sc + ', transform ' + getComputedStyle(vp).transform + ')');
+    if (!near(cover, .375, .02)) f.push('Halbe Strecke: --cover ' + cover + ' statt 0,375');
+    if (!near(rect(t).top, hh + S / 2, 2)) f.push('Halbe Strecke: Team beginnt bei ' + rect(t).top.toFixed(1) + ' statt ' + (hh + S / 2).toFixed(1));
+    var rr = rect(rail);
+    if (!at2(innerWidth / 2, rr.top + rr.height / 2)) f.push('Halbe Strecke: Das Team deckt den Balken nicht zu');
+    if (at2(innerWidth / 2, hh + S / 4)) f.push('Halbe Strecke: Team schon über der oberen Hälfte der Bühne');
     // Unterkante der stehenden Kopfleiste, auf halber Strecke gemessen. Am Ende steht sie noch: guard gibt sie erst eine Kopfleistenhöhe
     // später frei (toTeam.end + hh, story:header Teil 2).
     // Ohne ihre 1-px-Linie unten (.site-header ist --header-h plus Linie hoch): Die Linie liegt über dem Inhalt darunter, wie beim Pinnen.
     var hb = rect('.site-header').bottom - px('.site-header', 'borderBottomWidth');
     await go(end); await frames(2);
     if (away()) f.push('Ende des Übergangs (von oben kommend): Kopfleiste weggefahren');
-    rb = rect(rail).bottom;
-    if (!near(rb, hb, 1)) f.push('Ende: Balken endet bei ' + rb.toFixed(1) + ', die stehende Kopfleiste bei ' + hb.toFixed(1));
-    if (!near(G(vp, 'scale'), .92, .005)) f.push('Ende: Bühne bei scale ' + G(vp, 'scale').toFixed(3) + ' statt 0,92');
+    if (!near(rect(t).top, hb, 1)) f.push('Ende: Team beginnt bei ' + rect(t).top.toFixed(1) + ', die stehende Kopfleiste endet bei ' + hb.toFixed(1));
+    if (!near(rect(stage).top, rect(t).top, 1)) f.push('Ende: Bühne liegt nicht genau hinter dem Team (' + rect(stage).top.toFixed(1) + ' / ' + rect(t).top.toFixed(1) + ')');
+    if (G(vp, 'scale') !== 1) f.push('Ende: Etappen bei scale ' + G(vp, 'scale') + ' statt 1');
+    if (!near(parseFloat(getComputedStyle(stage).getPropertyValue('--cover')), .75, .01)) f.push('Ende: --cover nicht 0,75');
+    await go(end + 300); await frames(2);
+    rr = rect(rail);
+    var cy = rr.top + rr.height / 2;
+    if (cy > hh && cy < innerHeight && !at2(innerWidth / 2, cy)) f.push('300 px nach dem Übergang: Balken liegt frei');
     await go(0);
     return f;
   }, live);

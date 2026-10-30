@@ -64,6 +64,9 @@ Dienstleistungen sie auch haben. Der Entwurf zeigt sie nicht.
   Etappen darunter (Spalten 1.08fr | 1fr, also `calc(108% / 2.08)`).
 - Der Kopf füllt den ersten Bildschirm: Er endet beim Laden an der Unterkante des Fensters (Fenster minus Ankündigung, Kopfleiste und
   Service-Leiste). Wunsch des Nutzers vom 30.10., vorher `clamp(440px, 38vw, 640px)`. Überschrift `clamp(44px, 5.8vw, 92px)`.
+- Am Handy hat der Kopf unter dem Text einen schwarzen Saum von 120 px (`--about-head-skirt`). Safari am iPhone zeigt die Seite auch
+  hinter seiner Leiste unten, beim Laden 98 px unter der gemeldeten Fensterhöhe. Ohne Saum lagen dort die weiße Etappe und der Balken
+  frei (Meldung des Nutzers vom 30.10., „beim Laden der Seite ist der untere Bereich schon sichtbar“).
 - Am Handy (unter 900 px) steht das Foto oben über die volle Breite und nimmt den Platz über dem Text ein (mindestens 34svh), darunter
   der Text. Die Überschrift ist dort `clamp(44px, 12.8vw, 56px)` groß.
 - Beim Laden setzt sich das Foto aus 1,08 auf 1 (1,8 s, expo.out).
@@ -90,7 +93,9 @@ oben, Text unten). Es gibt keinen Fortschrittsbalken.
    Desktop fährt dabei zuerst das neue Foto über Jahreszahl und Text der alten Etappe. Dahinter folgt die weiße Textspalte der neuen
    Etappe, noch leer. Diese kurze Leere will der Nutzer ausdrücklich.
 2. Ab 0,5: Jahreszahl, Überschrift, Text und Ort der neuen Etappe gleiten nacheinander von rechts herein und blenden ein. Sie starten
-   22 % der Bühnenbreite weiter rechts, am Handy 40 %. Je Teil 0,3 lang, 0,05 versetzt, power3.out.
+   22 % der Bühnenbreite weiter rechts, am Handy 40 %. Je Teil 0,3 lang, 0,05 versetzt, power3.out. Bis dahin ist keines davon zu
+   sehen: Am 30.10. standen Überschrift, Text, Ort und Vorschau schon beim Hereinfahren da, verschwanden kurz und kamen dann ein zweites
+   Mal („die Texte laden doppelt“). Ursache war ein gestaffeltes Einblenden, das vorab nur das erste Teil versteckt.
 3. An der linken Kante der hereinfahrenden Etappe liegt ein weicher Schatten. Wartende Etappen stehen weit genug außerhalb, dass ihr
    Schatten nicht ins Bild ragt.
 4. Rückwärts läuft alles genau umgekehrt.
@@ -119,12 +124,16 @@ Kein Foto zoomt, wächst oder verschiebt sich im eigenen Rahmen.
 - Rechts unten auf der Bühne steht „Weiterscrollen“ mit Pfeil. Der Hinweis verschwindet nach den ersten 3 % des Wegs. Am Handy gibt es
   ihn nicht.
 
-**Übergang zum Team:** Bei „Heute“ endet das Pinnen. Der dunkle Team-Bereich schiebt sich von unten über die Bühne. Dabei passiert
-Folgendes:
-- Die Etappe fährt halb so schnell nach oben, wird auf 0,92 kleiner und dunkelt bis 0,75 ab.
-- Der Fortschrittsbalken sinkt nicht mit ab. Er sitzt auf der Oberkante des Teams und wird von ihm nach oben hinausgeschoben. Er liegt
-  über der Abdunkelung und wirft einen weichen Schatten auf die Etappe.
-- Bewegt werden nur Kinder der gepinnten Bühne, nie die Bühne selbst.
+**Übergang zum Team:** Nach „Heute“ bleibt die Bühne gepinnt stehen, und der dunkle Team-Bereich schiebt sich von unten über sie, eine
+Bühnenhöhe Scrollweg lang. Das ist der Auftritt aus dem Kopf in umgekehrter Richtung. Dabei passiert Folgendes:
+- Die Etappe „Heute“ bleibt, wie sie ist. Sie wird nicht verkleinert und nicht hinausgeschoben, sie dunkelt nur bis 0,75 ab.
+- Das Team deckt zuerst den Fortschrittsbalken zu, dann die Etappe, und wirft dabei einen weichen Schatten auf sie.
+- Am Ende erreicht die Oberkante des Teams die Kopfleiste, das Pinnen endet, und die Bühne liegt genau hinter dem Team. Das Team ist
+  dafür mindestens so hoch wie die Bühne, der Inhalt steht dann mittig.
+- Geschichte (Meldungen des Nutzers vom 30.10.): Bis dahin sank die Etappe halb so schnell, wie die Seite scrollte, und wurde auf 0,92
+  kleiner, der Balken fuhr auf der Oberkante des Teams hinaus. Das Skript schob die Etappe dafür gegen das Scrollen nach unten und kam
+  am iPhone nicht hinterher („der Übergang zu dem Team ist ruckelig“). Die Verkleinerung fand der Nutzer unnötig: „Das Team soll die
+  Karte Heute überdecken und nicht oben rausschieben.“
 
 ### 4.4 Das Team
 

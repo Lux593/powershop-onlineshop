@@ -2,7 +2,7 @@
    Power Shop – Seitenkopf „Halle, dunkel“ der Über-uns-Seite (sections/about-head.liquid).
    Lädt nur mit der Section. Schwarz wie Kopfleiste und Bühne: links Überschrift und Satz, rechts das Crew-Foto bis an den rechten
    Rand, am Handy das Foto oben über die volle Breite. Kein Bar & Shield und kein Signet im Kopf.
-   Der Kopf füllt das Fenster unter der Kopfleiste ganz aus.
+   Der Kopf füllt das Fenster unter der Kopfleiste ganz aus, am Handy mit einem schwarzen Saum bis unter die Leiste von Safari.
    Bewegung (nur mit html.has-motion, ohne reduzierte Bewegung): Das Foto setzt sich beim Laden aus einer leichten Vergrößerung. Mit
    der Bühne der Geschichte liegt diese hinter dem Kopf (about-story.css), der Kopf scrollt über ihr weg wie ein Rolltor und dunkelt
    dabei ab (--cover setzt assets/about-story.js an .about-head).
@@ -10,11 +10,23 @@
    ========================================================================== */
 
 /* Höhe des Kopfs: der Rest des ersten Bildschirms, Fenster minus das, was beim Laden darüber steht (Ankündigung, Kopfleiste, dazu
-   die Service-Navigation, 56 px plus Linie wie --subnav-h in pages.css; sie steht in der Vorlage über dem Kopf). Steht an html, weil
-   about-story.css die Bühne um genau diese Höhe unter den Kopf zieht. :has lässt sich nicht verschachteln, darum ohne Nachbarschaft. */
-html:has(.about-head) { --about-head-h: calc(100svh - var(--announce-h, 0px) - var(--header-h) - env(safe-area-inset-top, 0px)); }
+   die Service-Navigation, 56 px plus Linie wie --subnav-h in pages.css; sie steht in der Vorlage über dem Kopf), plus der Saum.
+   Steht an html, weil about-story.css die Bühne um genau diese Höhe unter den Kopf zieht. :has lässt sich nicht verschachteln, darum
+   ohne Nachbarschaft.
+   Saum (--about-head-skirt, am Handy): schwarzer Rand unter dem Text. Safari am iPhone zeigt die Seite auch hinter seiner Leiste unten,
+   beim Laden 98 px unter der gemeldeten Fensterhöhe (100svh, gemessen am 30.10. im iOS-Simulator, iPhone 17 Pro). Dort lag sonst die
+   Bühne frei, die hinter dem Kopf beginnt und um Ankündigung und Service-Navigation (93 px, unter 360 px Breite 109 px) über ihn
+   hinausragt: Man sah unten die weiße Etappe und den Balken. 120 px decken beides. Keine Einheit misst diesen Streifen, 100lvh reicht
+   nur 40 px weiter. */
+html:has(.about-head) {
+  --about-head-skirt: 0px;
+  --about-head-h: calc(100svh - var(--announce-h, 0px) - var(--header-h) - env(safe-area-inset-top, 0px) + var(--about-head-skirt));
+}
 html:has(.about-head):has(.service-subnav) {
-  --about-head-h: calc(100svh - var(--announce-h, 0px) - var(--header-h) - 57px - env(safe-area-inset-top, 0px));
+  --about-head-h: calc(100svh - var(--announce-h, 0px) - var(--header-h) - 57px - env(safe-area-inset-top, 0px) + var(--about-head-skirt));
+}
+@media (max-width: 899.98px) {
+  html:has(.about-head) { --about-head-skirt: 120px; }
 }
 
 /* Spalten wie die Etappen darunter: Die Fotokante sitzt genau über deren Teilung. Die Inhaltsbreite (zwei Hälften zu
@@ -27,6 +39,7 @@ html:has(.about-head):has(.service-subnav) {
      Bühne, die mit Bewegung hinter ihm beginnt. */
   z-index: 2;
   min-height: var(--about-head-h);
+  padding-bottom: var(--about-head-skirt);
   grid-template-columns:
     [full-start] minmax(var(--gutter), 1fr)
     [content-start] minmax(0, calc(var(--container) / 2 - var(--gutter)))

@@ -12,9 +12,11 @@
    Vorlage: entwuerfe/ueber-uns/h-vollbild.html, dort mit .full* statt .about-story* und .meta statt .leaf__meta.
    ========================================================================== */
 
+/* Bühne: Fenster minus Kopfleiste, mindestens 520 px. Das Skript lässt das Pinnen mit derselben --header-h beginnen. Steht an html, weil
+   about-team.css das Team um genau diese Höhe über die Bühne zieht (Übergang zum Team). */
+html:has(.about-story) { --stage-h: max(520px, calc(100svh - var(--header-h) - env(safe-area-inset-top, 0px))); }
+
 .about-story {
-  /* Bühne: Fenster minus Kopfleiste, mindestens 520 px. Das Skript lässt das Pinnen mit derselben --header-h beginnen. */
-  --stage-h: max(520px, calc(100svh - var(--header-h) - env(safe-area-inset-top, 0px)));
   /* Balken: Link plus Rand oben und unten. Vor dem Skript halten die Etappen genau so viel Platz frei. */
   --rail-pad: 2px;
   --rail-link: 44px;
@@ -115,9 +117,12 @@
   .has-motion .section-about-head + .shopify-section .about-story--stage:not(.is-static) { margin-top: calc(-1 * var(--about-head-h, 0px)); }
 }
 
-/* ---------------- Live: Bühne steht, die Etappen liegen übereinander ---------------- */
+/* ---------------- Live: Bühne steht, die Etappen liegen übereinander ----------------
+   z-index 0: Die Bühne ist immer eine eigene Ebene, auch wenn sie nicht gepinnt ist. So bleibt der Balken (z-index 5) in ihr, und das
+   Team (z-index 4, about-team.css) deckt ihn im Übergang mit zu. */
 .about-story.is-live .about-story__stage {
   position: relative;
+  z-index: 0;
   display: flex;
   flex-direction: column;
   height: var(--stage-h);
@@ -177,7 +182,7 @@ html:has(.about-story.is-live) { scroll-behavior: auto; }
 /* Balken am Fuß der Bühne: Die Jahre stehen in gleich breiten Spalten (--count aus der Section). Die Linie läuft von der Mitte der
    ersten bis zur Mitte der letzten Spalte mittig durch sie hindurch und füllt sich mit den Etappen. Wo der orange Balken angekommen
    ist, wird die Zahl orange (is-passed aus dem Skript). Der schwarze Grund hinter jeder Zahl unterbricht die Linie.
-   Im Übergang zum Team wirft er einen weichen Schatten auf die sinkende Etappe, so kräftig, wie sie abdunkelt (--cover). */
+   Er liegt über der Abdunkelung im Übergang zum Team (z-index 5), bis das Team ihn zudeckt. */
 .about-story.is-live .about-story__rail {
   position: relative;
   z-index: 5;
@@ -186,7 +191,6 @@ html:has(.about-story.is-live) { scroll-behavior: auto; }
   height: var(--rail-h);
   padding-block: var(--rail-pad);
   background: var(--c-black);
-  box-shadow: 0 -28px 56px -12px rgb(0 0 0 / calc(var(--cover, 0) * .95));
 }
 .about-story__steps { position: relative; }
 .about-story__rail ol { position: relative; display: grid; grid-template-columns: repeat(var(--count), minmax(0, 1fr)); justify-items: center; }

@@ -14,8 +14,8 @@
      scrollt über ihr weg: Seine Unterkante fährt nach oben und deckt die Bühne von unten nach oben auf wie ein Rolltor, zuerst den
      Balken, dann die erste Etappe. Jahreszahl und Text steigen dabei leicht auf, der Kopf dunkelt ab. Erst danach blättert die Bühne um.
      Die Bühne steht dabei wirklich (Pin), nichts wird gegen das Scrollen verschoben: So springt nichts.
-   - Übergang zum Team: Folgt direkt die Team-Section (sections/about-team.liquid), schiebt sie sich nach „Heute“ über die Bühne.
-     Die Etappe sinkt halb so schnell, wird kleiner und dunkelt ab, der Balken fährt auf der Oberkante des Teams hinaus.
+   - Übergang zum Team: Folgt direkt die Team-Section (sections/about-team.liquid), schiebt sie sich nach „Heute“ über die Bühne,
+     die gepinnt stehen bleibt. Die Etappe dunkelt nur ab, das Team deckt zuerst den Balken zu, dann alles.
    - Kopfleiste: Ab 150 px vor dem Pinnen bis eine Kopfleistenhöhe nach dem Ende des Übergangs zum Team (ohne Team: bis zum Ende
      des Pinnens) fährt sie ein und bleibt stehen (PS.headerHold aus header.js). Erst dann liegt nichts mehr von der Bühne hinter ihr.
    Ohne Bewegung, im Theme-Editor und unter 600 px Höhe läuft nichts davon: Die Etappen stehen untereinander, die Zahlen sind Anker.
@@ -200,6 +200,15 @@
     return prev ? prev.querySelector('[data-about-head]') : null;
   }
 
+  // Teile nacheinander einblenden, je ein fromTo statt einem mit stagger: Ein gestaffeltes fromTo setzt in einer Zeitleiste vorab nur
+  // das erste Teil auf den Startwert (GSAP 3.15), die übrigen stünden sichtbar da, bis sie an der Reihe sind, verschwänden dann und
+  // kämen ein zweites Mal (der Fehler vom 30.10. am iPhone: „die Texte laden doppelt“). Einzeln setzt jedes fromTo seinen Startwert sofort.
+  // Je Teil eigene Kopien der Werte: GSAP schreibt in die übergebenen Objekte.
+  function enter(tl, els, from, to, at, each) {
+    els.forEach(function (el, i) { tl.fromTo(el, Object.assign({}, from), Object.assign({}, to), at + i * each); });
+    return tl;
+  }
+
   function stage(PS, section, gsap, ScrollTrigger) {
     // Die Adressleiste am Handy ändert die Fensterhöhe beim Scrollen: kein Neuberechnen mitten im Umblättern
     ScrollTrigger.config({ ignoreMobileResize: true });
@@ -332,13 +341,16 @@
 
     /* ---------------- Pinnen ----------------
        Ein eigener ScrollTrigger hält die Bühne unter der Kopfleiste fest: erst für den Auftritt aus dem Kopf (rest, so weit die Bühne
-       unter den Kopf gezogen ist, about-story.css), dann eine Bildschirmhöhe Scrollweg je Etappe. Das Umblättern (st) läuft nur im
-       zweiten Teil, ohne eigenes Pinnen. Ohne Kopf davor ist rest 0, dann decken sich beide. */
+       unter den Kopf gezogen ist, about-story.css), dann eine Bildschirmhöhe Scrollweg je Etappe, mit Team danach zuletzt noch eine
+       Bühnenhöhe für den Übergang zum Team (tail, das Team ist um genau so viel hochgezogen, about-team.css). Das Umblättern (st) läuft
+       nur im mittleren Teil, ohne eigenes Pinnen. Ohne Kopf davor ist rest 0, ohne Team tail 0. */
+    var team = nextTeam(section);
     var rest = function () { return Math.max(0, -parseFloat(getComputedStyle(section).marginTop) || 0); };
+    var tail = function () { return team ? stageEl.offsetHeight : 0; };
     var pin = ScrollTrigger.create({
       trigger: stageEl,
       start: function () { return 'top top+=' + hh(); },
-      end: function () { return '+=' + (rest() + last * window.innerHeight); },
+      end: function () { return '+=' + (rest() + last * window.innerHeight + tail()); },
       pin: true,
       invalidateOnRefresh: true
     });
@@ -355,7 +367,7 @@
       scrollTrigger: {
         trigger: stageEl,
         start: function () { return pin.start + rest(); },
-        end: function () { return pin.end; }, // eine Bildschirmhöhe Scrollweg je Etappe
+        end: function () { return pin.end - tail(); }, // eine Bildschirmhöhe Scrollweg je Etappe
         // Nachziehen hinter der Scrollposition, keine Eigenbewegung: Ohne snap bleibt die Bühne stehen, wo man aufhört zu scrollen
         scrub: 0.6,
         invalidateOnRefresh: true
@@ -363,32 +375,31 @@
     });
     // fromTo mit festen Startwerten: Beim Neuberechnen (Größenänderung mitten im Umblättern) bleibt der Ausgangszustand erhalten
     for (var k = 1; k <= last; k++) {
-      slide
-        .fromTo(leaves[k], { xPercent: 100, x: 120 }, { xPercent: 0, x: 0, duration: 0.6, ease: 'power2.inOut' }, k - 1)
-        .fromTo(bits[k], { x: push, opacity: 0 }, { x: 0, opacity: 1, duration: 0.3, stagger: 0.05, ease: 'power3.out' }, k - 0.5);
+      slide.fromTo(leaves[k], { xPercent: 100, x: 120 }, { xPercent: 0, x: 0, duration: 0.6, ease: 'power2.inOut' }, k - 1);
+      enter(slide, bits[k], { x: push, opacity: 0 }, { x: 0, opacity: 1, duration: 0.3, ease: 'power3.out' }, k - 0.5, 0.05);
     }
     slide.set({}, {}, last);
     var st = slide.scrollTrigger;
 
     /* ---------------- Übergang zum Team ----------------
-       Ist „Heute“ erreicht, endet das Pinnen und das Team (die nächste Section) schiebt sich von unten über die Bühne. Die Etappe
-       fährt dabei nur halb so schnell nach oben (sie sinkt um die halbe Bühnenhöhe), wird auf 0,92 kleiner und dunkelt bis 0,75 ab
-       (--cover, CSS). Der Balken sinkt nicht mit: Er sitzt auf der Oberkante des Teams und wird von ihm hinausgeschoben, über der
-       Abdunkelung und mit weichem Schatten auf der Etappe. Es bewegen sich nur Kinder der Bühne: ein transform auf der Bühne oder
-       ihren Eltern störte das Pinnen. Ende: Die Oberkante des Teams erreicht die Unterkante der stehenden Kopfleiste.
-       Ohne Team (keine Section [data-about-team] direkt danach) gibt es keinen Übergang. */
-    var team = nextTeam(section), toTeam = null;
+       Ist „Heute“ erreicht, schiebt sich das Team (die nächste Section) von unten über die Bühne, die dabei gepinnt stehen bleibt
+       (tail oben): wie der Kopf beim Auftritt, nur umgekehrt. Die Etappe bleibt, wie sie ist, sie dunkelt nur bis 0,75 ab (--cover,
+       CSS), den Balken deckt das Team als Erstes zu. Nichts wird der Scrollposition nachgeführt und nichts verkleinert (beides bis zum
+       30.10.: Die Etappe sank halb so schnell, wie die Seite scrollte, und wurde auf 0,92 kleiner. Das Skript schob sie dafür gegen das
+       Scrollen nach unten und kam am iPhone nicht hinterher, es ruckelte; die Verkleinerung fand der Nutzer unnötig).
+       Ende: Die Oberkante des Teams erreicht die Unterkante der stehenden Kopfleiste, im selben Moment endet das Pinnen, und die Bühne
+       liegt genau hinter dem Team. Ohne Team (keine Section [data-about-team] direkt danach) gibt es keinen Übergang. */
+    var toTeam = null;
     if (team) {
       toTeam = gsap.timeline({
         scrollTrigger: {
-          trigger: team,
-          start: 'top bottom',
-          end: function () { return 'top top+=' + hh(); },
+          trigger: stageEl,
+          start: function () { return pin.end - tail(); },
+          end: function () { return pin.end; },
           scrub: true,
           invalidateOnRefresh: true
         }
       })
-        .fromTo(viewport, { y: 0, scale: 1 }, { y: function () { return stageEl.offsetHeight / 2; }, scale: 0.92, ease: 'none' }, 0)
         .fromTo(section, { '--cover': 0 }, { '--cover': 0.75, ease: 'none' }, 0)
         .scrollTrigger;
     }
@@ -407,16 +418,16 @@
           scrub: 0.6,
           invalidateOnRefresh: true
         }
-      })
-        .fromTo(hero, { '--cover': 0 }, { '--cover': 0.75, duration: 1, ease: 'none' }, 0)
-        .fromTo(bits[0], { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.35, stagger: { each: 0.08, from: 'end' }, ease: 'power2.out' }, 0.3)
+      }).fromTo(hero, { '--cover': 0 }, { '--cover': 0.75, duration: 1, ease: 'none' }, 0);
+      // von unten nach oben: Vorschau zuerst, Jahreszahl zuletzt
+      fromHead = enter(fromHead, bits[0].slice().reverse(), { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.35, ease: 'power2.out' }, 0.3, 0.08)
         .scrollTrigger;
     }
 
     // Kopfleiste: fährt 150 px vor dem Pinnen ein und bleibt bis eine Kopfleistenhöhe nach dem Ende des Übergangs zum Team (ohne Team
     // bis zum Ende des Pinnens). Führe sie im Übergang weg, endete das Team 64 bzw. 76 px tiefer als gemessen, und zwei Bewegungen
-    // liefen zugleich. Am Ende des Übergangs liegen Balken und abgedunkelte Etappe noch im Streifen hinter ihr; erst eine Kopfleisten-
-    // höhe weiter sind sie hinausgescrollt, dann darf sie wegfahren, ohne etwas aufzudecken.
+    // liefen zugleich. Am Ende des Übergangs liegt im Streifen hinter ihr noch der schwarze Rest der Section über dem Team; erst eine
+    // Kopfleistenhöhe weiter ist er hinausgescrollt, dann darf sie wegfahren, ohne etwas aufzudecken.
     // Das Ende kommt fertig gerechnet aus st bzw. toTeam (beide entstehen vorher und werden darum vorher neu gemessen): Mit dem Team
     // als endTrigger fehlte der Weg des Pinnens, denn guard beginnt vor dem Pinnen und wird deshalb nicht mit verschoben.
     // Beim Abbau räumt der Aufräumer unten auf, denn beim Abbau durch matchMedia feuert onToggle nicht sicher.

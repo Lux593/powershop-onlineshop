@@ -161,6 +161,17 @@
 }
 
 /* ---------------- Übergang von der Bühne ----------------
-   Folgt das Team direkt auf die laufende Bühne der Geschichte (assets/about-story.js), schiebt es sich über sie: Das Team liegt über
-   der Bühne (z-index 4), nur der Balken der Bühne liegt darüber (5) und wird von der Oberkante des Teams hinausgeschoben. */
-.section-about-story:has(.about-story.is-live) + .section-about-team > .spot { z-index: 4; }
+   Folgt das Team direkt auf die laufende Bühne der Geschichte (assets/about-story.js), schiebt es sich über sie, während sie gepinnt
+   steht: Es ist um die Bühnenhöhe (--stage-h, about-story.css) hochgezogen, genau so weit pinnt das Skript die Bühne länger (tail).
+   Am Ende liegt die Bühne genau hinter dem Team. Das Team liegt über der Bühne (z-index 4, der Balken bleibt in ihrer Ebene) und wirft
+   einen weichen Schatten auf die abgedunkelte Etappe. Es ist mindestens so hoch wie die Bühne, sonst ragte sie unten mit dem Balken
+   heraus (am Desktop ist das Team niedriger als ein Bildschirm); der Inhalt steht dann mittig. */
+.section-about-story:has(.about-story.is-live) + .section-about-team { margin-top: calc(-1 * var(--stage-h)); }
+.section-about-story:has(.about-story.is-live) + .section-about-team > .spot {
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: var(--stage-h);
+  box-shadow: 0 -24px 48px -16px rgb(0 0 0 / .5);
+}
