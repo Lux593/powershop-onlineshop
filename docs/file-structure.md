@@ -62,8 +62,8 @@ Ebenfalls lokal offen, aber nicht Teil von Etappe 2: Farbfelder der Motorrad-Kar
 |---|---|---|
 | `templates/page.ueber-uns.json` | neu | Vorlage: `subnav`, `head`, `story` (vier Etappen), `team` (acht Personen), `visit` |
 | `sections/about-head.liquid`, `assets/about-head.css` | neu | Seitenkopf „Halle, dunkel“ mit Crew-Foto; das Foto setzt sich beim Laden |
-| `sections/about-story.liquid`, `assets/about-story.css` | neu | Geschichte: Blöcke „Etappe“, Balken mit Bar & Shield, Vorstufe und Rückfall der Bühne |
-| `assets/about-story.js` | neu | Bühne: pinnen, umblättern, Balken, Einrasten, Übergang zum Team, Kopfleiste halten |
+| `sections/about-story.liquid`, `assets/about-story.css` | neu | Geschichte: Blöcke „Etappe“ mit bis zu vier Fotos und Vorschau, Balken mit Bar & Shield, Vorstufe und Rückfall der Bühne |
+| `assets/about-story.js` | neu | Bühne: pinnen, umblättern (ohne Einrasten), Balken, Übergang zum Team, Kopfleiste halten. Fotogalerie je Etappe (Web Animations API, auch ohne Bühne) |
 | `sections/about-team.liquid`, `assets/about-team.css`, `assets/about-team.js` | neu | Team-Spotlight: Blöcke „Person“, Foto-Wechsel, Raster, Pfeile, Wischen |
 | `sections/about-visit.liquid`, `assets/about-visit.css` | neu | „Komm vorbei“ als Etappe: Karte, Adresse, Route, Anrufen, WhatsApp, E-Mail, Lieferhinweis |
 | `snippets/visit-map.liquid` | neu | Karte des Dreiländerecks mit Pin und Schild, aus `sections/visit.liquid` herausgelöst (dort unverändert im Ergebnis); Parameter `sizes`, `ring`, `logo`, `reveal`, `address_lines` |

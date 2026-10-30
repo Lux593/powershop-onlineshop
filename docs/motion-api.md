@@ -83,8 +83,15 @@ Seiten-Einstellungen von Über uns (assets/about-story.js, about-story.css)
                      Die Adressleiste am Handy ändert die Fensterhöhe beim Scrollen: kein Neumessen mitten im Umblättern. Es gilt, sobald die Bühne gebaut
                      ist, global für ScrollTrigger und bleibt nach ihrem Abbau stehen. Wer auf Über uns weitere ScrollTrigger baut, erbt es.
   html { scroll-behavior: auto }   (about-story.css, html:has(.about-story.is-live))
-                     base.css setzt scroll-behavior: smooth. Solange die Bühne läuft, scrollt der Browser sonst weich zu einem Anker, und
-                     das Einrasten (snap, ohne Schwung) griffe dazwischen. Ohne laufende Bühne gilt wieder smooth.
+                     base.css setzt scroll-behavior: smooth. Solange die Bühne läuft, glitte die Seite sonst auch dorthin, wo ScrollTrigger
+                     die Scrollposition beim Neuberechnen selbst setzt. Der Sprung über den Balken scrollt ausdrücklich weich
+                     (behavior: 'smooth'). Ohne laufende Bühne gilt wieder smooth.
+  Kein Einrasten     Die Bühne hat kein snap (seit Task 9, Wunsch des Nutzers): Ihre Lage hängt nur vom Scrollen ab, scrub 0.6 zieht nur
+                     nach. Lässt man los, bewegt sie sich nicht mehr von selbst.
+  Fotogalerie        Etappen mit zwei und mehr Fotos (.leaf--gallery) wechseln das große Foto per Klick auf die Vorschau. Ohne GSAP, mit der
+                     Web Animations API (el.animate, 600 ms, cubic-bezier(.65, 0, .35, 1), nur translateX): Die Galerie läuft auch ohne
+                     Bühne und auf anderen Seitenvorlagen. Ohne html.has-motion, bei reduzierter Bewegung (bei jedem Klick abgefragt) und
+                     im Theme-Editor wechselt das Foto sofort. Richtung: SLIDE_FROM in about-story.js.
   Die Bühne pinnt nur mit  gsap.matchMedia('(prefers-reduced-motion: no-preference) and (min-height: 600px)'). Team-Fotowechsel und das
   Landen des Pins in „Komm vorbei“ (data-reveal am Pin) laufen unabhängig davon.
 ```
@@ -241,7 +248,7 @@ Alle laden mit `defer` am Seitenende von `layout/theme.liquid`, die Reihenfolge 
 | `motion.js` | überall (vor `header.js`) | diese Schicht |
 | `header.js`, `cart.js`, `sections.js` | überall | Header, Warenkorb und Drawer, Showroom und Quick-Add |
 | `contact.js` | product, page, im Theme-Editor immer | Kontakt-Box und Anfrage-Zeile (`compact`, festes Thema über `data-topic-default`): Thema wählen, WhatsApp-/E-Mail-Link, Öffnungsstatus |
-| `about-story.js` | page mit Suffix ueber-uns, aus `sections/about-story.liquid` (`<script defer>` in der Section, läuft deshalb vor `theme.js`), nur ab zwei Etappen | Bühne der Geschichte: pinnen, umblättern, Balken, Einrasten, Übergang zum Team, `PS.headerHold`. Ohne GSAP setzt es `is-static` |
+| `about-story.js` | aus `sections/about-story.liquid` (`<script defer>` am Ende der Section, läuft deshalb vor `theme.js`): auf page mit Suffix ueber-uns ab zwei Etappen, außerdem überall, wo eine Etappe zwei und mehr Fotos hat | Bühne der Geschichte: pinnen, umblättern (ohne Einrasten), Balken, Übergang zum Team, `PS.headerHold`. Ohne GSAP setzt es `is-static`. Dazu die Fotogalerie je Etappe (WAAPI, unabhängig von der Bühne) |
 | `about-team.js` | wo die Section `about-team` steht, aus der Section | Team-Spotlight: Foto-Wechsel, Raster, Pfeile, Wischen, Live-Region. Läuft auch ohne GSAP (dann wechselt alles sofort) |
 | `pages.js` | page (alle Seitenvorlagen) | Scrub der Partner-Aussagen (nur mit Bewegung); Service-Leiste: Scrollspy mit `aria-current="location"` und Verlauf am Rand, läuft auch ohne Bewegung |
 | `search.js` | beim ersten Öffnen des Such-Dialogs (`data-lazy-script`) | Vorschläge der Suche |

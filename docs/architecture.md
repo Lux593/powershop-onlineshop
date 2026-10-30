@@ -122,15 +122,18 @@ und als zweite Seite nach der Startseite **GSAP und ScrollTrigger** für die Bü
 templates/page.ueber-uns.json
 ├─ sections/service-subnav.liquid      Unternavigation (Untermenü „Service“)
 ├─ sections/about-head.liquid          Seitenkopf „Halle, dunkel“: h1, Satz, Crew-Foto bis an den Rand
-├─ sections/about-story.liquid         Geschichte, Blöcke „Etappe“ (stage): Foto, große Jahreszahl, Titel, Text, Ort.
-│                                      Ab zwei Etappen auf dieser Vorlage Bühne (Klasse about-story--stage), dazu der Balken mit den
-│                                      Jahren und das Symbol Bar & Shield (symbol i-barshield, nachgezogen aus assets/hd-bar-shield.png)
+├─ sections/about-story.liquid         Geschichte, Blöcke „Etappe“ (stage): Foto, große Jahreszahl, Titel, Text, Ort, bis zu drei
+│                                      weitere Fotos (Weiteres Foto 2–4 oder Zeilen „Weitere Fotos im Theme“). Ab zwei Fotos Vorschau
+│                                      unter dem Text (leaf--gallery). Ab zwei Etappen auf dieser Vorlage Bühne (Klasse
+│                                      about-story--stage), dazu der Balken mit den Jahren und das Symbol Bar & Shield (symbol
+│                                      i-barshield, nachgezogen aus assets/hd-bar-shield.png)
 ├─ sections/about-team.liquid          Team als Spotlight, Blöcke „Person“ (person, höchstens acht)
 └─ sections/about-visit.liquid         „Komm vorbei“ als Etappe: Karte, Adresse, Route, Anrufen, WhatsApp, E-Mail, Lieferhinweis
     └─ snippets/visit-map.liquid       Karte des Dreiländerecks mit Pin und Schild, auch von sections/visit.liquid benutzt
 
 assets/about-head.css                  Kopf, Setzen des Fotos beim Laden (Animation, nur mit Bewegung)
-assets/about-story.css, about-story.js Etappen, Vorstufe der Bühne, Bühne (pinnen, umblättern, Balken, Einrasten, Übergang zum Team)
+assets/about-story.css, about-story.js Etappen, Vorstufe der Bühne, Bühne (pinnen, umblättern ohne Einrasten, Balken, Übergang zum
+                                       Team), Fotogalerie je Etappe (Web Animations API, auch ohne Bühne)
 assets/about-team.css, about-team.js   Spotlight: Foto, Text, Vorschau-Raster, Pfeile, Wischen
 assets/about-visit.css                 „Komm vorbei“ und die Abweichungen der Karte unter .about-visit (kein Skript)
 assets/header.js                       + PS.headerHold(on): hält die Kopfleiste eingefahren (siehe motion-api.md)
@@ -154,6 +157,9 @@ assets/tokens.css                      + --c-orange-on-light, --c-hd-orange, --p
   vor `theme.js`).
 - **Zustand:** Nur im JS und in Klassen: `about-story--stage` (Liquid, Bühne vorgesehen), `is-live` (Bühne läuft), `is-static` (Rückfall),
   `is-ready` (Team ist ein Spotlight), `is-in` am Pin (gelandet). Die Bühne hängt `__story = { st, guard, last, revert }` an `[data-story]`.
+  Galerie: `leaf--gallery` (Liquid, ab zwei Fotos), `aria-pressed` an den Vorschauknöpfen, `hidden` an weiteren großen Fotos und
+  `aria-hidden` am ersten, solange sie nicht gewählt sind, `is-coming` am Foto, das gerade hereinschiebt. `__gallery = { finish }` an
+  `[data-story]` beendet laufende Wechsel (Abbau der Bühne).
 - **Kopfleiste:** Die Bühne ruft `PS.headerHold(true)` ab 150 px vor dem Pinnen bis eine Kopfleistenhöhe nach dem Übergang zum Team (ohne Team:
   bis zum Ende des Pinnens), danach `PS.headerHold(false)`. Dazwischen fährt die Leiste nicht weg.
 - **GSAP:** `layout/theme.liquid` lädt `gsap.min.js` und `ScrollTrigger.min.js` auf `index` und auf `page` mit Suffix `ueber-uns`, nie im
@@ -172,15 +178,17 @@ assets/tokens.css                      + --c-orange-on-light, --c-hd-orange, --p
 | Kein Skript, GSAP lädt nicht, Aufbau der Bühne bricht ab | Das Skript setzt `is-static`, ein `onerror` am Skript-Tag tut es bei einem Ladefehler: Die Vorstufe aus `about-story.css` fällt weg, die Etappen stehen untereinander, kein schwarzer Streifen. |
 | `prefers-reduced-motion`, Setting aus, Theme-Editor | Keine Bühne und keine Fahrten, alles steht untereinander und ist sichtbar. Der Balken ist ausgeblendet, die Jahreszahlen sind Anker (`#etappe-<Block-ID>`). Der Pin landet nicht, er steht schon da. Team-Fotos wechseln sofort. |
 | Fenster niedriger als 600 px (Handy quer) | Die Bühne wird nicht gepinnt (`gsap.matchMedia`: reduzierte Bewegung ausgenommen, mindestens 600 px Höhe), die Etappen stehen untereinander. 600 = Kopfleiste (bis 77 px) plus 520 px Mindesthöhe der Bühne. Team-Fotowechsel und der Pin gelten für jede Höhe. |
-| Eine Etappe | Keine Bühne, kein Balken, kein Skript. |
-| Mehr oder weniger Etappen | Der Balken teilt sich auf die Anzahl auf, Einrasten und Scrollweg rechnen mit ihr (eine Bildschirmhöhe je Wechsel). Ohne Etappen steht außerhalb des Editors nichts da. |
+| Eine Etappe | Keine Bühne, kein Balken. Das Skript lädt nur, wenn die Etappe eine Galerie hat. |
+| Mehr oder weniger Etappen | Der Balken teilt sich auf die Anzahl auf, der Scrollweg rechnet mit ihr (eine Bildschirmhöhe je Wechsel). Ohne Etappen steht außerhalb des Editors nichts da. |
+| Weitere Fotos einer Etappe | Reihenfolge: Foto oben, dann Weiteres Foto 2–4, nur wenn keins davon gewählt ist die Zeilen „Weitere Fotos im Theme“ (`datei | Beschreibung`). Höchstens vier. Ab zwei Fotos Vorschau unter dem Text, mit einem Foto Markup wie bisher. Ein Klick schiebt das gewählte Foto über das alte: Liegt es in der Vorschau links vom bisherigen, kommt es von rechts, sonst von links. Ohne Bewegung sofort. Ein Klick ändert nie die Scrollposition. Auf der Bühne sind nur die Vorschauknöpfe der aktuellen Etappe per Tab erreichbar (`tabindex="-1"` an den übrigen). Weitere große Fotos laden bei Hover, Fokus, Klick oder wenn ihre Etappe die aktuelle wird. |
+| Wenig Höhe mit Vorschau | Auf der Bühne ist jede Etappe so hoch wie das Bühnenfenster. Bis 800 px Höhe (Desktop) bzw. 760 px (Handy) bekommen Etappen mit Vorschau knappere Abstände und kleinere Vorschaubilder (66 × 44), am Handy nimmt ihr Foto 34 % statt 46 % ein. Unter 700 px Höhe am Handy nimmt das Foto jeder Etappe 42 % ein. Gemessen bis 1280 × 620, 1024 × 600, 900 × 600 und 320 × 640, mit „Heute“ als längstem Text. |
 | Team folgt nicht direkt auf die Geschichte | Kein Übergang zum Team, die Kopfleiste wird bis zum Ende des Pinnens gehalten. |
 | Eine Person im Team | Keine Pfeile und kein Raster, die Karte steht da. Höchstens acht Personen (Raster 4 × 2 bzw. 8 × 1). |
 | Person ohne Foto oder ohne breiten Ausschnitt | Ohne Foto eine dunkle Fläche. Ohne breiten Ausschnitt steht das quadratische Foto am Desktop ganz und mittig im Rahmen (`contain`). |
 | Team weniger als einen Bildschirm entfernt | Alle Teamfotos laden sofort (`eager`), ein Wechsel wartet auf das Dekodieren, höchstens 400 ms. |
 | Keine Händlerdaten | „Komm vorbei“ erscheint im Shop nicht, im Editor steht ein Hinweis. Ohne Adresse fehlt „Route planen“, ohne einen Kanal der zugehörige Knopf. |
 | Adressleiste am Handy | `ScrollTrigger.config({ ignoreMobileResize: true })`: kein Neumessen mitten im Umblättern. |
-| Anker und Klick auf eine Jahreszahl | Solange die Bühne läuft, steht `html` auf `scroll-behavior: auto` (`about-story.css`), sonst scrollte der Browser weich und das Einrasten griffe dazwischen. Ein Klick scrollt zur Etappe, ohne unterwegs einzurasten. |
+| Anker und Klick auf eine Jahreszahl | Solange die Bühne läuft, steht `html` auf `scroll-behavior: auto` (`about-story.css`), sonst glitte die Seite auch dorthin, wo ScrollTrigger die Scrollposition beim Neuberechnen selbst setzt. Ein Klick scrollt weich zur Etappe. Die Bühne rastet nie ein, ihre Lage hängt nur vom Scrollen ab. |
 | Theme-Editor | Immer statisch. Ein gewählter Teamblock zeigt seine Person sofort. |
 | Tastatur | Die Reihenfolge ist Balken, Team, Kontakt. Die Pfeiltasten wechseln die Person nur, solange der Fokus auf einem Knopf des Teams liegt. Der Fokusrahmen folgt dem Theme (`base.css` blendet ihn auf Wunsch des Händlers aus, offen in `freigaben.md`). |
 
