@@ -156,8 +156,8 @@
 
   // ---- Task 1: Grundlagen (Tokens, GSAP auf der Seite, Kopfleiste festhalten) ----
   UU.add('base:gsap', function () {
-    return document.documentElement.classList.contains('has-motion') && !(window.gsap && PS.motion.scroll) ? ['GSAP fehlt auf Über uns'] : [];
-  });
+    return window.gsap && PS.motion.scroll ? [] : ['GSAP fehlt auf Über uns'];
+  }, function () { return motion(); });
   UU.add('base:tokens', function () {
     return ['--c-orange-on-light', '--c-hd-orange', '--photo-grade']
       .filter(function (t) { return !getComputedStyle(document.documentElement).getPropertyValue(t).trim(); })
@@ -284,7 +284,8 @@
         if (!near(share, 108 / 2.08, .5)) f.push('Etappe ' + (i + 1) + ': Fotospalte ' + share.toFixed(1) + ' % statt 51,9 %');
       });
     }
-    s.querySelectorAll('.leaf__media img').forEach(function (img, i) {
+    // Nur das erste Foto je Etappe: Weitere Fotos einer Galerie lädt das Skript vor, sobald ihre Etappe ins Bild kommt (Task 9)
+    s.querySelectorAll('.leaf__media > img:first-child').forEach(function (img, i) {
       if (img.getAttribute('loading') !== 'lazy') f.push('Etappenfoto ' + (i + 1) + ' hat loading="' + img.getAttribute('loading') + '"');
     });
     return f;
@@ -486,9 +487,11 @@
   }, function () { var s = sec(); return s && (s.querySelectorAll('.leaf').length === 1 || story()) ? '' : 'nur mit Bühne oder einer Etappe'; });
 
   // ---- Task 9: Fotogalerie je Etappe ----
-  // Ablauf: Vorlage vorübergehend ändern (1985 bekommt per „assets_more“ zwei weitere vorhandene Dateien, z. B.
-  // "ueber-uns-vorplatz-1280.jpg | Vorplatz\nueber-uns-theke-1280.jpg | Theke"), hochladen lassen, neu laden, prüfen, danach
-  // git restore templates/page.ueber-uns.json. Ohne Etappe mit zwei und mehr Fotos werden die Prüfungen übersprungen.
+  // Ablauf: Vorlage vorübergehend ändern, alle vier Etappen mit Galerie: Jede bekommt per „assets_more“ zwei weitere vorhandene
+  // Dateien, z. B. "ueber-uns-vorplatz-1280.jpg | Vorplatz\nueber-uns-theke-1280.jpg | Theke" (1991 hat den längsten Text, bei „Heute“
+  // bricht der Ort am kleinen Handy um). Hochladen lassen, neu laden, prüfen bei 1440 × 900, 1280 × 620, 1100 × 800, 1024 × 640,
+  // 375 × 812 und 320 × 640, danach git restore templates/page.ueber-uns.json. Ohne Etappe mit zwei und mehr Fotos werden die
+  // Prüfungen übersprungen.
   var galleries = function () { return Array.prototype.slice.call(sec().querySelectorAll('.leaf--gallery')); };
   var withGallery = function () {
     var s = sec();
@@ -552,10 +555,22 @@
     if (!leaf) return ['Keine Etappe mit drei Fotos (Vorlage: 1985 mit zwei weiteren Dateien)'];
     var btns = leaf.querySelectorAll('.leaf__thumb'), shots = shotsOf(leaf), html = document.documentElement;
     var pressed = function (k) { return btns[k].getAttribute('aria-pressed') === 'true'; };
-    showLeaf(leaf);
     // Alle Fotos vorher laden, sonst wartet der Wechsel aufs Dekodieren und die 100 ms stimmen nicht
     shots.forEach(function (img) { img.loading = 'eager'; });
     await Promise.all(shots.map(function (img) { return img.decode().catch(function () {}); }));
+    // Mit laufender Bühne, ohne at() und ohne disable: Etappe anscrollen, Scrub ausklingen lassen, klicken. Weder scrollY noch der
+    // Fortschritt dürfen sich ändern.
+    var s0 = story();
+    if (s0) {
+      var st0 = s0.st;
+      await go(st0.start + (st0.end - st0.start) * leavesOf().indexOf(leaf) / s0.last + 1); await wait(900);
+      var y0 = window.scrollY, p0 = st0.progress, a0 = st0.animation.progress();
+      btns[1].click(); await wait(800); btns[0].click(); await wait(800);
+      if (!near(window.scrollY, y0, .5)) f.push('Laufende Bühne: scrollY nach Klicks ' + window.scrollY + ' statt ' + y0);
+      if (!near(st0.progress, p0, .0005)) f.push('Laufende Bühne: Fortschritt nach Klicks ' + st0.progress.toFixed(4) + ' statt ' + p0.toFixed(4));
+      if (!near(st0.animation.progress(), a0, .0005)) f.push('Laufende Bühne: Zeitleiste nach Klicks ' + st0.animation.progress().toFixed(4) + ' statt ' + a0.toFixed(4));
+    }
+    showLeaf(leaf);
     if (!pressed(0)) { btns[0].click(); await wait(800); }
     var y = window.scrollY;
     try {
@@ -604,7 +619,22 @@
       if (btns.some(function (b) { return b.tabIndex >= 0; })) f.push('Aktuelle Etappe ' + (other + 1) + ': Vorschauknöpfe von Etappe ' + (k + 1) + ' per Tab erreichbar');
       at(k / last);
       if (btns.some(function (b) { return b.tabIndex < 0; })) f.push('Aktuelle Etappe ' + (k + 1) + ': eigene Vorschauknöpfe nicht per Tab erreichbar');
+      if (k < last) at((k + 0.4) / last);
+      if (k < last && btns.some(function (b) { return b.tabIndex >= 0; })) f.push('Mitten im Wechsel nach Etappe ' + (k + 1) + ': deren Vorschauknöpfe noch per Tab erreichbar');
     });
+    // Fokus (Tab, Suche im Browser) verschiebt nichts seitlich: auch nicht auf einem Knopf einer wartenden Etappe außerhalb des Bilds
+    var s = sec(), boxes = [s.querySelector('[data-stage]'), s.querySelector('[data-viewport]'), s.querySelector('.about-story__track')].concat(L);
+    var y = window.scrollY;
+    at(0);
+    galleries().forEach(function (leaf) {
+      leaf.querySelectorAll('.leaf__thumb').forEach(function (b) { b.focus({ preventScroll: false }); });
+    });
+    boxes.forEach(function (e) {
+      if (e.scrollLeft || e.scrollTop) f.push((e.id || e.className) + ': nach Fokus verschoben (scrollLeft ' + e.scrollLeft + ', scrollTop ' + e.scrollTop + ')');
+    });
+    if (getComputedStyle(L[0]).overflowX !== 'clip') f.push('.leaf mit overflow ' + getComputedStyle(L[0]).overflowX + ' statt clip');
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+    window.scrollTo({ top: y, behavior: 'instant' });
     return f;
   }, function () { return live() || withGallery(); });
 

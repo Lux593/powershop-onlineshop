@@ -25,7 +25,9 @@
 .about-story__empty { padding: var(--s-4) var(--gutter); color: var(--c-muted); }
 
 /* ---------------- Etappen ---------------- */
-.leaf { position: relative; display: grid; overflow: hidden; background: var(--c-white); border-top: 1px solid var(--c-line); }
+/* overflow: clip statt hidden (hidden als Rückfall): clip macht keinen Scroll-Container, so kann Fokus oder die Suche im Browser
+   nichts seitlich verschieben. Ebenso Bühne und Fenster unten. */
+.leaf { position: relative; display: grid; overflow: hidden; overflow: clip; background: var(--c-white); border-top: 1px solid var(--c-line); }
 .leaf__media { position: relative; overflow: hidden; min-height: 320px; margin: 0; background: var(--c-anthracite); }
 .leaf__media > img { width: 100%; height: 100%; object-fit: cover; object-position: var(--focus, 50% 50%); filter: var(--photo-grade); }
 .leaf--mono .leaf__media > img { filter: grayscale(1) contrast(1.12) brightness(.98); }
@@ -57,7 +59,7 @@
    Die großen Fotos liegen gestapelt in .leaf__media: Das erste steht im Fluss wie bei einem Foto und gibt der Fläche ihre Höhe, die
    weiteren (.leaf__more) liegen deckend darüber. Sichtbar ist das gewählte: Weitere Fotos tragen sonst hidden, das erste aria-hidden und
    wird unsichtbar, behält aber seinen Platz. Beim Wechsel (about-story.js) schiebt sich das neue (is-coming, oben) über das alte, das
-   stehen bleibt. Die Fläche schneidet ab (overflow: hidden oben). Der Bildausschnitt (--focus) gilt nur für das erste Foto. */
+   stehen bleibt. Die Fläche schneidet ab (overflow: hidden oben, sie enthält nichts Fokussierbares). Der Bildausschnitt (--focus) gilt nur für das erste Foto. */
 /* isolation: Das hereinkommende Foto (z-index 2) bleibt in der Fotofläche, auch ohne Bühne */
 .leaf--gallery .leaf__media { isolation: isolate; }
 .leaf--gallery .leaf__media > img:first-child { position: relative; }
@@ -116,6 +118,7 @@
   flex-direction: column;
   height: var(--stage-h);
   overflow: hidden;
+  overflow: clip;
   background: var(--c-black);
 }
 /* Übergang zum Team (assets/about-story.js): Die Bühne dunkelt ab, während das Team über sie hochfährt. --cover (0 bis 0,75) setzt
@@ -129,7 +132,7 @@
   opacity: var(--cover, 0);
   pointer-events: none;
 }
-.about-story.is-live .about-story__viewport { position: relative; flex: 1; min-height: 0; overflow: hidden; }
+.about-story.is-live .about-story__viewport { position: relative; flex: 1; min-height: 0; overflow: hidden; overflow: clip; }
 .about-story.is-live .about-story__track { position: relative; height: 100%; }
 /* Spätere Etappen liegen oben (Reihenfolge im Markup). Der weiche Schatten an der linken Kante fällt auf die Etappe, über die sich die
    neue schiebt. Wartende Etappen stehen 120 px weiter rechts (Skript), so ragt er in Ruhe nicht ins Bild. */

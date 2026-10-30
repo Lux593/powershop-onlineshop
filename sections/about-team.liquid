@@ -7,7 +7,7 @@
   is-ready, zeigt dann nur die gewählte Person und wechselt (Foto senkrecht, aus 1,12 auf 1, nur mit Bewegung).
   Ohne Blöcke gibt die Section außerhalb des Editors nichts aus. Bei einer Person gibt es keine Pfeile und kein Raster.
   Fotos: ein im Editor gewähltes Bild oder eine Standarddatei aus assets/. Für die mitgelieferten breiten Ausschnitte
-  (ueber-uns-team-<id>-breit-1600.jpg) kennt die Section die kleinere Fassung -960.
+  (ueber-uns-team-<id>-breit-1600.jpg) kennt die Section die kleinere Fassung -960, für die Quadrate der Vorschau die Fassung -240.
   Entwurf: entwuerfe/ueber-uns/design-ueber-uns-h.md, Abschnitt 4.4 (Vorlage h-vollbild.html und shared/team-spotlight.js).
 {%- endcomment -%}
 {%- liquid
@@ -31,7 +31,18 @@
     {%- if count > 1 -%}
       <div class="spot__roster" role="group" aria-label="Ganzes Team">
         {%- for block in section.blocks -%}
-          {%- assign full_name = block.settings.first_name | append: ' ' | append: block.settings.last_name | strip -%}
+          {%- liquid
+            assign full_name = block.settings.first_name | append: ' ' | append: block.settings.last_name | strip
+            comment
+              Die Knöpfe sind höchstens rund 80 px breit (am Handy bis 899 px ein Viertel der Zeile). Für die mitgelieferten
+              Quadrate gibt es deshalb eine 240er-Fassung (ueber-uns-team-<id>-240.jpg), die 720er bleibt für dichte Bildschirme.
+            endcomment
+            assign pick_srcset = ''
+            case block.settings.asset
+              when 'ueber-uns-team-richard.jpg', 'ueber-uns-team-falk.jpg', 'ueber-uns-team-franziska.jpg', 'ueber-uns-team-gerhard.jpg', 'ueber-uns-team-ingrid.jpg', 'ueber-uns-team-jean.jpg', 'ueber-uns-team-aaron.jpg', 'ueber-uns-team-juergen.jpg'
+                assign pick_srcset = block.settings.asset | replace: '.jpg', '-240.jpg' | append: ' 240w, ' | append: block.settings.asset | append: ' 720w'
+            endcase
+          -%}
           <button
             class="spot__pick"
             type="button"
@@ -45,7 +56,8 @@
               width: 720,
               height: 720,
               alt: '',
-              sizes: '(min-width: 900px) 120px, 25vw',
+              sizes: '(min-width: 900px) 80px, calc((100vw - 56px) / 4)',
+              srcset: pick_srcset,
               loading: 'lazy'
             -%}
           </button>

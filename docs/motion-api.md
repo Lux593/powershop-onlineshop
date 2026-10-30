@@ -92,6 +92,9 @@ Seiten-Einstellungen von Über uns (assets/about-story.js, about-story.css)
                      Web Animations API (el.animate, 600 ms, cubic-bezier(.65, 0, .35, 1), nur translateX): Die Galerie läuft auch ohne
                      Bühne und auf anderen Seitenvorlagen. Ohne html.has-motion, bei reduzierter Bewegung (bei jedem Klick abgefragt) und
                      im Theme-Editor wechselt das Foto sofort. Richtung: SLIDE_FROM in about-story.js.
+  overflow: clip     (about-story.css, Bühne, Fenster und .leaf, Rückfall hidden) Ein fokussierter Vorschauknopf darf den Ausschnitt
+                     nicht verschieben: clip lässt sich auch vom Browser nicht scrollen. Auf der Bühne sind nur die Knöpfe der Etappe
+                     tabbar, die ganz da ist (setTabbable, von k − 0,1 bis k + 0,25 der Umblätter-Position).
   Die Bühne pinnt nur mit  gsap.matchMedia('(prefers-reduced-motion: no-preference) and (min-height: 600px)'). Team-Fotowechsel und das
   Landen des Pins in „Komm vorbei“ (data-reveal am Pin) laufen unabhängig davon.
 ```

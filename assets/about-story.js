@@ -48,8 +48,9 @@
        (seq, wie im Team). Ein Klick während des Schiebens beendet das laufende sofort (finish), dann startet das neue.
      - Ohne html.has-motion, mit reduzierter Bewegung (bei jedem Klick neu abgefragt) und im Theme-Editor wechselt das Foto sofort.
      - Ein Klick ändert nie die Scrollposition und bewegt die Bühne nicht.
-     - Laden: Weitere große Fotos sind lazy und hidden. Sie laden, sobald ein Knopf Hover oder Fokus bekommt, spätestens beim Klick. Mit
-       Bühne lädt sie setup() außerdem, wenn ihre Etappe die aktuelle wird.
+     - Laden: Weitere große Fotos sind lazy und hidden. Sie laden, sobald ihre Etappe ins Bild kommt (IntersectionObserver, halbe
+       Bildschirmhöhe vorher) oder ein Knopf Hover oder Fokus bekommt, spätestens beim Klick. Mit Bühne lädt sie setup() außerdem, wenn
+       ihre Etappe die aktuelle wird.
      section.__gallery = { finish } beendet laufende Wechsel (Abbau der Bühne). */
 
   // Richtung beim Schieben, so wie der Nutzer sie will (nicht die übliche Karussell-Richtung): Liegt das neue Foto in der Vorschau links
@@ -60,16 +61,31 @@
 
   function gallery(PS, section) {
     if (section.__gallery) return; // schon gestartet (die Prüfung story:fallback führt das Skript ein zweites Mal aus)
-    var all = [];
+    var all = [], more = [];
     Array.prototype.forEach.call(section.querySelectorAll('.leaf'), function (leaf) {
       var media = leaf.querySelector('.leaf__media');
       var thumbs = Array.prototype.slice.call(leaf.querySelectorAll('.leaf__thumb'));
       var shots = media ? Array.prototype.filter.call(media.children, function (e) { return e.tagName === 'IMG'; }) : [];
       if (thumbs.length < 2 || shots.length !== thumbs.length) return;
       all.push(photos(PS, thumbs, shots));
+      more.push([leaf, shots.slice(1)]);
     });
     if (!all.length) return;
     section.__gallery = { finish: function () { all.forEach(function (g) { g.finish(); }); } };
+    // Vorladen: Die weiteren großen Fotos einer Etappe laden, sobald die Etappe ins Bild kommt (halbe Bildschirmhöhe vorher). Ohne Bühne
+    // stehen die Etappen untereinander, so ist ein Foto da, bevor jemand antippt. Auf der Bühne liegen wartende Etappen außerhalb des
+    // beschnittenen Fensters und zählen erst beim Hereinfahren als sichtbar; dort lädt setup() außerdem die aktuelle Etappe.
+    if (!('IntersectionObserver' in window)) return;
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        more.forEach(function (m) {
+          if (m[0] === e.target) m[1].forEach(function (img) { if (img.loading === 'lazy') img.loading = 'eager'; });
+        });
+        io.unobserve(e.target);
+      });
+    }, { rootMargin: '50% 0px' });
+    more.forEach(function (m) { io.observe(m[0]); });
   }
 
   function photos(PS, thumbs, shots) {
@@ -217,9 +233,7 @@
     section.querySelectorAll('.leaf__media > img:first-child, .leaf__thumb img').forEach(function (img) { img.loading = 'eager'; });
     var thumbs = leaves.map(function (leaf) { return gsap.utils.toArray(leaf.querySelectorAll('.leaf__thumb')); });
 
-    // Aktuelle Etappe: Zahl im Balken (aria-current), weitere Fotos laden. Nur ihre Vorschauknöpfe sind per Tab erreichbar, die der
-    // übrigen Etappen (verdeckt oder rechts außerhalb des Bilds) bekommen tabindex -1. Sonst sorgt die Bühne für nichts dergleichen:
-    // Wartende Etappen tragen weder inert noch aria-hidden, sie haben außer den Vorschauknöpfen nichts Fokussierbares.
+    // Aktuelle Etappe: Zahl im Balken (aria-current), weitere Fotos laden
     function setActive(i) {
       if (i === current) return;
       current = i;
@@ -227,13 +241,25 @@
         if (k === i) a.setAttribute('aria-current', 'step');
         else a.removeAttribute('aria-current');
       });
-      thumbs.forEach(function (list, k) {
+      leaves[i].querySelectorAll('.leaf__media > img').forEach(function (img) { img.loading = 'eager'; });
+    }
+    // Per Tab erreichbar sind nur die Vorschauknöpfe einer Etappe, die ganz da ist: von kurz bevor ihre Vorschau (das letzte Teil von
+    // bits) angekommen ist, bis die nächste Etappe ihre Textspalte zu verdecken beginnt (Zeitleiste k − 0,1 bis k + 0,25). Dazwischen
+    // keine, alle übrigen tragen tabindex -1. Sonst sorgt die Bühne für nichts dergleichen: Wartende Etappen tragen weder inert noch
+    // aria-hidden, sie haben außer den Vorschauknöpfen nichts Fokussierbares. Fokus auf einem Knopf verschiebt nichts seitlich, weil
+    // Bühne, Fenster und Etappen mit overflow: clip abschneiden (about-story.css).
+    var tabbable = null;
+    function setTabbable(t) {
+      var k = Math.round(t);
+      var i = t - k >= -0.1 && t - k <= 0.25 ? k : -1;
+      if (i === tabbable) return;
+      tabbable = i;
+      thumbs.forEach(function (list, n) {
         list.forEach(function (b) {
-          if (k === i) b.removeAttribute('tabindex');
+          if (n === i) b.removeAttribute('tabindex');
           else b.setAttribute('tabindex', '-1');
         });
       });
-      leaves[i].querySelectorAll('.leaf__media > img').forEach(function (img) { img.loading = 'eager'; });
     }
 
     /* ---------------- Balken ----------------
@@ -296,6 +322,7 @@
         var p = slide.progress();
         paintRail(railAt());
         setActive(Math.round(p * last));
+        setTabbable(p * last);
         if (hint) hint.classList.toggle('is-gone', p > 0.03);
       },
       scrollTrigger: {
@@ -359,6 +386,7 @@
       measure();
       paintRail(railAt());
       setActive(Math.round(slide.progress() * last));
+      setTabbable(slide.progress() * last);
     }
     remeasure();
     ScrollTrigger.addEventListener('refresh', remeasure);

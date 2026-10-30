@@ -138,8 +138,10 @@
 
                   comment
                     Maße und kleinere Fassungen der mitgelieferten Standarddateien. Eine weitere Datei aus assets/, die auf -1280.jpg
-                    (oder .webp …) endet, bekommt die 720er-Fassung gleichen Namens dazu. Jede andere Datei steht ohne srcset als 4 : 3 im
-                    Markup (nur für das Seitenverhältnis vor dem Laden, das Foto füllt seine Fläche ohnehin per object-fit).
+                    (oder .webp …) endet, bekommt die 720er-Fassung gleichen Namens dazu. Das ist eine Abmachung, die der Info-Text von
+                    „Weitere Fotos im Theme“ nennt (Liquid kann nicht prüfen, ob die Datei da ist): So bleibt die Vorschau leicht, sie lädt
+                    die 720er statt der 1280er. Jede andere Datei steht ohne srcset als 4 : 3 im Markup (nur für das Seitenverhältnis vor
+                    dem Laden, das Foto füllt seine Fläche ohnehin per object-fit).
                   endcomment
                   assign img_w = 1200
                   assign img_h = 900
@@ -300,7 +302,7 @@
         { "type": "image_picker", "id": "image_2", "label": "Weiteres Foto 2", "info": "Die Bildbeschreibung kommt aus dem Alt-Text des Bildes in Shopify." },
         { "type": "image_picker", "id": "image_3", "label": "Weiteres Foto 3" },
         { "type": "image_picker", "id": "image_4", "label": "Weiteres Foto 4" },
-        { "type": "textarea", "id": "assets_more", "label": "Weitere Fotos im Theme", "placeholder": "ueber-uns-theke-1280.jpg | Holztheke im Showroom", "info": "Eine Zeile je Foto: Dateiname in assets/, dann | und die Bildbeschreibung. Wird nur genutzt, wenn oben keine weiteren Fotos gewählt sind." }
+        { "type": "textarea", "id": "assets_more", "label": "Weitere Fotos im Theme", "placeholder": "ueber-uns-theke-1280.jpg | Holztheke im Showroom", "info": "Eine Zeile je Foto: Dateiname in assets/, dann | und die Bildbeschreibung. Wird nur genutzt, wenn oben keine weiteren Fotos gewählt sind. Endet der Name auf -1280.jpg, muss daneben dieselbe Datei auf -720.jpg liegen: Sie dient kleinen Bildschirmen und der Vorschau." }
       ]
     }
   ],
