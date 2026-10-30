@@ -1,76 +1,66 @@
 {% doc %}
-  Farbfeld für eine Farb-Option. Reihenfolge: Shopify-Swatch-Farbe der verknüpften Option, dann der Farbeintrag mit
-  gleichem Namen unter Inhalte > Metaobjekte > Farbe (Handle = Name als Handle, z. B. "vivid-black"),
-  sonst eine Zuordnung nach Farbname.
+  Farbfeld für eine Farb-Option. Reihenfolge: natives Shopify-Swatch (Farbe/Bild), Variantenbild der ersten
+  passenden Variante, Metaobjekt Farbe (Handle = Name), Farbname (inkl. „ / “-Kombinationen), sonst grau.
 
-  @param {string} name - Farbname, z. B. "Schwarz"
+  @param {string} name - Farbname, z. B. „Schwarz“ oder „Weiß / Rot / Blau“
   @param {object} [swatch] - Swatch des Optionswerts (value.swatch)
-  @param {string} [tag] - "li" (Standard) oder "span"
+  @param {image} [variant_image] - Produktbild der ersten Variante mit diesem Wert
+  @param {string} [tag] - „li“ (Standard) oder „span“
 {% enddoc %}
 
 {%- liquid
-  assign hex = swatch.color
-  if hex == blank
-    assign entry_handle = name | handleize
-    assign hex = metaobjects['shopify--color-pattern'][entry_handle].color.value
-  endif
-  if hex == blank
-    assign key = name | downcase
-    case key
-      when 'schwarz', 'black', 'vivid black', 'gloss black', 'matte black'
-        assign hex = '#141414'
-      when 'braun', 'brown'
-        assign hex = '#6b4226'
-      when 'grau', 'gray', 'grey', 'dark billiard gray', 'billiard gray', 'silber', 'silver'
-        assign hex = '#8a8a8a'
-      when 'oliv', 'olive'
-        assign hex = '#5b5e3a'
-      when 'weiß', 'weiss', 'white'
-        assign hex = '#f4f4f2'
-      when 'orange'
-        assign hex = '#f26722'
-      when 'bordeaux', 'burgundy', 'wine'
-        assign hex = '#7d1f24'
-      when 'rot', 'red', 'brilliant red'
-        assign hex = '#b3262e'
-      when 'denim', 'aurora blue denim'
-        assign hex = '#3d5a80'
-      when 'blau', 'blue'
-        assign hex = '#2f66a8'
-      when 'sand', 'beige', 'tan'
-        assign hex = '#c8b79a'
-      when 'chrom', 'chrome', 'polished chrome'
-        assign hex = '#c9ccd1'
-      when 'gelb', 'yellow', 'gold'
-        assign hex = '#d4a017'
-      when 'grün', 'gruen', 'green'
-        assign hex = '#2d6a4f'
-      when 'lila', 'purple', 'violet'
-        assign hex = '#5c4d7d'
-      else
-        if key contains 'schwarz' or key contains 'black'
-          assign hex = '#141414'
-        elsif key contains 'orange'
-          assign hex = '#f26722'
-        elsif key contains 'rot' or key contains 'red'
-          assign hex = '#b3262e'
-        elsif key contains 'blau' or key contains 'blue'
-          assign hex = '#2f66a8'
-        elsif key contains 'grau' or key contains 'gray' or key contains 'grey'
-          assign hex = '#8a8a8a'
-        elsif key contains 'weiß' or key contains 'weiss' or key contains 'white'
-          assign hex = '#f4f4f2'
-        elsif key contains 'chrom' or key contains 'chrome'
-          assign hex = '#c9ccd1'
-        else
-          assign hex = '#cccccc'
-        endif
-    endcase
-  endif
-  assign bg = hex
+  assign bg = blank
+
   if swatch.image != blank
-    assign bg = 'url(' | append: swatch.image | image_url: width: 64 | append: ') center / cover'
+    assign bg = 'url(' | append: swatch.image | image_url: width: 128 | append: ') center / cover'
+  elsif swatch.color != blank
+    assign bg = swatch.color
   endif
+
+  if bg == blank and variant_image != blank
+    assign bg = 'url(' | append: variant_image | image_url: width: 128 | append: ') center / cover'
+  endif
+
+  if bg == blank
+    assign entry_handle = name | handleize
+    assign meta_hex = metaobjects['shopify--color-pattern'][entry_handle].color.value
+    if meta_hex != blank
+      assign bg = meta_hex
+    endif
+  endif
+
+  if bg == blank
+    assign combo = name | split: ' / '
+    if combo.size > 1
+      assign stops = ''
+      assign n = combo.size
+      for part in combo
+        capture part_hex
+          render 'swatch-hex', label: part
+        endcapture
+        assign part_hex = part_hex | strip
+        assign i = forloop.index0
+        assign start_pct = i | times: 100 | divided_by: n
+        assign end_pct = forloop.index | times: 100 | divided_by: n
+        if forloop.first
+          assign stops = part_hex | append: ' ' | append: start_pct | append: '% ' | append: end_pct | append: '%'
+        else
+          assign stops = stops | append: ', ' | append: part_hex | append: ' ' | append: start_pct | append: '% ' | append: end_pct | append: '%'
+        endif
+      endfor
+      assign bg = 'linear-gradient(90deg, ' | append: stops | append: ')'
+    else
+      capture single_hex
+        render 'swatch-hex', label: name
+      endcapture
+      assign bg = single_hex | strip
+    endif
+  endif
+
+  if bg == blank
+    assign bg = '#cccccc'
+  endif
+
   assign element = tag | default: 'li'
 -%}
 <{{ element }} class="swatch" style="background:{{ bg }}" title="{{ name | escape }}"></{{ element }}>

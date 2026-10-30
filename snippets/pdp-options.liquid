@@ -39,14 +39,30 @@
       {%- if is_color -%}
         <div class="swatches" role="group" aria-label="{{ option.name | escape }} wählen">
           {%- for value in option.values -%}
-            {%- assign value_name = value.name | default: value -%}
+            {%- liquid
+              assign value_name = value.name | default: value
+              assign option_prop = 'option' | append: option.position
+              assign value_variants = product.variants | where: option_prop, value_name
+              assign value_variant = value_variants | where: 'available' | first
+              if value_variant == blank
+                assign value_variant = value_variants | first
+              endif
+              assign value_variant_image = blank
+              if value_variant != blank
+                if value_variant.featured_media != blank and value_variant.featured_media.preview_image != blank
+                  assign value_variant_image = value_variant.featured_media.preview_image
+                elsif value_variant.featured_image != blank
+                  assign value_variant_image = value_variant.featured_image
+                endif
+              endif
+            -%}
             <button
               class="swatch-btn"
               type="button"
               data-option-value="{{ value_name | escape }}"
               aria-pressed="{% if value_name == selected_value %}true{% else %}false{% endif %}"
               aria-label="{{ value_name | escape }}"
-            >{% render 'swatch', name: value_name, swatch: value.swatch, tag: 'span' %}</button>
+            >{% render 'swatch', name: value_name, swatch: value.swatch, variant_image: value_variant_image, tag: 'span' %}</button>
           {%- endfor -%}
         </div>
       {%- else -%}

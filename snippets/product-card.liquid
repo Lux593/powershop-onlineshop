@@ -133,8 +133,24 @@
     {%- elsif color_option and color_option.values.size > 1 -%}
       <ul class="swatches" aria-label="{{ color_option.values.size }} Farben">
         {%- for value in color_option.values limit: 4 -%}
-          {%- assign swatch_name = value.name | default: value -%}
-          {% render 'swatch', name: swatch_name, swatch: value.swatch %}
+          {%- liquid
+            assign swatch_name = value.name | default: value
+            assign color_prop = 'option' | append: color_option.position
+            assign card_variants = product.variants | where: color_prop, swatch_name
+            assign card_variant = card_variants | where: 'available' | first
+            if card_variant == blank
+              assign card_variant = card_variants | first
+            endif
+            assign card_variant_image = blank
+            if card_variant != blank
+              if card_variant.featured_media != blank and card_variant.featured_media.preview_image != blank
+                assign card_variant_image = card_variant.featured_media.preview_image
+              elsif card_variant.featured_image != blank
+                assign card_variant_image = card_variant.featured_image
+              endif
+            endif
+          -%}
+          {% render 'swatch', name: swatch_name, swatch: value.swatch, variant_image: card_variant_image %}
         {%- endfor -%}
         {%- if color_option.values.size > 4 -%}
           <li class="swatches__more">+{{ color_option.values.size | minus: 4 }}</li>

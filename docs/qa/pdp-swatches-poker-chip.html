@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Poker Chip Swatches QA</title>
+  <link rel="stylesheet" href="../../assets/tokens.css">
+  <link rel="stylesheet" href="../../assets/base.css">
+  <link rel="stylesheet" href="../../assets/components.css">
+  <link rel="stylesheet" href="../../assets/shop.css">
+  <style>
+    .qa-shell { max-width: 100vw; padding: 16px; background: var(--c-offwhite); }
+  </style>
+</head>
+<body>
+  <div class="qa-shell">
+    <div class="pdp">
+      <div class="pdp__info">
+        <h1 class="pdp__title">Harley-Davidson Power Shop Poker Chip</h1>
+        <div class="pdp__meta"><span>Harley-Davidson</span><span>Patches, Pins &amp; Aufkleber</span></div>
+        <form class="pdp-form">
+          <div class="pdp__row">
+            <div class="pdp__row-head"><span><strong>Farbe:</strong> <span>Grün</span></span></div>
+            <div class="swatches" role="group" aria-label="Farbe wählen" id="swatches"></div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <script>
+    var variants = [
+      { name: 'Grün', url: 'https://cdn.shopify.com/s/files/1/1017/1220/0024/files/poker-chip-01-gruen.jpg?v=1793367591' },
+      { name: 'Orange', url: 'https://cdn.shopify.com/s/files/1/1017/1220/0024/files/poker-chip-02-orange.jpg?v=1793367647' },
+      { name: 'Türkis', url: 'https://cdn.shopify.com/s/files/1/1017/1220/0024/files/poker-chip-03-tuerkis.jpg?v=1793367661' },
+      { name: 'Dunkelblau', url: 'https://cdn.shopify.com/s/files/1/1017/1220/0024/files/poker-chip-04-dunkelblau.jpg?v=1793367675' },
+      { name: 'Grau / Orange', url: 'https://cdn.shopify.com/s/files/1/1017/1220/0024/files/poker-chip-05-grau-orange.jpg?v=1793367697' },
+      { name: 'Weiß / Schwarz', url: 'https://cdn.shopify.com/s/files/1/1017/1220/0024/files/poker-chip-06-weiss-schwarz.jpg?v=1793367710' },
+      { name: 'Weiß / Rot / Blau', url: 'https://cdn.shopify.com/s/files/1/1017/1220/0024/files/poker-chip-07-weiss-rot-blau.jpg?v=1793367724' },
+      { name: 'Gelb', url: 'https://cdn.shopify.com/s/files/1/1017/1220/0024/files/poker-chip-08-gelb_5c971922-a633-488e-b3d0-daf5a17189da.jpg?v=1793367776' },
+      { name: 'Hellblau', url: 'https://cdn.shopify.com/s/files/1/1017/1220/0024/files/poker-chip-09-hellblau.jpg?v=1793367789' },
+      { name: 'Schwarz / Orange', url: 'https://cdn.shopify.com/s/files/1/1017/1220/0024/files/poker-chip-10-schwarz-orange.jpg?v=1793367804' }
+    ];
+    var useImages = location.search.indexOf('images=1') >= 0;
+    var root = document.getElementById('swatches');
+    variants.forEach(function (v, i) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'swatch-btn';
+      btn.setAttribute('aria-pressed', i === 0 ? 'true' : 'false');
+      btn.setAttribute('aria-label', v.name);
+      var span = document.createElement('span');
+      span.className = 'swatch';
+      span.title = v.name;
+      if (useImages) {
+        span.style.background = 'url(' + v.url + ') center / cover';
+      } else {
+        span.style.background = '#cccccc';
+      }
+      btn.appendChild(span);
+      root.appendChild(btn);
+    });
+  </script>
+</body>
+</html>
