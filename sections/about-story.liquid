@@ -74,14 +74,14 @@
               when 'ueber-uns-1991-678.jpg'
                 assign img_w = 678
                 assign img_h = 510
-              when 'ueber-uns-2016-1280.jpg'
+              when 'ueber-uns-vorplatz-1280.jpg'
+                assign img_w = 1280
+                assign img_h = 720
+                assign img_srcset = 'ueber-uns-vorplatz-720.jpg 720w, ueber-uns-vorplatz-1280.jpg 1280w'
+              when 'ueber-uns-theke-1280.jpg'
                 assign img_w = 1280
                 assign img_h = 960
-                assign img_srcset = 'ueber-uns-2016-720.jpg 720w, ueber-uns-2016-1280.jpg 1280w'
-              when 'ueber-uns-heute-1280.jpg'
-                assign img_w = 1280
-                assign img_h = 786
-                assign img_srcset = 'ueber-uns-heute-720.jpg 720w, ueber-uns-heute-1280.jpg 1280w'
+                assign img_srcset = 'ueber-uns-theke-720.jpg 720w, ueber-uns-theke-1280.jpg 1280w'
             endcase
             assign focus = b.focus | default: '50% 50%'
             assign year = b.year | escape
@@ -176,8 +176,8 @@
       "blocks": [
         { "type": "stage", "settings": { "year": "1985", "title": "Gründung auf der Schusterinsel", "text": "Gerhard Link gründet den Power Shop auf dem Areal der ehemaligen Färberei und Appretur Schusterinsel im Stadtteil Weil-Friedlingen.", "meta": "Weil-Friedlingen", "asset": "ueber-uns-team-gerhard.jpg", "alt": "Porträt von Gerhard Link, Gründer des Power Shop", "focus": "50% 30%", "mono": true } },
         { "type": "stage", "settings": { "year": "1991", "title": "Ein eigenes Haus", "text": "Die Räume in Friedlingen werden zu klein. Im November 1991 zieht der Power Shop in das selbst gebaute Firmengebäude in Weil-Haltingen. Bis heute die Adresse: Burghölzle 15.", "meta": "Weil-Haltingen", "asset": "ueber-uns-1991-678.jpg", "alt": "Altes Farbfoto: weißes Haus mit großem Power-Shop-Schriftzug und Harley-Davidson-Schild, davor Motorräder und ein rotes Auto" } },
-        { "type": "stage", "settings": { "year": "2016", "title": "Die zweite Generation übernimmt", "text": "Die zweite Generation übernimmt den Power Shop, baut die Räume komplett um und erweitert den Showroom.", "meta": "Umbau und neuer Showroom", "asset": "ueber-uns-2016-1280.jpg", "alt": "Holztheke und Merchandise-Regal im Showroom des Power Shop", "focus": "50% 58%" } },
-        { "type": "stage", "settings": { "year": "Heute", "dot": true, "title": "Showroom trifft Werkstatt", "text": "Heute führen Franziska, Richard und Falk Link den Power Shop, Ingrid ist seit der ersten Stunde dabei. Acht Leute, Showroom und Werkstatt unter einem Dach.", "meta": "Burghölzle 15, Weil am Rhein", "asset": "ueber-uns-heute-1280.jpg", "alt": "Vier Fahrerinnen und Fahrer auf Custom-Harleys in einer Halle, die Scheinwerfer an" } }
+        { "type": "stage", "settings": { "year": "2016", "title": "Die zweite Generation übernimmt", "text": "Die zweite Generation übernimmt den Power Shop, baut die Räume komplett um und erweitert den Showroom.", "meta": "Umbau und neuer Showroom", "asset": "ueber-uns-vorplatz-1280.jpg", "alt": "Falk, Franziska und Richard Link (von links) in weißen Harley-Davidson-Shirts auf dem Vorplatz, dahinter eine Reihe Motorräder", "focus": "10% 50%", "mono": true } },
+        { "type": "stage", "settings": { "year": "Heute", "dot": true, "title": "Showroom trifft Werkstatt", "text": "Heute führen Franziska, Richard und Falk Link den Power Shop, Ingrid ist seit der ersten Stunde dabei. Acht Leute, Showroom und Werkstatt unter einem Dach.", "meta": "Burghölzle 15, Weil am Rhein", "asset": "ueber-uns-theke-1280.jpg", "alt": "Holztheke und Merchandise-Regal im Showroom des Power Shop", "focus": "50% 58%" } }
       ]
     }
   ],

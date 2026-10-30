@@ -14,8 +14,8 @@
       "settings": {
         "heading": "Seit 1985 in *Familienhand.*",
         "text": "Offizieller Harley-Davidson-Vertragshändler in Weil am Rhein, in zweiter Generation.",
-        "asset": "ueber-uns-halle-1257.jpg",
-        "alt": "Harley mit Flammen-Lackierung in der Halle, der Scheinwerfer leuchtet, dahinter orange Neonröhren"
+        "asset": "ueber-uns-crew-1600.jpg",
+        "alt": "Vier Fahrerinnen und Fahrer auf Custom-Harleys in einer Halle, die Scheinwerfer an"
       }
     },
     "story": {
@@ -57,10 +57,10 @@
             "title": "Die zweite Generation übernimmt",
             "text": "Die zweite Generation übernimmt den Power Shop, baut die Räume komplett um und erweitert den Showroom.",
             "meta": "Umbau und neuer Showroom",
-            "asset": "ueber-uns-2016-1280.jpg",
-            "alt": "Holztheke und Merchandise-Regal im Showroom des Power Shop",
-            "focus": "50% 58%",
-            "mono": false
+            "asset": "ueber-uns-vorplatz-1280.jpg",
+            "alt": "Falk, Franziska und Richard Link (von links) in weißen Harley-Davidson-Shirts auf dem Vorplatz, dahinter eine Reihe Motorräder",
+            "focus": "10% 50%",
+            "mono": true
           }
         },
         "heute": {
@@ -71,9 +71,9 @@
             "title": "Showroom trifft Werkstatt",
             "text": "Heute führen Franziska, Richard und Falk Link den Power Shop, Ingrid ist seit der ersten Stunde dabei. Acht Leute, Showroom und Werkstatt unter einem Dach.",
             "meta": "Burghölzle 15, Weil am Rhein",
-            "asset": "ueber-uns-heute-1280.jpg",
-            "alt": "Vier Fahrerinnen und Fahrer auf Custom-Harleys in einer Halle, die Scheinwerfer an",
-            "focus": "50% 50%",
+            "asset": "ueber-uns-theke-1280.jpg",
+            "alt": "Holztheke und Merchandise-Regal im Showroom des Power Shop",
+            "focus": "50% 58%",
             "mono": false
           }
         }

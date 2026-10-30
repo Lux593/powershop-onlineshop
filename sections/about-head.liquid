@@ -1,9 +1,9 @@
 {%- comment -%}
-  Seitenkopf der Über-uns-Seite „Halle, dunkel“: schwarz, links Überschrift und Satz, rechts das Hallenfoto bis an den Rand, am
+  Seitenkopf der Über-uns-Seite „Halle, dunkel“: schwarz, links Überschrift und Satz, rechts das Foto bis an den Rand, am
   Handy das Foto oben. Die Überschrift ist die einzige h1 der Seite. Text zwischen zwei Sternen (*Familienhand.*) wird orange.
   Das Foto setzt sich beim Laden aus einer leichten Vergrößerung (assets/about-head.css, nur mit Bewegung).
-  Hallenfoto: Standarddatei ueber-uns-halle-1257.jpg mit der kleineren Fassung ueber-uns-halle-720.jpg im srcset; ein im Editor
-  gewähltes Bild ersetzt beide. Wer unter „Standarddatei“ eine andere Datei einträgt, hat kein srcset.
+  Foto: Standarddatei ist die Crew auf ihren Bikes in der Halle (ueber-uns-crew-1600.jpg, Querformat), mit den kleineren Fassungen
+  720 und 1280 im srcset; ein im Editor gewähltes Bild ersetzt sie. Wer unter „Standarddatei“ eine andere Datei einträgt, hat kein srcset.
   Entwurf: entwuerfe/ueber-uns/design-ueber-uns-h.md, Abschnitt 4.2.
 {%- endcomment -%}
 {{ 'about-head.css' | asset_url | stylesheet_tag }}
@@ -17,11 +17,14 @@
   assign heading_parts = heading | split: '*'
 
   comment
-    Kleinere Fassung nur für die mitgelieferte Datei: für eine andere Standarddatei wäre sie falsch.
+    Kleinere Fassungen nur für die mitgelieferte Datei: für eine andere Standarddatei wären sie falsch. Ihr Name steht im Code nur hier,
+    die Größen hängen sich an; dazu passen muss nur der Standardwert von „Standard-Foto im Theme“ im Schema unten.
   endcomment
+  assign crew = 'ueber-uns-crew-'
+  assign crew_large = crew | append: '1600.jpg'
   assign photo_srcset = ''
-  if section.settings.asset == 'ueber-uns-halle-1257.jpg'
-    assign photo_srcset = 'ueber-uns-halle-720.jpg 720w, ueber-uns-halle-1257.jpg 1257w'
+  if section.settings.asset == crew_large
+    assign photo_srcset = crew | append: '720.jpg 720w, ' | append: crew | append: '1280.jpg 1280w, ' | append: crew_large | append: ' 1600w'
   endif
 -%}
 {%- capture photo -%}
@@ -29,8 +32,8 @@
     image: section.settings.image,
     asset: section.settings.asset,
     srcset: photo_srcset,
-    width: 1257,
-    height: 1280,
+    width: 1600,
+    height: 983,
     alt: section.settings.alt,
     sizes: '(min-width: 900px) 48vw, 100vw',
     loading: 'eager',
@@ -61,9 +64,9 @@
   "settings": [
     { "type": "inline_richtext", "id": "heading", "label": "Überschrift", "default": "Seit 1985 in *Familienhand.*", "info": "Text zwischen zwei Sternen wird orange, z. B. *Familienhand.* Leer = Titel der Seite. Die einzige Überschrift 1 der Seite." },
     { "type": "textarea", "id": "text", "label": "Satz darunter", "default": "Offizieller Harley-Davidson-Vertragshändler in Weil am Rhein, in zweiter Generation." },
-    { "type": "image_picker", "id": "image", "label": "Foto (Hochformat)", "info": "Steht rechts, am Handy oben. Am besten im Format 1257 × 1280 oder ähnlich, der Ausschnitt ist auf den unteren Teil des Bildes gelegt." },
-    { "type": "text", "id": "asset", "label": "Standard-Foto im Theme", "default": "ueber-uns-halle-1257.jpg", "info": "Datei in assets/, wenn oben kein Foto gewählt ist." },
-    { "type": "text", "id": "alt", "label": "Bildbeschreibung", "default": "Harley mit Flammen-Lackierung in der Halle, der Scheinwerfer leuchtet, dahinter orange Neonröhren" }
+    { "type": "image_picker", "id": "image", "label": "Foto (Querformat)", "info": "Steht rechts, am Handy oben. Am besten im Format 1600 × 983 oder ähnlich. Rechts und links wird beschnitten, mittig bleibt alles; auf sehr breiten Bildschirmen bleibt eher der untere Teil." },
+    { "type": "text", "id": "asset", "label": "Standard-Foto im Theme", "default": "ueber-uns-crew-1600.jpg", "info": "Datei in assets/, wenn oben kein Foto gewählt ist." },
+    { "type": "text", "id": "alt", "label": "Bildbeschreibung", "default": "Vier Fahrerinnen und Fahrer auf Custom-Harleys in einer Halle, die Scheinwerfer an" }
   ],
   "presets": [{ "name": "Seitenkopf Über uns" }],
   "enabled_on": { "templates": ["page"] }
