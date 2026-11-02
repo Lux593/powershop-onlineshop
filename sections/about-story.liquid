@@ -114,7 +114,7 @@
             id="etappe-{{ block.id }}"
             {{ block.shopify_attributes }}
           >
-            <figure class="leaf__media" style="--focus: {{ focus | escape }}">
+            <figure class="leaf__media" style="--focus: {{ focus | escape }}{% if b.focus_mobile != blank %}; --focus-m: {{ b.focus_mobile | escape }}{% endif %}">
               {%- for key in shots limit: 4 -%}
                 {%- liquid
                   assign img = nil
@@ -296,6 +296,7 @@
         { "type": "text", "id": "asset", "label": "Standard-Foto im Theme", "info": "Datei in assets/, wenn oben kein Foto gewählt ist. Beides leer = dunkle Fläche." },
         { "type": "text", "id": "alt", "label": "Bildbeschreibung" },
         { "type": "text", "id": "focus", "label": "Bildausschnitt", "default": "50% 50%", "info": "Welcher Punkt des Fotos sichtbar bleibt, waagerecht und senkrecht in Prozent, z. B. „50% 30%“. Gilt nur für das Foto oben, weitere Fotos zeigen ihre Mitte." },
+        { "type": "text", "id": "focus_mobile", "label": "Bildausschnitt am Handy", "info": "Optional, bis 899 px Breite, sonst gilt der Bildausschnitt oben. Am Handy ist das Foto schmaler, z. B. „75% 50%“ rückt es nach links." },
         { "type": "checkbox", "id": "mono", "label": "Schwarz-weiß", "default": false, "info": "Wie das Foto von 1985. Gilt für alle Fotos der Etappe." },
         { "type": "header", "content": "Weitere Fotos" },
         { "type": "paragraph", "content": "Ab zwei Fotos steht unter dem Text eine Vorschau, durch die man sich klicken kann. Höchstens vier Fotos je Etappe, das Foto oben zählt mit." },

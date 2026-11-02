@@ -14,6 +14,12 @@
     Leer = die Karte steht da (Klasse is-in von Anfang an, damit pages.css Punkt und Schild nicht versteckt), und der Pin trägt
     data-reveal und landet allein, sobald er ins Bild kommt (motion.js).
   @param {object} [address_lines] - Liste (Array) der Adresszeilen unter „Power Shop“ im Schild (Über uns, am Handy). Ohne Angabe steht dort keine Adresse.
+  @param {boolean} [film] - true zeigt statt der Karte den Film „Flug zum Laden“ (seit dem 2.11.): Startbild ist die Karte mit Bar & Shield
+    und Schild „Power Shop“ (eingebrannt, darum ohne Länder, Pin und Schild als HTML). Ein Klick auf Logo oder Schild fliegt zum Laden
+    (Film vorwärts), am Ende steht das Bild still und „Zurück zur Karte“ erscheint; der Knopf spielt den umgedrehten Film. Ablauf in
+    assets/visit-film.js, Styles in assets/pages.css. Dateien: visit-film-1080/-720.mp4 (vorwärts), visit-film-rueck-1080/-720.mp4
+    (rückwärts), visit-film-start-*/-ende-*.webp (erstes und letztes Bild). Alle ohne Ton, unten um die eingebrannte Quellenangabe
+    gekürzt (1392 × 1440 aus dem Original 1392 × 1488); die Quellenangabe steht als Link darüber. Ohne Skript bleibt das Startbild stehen.
 
   @example
   {% render 'visit-map' %}
@@ -21,6 +27,33 @@
   @example
   {% render 'visit-map', sizes: '(min-width: 900px) 100vw, 230vw', ring: false, logo: true, reveal: '', address_lines: lines %}
 {% enddoc %}
+{%- if film -%}
+        <div class="visit__map visit__map--film" data-reveal="clip" data-visit-film>
+          <div class="visit__frame">
+            <div class="visit__film">
+              <img
+                class="visit__still"
+                src="{{ 'visit-film-start-1080.webp' | asset_url }}"
+                srcset="{{ 'visit-film-start-720.webp' | asset_url }} 720w, {{ 'visit-film-start-1080.webp' | asset_url }} 1080w"
+                data-end-srcset="{{ 'visit-film-ende-720.webp' | asset_url }} 720w, {{ 'visit-film-ende-1080.webp' | asset_url }} 1080w"
+                sizes="(min-width: 1280px) 720px, 100vw"
+                width="1080"
+                height="1118"
+                alt="Karte des Dreiländerecks mit Weil am Rhein, Basel und Saint-Louis. Markiert ist der Power Shop in Weil am Rhein-Haltingen."
+                data-alt-end="Der Power Shop von außen: weißes Haus mit großem Harley-Davidson-Schriftzug, davor das Team und Motorräder."
+                loading="lazy"
+              >
+              <video class="visit__video" data-film="hin" muted playsinline preload="none" disablepictureinpicture aria-hidden="true" tabindex="-1"
+                data-src="{{ 'visit-film-1080.mp4' | asset_url }}" data-src-m="{{ 'visit-film-720.mp4' | asset_url }}"></video>
+              <video class="visit__video" data-film="zurueck" muted playsinline preload="none" disablepictureinpicture aria-hidden="true" tabindex="-1"
+                data-src="{{ 'visit-film-rueck-1080.mp4' | asset_url }}" data-src-m="{{ 'visit-film-rueck-720.mp4' | asset_url }}"></video>
+              <button class="visit__fly" type="button" aria-label="Zum Power Shop heranfliegen" hidden><i class="visit__ring"></i></button>
+            </div>
+          </div>
+          <button class="btn btn--primary btn--sm visit__back" type="button" hidden>{% render 'icon', name: 'arrow-right' %}Zurück zur Karte</button>
+          <a class="visit__credit" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">Karte © OpenStreetMap-Mitwirkende<span class="sr-only"> (öffnet neues Fenster)</span></a>
+        </div>
+{%- else -%}
 {%- liquid
   assign map_sizes = sizes | default: '(min-width: 1280px) 1300px, (min-width: 640px) 100vw, 160vw'
   assign show_ring = true
@@ -80,3 +113,4 @@
           </div>
           <a class="visit__credit" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">Karte © OpenStreetMap-Mitwirkende<span class="sr-only"> (öffnet neues Fenster)</span></a>
         </div>
+{%- endif -%}

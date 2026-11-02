@@ -12,6 +12,8 @@
   (neben bzw. über den Angaben), steht jetzt der Name des Ladens („Harley-Davidson Power Shop“, Einstellung „Name über der Adresse“),
   mit dem orangen Bar & Shield davor (wie im Header), fett und direkt über der Adresse, am Handy also unter der Karte. Die Straße steht
   seitdem nicht mehr fett, sondern wie der Ort.
+  Karte als Film (Einstellung, Standard an, seit dem 2.11.): Statt des Kartenbilds steht der Film „Flug zum Laden“, ein Klick auf Logo
+  oder Schild fliegt hin, „Zurück zur Karte“ zurück (snippets/visit-map.liquid, assets/visit-film.js). Ausgeschaltet die Karte als Bild.
   „Route planen“ öffnet Google Maps in einem neuen Fenster, eingebettet wird nichts. Die Öffnungszeiten stehen hier, die
   Kontakt-Box zeigt sie darum nicht noch einmal (hours: false). Styles in assets/pages.css.
 {%- endcomment -%}
@@ -40,7 +42,7 @@
     </div>
     <div class="container visit__grid">
       {%- if section.settings.show_map -%}
-        {%- render 'visit-map' -%}
+        {%- render 'visit-map', film: section.settings.film -%}
       {%- endif -%}
 
       <div class="visit__info">
@@ -79,6 +81,9 @@
       {% render 'contact-box', anchor: contact_anchor, title: section.settings.contact_title, topics: 'probefahrt,inzahlungnahme,finanzierung,versicherung,lieferung,werkstatt,frage', topic: 'frage', hours: false %}
     </div>
   </section>
+  {%- if section.settings.show_map and section.settings.film -%}
+    <script src="{{ 'visit-film.js' | asset_url }}" defer></script>
+  {%- endif -%}
 {%- endif -%}
 
 {% schema %}
@@ -92,6 +97,7 @@
     { "type": "text", "id": "anchor", "label": "Anker (ohne #)", "default": "standort", "info": "Sprungziel, z. B. /pages/service#standort. Der Menüpunkt „Standort & Kontakt“ zeigt darauf." },
     { "type": "text", "id": "note", "label": "Satz unter der Adresse", "default": "Im Stadtteil Haltingen, mitten im Dreiländereck." },
     { "type": "checkbox", "id": "show_map", "label": "Karte des Dreiländerecks zeigen", "default": true },
+    { "type": "checkbox", "id": "film", "label": "Karte als Film", "default": true, "info": "Ein Klick auf Logo oder „Power Shop“ fliegt zum Laden, ein Knopf fliegt zurück. Aus: die Karte mit Ländern und Pin als Bild." },
     {
       "type": "select",
       "id": "scheme",

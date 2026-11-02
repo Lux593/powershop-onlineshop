@@ -297,6 +297,40 @@ html:has(.service-subnav--sticky) { --subnav-h: 57px; scroll-padding-top: calc(v
   top: calc(var(--ay) * 1cqh - 0.3997 * var(--mw) / 1.6);
 }
 .visit__img { display: block; width: 100%; height: 100%; }
+
+/* ---------- Karte als Film (snippets/visit-map.liquid mit film, Ablauf in assets/visit-film.js, seit dem 2.11.) ----------
+   Die Ebene .visit__film verhält sich wie ein cover-Bild des Films (1392 × 1440, 0,9667 : 1): Sie füllt den Rahmen ganz, waagrecht
+   mittig (Logo und Schild stehen im Film schon fast mittig, 38–59 %), senkrecht über --fy wie object-position: 0,4665 legt das Logo
+   (46,65 % der Filmhöhe) auf 46,65 % des Rahmens, wie bei der Karte als Bild. Am Laden (is-there) rückt der Ausschnitt auf 0,2: In
+   breiten Rahmen (Desktop, Tablet) läge sonst der Schriftzug am Haus oben außerhalb. Der Schwenk beginnt erst, wenn das Bar & Shield
+   durchflogen ist (1,4 s), zurück sofort. Unten liegt das Standbild (Anfang bzw. Ende des Films), darüber die beiden Filme; sichtbar
+   ist nur der, der gerade läuft oder steht (is-shown). */
+.visit__film {
+  --fw: max(100cqw, 96.67cqh);
+  --fy: 0.4665;
+  position: absolute;
+  width: var(--fw);
+  aspect-ratio: 1392 / 1440;
+  left: calc((100cqw - var(--fw)) / 2);
+  top: calc((100cqh - var(--fw) * 1.0345) * var(--fy));
+  transition: top 1.6s var(--ease) 0s;
+}
+.visit__map--film.is-there .visit__film { --fy: 0.2; transition-delay: 1.4s; }
+.visit__map--film.is-calm .visit__film { transition: none; }
+.visit__still, .visit__video { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; }
+.visit__video { visibility: hidden; }
+.visit__video.is-shown { visibility: visible; }
+/* Klickfläche über Logo und Schild im Film (dort 38,4–59,5 % × 44,5–48,8 %), mit etwas Luft. Der Ring sitzt auf dem Logo. */
+.visit__fly { position: absolute; z-index: 1; left: 36.5%; top: 42%; width: 24.5%; height: 9.5%; padding: 0; background: none; border: 0; border-radius: 4px; cursor: pointer; }
+.visit__fly:focus-visible { outline: 2px solid var(--c-orange); outline-offset: 4px; }
+.visit__fly .visit__ring { left: calc(20.4% - 24px); top: calc(49% - 24px); }
+.visit__map--film.is-busy { cursor: progress; }
+/* Zurück zur Karte: unten links im Bild, erscheint, wenn der Film am Laden steht */
+.visit__back { position: absolute; z-index: 3; left: 16px; bottom: 16px; }
+.visit__back .icon { scale: -1 1; }
+/* Die Quellenangabe gehört zur Karte: am Laden blendet sie aus */
+.visit__map--film .visit__credit { transition: opacity var(--t-fast) var(--ease); }
+.visit__map--film.is-there .visit__credit { opacity: 0; pointer-events: none; }
 .visit__label, .visit__mark, .visit__pin { position: absolute; left: var(--x); top: var(--y); pointer-events: none; }
 .visit__label { z-index: 1; translate: -50% -50%; font: 700 11px/1 var(--f-head); letter-spacing: 0.26em; text-transform: uppercase; white-space: nowrap; color: rgb(233 230 225 / 0.64); }
 .visit__label--end { translate: -100% -50%; } /* endet am Kartenpunkt und bleibt so auf deutschem Gebiet */
@@ -333,6 +367,9 @@ html:has(.service-subnav--sticky) { --subnav-h: 57px; scroll-padding-top: calc(v
   .has-motion .visit__map:not(.is-in) .visit__dot { opacity: 0; translate: 0 -18px; }
   .has-motion .visit__map:not(.is-in) .visit__tag { opacity: 0; translate: 0 calc(-50% - 18px); }
   .has-motion .visit__map.is-in .visit__ring { animation: visit-ring 1700ms var(--ease-out) 850ms 2; }
+  /* Film: Der Ring lädt zum Klicken ein, unter dem Zeiger und mit Tastaturfokus läuft er weiter. Der Zurück-Knopf blendet ein. */
+  .has-motion .visit__fly:hover .visit__ring, .has-motion .visit__fly:focus-visible .visit__ring { animation: visit-ring 1700ms var(--ease-out) infinite; }
+  .has-motion .visit__back:not([hidden]) { animation: ps-fade 400ms var(--ease-out) backwards; }
 }
 
 .visit__address { display: grid; gap: 6px; font-style: normal; }

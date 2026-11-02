@@ -75,6 +75,7 @@ Austausch den Dateinamen aus der Liste streichen (siehe `README.md`).
 | `service-standort.jpg` | 1200 × 800 | Lifestyle/Marke | Platzhalter | Außenansicht Power Shop mit Logo, Abendstimmung | Service · Standort |
 | `messanleitung.jpg` | 800 × 600 | Freisteller | Platzhalter | Illustration: Messpunkte Brust, Taille, Hüfte, Innenbeinlänge | Größentabellen-Popup |
 | `hd-bar-shield.png` | 190 × 154 | Logo | echt | Offizielles H-D Bar & Shield, transparenter Hintergrund (Ersatz laut Briefing aus dem Händlerportal) | Header, Mobile-Menü, Footer |
+| `hd-bar-shield-pin.png` | 190 × 154 | Logo | echt | Wie `hd-bar-shield.png`, das Innere schwarz gefüllt (2.11.), damit auf der Karte keine Straßennamen durchscheinen | Karte „Komm vorbei“ · Pin (wenn die Karte als Bild statt als Film steht) |
 | `power-shop-signet.svg` | Vektor | Logo | echt | Power-Shop-Signet | Favicon, Passwortseite, Geschenkgutschein |
 
 `story-werkstatt.jpg` (1200 × 900, Mechaniker bei der Arbeit in der Werkstatt) liegt noch in `assets/` und steht in der Platzhalterliste,
@@ -104,6 +105,7 @@ Die gesamte Liste der offenen Händlerfreigaben steht in [`freigaben.md`](freiga
 | `clothing-herren.mp4` · `clothing-herren-poster.jpg` | 960 × 720, ca. 18 s | Kategorieseite Herren · Film-Intro |
 | `clothing-damen.mp4` · `clothing-damen-poster.jpg` | 960 × 720, ca. 6 s | Kategorieseite Damen · Film-Intro |
 | `werkstatt-intro.mp4` · `werkstatt-intro-poster.jpg` | 960 × 720, 24 fps, ca. 15 s, ohne Ton | Werkstatt · Seitenkopf. Quelle `~/Downloads/werkstatt-intro.mp4` (1920 × 1080, 6 s, Kamerafahrt). Mitte 4 : 3 (`crop=1440:1080:240:0`), `minterpolate` auf 192 fps, Zeitkurve mit sanftem Anlauf (erste 0,5 s) und Auslauf (letzte 1 s bis Bild 143), dann vorwärts und rückwärts aneinander (Ping-Pong, Doppelbilder an den Wenden entfernt): keine harte Schleife. x264 slow, CRF 26. Poster = Bild 0. |
+| `visit-film-1080.mp4` · `visit-film-720.mp4` · `visit-film-rueck-1080.mp4` · `visit-film-rueck-720.mp4` · `visit-film-start-1080/-720.webp` · `visit-film-ende-1080/-720.webp` | 1080 × 1118 bzw. 720 × 744, 24 fps, 3,04 s (73 Bilder), ohne Ton | „Komm vorbei“ (Über uns, Service) · Karte als Film „Flug zum Laden“, seit 2.11. Quelle: Upload `location-zoom.mp4` des Händlers (1392 × 1488, mit Tonspur): Karte mit Bar & Shield und Schild „Power Shop“, Flug durch das Logo, Ende vor der Ladenfront mit Team. Unten 48 px abgeschnitten (`crop=1392:1440:0:0`, dort war die Quellenangabe eingebrannt; sie steht als Link darüber), Ton entfernt (`-an`). x264 veryslow, CRF 26 (1080) bzw. 27 (720), Keyframe alle 12 Bilder, `faststart`. Rückwärts mit `reverse`. Standbilder = Bild 0 und Bild 72 als WebP (Qualität 80 bzw. 78). Ca. 1,2 MB je Richtung (1080), 0,6 MB (720). |
 
 ## Custom-Umbauten (Werkstatt-Seite)
 

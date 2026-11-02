@@ -39,6 +39,8 @@ html:has(.about-story) { --stage-h: max(520px, calc(100svh - var(--header-h) - e
 .leaf { position: relative; display: grid; overflow: hidden; overflow: clip; background: var(--c-white); border-top: 1px solid var(--c-line); }
 .leaf__media { position: relative; overflow: hidden; min-height: 320px; margin: 0; background: var(--c-anthracite); }
 .leaf__media > img { width: 100%; height: 100%; object-fit: cover; object-position: var(--focus, 50% 50%); filter: var(--photo-grade); }
+/* Am Handy eigener Ausschnitt, wenn die Etappe einen hat („Bildausschnitt am Handy“, --focus-m): das Foto ist dort schmaler */
+@media (max-width: 899.98px) { .leaf__media > img { object-position: var(--focus-m, var(--focus, 50% 50%)); } }
 .leaf--mono .leaf__media > img { filter: grayscale(1) contrast(1.12) brightness(.98); }
 .leaf__body {
   display: flex;

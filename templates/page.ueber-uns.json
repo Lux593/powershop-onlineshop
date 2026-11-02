@@ -63,6 +63,7 @@
             "asset": "ueber-uns-vorplatz-1280.jpg",
             "alt": "Falk, Franziska und Richard Link (von links) in weißen Harley-Davidson-Shirts auf dem Vorplatz, dahinter eine Reihe Motorräder",
             "focus": "10% 50%",
+            "focus_mobile": "66% 50%",
             "mono": true,
             "assets_more": "ueber-uns-hog-1280.jpg | Gruppenfoto mit H.O.G.-Chapter-Banner auf einer Wiese vor einem Steintor"
           }
