@@ -120,6 +120,7 @@
                   assign img = nil
                   assign file = ''
                   assign alt = ''
+                  assign shot_m = ''
                   if key == 'main'
                     assign img = b.image
                     assign file = b.asset
@@ -131,9 +132,15 @@
                   else
                     assign line_index = key | remove_first: 'a' | plus: 0
                     assign line = more_lines[line_index]
+                    comment
+                      Zeile: Datei | Beschreibung | Ausschnitt am Handy (optional, seit dem 2.11., z. B. „50% 0%“)
+                    endcomment
                     assign line_parts = line | split: '|'
                     assign file = line_parts.first | strip
-                    assign alt = line | remove_first: line_parts.first | remove_first: '|' | strip
+                    assign alt = line_parts[1] | strip
+                    if line_parts.size > 2
+                      assign shot_m = line_parts[2] | strip
+                    endif
                   endif
 
                   comment
@@ -179,7 +186,12 @@
                     capture shot_html
                       render 'media', image: img, asset: file, srcset: img_srcset, width: img_w, height: img_h, alt: alt, sizes: '(min-width: 900px) 52vw, 100vw', loading: 'lazy', class: 'leaf__more'
                     endcapture
-                    echo shot_html | replace_first: '<img', '<img hidden'
+                    assign img_open = '<img hidden'
+                    if shot_m != blank
+                      assign shot_safe = shot_m | escape
+                      assign img_open = '<img hidden style="--shot-m: ' | append: shot_safe | append: '"'
+                    endif
+                    echo shot_html | replace_first: '<img', img_open
                   endif
 
                   comment
@@ -303,7 +315,7 @@
         { "type": "image_picker", "id": "image_2", "label": "Weiteres Foto 2", "info": "Die Bildbeschreibung kommt aus dem Alt-Text des Bildes in Shopify." },
         { "type": "image_picker", "id": "image_3", "label": "Weiteres Foto 3" },
         { "type": "image_picker", "id": "image_4", "label": "Weiteres Foto 4" },
-        { "type": "textarea", "id": "assets_more", "label": "Weitere Fotos im Theme", "placeholder": "ueber-uns-theke-1280.jpg | Holztheke im Showroom", "info": "Eine Zeile je Foto: Dateiname in assets/, dann | und die Bildbeschreibung. Wird nur genutzt, wenn oben keine weiteren Fotos gewählt sind. Endet der Name auf -1280.jpg, muss daneben dieselbe Datei auf -720.jpg liegen: Sie dient kleinen Bildschirmen und der Vorschau." }
+        { "type": "textarea", "id": "assets_more", "label": "Weitere Fotos im Theme", "placeholder": "ueber-uns-theke-1280.jpg | Holztheke im Showroom", "info": "Eine Zeile je Foto: Dateiname in assets/, dann | und die Bildbeschreibung, optional noch | und der Bildausschnitt am Handy (z. B. 50% 0%: oben bleibt sichtbar). Wird nur genutzt, wenn oben keine weiteren Fotos gewählt sind. Endet der Name auf -1280.jpg, muss daneben dieselbe Datei auf -720.jpg liegen: Sie dient kleinen Bildschirmen und der Vorschau." }
       ]
     }
   ],

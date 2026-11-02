@@ -320,10 +320,25 @@ html:has(.service-subnav--sticky) { --subnav-h: 57px; scroll-padding-top: calc(v
 .visit__still, .visit__video { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; }
 .visit__video { visibility: hidden; }
 .visit__video.is-shown { visibility: visible; }
-/* Klickfläche über Logo und Schild im Film (dort 38,4–59,5 % × 44,5–48,8 %), mit etwas Luft. Der Ring sitzt auf dem Logo. */
-.visit__fly { position: absolute; z-index: 1; left: 36.5%; top: 42%; width: 24.5%; height: 9.5%; padding: 0; background: none; border: 0; border-radius: 4px; cursor: pointer; }
+/* Klickfläche über Logo und Schild im Film (dort 38,4–59,5 % × 44,5–48,8 %) und dem Hinweis darunter, mit etwas Luft: 36,5–61 % ×
+   42–56 % der Filmebene. Der Ring sitzt auf dem Logo (41,5 % / 46,65 %), der Hinweis mittig unter der Gruppe (Mitte 49 %, 12 px unter dem Schild),
+   umgerechnet in Prozent der Klickfläche. Der Hinweis zeigt, dass man klicken kann (Wunsch vom 2.11.: „sonst checkt das keiner“). */
+.visit__fly { position: absolute; z-index: 1; left: 36.5%; top: 42%; width: 24.5%; height: 14%; padding: 0; color: var(--c-white); background: none; border: 0; border-radius: 4px; cursor: pointer; }
 .visit__fly:focus-visible { outline: 2px solid var(--c-orange); outline-offset: 4px; }
-.visit__fly .visit__ring { left: calc(20.4% - 24px); top: calc(49% - 24px); }
+.visit__fly .visit__ring { left: calc(20.4% - 24px); top: calc(33.2% - 24px); }
+.visit__hint {
+  position: absolute; left: 50.8%; top: calc(53.6% + 12px); translate: -50% 0; /* 12 px unter dem Schild (Unterkante 49,5 % der Ebene) */
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 10px 5px;
+  font: 700 12px/1 var(--f-head); letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap;
+  color: var(--c-white); background: rgb(10 10 10 / 0.88); border: 1px solid rgb(242 103 34 / 0.7);
+  box-shadow: 0 8px 18px rgb(0 0 0 / 0.45);
+  transition: background-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+}
+.visit__hint .icon { width: 11px; height: 11px; color: var(--c-orange); transition: color var(--t-fast) var(--ease); }
+.visit__fly:hover .visit__hint, .visit__fly:focus-visible .visit__hint { color: var(--c-black); background: var(--c-orange); }
+.visit__fly:hover .visit__hint .icon, .visit__fly:focus-visible .visit__hint .icon { color: var(--c-black); }
+@media (min-width: 1024px) { .visit__hint { padding: 7px 12px 6px; font-size: 13px; } }
 .visit__map--film.is-busy { cursor: progress; }
 /* Zurück zur Karte: unten links im Bild, erscheint, wenn der Film am Laden steht */
 .visit__back { position: absolute; z-index: 3; left: 16px; bottom: 16px; }
@@ -361,6 +376,7 @@ html:has(.service-subnav--sticky) { --subnav-h: 57px; scroll-padding-top: calc(v
 
 /* Ankunft: Ist die Karte eingeblendet (data-reveal, motion.js), landet der Pin, und ein Ring läuft zweimal aus */
 @keyframes visit-ring { from { opacity: 0.95; scale: 0.45; } to { opacity: 0; scale: 2.4; } }
+@keyframes visit-hint-bob { 0%, 100% { translate: -50% 0; } 45% { translate: -50% -5px; } }
 @media (prefers-reduced-motion: no-preference) {
   .has-motion .visit__map .visit__dot, .has-motion .visit__map .visit__tag { transition: opacity 500ms var(--ease) 500ms, translate 800ms var(--ease-out) 500ms; }
   .has-motion .visit__map .visit__tag { transition-delay: 660ms; }
@@ -370,6 +386,8 @@ html:has(.service-subnav--sticky) { --subnav-h: 57px; scroll-padding-top: calc(v
   /* Film: Der Ring lädt zum Klicken ein, unter dem Zeiger und mit Tastaturfokus läuft er weiter. Der Zurück-Knopf blendet ein. */
   .has-motion .visit__fly:hover .visit__ring, .has-motion .visit__fly:focus-visible .visit__ring { animation: visit-ring 1700ms var(--ease-out) infinite; }
   .has-motion .visit__back:not([hidden]) { animation: ps-fade 400ms var(--ease-out) backwards; }
+  /* Der Hinweis wippt nach dem Einblenden der Karte zweimal leicht nach oben */
+  .has-motion .visit__map.is-in .visit__hint { animation: visit-hint-bob 900ms var(--ease) 1.4s 2; }
 }
 
 .visit__address { display: grid; gap: 6px; font-style: normal; }

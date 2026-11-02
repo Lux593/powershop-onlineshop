@@ -24,6 +24,12 @@ html:has(.about-story) { --stage-h: max(520px, calc(100svh - var(--header-h) - e
 }
 
 .about-story {
+  /* Abstand unten am Handy (Etappe auf der Bühne): der Teil des Fensters unter der eingeblendeten Leiste von Safari (100lvh − 100svh),
+     dort enden Foto und Text. In iOS 26 schwebt die Leiste als Pille, darüber liegen rund 54 pt freie Seite: Mit dem vollen Abstand
+     standen zwischen Vorschau und Pille rund 70 pt (Rückmeldung vom iPhone, 2.11.). Nur in iOS-Safari (-webkit-touch-callout) darum
+     32 px weniger, dort reicht die Etappe 32 px unter 100svh. Unter iOS 18 und älter (feste Leiste) liegen diese 32 px bei
+     eingeblendeter Leiste hinter ihr, beim Scrollen blendet Safari sie aus. Android zeigt die Leiste oben, dort bleibt es beim vollen Wert. */
+  --bar-gap: calc(100lvh - 100svh);
   /* Balken: Link plus Rand oben und unten. Vor dem Skript halten die Etappen genau so viel Platz frei. */
   --rail-pad: 2px;
   --rail-link: 44px;
@@ -32,6 +38,7 @@ html:has(.about-story) { --stage-h: max(520px, calc(100svh - var(--header-h) - e
   background: var(--c-white);
 }
 .about-story__empty { padding: var(--s-4) var(--gutter); color: var(--c-muted); }
+@supports (-webkit-touch-callout: none) { .about-story { --bar-gap: max(0px, calc(100lvh - 100svh - 32px)); } }
 
 /* ---------------- Etappen ---------------- */
 /* overflow: clip statt hidden (hidden als Rückfall): clip macht keinen Scroll-Container, so kann Fokus oder die Suche im Browser
@@ -39,8 +46,9 @@ html:has(.about-story) { --stage-h: max(520px, calc(100svh - var(--header-h) - e
 .leaf { position: relative; display: grid; overflow: hidden; overflow: clip; background: var(--c-white); border-top: 1px solid var(--c-line); }
 .leaf__media { position: relative; overflow: hidden; min-height: 320px; margin: 0; background: var(--c-anthracite); }
 .leaf__media > img { width: 100%; height: 100%; object-fit: cover; object-position: var(--focus, 50% 50%); filter: var(--photo-grade); }
-/* Am Handy eigener Ausschnitt, wenn die Etappe einen hat („Bildausschnitt am Handy“, --focus-m): das Foto ist dort schmaler */
-@media (max-width: 899.98px) { .leaf__media > img { object-position: var(--focus-m, var(--focus, 50% 50%)); } }
+/* Am Handy eigener Ausschnitt, wenn die Etappe einen hat („Bildausschnitt am Handy“, --focus-m): Die Fläche ist dort etwa 2 : 1, von
+   fast quadratischen Fotos fällt oben und unten viel weg. Weitere Fotos der Galerie haben ihren eigenen (--shot-m, drittes Feld in
+   „Weitere Fotos im Theme“, seit dem 2.11.), sonst ihre Mitte. Steht nach der Regel für .leaf__more (unten) und gewinnt darum. */
 .leaf--mono .leaf__media > img { filter: grayscale(1) contrast(1.12) brightness(.98); }
 .leaf__body {
   display: flex;
@@ -77,6 +85,10 @@ html:has(.about-story) { --stage-h: max(520px, calc(100svh - var(--header-h) - e
 .leaf--gallery .leaf__media { isolation: isolate; }
 .leaf--gallery .leaf__media > img:first-child { position: relative; }
 .leaf__media > .leaf__more { position: absolute; inset: 0; object-position: 50% 50%; background: var(--c-anthracite); }
+@media (max-width: 899.98px) {
+  .leaf__media > img { object-position: var(--focus-m, var(--focus, 50% 50%)); }
+  .leaf__media > .leaf__more { object-position: var(--shot-m, 50% 50%); }
+}
 .leaf__media > img[aria-hidden="true"] { visibility: hidden; }
 .leaf__media > img.is-coming { z-index: 2; }
 
@@ -132,7 +144,7 @@ html:has(.about-story) { --stage-h: max(520px, calc(100svh - var(--header-h) - e
   .has-motion .about-story--stage:not(.is-live):not(.is-static) .leaf:first-child {
     margin-top: var(--rail-h);
     margin-bottom: 0;
-    padding-bottom: calc(100lvh - 100svh);
+    padding-bottom: var(--bar-gap);
   }
 }
 
@@ -275,7 +287,7 @@ html:has(.about-story.is-live) { scroll-behavior: auto; }
 /* ---------------- Handy: Foto oben, Text darunter ---------------- */
 @media (max-width: 899.98px) {
   .leaf { grid-template-rows: minmax(0, 46%) minmax(0, 1fr); min-height: 640px; }
-  .leaf__body { gap: 10px; padding: 18px var(--gutter) 22px; }
+  .leaf__body { gap: 10px; padding: 18px var(--gutter) 14px; }
   .leaf__year { font-size: clamp(56px, 16vw, 76px); }
   .leaf h3 { font-size: clamp(26px, 7.4vw, 32px); }
   .leaf__text p { margin-top: 10px; font-size: 15px; line-height: 1.55; }
@@ -286,7 +298,7 @@ html:has(.about-story.is-live) { scroll-behavior: auto; }
   /* Balken oben, die Bühne reicht bis 100lvh (oben). Der Innenabstand unten ist der Teil unter 100svh: Foto und Text haben dieselbe
      Höhe wie mit 100svh und enden über der ausgeklappten Leiste, darunter bleibt es weiß. */
   .about-story.is-live .about-story__rail { order: -1; }
-  .about-story.is-live .leaf { padding-bottom: calc(100lvh - 100svh); }
+  .about-story.is-live .leaf { padding-bottom: var(--bar-gap); }
   /* Die Fläche hinter seiner Leiste färbt Safari 26 nach dem festen Inhalt am unteren Rand, hier der gepinnten Bühne mit der Etappe
      (im iOS-Simulator geprüft, 30.10.: Seiten- und Abstandshalter-Farbe wirkten dort nicht). Am Handy ist ihr Grund darum weiß wie die
      Etappe, der Balken oben hat seinen eigenen schwarzen Grund. Der Abstandshalter des Pinnens ist ebenfalls weiß, falls ein Browser
@@ -323,7 +335,7 @@ html:has(.about-story.is-live) { scroll-behavior: auto; }
 }
 @media (max-width: 899.98px) and (max-height: 760px) {
   .leaf--gallery { grid-template-rows: minmax(0, 34%) minmax(0, 1fr); }
-  .leaf--gallery .leaf__body { gap: 8px; padding-top: 14px; padding-bottom: 16px; }
+  .leaf--gallery .leaf__body { gap: 8px; padding-top: 14px; padding-bottom: 10px; }
   .leaf--gallery .leaf__text p { margin-top: 8px; }
   .leaf--gallery .leaf__meta { display: flex; margin-top: 10px; }
   .leaf--gallery .leaf__thumbs { margin-top: 10px; }

@@ -42,7 +42,7 @@
     </div>
     <div class="container visit__grid">
       {%- if section.settings.show_map -%}
-        {%- render 'visit-map', film: section.settings.film -%}
+        {%- render 'visit-map', film: section.settings.film, film_hint: section.settings.film_hint -%}
       {%- endif -%}
 
       <div class="visit__info">
@@ -98,6 +98,7 @@
     { "type": "text", "id": "note", "label": "Satz unter der Adresse", "default": "Im Stadtteil Haltingen, mitten im Dreiländereck." },
     { "type": "checkbox", "id": "show_map", "label": "Karte des Dreiländerecks zeigen", "default": true },
     { "type": "checkbox", "id": "film", "label": "Karte als Film", "default": true, "info": "Ein Klick auf Logo oder „Power Shop“ fliegt zum Laden, ein Knopf fliegt zurück. Aus: die Karte mit Ländern und Pin als Bild." },
+    { "type": "text", "id": "film_hint", "label": "Hinweis unter dem Logo", "default": "Zum Laden fliegen", "info": "Nur mit „Karte als Film“: zeigt, dass man auf Logo oder Hinweis klicken kann." },
     {
       "type": "select",
       "id": "scheme",

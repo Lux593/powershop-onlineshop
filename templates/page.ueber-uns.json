@@ -33,8 +33,9 @@
             "asset": "ueber-uns-team-gerhard.jpg",
             "alt": "Porträt von Gerhard Link, Gründer des Power Shop",
             "focus": "50% 30%",
+            "focus_mobile": "50% 5%",
             "mono": true,
-            "assets_more": "ueber-uns-1991-678.jpg | Altes Farbfoto: weißes Haus mit großem Power-Shop-Schriftzug und Harley-Davidson-Schild, davor Motorräder und ein rotes Auto"
+            "assets_more": "ueber-uns-1991-678.jpg | Altes Farbfoto: weißes Haus mit großem Power-Shop-Schriftzug und Harley-Davidson-Schild, davor Motorräder und ein rotes Auto | 50% 0%"
           }
         },
         "1991": {
@@ -48,6 +49,7 @@
             "asset": "ueber-uns-1991-678.jpg",
             "alt": "Altes Farbfoto: weißes Haus mit großem Power-Shop-Schriftzug und Harley-Davidson-Schild, davor Motorräder und ein rotes Auto",
             "focus": "50% 50%",
+            "focus_mobile": "50% 0%",
             "mono": false,
             "assets_more": "ueber-uns-gebaeude-744.jpg | Zeichnung eines Hauses mit Harley-Davidson-Schriftzug über den Schaufenstern"
           }
