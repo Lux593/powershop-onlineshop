@@ -87,16 +87,16 @@ html:has(.about-head):has(.service-subnav) {
 }
 
 /* ---------- „Weiter“: Hinweis zum Weiterscrollen wie im Hero der Startseite (assets/hero.css, .hero__scroll) ----------
-   Wort plus Linie mit wanderndem Orange. Am Desktop links unter dem Text, bündig mit der Überschrift: mittig läge er auf der
-   Fotokante. Unter dem Abdunkeln (::after, z-index 2), dunkelt also mit ab; mit der Bühne blendet about-story.js ihn beim Wegscrollen
+   Wort plus Linie mit wanderndem Orange. Am Desktop mittig im schwarzen Feld links neben dem Foto (dessen Kante liegt bei 108 % / 2,08):
+   mittig über die ganze Breite läge er auf der Fotokante, mittig im Foto auf dem Vorderrad, bündig links mit der Überschrift stand er
+   verloren in der Ecke (Rückmeldung vom 2.11.). Am Handy mittig über die volle Breite wie auf der Startseite. Unter dem Abdunkeln (::after, z-index 2), dunkelt also mit ab; mit der Bühne blendet about-story.js ihn beim Wegscrollen
    per Inline-Opacity aus. Mit Tastaturfokus bleibt er sichtbar (WCAG 2.4.7), !important schlägt das Inline-Style.
    Bewegung: Das Orange wandert zweimal durch die Linie (3,8 s) und füllt sie dann ganz. Unter 5 s braucht es keine Pause-Taste
    (WCAG 2.2.2), der Hero der Startseite hat eine, der Kopf nicht. Ohne Bewegung steht die Linie gleich voll orange. */
 .about-head__scroll {
   position: absolute; z-index: 1;
-  left: max(var(--gutter), calc((100% - var(--container)) / 2 + var(--gutter)));
+  left: calc(108% / 2.08 / 2); translate: -50% 0;
   bottom: calc(16px + var(--about-head-skirt));
-  margin-left: -12px; /* das Wort sitzt bündig mit der Überschrift, der Innenabstand liegt links davor */
   display: flex; flex-direction: column; align-items: center; gap: 8px;
   min-width: 44px; min-height: 44px; padding: 6px 12px;
   color: var(--c-offwhite);
@@ -130,6 +130,6 @@ html:has(.about-head):has(.service-subnav) {
   /* Platz für den Hinweis unter dem Satz: Er ist gut 60 px hoch (Wort, 24 px Linie wie am Handy auf der Startseite) und steht 12 px über
      dem Rand, dazu gut 20 px Luft zum Satz */
   .about-head:has(.about-head__scroll) .about-head__text { padding-bottom: 96px; }
-  .about-head__scroll { bottom: calc(12px + var(--about-head-skirt)); }
+  .about-head__scroll { left: 50%; bottom: calc(12px + var(--about-head-skirt)); }
   .about-head__scroll-line { height: 24px; }
 }

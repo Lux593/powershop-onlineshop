@@ -29,9 +29,9 @@
         "tile_acc_mode": { "type": "tile", "settings": { "parent": "Accessoires", "group": "Mode-Accessoires", "image_asset": "mega-accessoires-mode.webp", "focus": "center" } },
         "tile_acc_zuhause": { "type": "tile", "settings": { "parent": "Accessoires", "group": "Zuhause & Garage", "image_asset": "bento-accessoires-eiskuebel.jpg", "focus": "center" } },
         "tile_acc_extras": { "type": "tile", "settings": { "parent": "Accessoires", "group": "Biker-Extras & Geschenke", "image_asset": "bento-teile.jpg", "focus": "center" } },
-        "tile_service_werkstatt": { "type": "tile", "settings": { "parent": "Service", "group": "Werkstatt", "image_asset": "mega-service-werkstatt.webp", "text": "Inspektion, Einbau, Custom-Umbau …", "focus": "center" } },
+        "tile_service_werkstatt": { "type": "tile", "settings": { "parent": "Service", "group": "Werkstatt", "text": "Inspektion, Einbau, Custom-Umbau …", "image_asset": "mega-service-werkstatt.webp", "focus": "center" } },
         "tile_service_dienstleistungen": { "type": "tile", "settings": { "parent": "Service", "group": "Dienstleistungen", "image_asset": "mega-service-dienstleistungen.webp", "focus": "center" } },
-        "tile_service_ueber_uns": { "type": "tile", "settings": { "parent": "Service", "group": "Über uns", "image_asset": "mega-service-ueber-uns.webp", "text": "Geschichte, Team, Anfahrt", "focus": "center" } },
+        "tile_service_ueber_uns": { "type": "tile", "settings": { "parent": "Service", "group": "Über uns", "text": "Geschichte, Team, Anfahrt", "image_asset": "mega-service-ueber-uns.webp", "focus": "center" } },
         "contact_service": { "type": "contact", "settings": { "parent": "Service", "title": "Direkter Draht" } }
       },
       "block_order": [
