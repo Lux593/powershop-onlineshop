@@ -259,7 +259,7 @@ html:has(.service-subnav--sticky) { --subnav-h: 57px; scroll-padding-top: calc(v
   .visit__head { margin-bottom: calc(var(--s-8) + var(--s-3)); }
 }
 /* Name des Ladens über der Adresse (am Handy unter der Karte), fett wie bis zum 2.11. die Straße, davor das orange Bar & Shield */
-.visit__name { display: flex; align-items: center; gap: 12px; margin-bottom: -6px; font-family: var(--f-head); font-weight: 800; font-size: clamp(28px, 2.4vw, 34px); line-height: 0.95; letter-spacing: 0.01em; text-transform: uppercase; text-wrap: balance; }
+.visit__store { display: flex; align-items: center; gap: 12px; margin-bottom: -6px; font-family: var(--f-head); font-weight: 800; font-size: clamp(28px, 2.4vw, 34px); line-height: 0.95; letter-spacing: 0.01em; text-transform: uppercase; text-wrap: balance; }
 .visit__shield { flex: none; width: auto; height: 1.15em; }
 .visit__map { position: relative; overflow: hidden; height: clamp(300px, 92vw, 440px); background: var(--c-black-soft); }
 .visit__frame { position: absolute; inset: 0; container-type: size; }
@@ -299,9 +299,12 @@ html:has(.service-subnav--sticky) { --subnav-h: 57px; scroll-padding-top: calc(v
 .visit__mark { z-index: 1; display: flex; align-items: center; gap: 8px; translate: -5px -50%; font-size: 12px; line-height: 1; white-space: nowrap; color: rgb(233 230 225 / 0.72); }
 .visit__mark i { width: 10px; height: 10px; border: 1.5px solid rgb(233 230 225 / 0.8); rotate: 45deg; }
 .visit__pin { z-index: 2; width: 0; height: 0; }
-.visit__dot { position: absolute; left: -11px; top: -11px; width: 22px; height: 22px; border-radius: 50%; background: var(--c-orange); border: 4px solid var(--c-black); box-shadow: 0 8px 18px rgb(0 0 0 / 0.55); }
+/* Pin: das orange Bar & Shield statt eines Punkts (Wunsch vom 2.11.), mittig auf dem Kartenpunkt. hd-bar-shield-pin.png ist
+   hd-bar-shield.png (190 × 154) mit schwarz gefülltem Inneren, sonst schienen Straßennamen durch.
+   Der Schatten hebt es von den Straßen ab. Das Schild „Power Shop“ rückt dafür weiter nach rechts. */
+.visit__dot { position: absolute; left: -22px; top: -18px; width: 44px; height: auto; max-width: none; filter: drop-shadow(0 0 1px rgb(0 0 0 / 0.9)) drop-shadow(0 6px 14px rgb(0 0 0 / 0.7)); }
 .visit__ring { position: absolute; left: -24px; top: -24px; width: 48px; height: 48px; border-radius: 50%; border: 2px solid var(--c-orange); opacity: 0; }
-.visit__tag { position: absolute; left: 22px; top: 0; translate: 0 -50%; padding: 7px 10px 6px; background: var(--c-black); color: var(--c-white); font: 700 13px/1 var(--f-head); letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; box-shadow: 0 8px 18px rgb(0 0 0 / 0.45); }
+.visit__tag { position: absolute; left: 32px; top: 0; translate: 0 -50%; padding: 7px 10px 6px; background: var(--c-black); color: var(--c-white); font: 700 13px/1 var(--f-head); letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; box-shadow: 0 8px 18px rgb(0 0 0 / 0.45); }
 @media (min-width: 1024px) {
   .visit__label { font-size: clamp(12px, 1.05vw, 15px); letter-spacing: 0.34em; }
   .visit__mark { font-size: 13px; }

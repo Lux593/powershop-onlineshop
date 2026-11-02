@@ -1,6 +1,6 @@
 {% doc %}
   Karte des Dreiländerecks mit dem Pin auf Burghölzle 15 (.visit__map): vorskaliertes WebP der OpenStreetMap, dazu Länder,
-  Dreiländereck, Pin mit Schild „Power Shop“ und Quellenangabe. Pin, Länder und Dreiländereck stehen in Prozent der Kartendatei,
+  Dreiländereck, Pin (seit dem 2.11. das orange H-D Bar & Shield statt eines Punkts) mit Schild „Power Shop“ und Quellenangabe. Pin, Länder und Dreiländereck stehen in Prozent der Kartendatei,
   die Kartenebene (.visit__layer) hält sie bei jedem Seitenverhältnis im Bild. Styles in assets/pages.css.
   Ohne Angaben gibt das Snippet genau die Karte aus, die sections/visit.liquid (Service, Kontakt) zeigt. Die Einrückung der Zeilen
   ist Teil davon: Ein Vergleich vor und nach einem Umbau (docs/qa/karte-ausschneiden.py) soll Zeichen für Zeichen gleich bleiben.
@@ -55,7 +55,7 @@
               <span class="visit__mark" style="--x: 55.98%; --y: 67.47%" aria-hidden="true"><i></i>Dreiländereck</span>
               <span class="visit__pin" style="--x: 66.51%; --y: 39.97%"{% if map_reveal == blank %} data-reveal{% endif %} aria-hidden="true">
                 {%- if show_ring -%}<i class="visit__ring"></i>{%- endif -%}
-                <i class="visit__dot"></i>
+                <img class="visit__dot" src="{{ 'hd-bar-shield-pin.png' | asset_url }}" width="190" height="154" alt="" loading="lazy">
                 {%- if logo or has_address -%}
                   <span class="visit__tag"><span class="visit__name">
                     {%- if logo -%}<img class="visit__logo" src="{{ 'hd-bar-shield.png' | asset_url }}" width="190" height="154" alt="" loading="lazy">{%- endif -%}
