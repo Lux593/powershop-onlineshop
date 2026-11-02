@@ -1,7 +1,9 @@
 {%- comment -%}
   Seitenkopf der Über-uns-Seite „Halle, dunkel“: schwarz, links Überschrift und Satz, rechts das Foto bis an den Rand, am
   Handy das Foto oben. Füllt den ersten Bildschirm. Die Überschrift ist die einzige h1 der Seite. Text zwischen zwei Sternen (*Familienhand.*) wird orange.
-  Das Foto setzt sich beim Laden aus einer leichten Vergrößerung (assets/about-head.css, nur mit Bewegung).
+  Das Foto setzt sich beim Laden aus einer leichten Vergrößerung (assets/about-head.css, nur mit Bewegung). Überschrift und Satz
+  kommen beim Laden wie im Hero der Startseite: die Überschrift Wort für Wort von unten (data-split), der Satz danach (data-reveal,
+  assets/motion.js).
   „Weiter“ unten (Einstellung, Standard an): Hinweis zum Weiterscrollen wie im Hero der Startseite, Wort plus Linie mit wanderndem Orange.
   Der Anker führt ans Ende des Kopfs (about-head__end), also zur Geschichte darunter. Mit der Bühne (sections/about-story.liquid) gleitet
   assets/about-story.js an die Stelle, an der der Kopf ganz weg ist, und blendet den Hinweis beim Wegscrollen aus.
@@ -47,13 +49,13 @@
 
 <section class="about-head on-dark" data-about-head aria-labelledby="about-head-title-{{ section.id }}">
   <div class="about-head__text">
-    <h1 id="about-head-title-{{ section.id }}">
+    <h1 id="about-head-title-{{ section.id }}" data-split="words">
       {%- for part in heading_parts -%}
         {%- assign inside = forloop.index0 | modulo: 2 -%}
         {%- if inside == 1 -%}<em>{{ part }}</em>{%- else -%}{{ part }}{%- endif -%}
       {%- endfor -%}
     </h1>
-    {%- if section.settings.text != blank -%}<p>{{ section.settings.text | escape }}</p>{%- endif -%}
+    {%- if section.settings.text != blank -%}<p data-reveal data-reveal-delay="350">{{ section.settings.text | escape }}</p>{%- endif -%}
   </div>
   {%- if photo != blank -%}
     <figure class="about-head__photo">{{ photo }}</figure>

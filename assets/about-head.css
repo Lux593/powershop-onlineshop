@@ -87,21 +87,22 @@ html:has(.about-head):has(.service-subnav) {
 }
 
 /* ---------- „Weiter“: Hinweis zum Weiterscrollen wie im Hero der Startseite (assets/hero.css, .hero__scroll) ----------
-   Wort plus Linie mit wanderndem Orange. Am Desktop mittig im schwarzen Feld links neben dem Foto (dessen Kante liegt bei 108 % / 2,08):
-   mittig über die ganze Breite läge er auf der Fotokante, mittig im Foto auf dem Vorderrad, bündig links mit der Überschrift stand er
-   verloren in der Ecke (Rückmeldung vom 2.11.). Am Handy mittig über die volle Breite wie auf der Startseite. Unter dem Abdunkeln (::after, z-index 2), dunkelt also mit ab; mit der Bühne blendet about-story.js ihn beim Wegscrollen
+   Wort plus Linie mit wanderndem Orange. Am Desktop genau auf der Kante zwischen Text und Foto (108 % / 2,08, fast die Mitte des
+   Fensters): Die Linie liegt auf der Kante, das Wort halb auf Schwarz, halb auf dem Foto (Wunsch vom 2.11.; ein Schatten hält es auf
+   dem Foto lesbar). Am Handy mittig über die volle Breite wie auf der Startseite. Blendet beim Laden nach Überschrift und Satz ein. Unter dem Abdunkeln (::after, z-index 2), dunkelt also mit ab; mit der Bühne blendet about-story.js ihn beim Wegscrollen
    per Inline-Opacity aus. Mit Tastaturfokus bleibt er sichtbar (WCAG 2.4.7), !important schlägt das Inline-Style.
-   Bewegung: Das Orange wandert zweimal durch die Linie (3,8 s) und füllt sie dann ganz. Unter 5 s braucht es keine Pause-Taste
+   Bewegung: Das Orange wandert zweimal durch die Linie (3,8 s, ab 1,4 s) und füllt sie dann ganz. Unter 5 s braucht es keine Pause-Taste
    (WCAG 2.2.2), der Hero der Startseite hat eine, der Kopf nicht. Ohne Bewegung steht die Linie gleich voll orange. */
 .about-head__scroll {
   position: absolute; z-index: 1;
-  left: calc(108% / 2.08 / 2); translate: -50% 0;
+  left: calc(108% / 2.08); translate: -50% 0;
   bottom: calc(16px + var(--about-head-skirt));
   display: flex; flex-direction: column; align-items: center; gap: 8px;
   min-width: 44px; min-height: 44px; padding: 6px 12px;
   color: var(--c-offwhite);
   font-family: var(--f-head); font-size: 13px; font-weight: 700;
   letter-spacing: 0.16em; text-transform: uppercase;
+  text-shadow: 0 1px 8px rgb(0 0 0 / 0.6);
 }
 .about-head__scroll:hover { color: var(--c-white); }
 .about-head__scroll:focus-visible { opacity: 1 !important; }
@@ -113,9 +114,10 @@ html:has(.about-head):has(.service-subnav) {
 }
 @keyframes about-head-scroll-fill { from { transform: translateY(-100%); } to { transform: none; } }
 @media (prefers-reduced-motion: no-preference) {
+  .has-motion .about-head__scroll { animation: ps-fade .6s var(--ease-out) 1.1s backwards; }
   .has-motion .about-head__scroll-line::after {
     transform: translateY(-100%);
-    animation: about-head-scroll 1.9s var(--ease) .6s 2 backwards, about-head-scroll-fill .8s var(--ease-out) 4.4s forwards;
+    animation: about-head-scroll 1.9s var(--ease) 1.4s 2 backwards, about-head-scroll-fill .8s var(--ease-out) 5.2s forwards;
   }
 }
 /* Anker am Ende des Kopfs: Ziel des Hinweises ohne Bühne */

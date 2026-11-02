@@ -1,8 +1,10 @@
 {%- comment -%}
-  Team der Über-uns-Seite als Spotlight (Blöcke „Person“): Titel, großes Foto, Name, Rolle und Text der gewählten Person, darunter
-  das ganze Team als Vorschau-Knöpfe, am Desktop dazu zwei Pfeile. Desktop ab 900 px: Titel hochkant links, daneben der Text, rechts
-  das Foto im Querformat 3 : 2 (breiter Ausschnitt mit dem ganzen Motorrad; ohne ihn steht das Quadrat ganz darin, auf Schwarz).
-  Handy: Titel, quadratisches Foto, Raster 4 × 2, Text; gewechselt wird per Vorschau oder Wischen auf dem Foto.
+  Team der Über-uns-Seite als Spotlight (Blöcke „Person“): Kopf aus Überschrift und Einleitung, großes Foto, Name, Rolle und Text
+  der gewählten Person, darunter das ganze Team als Vorschau-Knöpfe, am Desktop dazu zwei Pfeile. Desktop ab 900 px: oben der Kopf
+  waagrecht über die ganze Breite (wie die Abschnitte der Startseite), darunter links der Text, rechts das Foto im Querformat 3 : 2
+  (breiter Ausschnitt mit dem ganzen Motorrad; ohne ihn steht das Quadrat ganz darin, auf Schwarz). Bis zum 2.11. stand der Titel
+  am Desktop hochkant links. Überschrift und Einleitung blenden ein, wenn sie ins Bild kommen (data-split, data-reveal, motion.js).
+  Handy: Kopf, quadratisches Foto, Raster 4 × 2, Text; gewechselt wird per Vorschau oder Wischen auf dem Foto.
   Liquid rendert alle Personen vollständig. Ohne Skript stehen sie untereinander, je Foto und Text. assets/about-team.js setzt
   is-ready, zeigt dann nur die gewählte Person und wechselt (Foto senkrecht, aus 1,12 auf 1, nur mit Bewegung).
   Ohne Blöcke gibt die Section außerhalb des Editors nichts aus. Bei einer Person gibt es keine Pfeile und kein Raster.
@@ -23,7 +25,12 @@
 
 <section class="spot on-dark textured" id="team" data-about-team aria-labelledby="{{ title_id }}">
   <div class="container spot__grid">
-    <h2 class="spot__title" id="{{ title_id }}">{{ heading | escape }}</h2>
+    <div class="spot__head">
+      <h2 class="spot__title" id="{{ title_id }}" data-split="words">{{ heading | escape }}</h2>
+      {%- if section.settings.text != blank -%}
+        <p class="spot__intro" data-reveal data-reveal-delay="200">{{ section.settings.text | escape }}</p>
+      {%- endif -%}
+    </div>
     {%- if count == 0 -%}
       <p class="spot__empty">Noch keine Personen. Links unter „Team“ Blöcke „Person“ hinzufügen.</p>
     {%- endif -%}
@@ -164,7 +171,8 @@
   "class": "section-about-team",
   "max_blocks": 8,
   "settings": [
-    { "type": "text", "id": "heading", "label": "Überschrift", "default": "Das Team", "info": "Steht am Desktop hochkant links." }
+    { "type": "text", "id": "heading", "label": "Überschrift", "default": "Das Team", "info": "Steht oben über dem Team." },
+    { "type": "textarea", "id": "text", "label": "Einleitung", "default": "Hinter dem Power Shop stehen acht Leute, die ihr Handwerk gelernt haben und für Harley-Davidson brennen. Jeder von uns ist Profi in seinem Bereich, viele sind seit Jahren dabei. Das merkst du, wenn du zu uns kommst: in der Werkstatt, im Showroom und am Telefon.", "info": "Steht unter der Überschrift. Leer = keine Einleitung." }
   ],
   "blocks": [
     {
