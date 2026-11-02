@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "subnav": {
@@ -65,7 +74,7 @@
             "asset": "ueber-uns-vorplatz-1280.jpg",
             "alt": "Falk, Franziska und Richard Link (von links) in weißen Harley-Davidson-Shirts auf dem Vorplatz, dahinter eine Reihe Motorräder",
             "focus": "10% 50%",
-            "focus_mobile": "66% 50%",
+            "focus_mobile": "52% 50%",
             "mono": true,
             "assets_more": "ueber-uns-hog-1280.jpg | Gruppenfoto mit H.O.G.-Chapter-Banner auf einer Wiese vor einem Steintor"
           }
@@ -81,6 +90,7 @@
             "asset": "ueber-uns-theke-1280.jpg",
             "alt": "Holztheke und Merchandise-Regal im Showroom des Power Shop",
             "focus": "50% 58%",
+            "focus_mobile": "",
             "mono": false,
             "assets_more": "ueber-uns-werkstatt-1280.jpg | Werkstatt mit schwarzen Werkbänken, orangefarbener Wand und einer Harley-Davidson auf der Hebebühne"
           }
@@ -148,7 +158,8 @@
             "last_name": "Link",
             "role": "Sekretärin",
             "text": "Ingrid ist seit der allerersten Stunde dabei. Heute kümmert sie sich um alle Terminanfragen und die Verwaltung.",
-            "asset": "ueber-uns-team-ingrid.jpg"
+            "asset": "ueber-uns-team-ingrid.jpg",
+            "asset_wide": ""
           }
         },
         "jean": {
@@ -158,7 +169,8 @@
             "last_name": "Kibler",
             "role": "Zweiradmechatroniker",
             "text": "Jean-Nicolas arbeitet als Zweiradmechatroniker in unserer Werkstatt. Wartung und Reparatur an deinem Motorrad gehen über seine Werkbank.",
-            "asset": "ueber-uns-team-jean.jpg"
+            "asset": "ueber-uns-team-jean.jpg",
+            "asset_wide": ""
           }
         },
         "aaron": {
@@ -168,7 +180,8 @@
             "last_name": "Klosterhuber",
             "role": "Zweiradmechatroniker",
             "text": "Aaron ist Zweiradmechatroniker in unserer Werkstatt. Er kümmert sich um Inspektionen und Reparaturen.",
-            "asset": "ueber-uns-team-aaron.jpg"
+            "asset": "ueber-uns-team-aaron.jpg",
+            "asset_wide": ""
           }
         },
         "juergen": {
@@ -178,7 +191,8 @@
             "last_name": "Scheurer",
             "role": "Motorradaufbereitung",
             "text": "Jürgen ist bei uns für die Motorradaufbereitung zuständig. Er sorgt dafür, dass die Motorräder gepflegt dastehen.",
-            "asset": "ueber-uns-team-juergen.jpg"
+            "asset": "ueber-uns-team-juergen.jpg",
+            "asset_wide": ""
           }
         }
       },
@@ -201,9 +215,12 @@
       "type": "visit",
       "settings": {
         "heading": "Komm vorbei.",
+        "intro": "",
+        "name": "Harley-Davidson Power Shop",
         "anchor": "besuch",
         "note": "Im Stadtteil Haltingen, mitten im Dreiländereck.",
         "show_map": true,
+        "film": true,
         "scheme": "light",
         "contact_title": "Kontaktiere uns",
         "foot": "Zu weit für einen Besuch? Wir <a href=\"/pages/dienstleistungen#lieferung\">liefern dein Motorrad</a> bundesweit, in die Schweiz und nach Frankreich."
