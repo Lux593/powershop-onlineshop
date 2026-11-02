@@ -241,10 +241,13 @@ html:has(.service-subnav--sticky) { --subnav-h: 57px; scroll-padding-top: calc(v
    - 1024 bis 1279 px (iPad quer): Karte über die volle Breite, darunter Angaben und Kontakt-Box nebeneinander.
    - Ab 1280 px Karte links, rechts Überschrift, Angaben und Kontakt-Box. Die Karte wird so hoch wie die rechte Spalte, aber nie
      schmaler als 0,9 : 1, sonst fiele „Deutschland“ aus dem Bild. Die Rahmenbreite steht darum als Formel in der max-height.
-   Die Kartenebene verhält sich wie ein cover-Bild, das an einem Punkt verankert ist (Containereinheiten): Der Pin steht
-   immer bei --ax Prozent der Rahmenbreite und 39,97 % der Höhe, Länder und Dreiländereck bleiben bei jedem Seitenverhältnis
-   im Bild. Auf dem Handy rückt der Anker nach links (55 %), damit das Schild „Power Shop“ rechts neben dem Pin Platz hat;
-   --mw ist dort mindestens 135 % der Breite, damit die Karte den Rahmen trotzdem ganz füllt.
+   Die Kartenebene verhält sich wie ein cover-Bild, das an einem Punkt verankert ist (Containereinheiten). Seit dem 2.11. stehen
+   Bar & Shield und Schild „Power Shop“ zusammen in der Mitte des Rahmens: Der Pin steht bei --ax Prozent der Breite (50) minus
+   --shift (die halbe Breite von Logo, Abstand und Schild, gemessen vom Logo-Mittelpunkt: 49 px, ab 1024 px mit größerem Schild 60 px)
+   und bei --ay Prozent der Höhe (45, knapp über der Mitte: genau mittig bräuchte noch mehr Zoom, und das Dreiländereck fiele unten
+   heraus). In der Kartendatei liegt der Pin bei 66,51 % / 39,97 %, also rechts oberhalb der Mitte: Damit die Karte den Rahmen trotzdem
+   ganz füllt, ist sie mindestens 149,3 % der Breite plus 180 px breit (rechter Rand) und 180 % der Höhe mal 1,6 (oberer Rand). Bis dahin
+   stand der Pin bei 66,51 % (am Handy 55 %) der Breite und 39,97 % der Höhe, die Karte war entsprechend weniger vergrößert.
    Container ist .visit__frame, absolut über die ganze Karte gelegt: So steht seine Größe immer fest, auch wenn sich die Karte
    ab 1280 px nach der Nachbarspalte streckt (mit height:auto rechnet Chrome cqh sonst mit 0). */
 .visit { padding-block: var(--section-y); }
@@ -286,15 +289,23 @@ html:has(.service-subnav--sticky) { --subnav-h: 57px; scroll-padding-top: calc(v
   .visit__grid > .visit__map { grid-area: map; height: auto; min-height: clamp(460px, 38vw, 600px); max-height: calc((min(100vw, var(--container)) - 2 * var(--gutter) - 56px) * 7 / 12 / 0.9); }
 }
 
-.visit__layer { --ax: 55; --mw: max(135cqw, 160cqh); position: absolute; width: var(--mw); aspect-ratio: 1600 / 1000; left: calc(var(--ax) * 1cqw - 0.6651 * var(--mw)); top: calc(39.97cqh - 0.3997 * var(--mw) / 1.6); }
-@media (min-width: 640px) { .visit__layer { --ax: 66.51; --mw: max(100cqw, 160cqh); } }
+.visit__layer {
+  --ax: 50; --ay: 45; --shift: 49px;
+  --mw: max(calc(149.3cqw + 180px), 180cqh);
+  position: absolute; width: var(--mw); aspect-ratio: 1600 / 1000;
+  left: calc(var(--ax) * 1cqw - var(--shift) - 0.6651 * var(--mw));
+  top: calc(var(--ay) * 1cqh - 0.3997 * var(--mw) / 1.6);
+}
 .visit__img { display: block; width: 100%; height: 100%; }
 .visit__label, .visit__mark, .visit__pin { position: absolute; left: var(--x); top: var(--y); pointer-events: none; }
 .visit__label { z-index: 1; translate: -50% -50%; font: 700 11px/1 var(--f-head); letter-spacing: 0.26em; text-transform: uppercase; white-space: nowrap; color: rgb(233 230 225 / 0.64); }
 .visit__label--end { translate: -100% -50%; } /* endet am Kartenpunkt und bleibt so auf deutschem Gebiet */
-/* Breite, flache Rahmen (Handy quer, 200 % Zoom) zeigen nur ein Band der Karte: Länder, die oben oder unten herausfielen, entfallen
-   ganz statt halb abgeschnitten. Schweiz liegt am tiefsten (92 %), Deutschland am höchsten (16 %). */
-@container (aspect-ratio > 9 / 5) { .visit__label--south { display: none; } }
+/* Was nicht ins Bild passt, entfällt ganz statt halb abgeschnitten. Mit dem Pin in der Mitte zeigt die Karte links nur einen
+   schmalen Streifen Frankreich: Das Wort passt erst ab 1000 px Kartenbreite hinein. Schweiz liegt am tiefsten (76 %) und fällt aus
+   breiten, flachen Rahmen unten heraus. */
+.visit__label--west { display: none; }
+@container (min-width: 1000px) { .visit__label--west { display: block; } }
+@container (aspect-ratio > 7 / 5) or (max-width: 339px) { .visit__label--south { display: none; } }
 @container (aspect-ratio > 5 / 2) { .visit__label { display: none; } }
 .visit__mark { z-index: 1; display: flex; align-items: center; gap: 8px; translate: -5px -50%; font-size: 12px; line-height: 1; white-space: nowrap; color: rgb(233 230 225 / 0.72); }
 .visit__mark i { width: 10px; height: 10px; border: 1.5px solid rgb(233 230 225 / 0.8); rotate: 45deg; }
@@ -306,6 +317,7 @@ html:has(.service-subnav--sticky) { --subnav-h: 57px; scroll-padding-top: calc(v
 .visit__ring { position: absolute; left: -24px; top: -24px; width: 48px; height: 48px; border-radius: 50%; border: 2px solid var(--c-orange); opacity: 0; }
 .visit__tag { position: absolute; left: 32px; top: 0; translate: 0 -50%; padding: 7px 10px 6px; background: var(--c-black); color: var(--c-white); font: 700 13px/1 var(--f-head); letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; box-shadow: 0 8px 18px rgb(0 0 0 / 0.45); }
 @media (min-width: 1024px) {
+  .visit__layer { --shift: 60px; }
   .visit__label { font-size: clamp(12px, 1.05vw, 15px); letter-spacing: 0.34em; }
   .visit__mark { font-size: 13px; }
   .visit__tag { padding: 8px 12px 7px; font-size: 15px; }

@@ -1,6 +1,8 @@
 {% doc %}
   Karte des Dreiländerecks mit dem Pin auf Burghölzle 15 (.visit__map): vorskaliertes WebP der OpenStreetMap, dazu Länder,
-  Dreiländereck, Pin (seit dem 2.11. das orange H-D Bar & Shield statt eines Punkts) mit Schild „Power Shop“ und Quellenangabe. Pin, Länder und Dreiländereck stehen in Prozent der Kartendatei,
+  Dreiländereck, Pin (seit dem 2.11. das orange H-D Bar & Shield statt eines Punkts) mit Schild „Power Shop“ und Quellenangabe.
+  Seit dem 2.11. stehen Pin und Schild in der Mitte der Karte (pages.css), die Karte ist dafür stärker vergrößert. Die Länder stehen
+  darum näher am Pin: Deutschland am Tüllinger Berg, Frankreich am Hafen Huningue, Schweiz in Kleinhüningen (Basel). Pin, Länder und Dreiländereck stehen in Prozent der Kartendatei,
   die Kartenebene (.visit__layer) hält sie bei jedem Seitenverhältnis im Bild. Styles in assets/pages.css.
   Ohne Angaben gibt das Snippet genau die Karte aus, die sections/visit.liquid (Service, Kontakt) zeigt. Die Einrückung der Zeilen
   ist Teil davon: Ein Vergleich vor und nach einem Umbau (docs/qa/karte-ausschneiden.py) soll Zeichen für Zeichen gleich bleiben.
@@ -49,9 +51,9 @@
                 alt: 'Karte des Dreiländerecks mit Weil am Rhein, Basel und Saint-Louis. Markiert ist der Power Shop in Weil am Rhein-Haltingen.',
                 class: 'visit__img'
               -%}
-              <span class="visit__label visit__label--end" style="--x: 83.95%; --y: 15.98%" aria-hidden="true">Deutschland</span>
-              <span class="visit__label" style="--x: 44.12%; --y: 44.67%" aria-hidden="true">Frankreich</span>
-              <span class="visit__label visit__label--south" style="--x: 71.93%; --y: 92%" aria-hidden="true">Schweiz</span>
+              <span class="visit__label visit__label--end" style="--x: 84%; --y: 21%" aria-hidden="true">Deutschland</span>
+              <span class="visit__label visit__label--west" style="--x: 44%; --y: 50%" aria-hidden="true">Frankreich</span>
+              <span class="visit__label visit__label--south" style="--x: 54%; --y: 76%" aria-hidden="true">Schweiz</span>
               <span class="visit__mark" style="--x: 55.98%; --y: 67.47%" aria-hidden="true"><i></i>Dreiländereck</span>
               <span class="visit__pin" style="--x: 66.51%; --y: 39.97%"{% if map_reveal == blank %} data-reveal{% endif %} aria-hidden="true">
                 {%- if show_ring -%}<i class="visit__ring"></i>{%- endif -%}
