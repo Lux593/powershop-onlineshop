@@ -235,9 +235,8 @@ html:has(.service-subnav--sticky) { --subnav-h: 57px; scroll-padding-top: calc(v
 }
 
 /* ---------- Komm vorbei (sections/visit.liquid) ----------
-   Dunkle Karte des Dreiländerecks mit Pin, dazu Adresse, Route, Öffnungszeiten und Kontakt-Box. Oben der Kopf (.visit__head) über die
-   ganze Breite. Im Raster heißt der Bereich weiter „title“: Dort steht der Name des Ladens (.visit__title), am Handy vor der Karte,
-   damit sie nicht mit einer namenlosen Fläche beginnt.
+   Dunkle Karte des Dreiländerecks mit Pin, dazu Name des Ladens, Adresse, Route, Öffnungszeiten und Kontakt-Box. Oben der Kopf
+   (.visit__head) über die ganze Breite, er benennt den Abschnitt vor der Karte. Der Name steht in den Angaben (.visit__info).
    - Bis 1023 px alles untereinander: Die Kontakt-Box stellt dort ihre drei Knöpfe nebeneinander und braucht die volle Breite (shop.css).
    - 1024 bis 1279 px (iPad quer): Karte über die volle Breite, darunter Angaben und Kontakt-Box nebeneinander.
    - Ab 1280 px Karte links, rechts Überschrift, Angaben und Kontakt-Box. Die Karte wird so hoch wie die rechte Spalte, aber nie
@@ -259,8 +258,9 @@ html:has(.service-subnav--sticky) { --subnav-h: 57px; scroll-padding-top: calc(v
 @media (min-width: 900px) {
   .visit__head { margin-bottom: calc(var(--s-8) + var(--s-3)); }
 }
-/* Name des Ladens, wo bis zum 2.11. die Überschrift stand: rückt näher an Karte oder Adresse als die Blöcke untereinander */
-.visit__title { margin-bottom: calc(var(--s-3) - var(--s-4)); font-family: var(--f-head); font-weight: 700; font-size: var(--fs-h2); line-height: 1; letter-spacing: 0.02em; text-transform: uppercase; text-wrap: balance; }
+/* Name des Ladens über der Adresse (am Handy unter der Karte), fett wie bis zum 2.11. die Straße, davor das orange Bar & Shield */
+.visit__name { display: flex; align-items: center; gap: 12px; margin-bottom: -6px; font-family: var(--f-head); font-weight: 800; font-size: clamp(28px, 2.4vw, 34px); line-height: 0.95; letter-spacing: 0.01em; text-transform: uppercase; text-wrap: balance; }
+.visit__shield { flex: none; width: auto; height: 1.15em; }
 .visit__map { position: relative; overflow: hidden; height: clamp(300px, 92vw, 440px); background: var(--c-black-soft); }
 .visit__frame { position: absolute; inset: 0; container-type: size; }
 .visit__info { display: grid; gap: var(--s-2); align-content: start; }
@@ -269,21 +269,19 @@ html:has(.service-subnav--sticky) { --subnav-h: 57px; scroll-padding-top: calc(v
 @media (min-width: 640px) { .visit__map { height: clamp(300px, 58vw, 75svh); } }
 /* Raster nur, wo eine Vorlage passt: Ohne Karte und Kontakt-Box (oder bis 1279 px ohne Kontakt-Box) bleibt alles untereinander */
 @media (min-width: 1024px) {
-  .visit__grid:not(:has(> .visit__map)):has(> .contact-box) { grid-template: "title contact" auto "info contact" 1fr / minmax(0, 7fr) minmax(0, 5fr); column-gap: 56px; }
-  .visit__grid:has(> .contact-box) > .visit__title { grid-area: title; }
+  .visit__grid:not(:has(> .visit__map)):has(> .contact-box) { grid-template: "info contact" 1fr / minmax(0, 7fr) minmax(0, 5fr); column-gap: 56px; }
   .visit__grid:has(> .contact-box) > .visit__map { grid-area: map; }
   .visit__grid:has(> .contact-box) > .visit__info { grid-area: info; }
   .visit__grid > .contact-box { grid-area: contact; }
 }
 @media (min-width: 1024px) and (max-width: 1279px) {
-  .visit__grid:has(> .visit__map):has(> .contact-box) { grid-template: "title title" auto "map map" auto "info contact" auto / minmax(0, 5fr) minmax(0, 7fr); column-gap: var(--s-6); }
+  .visit__grid:has(> .visit__map):has(> .contact-box) { grid-template: "map map" auto "info contact" auto / minmax(0, 5fr) minmax(0, 7fr); column-gap: var(--s-6); }
   /* Drei Knöpfe passen mit der Telefonnummer erst ab etwa 600 px Boxbreite: Anrufen über die ganze Zeile, darunter die beiden anderen */
   .visit .contact-box__buttons { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .visit .contact-box__buttons > :first-child:nth-last-child(odd) { grid-column: 1 / -1; }
 }
 @media (min-width: 1280px) {
-  .visit__grid:has(> .visit__map) { grid-template: "map title" auto "map info" auto "map contact" 1fr / minmax(0, 7fr) minmax(0, 5fr); column-gap: 56px; }
-  .visit__grid:has(> .visit__map) > .visit__title { grid-area: title; }
+  .visit__grid:has(> .visit__map) { grid-template: "map info" auto "map contact" 1fr / minmax(0, 7fr) minmax(0, 5fr); column-gap: 56px; }
   .visit__grid:has(> .visit__map) > .visit__info { grid-area: info; }
   .visit__grid > .visit__map { grid-area: map; height: auto; min-height: clamp(460px, 38vw, 600px); max-height: calc((min(100vw, var(--container)) - 2 * var(--gutter) - 56px) * 7 / 12 / 0.9); }
 }
@@ -323,8 +321,7 @@ html:has(.service-subnav--sticky) { --subnav-h: 57px; scroll-padding-top: calc(v
 }
 
 .visit__address { display: grid; gap: 6px; font-style: normal; }
-.visit__street { font-family: var(--f-head); font-weight: 800; font-size: clamp(28px, 2.4vw, 34px); line-height: 0.95; letter-spacing: 0.01em; text-transform: uppercase; }
-.visit__city { font-size: 17px; }
+.visit__street, .visit__city { font-size: 17px; }
 .visit__note { font-size: var(--fs-small); color: var(--c-muted); }
 .visit__route { width: 100%; margin-top: 8px; }
 @media (min-width: 640px) { .visit__route { justify-self: start; width: auto; } }

@@ -9,7 +9,9 @@
   stehen in Prozent der Kartendatei; pages.css hält sie bei jedem Seitenverhältnis im Bild.
   Kopf wie beim Team der Über-uns-Seite (sections/about-team.liquid): die Überschrift („Komm vorbei.“) groß und waagrecht über der
   ganzen Breite, optional ein Satz darunter, beides blendet ein (data-split, data-reveal). Wo bis zum 2.11. die Überschrift stand
-  (neben bzw. über den Angaben), steht jetzt der Name des Ladens („Harley-Davidson Power Shop“, Einstellung „Name über der Adresse“).
+  (neben bzw. über den Angaben), steht jetzt der Name des Ladens („Harley-Davidson Power Shop“, Einstellung „Name über der Adresse“),
+  mit dem orangen Bar & Shield davor (wie im Header), fett und direkt über der Adresse, am Handy also unter der Karte. Die Straße steht
+  seitdem nicht mehr fett, sondern wie der Ort.
   „Route planen“ öffnet Google Maps in einem neuen Fenster, eingebettet wird nichts. Die Öffnungszeiten stehen hier, die
   Kontakt-Box zeigt sie darum nicht noch einmal (hours: false). Styles in assets/pages.css.
 {%- endcomment -%}
@@ -37,15 +39,17 @@
       {%- endif -%}
     </div>
     <div class="container visit__grid">
-      {%- if section.settings.name != blank -%}
-        <p class="visit__title">{{ section.settings.name | escape }}</p>
-      {%- endif -%}
-
       {%- if section.settings.show_map -%}
         {%- render 'visit-map' -%}
       {%- endif -%}
 
       <div class="visit__info">
+        {%- if section.settings.name != blank -%}
+          <p class="visit__name">
+            <img class="visit__shield" src="{{ 'hd-bar-shield.png' | asset_url }}" alt="" width="49" height="40" loading="lazy">
+            {{- section.settings.name | escape -}}
+          </p>
+        {%- endif -%}
         {%- if settings.address != blank -%}
           <address class="visit__address">
             {%- for line in address_lines -%}
