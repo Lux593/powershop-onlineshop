@@ -79,9 +79,7 @@ templates/page.service.json
 │   └─ Block „event“                   Karten (snippets/event-card), gesammelt im Abschnitt #events
 └─ sections/visit.liquid               „Standort & Kontakt“ (#standort): Karte, Adresse, Route, Öffnungszeiten, Kontakt-Box
 
-templates/page.contact.json
-├─ sections/page.liquid                Seitenkopf, Seitentext nur, wenn vorhanden
-└─ sections/visit.liquid               „Komm vorbei.“
+templates/page.contact.json             am 2.11. gelöscht: Der Shop nutzt keine Kontakt-Seite. „Komm vorbei.“ steht auf Service und Über uns.
 ```
 
 **Datenfluss**

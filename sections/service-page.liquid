@@ -246,7 +246,7 @@
             assign offer_step = step
           endif
         -%}
-        {%- comment -%} Ohne Händlerdaten führt „Kontakt aufnehmen“ zur Kontakt-Seite (Standard des Snippets) {%- endcomment -%}
+        {%- comment -%} Ohne Händlerdaten führt „Kontakt aufnehmen“ zu „Komm vorbei“ (#standort) {%- endcomment -%}
         {% render 'partner-offer', block: block, step: offer_step %}
 
       {%- when 'event' -%}

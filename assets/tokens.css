@@ -68,7 +68,7 @@
      „Geschwindigkeitsbegrenzung“ bei 320/390 px aus dem Bild (WCAG 1.4.10). */
   --fs-display: clamp(64px, 11vw, 200px);
   /* Abschnitts-Überschriften (.section-title, base.css): Startseite (Neuheiten, Shop nach Kategorie, Bikes im Showroom, Mehr als ein
-     Shop), Über uns (Das Team) und „Komm vorbei.“ (Über uns, Service, Kontakt). Am Handy so groß wie bisher die Startseite, am Desktop
+     Shop), Über uns (Das Team) und „Komm vorbei.“ (Über uns, Service). Am Handy so groß wie bisher die Startseite, am Desktop
      so groß wie bisher Über uns (Wunsch vom 2.11.: „das Beste von beidem“), dazwischen eine Stufe fürs Tablet. */
   --fs-section: 28px;
 

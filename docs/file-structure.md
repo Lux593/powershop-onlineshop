@@ -25,7 +25,7 @@ Wer welche Datei verantwortet. Plan: [`plan-service-werkstatt.md`](plan-service-
 | `sections/service-page.liquid` | geändert | Türen, Kaufweg mit Schritt-Nummern, Anfrage-Zeilen, Events mit Hinweis; Chip-Leiste und Block „Standort“ entfernt |
 | `templates/page.service.json` | geändert | Sektionen `subnav` (klebend), `main`, `standort`; Blöcke `tuer_werkstatt` und `lieferung` neu, `werkstatt` und `standort` entfernt |
 | `sections/visit.liquid` | neu | „Komm vorbei“: Karte, Adresse, Route, Öffnungszeiten, Kontakt-Box |
-| `templates/page.contact.json` | neu | Seitenkopf und „Komm vorbei“ für `/pages/contact` |
+| `templates/page.contact.json` | neu, am 2.11. gelöscht | Seitenkopf und „Komm vorbei“ für `/pages/contact` (der Shop nutzt keine Kontakt-Seite) |
 | `snippets/step-no.liquid` | neu | Schritt-Nummer mit Text für Screenreader |
 | `assets/karte-dreilaendereck-{800,1200,1600}.webp` | neu | Karte des Dreiländerecks (OpenStreetMap) |
 | `snippets/contact-box.liquid`, `assets/contact.js` | geändert | Variante `compact`, `hours: false`, Thema „Lieferung“ |

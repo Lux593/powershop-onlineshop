@@ -12,7 +12,8 @@
   @param {object} block - Block „partner“ der Service-Seite (sections/service-page.liquid)
   @param {number} [step] - Schritt im Kaufweg; steht als eigene Zeile über der Aussage (snippets/step-no.liquid), 0 = ohne
   @param {string} [fallback_url] - Ziel von „Kontakt aufnehmen“, wenn Kontakt-Box oder Kanäle der Karte mangels Händlerdaten fehlen.
-    Standard: die Kontakt-Seite. Auf der Service-Seite „#standort“ (Adresse und Route stehen dort auch ohne Kanäle).
+    Standard: „Komm vorbei“ auf der Service-Seite (/pages/service#standort; Adresse und Route stehen dort auch ohne Kanäle). Bis zum
+    2.11. war es die Kontakt-Seite; die Vorlage page.contact gibt es nicht mehr, der Shop nutzt keine Kontakt-Seite.
 
   @example
   {% render 'partner-offer', block: block, step: 3, fallback_url: '#standort' %}
@@ -25,7 +26,8 @@
     assign dark = true
   endif
   assign anchor = s.anchor | default: block.id
-  assign fallback = fallback_url | default: pages['contact'].url
+  assign fallback_default = pages['service'].url | append: '#standort'
+  assign fallback = fallback_url | default: fallback_default
   assign bullets = s.bullets | newline_to_br | split: '<br />'
   assign photo_pos = s.person_image_position | default: '50% 50%'
   assign text = s.text
