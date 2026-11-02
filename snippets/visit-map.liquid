@@ -21,7 +21,7 @@
     (rückwärts), visit-film-start-*/-ende-*.webp (erstes und letztes Bild). Alle ohne Ton, unten um die eingebrannte Quellenangabe
     gekürzt (1392 × 1440 aus dem Original 1392 × 1488); die Quellenangabe steht als Link darüber. Ohne Skript bleibt das Startbild stehen.
     Unter Logo und Schild steht ein Hinweis, dass man klicken kann (Wiedergabe-Symbol und film_hint); er ist Teil der Klickfläche und ihr Name.
-  @param {string} [film_hint] - Text des Hinweises unter dem Logo, Standard „Zum Laden fliegen“.
+  @param {string} [film_hint] - Text des Hinweises unter dem Logo, Standard „Glide to Shop“ (bis 2.11. „Zum Laden fliegen“).
 
   @example
   {% render 'visit-map' %}
@@ -30,10 +30,9 @@
   {% render 'visit-map', sizes: '(min-width: 900px) 100vw, 230vw', ring: false, logo: true, reveal: '', address_lines: lines %}
 {% enddoc %}
 {%- if film -%}
-        {%- assign hint = film_hint | default: 'Zum Laden fliegen' -%}
+        {%- assign hint = film_hint | default: 'Glide to Shop' -%}
         <div class="visit__map visit__map--film" data-reveal="clip" data-visit-film>
           <div class="visit__frame">
-            <div class="visit__film">
               <img
                 class="visit__still"
                 src="{{ 'visit-film-start-1080.webp' | asset_url }}"
@@ -50,6 +49,7 @@
                 data-src="{{ 'visit-film-1080.mp4' | asset_url }}" data-src-m="{{ 'visit-film-720.mp4' | asset_url }}"></video>
               <video class="visit__video" data-film="zurueck" muted playsinline preload="none" disablepictureinpicture aria-hidden="true" tabindex="-1"
                 data-src="{{ 'visit-film-rueck-1080.mp4' | asset_url }}" data-src-m="{{ 'visit-film-rueck-720.mp4' | asset_url }}"></video>
+            <div class="visit__film">
               <button class="visit__fly" type="button" hidden>
                 <i class="visit__ring"></i>
                 <span class="visit__hint">{% render 'icon', name: 'play' %}<span>{{ hint | escape }}</span></span>
