@@ -44,9 +44,9 @@
             "subtitle": "Team & Geschichte seit 1985",
             "url": "shopify://pages/ueber-uns",
             "anchor": "ueber-uns",
-            "image_asset": "tuer-ueber-uns-1600.webp",
-            "image_srcset": "tuer-ueber-uns-720.webp 720w, tuer-ueber-uns-1280.webp 1280w, tuer-ueber-uns-1600.webp 1600w",
-            "image_position": "50% 55%"
+            "image_asset": "ueber-uns-crew-1600.jpg",
+            "image_srcset": "ueber-uns-crew-720.jpg 720w, ueber-uns-crew-1280.jpg 1280w, ueber-uns-crew-1600.jpg 1600w",
+            "image_position": "50% 40%"
           }
         }
       },
