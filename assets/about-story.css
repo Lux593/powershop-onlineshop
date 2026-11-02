@@ -25,10 +25,10 @@ html:has(.about-story) { --stage-h: max(520px, calc(100svh - var(--header-h) - e
 
 .about-story {
   /* Abstand unten am Handy (Etappe auf der Bühne): der Teil des Fensters unter der eingeblendeten Leiste von Safari (100lvh − 100svh),
-     dort enden Foto und Text. In iOS 26 schwebt die Leiste als Pille, darüber liegen rund 54 pt freie Seite: Mit dem vollen Abstand
-     standen zwischen Vorschau und Pille rund 70 pt (Rückmeldung vom iPhone, 2.11.). Nur in iOS-Safari (-webkit-touch-callout) darum
-     32 px weniger, dort reicht die Etappe 32 px unter 100svh. Unter iOS 18 und älter (feste Leiste) liegen diese 32 px bei
-     eingeblendeter Leiste hinter ihr, beim Scrollen blendet Safari sie aus. Android zeigt die Leiste oben, dort bleibt es beim vollen Wert. */
+     dort enden Foto und Text. Nicht verkleinern: Der Bereich darunter ist die Leiste von Safari, und Safari färbt sie nach dem Inhalt am
+     unteren Rand. Am 2.11. reichte die Etappe in iOS-Safari 32 px tiefer (um den Abstand unter der Vorschau zu verkleinern), dann lagen
+     dort die dunklen Vorschaubilder, und die Leiste wurde schwarz (Rückmeldung vom iPhone). Darum wieder der volle Wert; kleiner wurde
+     nur der Innenabstand unten im Text (Handy, unten). */
   --bar-gap: calc(100lvh - 100svh);
   /* Balken: Link plus Rand oben und unten. Vor dem Skript halten die Etappen genau so viel Platz frei. */
   --rail-pad: 2px;
@@ -38,7 +38,6 @@ html:has(.about-story) { --stage-h: max(520px, calc(100svh - var(--header-h) - e
   background: var(--c-white);
 }
 .about-story__empty { padding: var(--s-4) var(--gutter); color: var(--c-muted); }
-@supports (-webkit-touch-callout: none) { .about-story { --bar-gap: max(0px, calc(100lvh - 100svh - 32px)); } }
 
 /* ---------------- Etappen ---------------- */
 /* overflow: clip statt hidden (hidden als Rückfall): clip macht keinen Scroll-Container, so kann Fokus oder die Suche im Browser
@@ -335,7 +334,7 @@ html:has(.about-story.is-live) { scroll-behavior: auto; }
 }
 @media (max-width: 899.98px) and (max-height: 760px) {
   .leaf--gallery { grid-template-rows: minmax(0, 34%) minmax(0, 1fr); }
-  .leaf--gallery .leaf__body { gap: 8px; padding-top: 14px; padding-bottom: 10px; }
+  .leaf--gallery .leaf__body { gap: 8px; padding-top: 14px; padding-bottom: 14px; }
   .leaf--gallery .leaf__text p { margin-top: 8px; }
   .leaf--gallery .leaf__meta { display: flex; margin-top: 10px; }
   .leaf--gallery .leaf__thumbs { margin-top: 10px; }

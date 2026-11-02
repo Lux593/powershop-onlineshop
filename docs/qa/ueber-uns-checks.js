@@ -734,8 +734,8 @@
   // Lage des Balkens auf der gepinnten Bühne. Desktop: am Fuß, die Bühne endet am Fensterrand. Handy (seit 30.10., Rückmeldung vom
   // iPhone): oben unter der Kopfleiste, die weiße Etappe reicht bis 100lvh, dahinter (unter der Leiste von Safari) liegt der weiße
   // Abstandshalter. Foto und Text enden an der Fensterunterkante (ohne Leiste hier = 100svh).
-  // Seit dem 2.11. ist der Abstandshalter --bar-gap (about-story.css): in iOS-Safari 32 px kleiner, Foto und Text reichen dort 32 px
-  // unter 100svh. Im Browser auf dem Rechner (ohne Leiste) ist er 0, die Prüfung unten gilt dort unverändert.
+  // Der Abstandshalter steht seit dem 2.11. als --bar-gap in about-story.css, Wert unverändert 100lvh − 100svh (ein kleinerer Wert färbte
+  // in iOS-Safari die Leiste schwarz). Im Browser auf dem Rechner (ohne Leiste) ist er 0.
   UU.add('story:railplace', async function () {
     var f = [], s = sec(), st = story().st;
     var stage = s.querySelector('[data-stage]'), rail = s.querySelector('[data-rail]'), leaf = s.querySelector('.leaf');
