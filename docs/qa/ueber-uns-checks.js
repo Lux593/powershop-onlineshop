@@ -1003,7 +1003,8 @@
       if (rr.top < pr.bottom - 1) f.push('Raster beginnt bei ' + rr.top.toFixed(1) + ', das Foto endet bei ' + pr.bottom.toFixed(1));
     } else {
       if (grid !== '4 × 2') f.push('Raster ' + grid + ' statt 4 × 2');
-      if (!near(pr.width, pr.height, 1)) f.push('Foto ' + pr.width.toFixed(1) + ' × ' + pr.height.toFixed(1) + ' nicht quadratisch');
+      // Seit dem 2.11. auch am Handy 3 : 2 (vorher quadratisch)
+      if (!near(pr.width / pr.height, 1.5, .02)) f.push('Foto ' + pr.width.toFixed(1) + ' × ' + pr.height.toFixed(1) + ' nicht 3 : 2');
       if (rr.top < pr.bottom - 1) f.push('Raster steht nicht unter dem Foto');
     }
     if (cw() >= 900) {

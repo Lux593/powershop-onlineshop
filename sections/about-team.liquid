@@ -4,7 +4,7 @@
   waagrecht über die ganze Breite (wie die Abschnitte der Startseite), darunter links der Text, rechts das Foto im Querformat 3 : 2
   (breiter Ausschnitt mit dem ganzen Motorrad; ohne ihn steht das Quadrat ganz darin, auf Schwarz). Bis zum 2.11. stand der Titel
   am Desktop hochkant links. Überschrift und Einleitung blenden ein, wenn sie ins Bild kommen (data-split, data-reveal, motion.js).
-  Handy: Kopf, quadratisches Foto, Raster 4 × 2, Text; gewechselt wird per Vorschau oder Wischen auf dem Foto.
+  Handy: Kopf, Foto 3 : 2 (seit 2.11., vorher quadratisch), Raster 4 × 2, Text; gewechselt wird per Vorschau oder Wischen auf dem Foto.
   Liquid rendert alle Personen vollständig. Ohne Skript stehen sie untereinander, je Foto und Text. assets/about-team.js setzt
   is-ready, zeigt dann nur die gewählte Person und wechselt (Foto senkrecht, aus 1,12 auf 1, nur mit Bewegung).
   Ohne Blöcke gibt die Section außerhalb des Editors nichts aus. Bei einer Person gibt es keine Pfeile und kein Raster.
@@ -78,7 +78,9 @@
         {%- liquid
           assign b = block.settings
           comment
-            Breiter Ausschnitt nur ab 900 px. Ohne ihn bleibt es beim Quadrat (am Desktop ganz im Rahmen, contain).
+            Breiter Ausschnitt (3 : 2) auf allen Breiten, seit dem 2.11. auch am Handy (vorher erst ab 900 px, am Handy das Quadrat): Das große
+            Foto ist dort 3 : 2 statt quadratisch, weniger hoch, und zeigt das ganze Motorrad. Ohne breiten Ausschnitt bleibt es beim
+            Quadrat: am Desktop ganz im Rahmen (contain), am Handy auf Kopf und Schultern zugeschnitten (about-team.css).
           endcomment
           assign wide_srcset = ''
           assign wide_w = 1600
@@ -110,9 +112,8 @@
         >
           {%- if wide_srcset != blank -%}
             <source
-              media="(min-width: 900px)"
               srcset="{{ wide_srcset }}"
-              sizes="(min-width: 1440px) 820px, 58vw"
+              sizes="(min-width: 1440px) 820px, (min-width: 900px) 58vw, 100vw"
               width="{{ wide_w }}"
               height="{{ wide_h }}"
             >

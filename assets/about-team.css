@@ -6,7 +6,7 @@
    - .is-ready (setzt assets/about-team.js): Spotlight nach dem „Testimonial Slider“ von 21st.dev. Oben der Kopf (Überschrift und
      Einleitung) waagrecht über die ganze Breite. Darunter steht am Desktop alles Bedienbare links: Name, Rolle und Text, darunter
      Pfeile und das ganze Team als Vorschau. Rechts bekommt das Foto die übrige Breite im Querformat 3 : 2. Personen mit breitem Ausschnitt zeigen dort das ganze Motorrad, die anderen stehen als
-     Quadrat ganz und mittig im Rahmen (contain), statt aufgeblasen und angeschnitten zu werden. Am Handy: Kopf, quadratisches Foto,
+     Quadrat ganz und mittig im Rahmen (contain), statt aufgeblasen und angeschnitten zu werden. Am Handy: Kopf, Foto 3 : 2 (seit 2.11., vorher quadratisch),
      das Team als Raster 4 × 2 zum Antippen, Text. Keine Pfeile, Raster und Wischen reichen.
    Vorlage: entwuerfe/ueber-uns/h-vollbild.html (.spot*, dort .arrow statt .spot__arrow), Spec design-ueber-uns-h.md, Abschnitt 4.4.
    ========================================================================== */
@@ -48,13 +48,17 @@
   grid-area: photo;
   position: relative;
   overflow: hidden;
-  aspect-ratio: 1;
+  /* 3 : 2 wie die breiten Ausschnitte, auch am Handy (bis 2.11. quadratisch: zu hoch, vom Motorrad war wenig zu sehen) */
+  aspect-ratio: 3 / 2;
   background: var(--c-pure-black);
   touch-action: pan-y; /* waagrecht wischt das Skript, senkrecht scrollt die Seite */
   -webkit-user-select: none;
   user-select: none;
 }
 .spot__shot img { width: 100%; height: 100%; object-fit: cover; filter: var(--photo-grade); -webkit-user-drag: none; }
+/* Nur ein quadratisches Porträt (Kopf und Schultern vor dem Banner): am Handy auf 3 : 2 zugeschnitten, das Gesicht steht im oberen
+   Drittel. Am Desktop steht es ganz im Rahmen (contain, unten). */
+.spot__shot--quadrat img { object-position: 50% 12%; }
 /* Körnung über dem Foto, stärker als auf der Fläche (.textured) */
 .spot__photo::after {
   content: "";
@@ -100,7 +104,7 @@
 .spot:not(.is-ready) .spot__copy { display: contents; }
 .spot:not(.is-ready) .spot__shot,
 .spot:not(.is-ready) .spot__card { order: var(--o); }
-.spot:not(.is-ready) .spot__shot { position: relative; display: block; aspect-ratio: 1; overflow: hidden; background: var(--c-pure-black); }
+.spot:not(.is-ready) .spot__shot { position: relative; display: block; aspect-ratio: 3 / 2; overflow: hidden; background: var(--c-pure-black); }
 .spot:not(.is-ready) .spot__photo::after { content: none; } /* ohne Box läge die Körnung über der ganzen Section */
 .spot:not(.is-ready) .spot__card { margin-bottom: var(--s-6); }
 
