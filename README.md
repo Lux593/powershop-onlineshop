@@ -70,7 +70,7 @@ pics_to_use/ Quellbilder für Kategorien und Team
 | `theme.css` | Ergänzungen fürs Shopify-Theme, Kontrastmodus (`forced-colors`) für gewählte Zustände |
 | `motion.css` · `motion.js` | Motion-Schicht: Einblenden beim Scrollen, Wort-Splitter, Zahlen-Zählen, Parallax, weiches Scrollen |
 | `gsap.min.js` · `ScrollTrigger.min.js` | Bibliotheken der Motion-Schicht (Scrub, Parallax), self-hosted, nur auf der Startseite |
-| `lenis.min.js` | weiches Scrollen, self-hosted, lädt nach (Head-Skript plus `motion.js`), nur auf Startseite, Kollektion und Produkt und nur für Maus und Trackpad |
+| `lenis.min.js` | weiches Scrollen, self-hosted, lädt nach (Head-Skript plus `motion.js`), nur auf Startseite, Kollektion, Produkt und Seiten (Über uns, Werkstatt …) und nur für Maus und Trackpad |
 | `header.css` · `header.js` | Ankündigungsleiste, Header, Megamenü, Mobile-Menü, Such-Dialog |
 | `hero.css` · `hero.js` | Hero mit Modell-Tabs (beide laden nur auf der Startseite) |
 | `home.css` · `home.js` | Startseiten-Bereiche: Service-Leiste, Produkt-Tabs, Kategorie-Bento, Showroom, Story |

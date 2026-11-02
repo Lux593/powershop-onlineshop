@@ -237,7 +237,10 @@
       var headerH = cssPx('--header-h', html) * (isNaN(shown) ? 1 : shown);
       var y = els[0].getBoundingClientRect().top + window.scrollY + bi * closedH - headerH;
       if (PS.headerQuiet) PS.headerQuiet(1600);
-      window.scrollTo({ top: Math.max(0, Math.round(y)), behavior: reduce ? 'auto' : 'smooth' });
+      y = Math.max(0, Math.round(y));
+      // Mit Lenis (Maus und Trackpad, schmales Fenster) gleitet Lenis selbst: ein natives Gleiten liefe gegen seines
+      if (PS.lenis && !PS.lenis.isStopped && !reduce) PS.lenis.scrollTo(y);
+      else window.scrollTo({ top: y, behavior: reduce ? 'auto' : 'smooth' });
     }
     function openBay(bi, fromEditor) {
       if (bi === open) return;
@@ -350,6 +353,7 @@
         });
         show(i);
         html.style.overflow = 'hidden';
+        if (PS.lenis) PS.lenis.stop(); // die Seite dahinter steht, wie bei PS.openDialog (theme.js)
         dlg.showModal();
         if (!reduce) {
           dlg.animate([{ backgroundColor: 'rgba(6,6,6,0)' }, { backgroundColor: 'rgba(6,6,6,1)' }], { duration: 300, easing: EASE });
@@ -366,6 +370,7 @@
           dlg.getAnimations({ subtree: true }).forEach(function (a) { a.cancel(); });
           dlg.close();
           html.style.overflow = '';
+          if (PS.lenis) PS.lenis.start();
           if (opener && opener.focus) opener.focus({ preventScroll: true });
         };
         var target = photo() && photo().img;

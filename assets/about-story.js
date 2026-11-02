@@ -426,6 +426,7 @@
        about-head.css), Jahreszahl und Text der ersten Etappe steigen um 40 px auf und blenden ein, von unten nach oben, wie die
        Kante sie erreicht. Ohne Kopf direkt davor (rest 0) gibt es nichts davon. */
     var hero = prevHead(section), fromHead = null;
+    var cue = hero && hero.querySelector('.about-head__scroll');
     if (hero && rest() > 0) {
       fromHead = gsap.timeline({
         scrollTrigger: {
@@ -436,6 +437,8 @@
           invalidateOnRefresh: true
         }
       }).fromTo(hero, { '--cover': 0 }, { '--cover': 0.75, duration: 1, ease: 'none' }, 0);
+      // „Weiter“ im Kopf (about-head.css) blendet gleich zu Beginn aus, wie der Pfeil im Hero der Startseite
+      if (cue) fromHead.fromTo(cue, { opacity: 1 }, { opacity: 0, duration: 0.15, ease: 'none' }, 0);
       // von unten nach oben: Vorschau zuerst, Jahreszahl zuletzt
       fromHead = enter(fromHead, bits[0].slice().reverse(), { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.35, ease: 'power2.out' }, 0.3, 0.08)
         .scrollTrigger;
@@ -467,14 +470,28 @@
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(remeasure);
 
     /* ---------------- Sprung über den Balken ----------------
-       Mit Bühne führt der Anker nicht zur Etappe (sie liegt auf der Bühne), sondern weich zur passenden Scroll-Stelle. */
+       Mit Bühne führt der Anker nicht zur Etappe (sie liegt auf der Bühne), sondern weich zur passenden Scroll-Stelle.
+       Mit Lenis (Maus und Trackpad) gleitet Lenis selbst, ein natives Gleiten liefe gegen seines. */
+    function glide(y) {
+      if (PS.lenis && !PS.lenis.isStopped) PS.lenis.scrollTo(y);
+      else window.scrollTo({ top: y, behavior: 'smooth' });
+    }
     function onJump(e) {
       var a = e.target.closest && e.target.closest('[data-jump]');
       if (!a || !section.contains(a)) return;
       e.preventDefault();
-      window.scrollTo({ top: st.start + (st.end - st.start) * (+a.getAttribute('data-jump') / last), behavior: 'smooth' });
+      glide(st.start + (st.end - st.start) * (+a.getAttribute('data-jump') / last));
     }
     section.addEventListener('click', onJump);
+    // „Weiter“ im Kopf: Der Anker am Ende des Kopfs (sections/about-head.liquid) läge mit Bühne um den Abstand unter der Kopfleiste
+    // (scroll-padding-top) daneben, und html:has(.is-live) gleitet nativ nicht. Ziel ist die Stelle, an der der Kopf ganz weg ist
+    // und die erste Etappe frei liegt (st.start).
+    function onCue(e) {
+      if (e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      e.preventDefault();
+      glide(st.start);
+    }
+    if (cue && fromHead) cue.addEventListener('click', onCue);
 
     section.__story = { st: st, pin: pin, guard: guard, fromHead: fromHead, last: last, revert: revert };
 
@@ -486,6 +503,10 @@
       alive = false;
       ScrollTrigger.removeEventListener('refresh', remeasure);
       section.removeEventListener('click', onJump);
+      if (cue) {
+        cue.removeEventListener('click', onCue);
+        cue.style.removeProperty('opacity');
+      }
       // Galerie: Die Wahl bleibt, ein laufendes Schieben springt ans Ende, die Vorschauknöpfe sind wieder alle per Tab erreichbar
       if (section.__gallery) section.__gallery.finish();
       if (thumbs) thumbs.forEach(function (list) { list.forEach(function (b) { b.removeAttribute('tabindex'); }); });

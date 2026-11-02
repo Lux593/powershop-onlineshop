@@ -2,7 +2,7 @@
    Power Shop – Motion-Schicht: Reveals, Wort-Splitter, Count-up, Parallax, Smooth-Scroll.
    Lädt auf allen Templates (defer, nach theme.js, vor header.js). GSAP und ScrollTrigger kommen nur auf der Startseite und auf
    Über uns dazu (nur dort gibt es Scrub, Pinnen und Parallax), nur mit Setting und nie im Theme-Editor. Lenis (weiches Scrollen) lädt
-   nach, nur auf index, collection und product und nur für Maus und Trackpad. Ohne sie läuft die Schicht im
+   nach, nur auf index, collection, product und page und nur für Maus und Trackpad. Ohne sie läuft die Schicht im
    Fallback (Reveals per IntersectionObserver, Count-up, Splitter).
 
    Vertrag (Attribute, Zustände, Hilfs-API): docs/motion-api.md – daran bauen Hero, Startseite und Shop.
@@ -109,7 +109,8 @@
 
   /* ---------------- Lenis (optional, nur Maus und Trackpad) ----------------
      Das Head-Skript (theme.liquid) setzt PS.lenisSrc nur mit Setting „Weiches Scrollen“ und feinem Zeiger und lädt die Datei vor.
-     Mit GSAP (Startseite) gibt dessen Ticker den Takt und ScrollTrigger folgt Lenis; ohne GSAP (Kollektion, Produkt) läuft Lenis allein. */
+     Mit GSAP (Startseite, Über uns) gibt dessen Ticker den Takt und ScrollTrigger folgt Lenis; ohne GSAP (Kollektion, Produkt, übrige
+     Seiten) läuft Lenis allein. */
   function smooth() {
     if (lenis || !M.enabled || !window.Lenis) return;
     try {

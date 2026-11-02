@@ -2,6 +2,9 @@
   Seitenkopf der Über-uns-Seite „Halle, dunkel“: schwarz, links Überschrift und Satz, rechts das Foto bis an den Rand, am
   Handy das Foto oben. Füllt den ersten Bildschirm. Die Überschrift ist die einzige h1 der Seite. Text zwischen zwei Sternen (*Familienhand.*) wird orange.
   Das Foto setzt sich beim Laden aus einer leichten Vergrößerung (assets/about-head.css, nur mit Bewegung).
+  „Weiter“ unten (Einstellung, Standard an): Hinweis zum Weiterscrollen wie im Hero der Startseite, Wort plus Linie mit wanderndem Orange.
+  Der Anker führt ans Ende des Kopfs (about-head__end), also zur Geschichte darunter. Mit der Bühne (sections/about-story.liquid) gleitet
+  assets/about-story.js an die Stelle, an der der Kopf ganz weg ist, und blendet den Hinweis beim Wegscrollen aus.
   Foto: Standarddatei ist die Crew auf ihren Bikes in der Halle (ueber-uns-crew-1600.jpg, Querformat), mit den kleineren Fassungen
   720 und 1280 im srcset; ein im Editor gewähltes Bild ersetzt sie. Wer unter „Standarddatei“ eine andere Datei einträgt, hat kein srcset.
   Entwurf: entwuerfe/ueber-uns/design-ueber-uns-h.md, Abschnitt 4.2.
@@ -55,7 +58,14 @@
   {%- if photo != blank -%}
     <figure class="about-head__photo">{{ photo }}</figure>
   {%- endif -%}
+  {%- if section.settings.scroll_cue -%}
+    <a class="about-head__scroll" href="#about-head-end-{{ section.id }}">
+      <span>Weiter<span class="sr-only"> zum Inhalt</span></span>
+      <span class="about-head__scroll-line" aria-hidden="true"></span>
+    </a>
+  {%- endif -%}
 </section>
+{%- if section.settings.scroll_cue -%}<div class="about-head__end" id="about-head-end-{{ section.id }}"></div>{%- endif -%}
 
 {% schema %}
 {
@@ -66,7 +76,8 @@
     { "type": "textarea", "id": "text", "label": "Satz darunter", "default": "Offizieller Harley-Davidson-Vertragshändler in Weil am Rhein, in zweiter Generation." },
     { "type": "image_picker", "id": "image", "label": "Foto (Querformat)", "info": "Steht rechts, am Handy oben. Am besten im Format 1600 × 983 oder ähnlich. Rechts und links wird beschnitten, mittig bleibt alles; auf sehr breiten Bildschirmen bleibt eher der untere Teil." },
     { "type": "text", "id": "asset", "label": "Standard-Foto im Theme", "default": "ueber-uns-crew-1600.jpg", "info": "Datei in assets/, wenn oben kein Foto gewählt ist." },
-    { "type": "text", "id": "alt", "label": "Bildbeschreibung", "default": "Vier Fahrerinnen und Fahrer auf Custom-Harleys in einer Halle, die Scheinwerfer an" }
+    { "type": "text", "id": "alt", "label": "Bildbeschreibung", "default": "Vier Fahrerinnen und Fahrer auf Custom-Harleys in einer Halle, die Scheinwerfer an" },
+    { "type": "checkbox", "id": "scroll_cue", "label": "„Weiter“-Hinweis unten", "default": true, "info": "Zeigt unten im Kopf, dass es darunter weitergeht, wie auf der Startseite. Ein Klick scrollt zum nächsten Abschnitt." }
   ],
   "presets": [{ "name": "Seitenkopf Über uns" }],
   "enabled_on": { "templates": ["page"] }

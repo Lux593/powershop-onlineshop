@@ -4,7 +4,9 @@
   - Ebene 2 mit Unterpunkten = Kachel (Knopf). Ein Klick klappt ihre Links (Ebene 3) unter der Reihe auf, die offene klappt zu,
     ein zweiter Klick auf die offene schließt sie (header.js). Beim Öffnen des Menüs sind alle Gruppen zu.
   - Ebene 2 ohne Unterpunkte, solange andere Gruppen Unterpunkte haben = Kachel als Link (Pfeil statt Winkel),
-    z. B. Service: Werkstatt und Über uns als Link, Dienstleistungen klappt auf
+    z. B. Service: Werkstatt und Über uns als Link, Dienstleistungen klappt auf. Unter dem Titel steht der Text aus dem
+    Kachelbild-Block („Text unter dem Titel“), so stehen die Titel auf einer Linie mit denen der Gruppen (deren Zeile zeigt die
+    ersten drei Links)
   - Hat keine Ebene-2-Position Unterpunkte, ist jeder Ebene-2-Punkt eine kleinere Kachel als Link, vier je Reihe;
     der Kontakt-Block steht dann als letzte Kachel im Raster statt in der Fußzeile
   - Die Links stehen direkt unter ihrer Kachel: ab drei Kacheln einspaltig, bei zwei Kacheln bis zu zwei, bei einer bis zu vier
@@ -119,6 +121,9 @@
           {%- render 'mega-tile-media', block: tile_block, sizes: tile_sizes -%}
           <span class="mega-tile__body">
             <span class="mega-tile__title">{{ group.title | escape }}</span>
+            {%- if tile_block.settings.text != blank -%}
+              <span class="mega-tile__meta">{{ tile_block.settings.text | escape }}</span>
+            {%- endif -%}
           </span>
           {% render 'icon', name: 'arrow-right' %}
         </a>

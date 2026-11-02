@@ -15,7 +15,8 @@
         "heading": "Seit 1985 in *Familienhand.*",
         "text": "Offizieller Harley-Davidson-Vertragshändler in Weil am Rhein, in zweiter Generation.",
         "asset": "ueber-uns-crew-1600.jpg",
-        "alt": "Vier Fahrerinnen und Fahrer auf Custom-Harleys in einer Halle, die Scheinwerfer an"
+        "alt": "Vier Fahrerinnen und Fahrer auf Custom-Harleys in einer Halle, die Scheinwerfer an",
+        "scroll_cue": true
       }
     },
     "story": {

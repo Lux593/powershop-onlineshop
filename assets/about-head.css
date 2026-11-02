@@ -3,6 +3,7 @@
    Lädt nur mit der Section. Schwarz wie Kopfleiste und Bühne: links Überschrift und Satz, rechts das Crew-Foto bis an den rechten
    Rand, am Handy das Foto oben über die volle Breite. Kein Bar & Shield und kein Signet im Kopf.
    Der Kopf füllt das Fenster unter der Kopfleiste ganz aus, am Handy mit einem schwarzen Saum bis unter die Leiste von Safari.
+   Unten „Weiter“ (.about-head__scroll), Hinweis zum Weiterscrollen wie im Hero der Startseite.
    Bewegung (nur mit html.has-motion, ohne reduzierte Bewegung): Das Foto setzt sich beim Laden aus einer leichten Vergrößerung. Mit
    der Bühne der Geschichte liegt diese hinter dem Kopf (about-story.css), der Kopf scrollt über ihr weg wie ein Rolltor und dunkelt
    dabei ab (--cover setzt assets/about-story.js an .about-head).
@@ -85,10 +86,50 @@ html:has(.about-head):has(.service-subnav) {
   .has-motion .about-head__photo img { animation: about-head-settle 1.8s var(--ease-out) .1s backwards; }
 }
 
+/* ---------- „Weiter“: Hinweis zum Weiterscrollen wie im Hero der Startseite (assets/hero.css, .hero__scroll) ----------
+   Wort plus Linie mit wanderndem Orange. Am Desktop links unter dem Text, bündig mit der Überschrift: mittig läge er auf der
+   Fotokante. Unter dem Abdunkeln (::after, z-index 2), dunkelt also mit ab; mit der Bühne blendet about-story.js ihn beim Wegscrollen
+   per Inline-Opacity aus. Mit Tastaturfokus bleibt er sichtbar (WCAG 2.4.7), !important schlägt das Inline-Style.
+   Bewegung: Das Orange wandert zweimal durch die Linie (3,8 s) und füllt sie dann ganz. Unter 5 s braucht es keine Pause-Taste
+   (WCAG 2.2.2), der Hero der Startseite hat eine, der Kopf nicht. Ohne Bewegung steht die Linie gleich voll orange. */
+.about-head__scroll {
+  position: absolute; z-index: 1;
+  left: max(var(--gutter), calc((100% - var(--container)) / 2 + var(--gutter)));
+  bottom: calc(16px + var(--about-head-skirt));
+  margin-left: -12px; /* das Wort sitzt bündig mit der Überschrift, der Innenabstand liegt links davor */
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  min-width: 44px; min-height: 44px; padding: 6px 12px;
+  color: var(--c-offwhite);
+  font-family: var(--f-head); font-size: 13px; font-weight: 700;
+  letter-spacing: 0.16em; text-transform: uppercase;
+}
+.about-head__scroll:hover { color: var(--c-white); }
+.about-head__scroll:focus-visible { opacity: 1 !important; }
+.about-head__scroll-line { position: relative; display: block; width: 2px; height: 40px; overflow: hidden; background: rgb(255 255 255 / 0.35); }
+.about-head__scroll-line::after { content: ""; position: absolute; inset: 0; background: var(--c-orange); }
+@keyframes about-head-scroll {
+  0% { transform: translateY(-100%); }
+  65%, 100% { transform: translateY(100%); }
+}
+@keyframes about-head-scroll-fill { from { transform: translateY(-100%); } to { transform: none; } }
+@media (prefers-reduced-motion: no-preference) {
+  .has-motion .about-head__scroll-line::after {
+    transform: translateY(-100%);
+    animation: about-head-scroll 1.9s var(--ease) .6s 2 backwards, about-head-scroll-fill .8s var(--ease-out) 4.4s forwards;
+  }
+}
+/* Anker am Ende des Kopfs: Ziel des Hinweises ohne Bühne */
+.about-head__end { height: 0; }
+
 /* Handy: das Foto über die volle Breite oben, es nimmt den Platz über dem Text ein, darunter der Text */
 @media (max-width: 899.98px) {
   .about-head { grid-template-rows: minmax(0, 1fr) auto; }
   .about-head h1 { font-size: clamp(44px, 12.8vw, 56px); }
   .about-head__photo { position: relative; inset: auto; grid-column: full; grid-row: 1; min-height: 34svh; }
   .about-head__text { grid-column: content-start / content-end; grid-row: 2; padding: 28px 0 40px; }
+  /* Platz für den Hinweis unter dem Satz: Er ist gut 60 px hoch (Wort, 24 px Linie wie am Handy auf der Startseite) und steht 12 px über
+     dem Rand, dazu gut 20 px Luft zum Satz */
+  .about-head:has(.about-head__scroll) .about-head__text { padding-bottom: 96px; }
+  .about-head__scroll { bottom: calc(12px + var(--about-head-skirt)); }
+  .about-head__scroll-line { height: 24px; }
 }

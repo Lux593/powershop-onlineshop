@@ -7,7 +7,7 @@ Die Datei selbst enthält nur einen Verweis hierher, damit der Vertragstext nich
 Power Shop – Motion-Schicht: Reveals, Wort-Splitter, Count-up, Parallax, Smooth-Scroll.
 Lädt auf allen Templates (defer, nach theme.js, vor header.js). GSAP und ScrollTrigger kommen nur auf der Startseite
 und auf der Über-uns-Seite (Vorlage page.ueber-uns) dazu (nur dort gibt es Scrub, Parallax und die Bühne), nur mit Setting und nie im Theme-Editor. Lenis (weiches Scrollen) lädt
-nach, nur auf index, collection und product und nur für Maus und Trackpad. Ohne sie läuft die Schicht im
+nach, nur auf index, collection, product und page und nur für Maus und Trackpad. Ohne sie läuft die Schicht im
 Fallback (Reveals per IntersectionObserver, Count-up, Splitter).
 
 VERTRAG – daran bauen Hero, Startseite und Shop. Namen nicht ändern.
@@ -33,7 +33,9 @@ Zustand
   PS.lenis             Lenis-Instanz oder null (Setting, pointer:fine und hover:hover, ohne reduced-motion). Lenis lädt
                        nach motion.js (Head-Skript setzt PS.lenisSrc und lädt vor), daher immer lazy prüfen:
                        PS.lenis && PS.lenis.stop(). Ein Dialog, der vor dem Start offen war, hält es beim Start an.
-                       Mit GSAP (Startseite) gibt dessen Ticker den Takt, sonst läuft Lenis mit autoRaf.
+                       Mit GSAP (Startseite, Über uns) gibt dessen Ticker den Takt, sonst läuft Lenis mit autoRaf.
+                       Eigene Sprünge per Skript: PS.lenis ? PS.lenis.scrollTo(y) : window.scrollTo({ top: y, … }).
+                       Ein natives Gleiten (behavior: 'smooth') liefe sonst gegen Lenis.
                        Anker (#id) scrollt Lenis selbst (Abstand = html scroll-padding-top) und fokussiert das Ziel.
                        Tastatur-Scroll bricht ein laufendes Gleiten ab. html.lenis setzt scroll-behavior mit !important
                        auf auto: ScrollTrigger schreibt es sonst inline zurück.
@@ -246,8 +248,8 @@ Alle laden mit `defer` am Seitenende von `layout/theme.liquid`, die Reihenfolge 
 | Skript | Lädt auf | Zweck |
 |---|---|---|
 | `theme.js` | überall | Kern: `PS.on`, Dialoge, Tabs, Toast |
-| `gsap.min.js`, `ScrollTrigger.min.js` | index und die Vorlage `page.ueber-uns` (`template.name == 'page' and template.suffix == 'ueber-uns'`), nur mit Setting, nie im Theme-Editor. `sections/about-story.liquid` prüft für die Bühne dieselbe Bedingung: ändert sich eine, muss die andere mit | Scrub, Parallax, Takt für Lenis (index), Bühne der Geschichte (Über uns) |
-| `lenis.min.js` | index, collection, product, nur mit „Weiches Scrollen“ und nur für Maus/Trackpad (`pointer: fine`, `hover: hover`). Kein `<script>` am Seitenende: das Head-Skript lädt es vor, `motion.js` hängt es an. Touch-Geräte laden es nie | Weiches Scrollen |
+| `gsap.min.js`, `ScrollTrigger.min.js` | index und die Vorlage `page.ueber-uns` (`template.name == 'page' and template.suffix == 'ueber-uns'`), nur mit Setting, nie im Theme-Editor. `sections/about-story.liquid` prüft für die Bühne dieselbe Bedingung: ändert sich eine, muss die andere mit | Scrub, Parallax, Takt für Lenis (index, Über uns), Bühne der Geschichte (Über uns) |
+| `lenis.min.js` | index, collection, product, page (alle Seitenvorlagen, auch Über uns und Werkstatt), nur mit „Weiches Scrollen“ und nur für Maus/Trackpad (`pointer: fine`, `hover: hover`). Kein `<script>` am Seitenende: das Head-Skript lädt es vor, `motion.js` hängt es an. Touch-Geräte laden es nie | Weiches Scrollen |
 | `motion.js` | überall (vor `header.js`) | diese Schicht |
 | `header.js`, `cart.js`, `sections.js` | überall | Header, Warenkorb und Drawer, Showroom und Quick-Add |
 | `contact.js` | product, page, im Theme-Editor immer | Kontakt-Box und Anfrage-Zeile (`compact`, festes Thema über `data-topic-default`): Thema wählen, WhatsApp-/E-Mail-Link, Öffnungsstatus |

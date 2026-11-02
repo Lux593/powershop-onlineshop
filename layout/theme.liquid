@@ -24,7 +24,7 @@
             d.classList.add('has-motion');
             {%- if settings.motion_smooth_scroll %}
             d.classList.add('has-smooth');
-            {%- if template.name == 'index' or template.name == 'collection' or template.name == 'product' %}
+            {%- if template.name == 'index' or template.name == 'collection' or template.name == 'product' or template.name == 'page' %}
             if (matchMedia('(pointer: fine) and (hover: hover)').matches) {
               var l = document.createElement('link');
               l.href = {{ 'lenis.min.js' | asset_url | json }};
@@ -145,8 +145,10 @@
       GSAP und ScrollTrigger laden nur mit Setting „Animationen aktivieren“, nicht im Theme-Editor und nur auf der
       Startseite und auf Über uns (Seitenvorlage mit Suffix ueber-uns): nur dort gibt es Scrub, Pinnen und Parallax (hero.js, home.js,
       data-parallax, die Skripte der Über-uns-Sections). Ohne sie läuft motion.js im Fallback.
-      Lenis (Setting „Weiches Scrollen“, nur index/collection/product) lädt das Head-Skript nach, nur für Maus und Trackpad
-      (siehe oben); auf Kollektion und Produkt treibt es sich selbst per requestAnimationFrame, ohne GSAP.
+      Lenis (Setting „Weiches Scrollen“, nur index/collection/product/page) lädt das Head-Skript nach, nur für Maus und Trackpad
+      (siehe oben); auf Startseite und Über uns gibt der Ticker von GSAP den Takt, sonst (Kollektion, Produkt, übrige Seiten wie
+      Werkstatt und Dienstleistungen) treibt es sich selbst per requestAnimationFrame. Seiten gehören seit dem 2.11. dazu: Über uns und
+      Werkstatt scrollten mit Maus und Mausrad sonst spürbar ruckeliger als die Startseite.
       Restkosten (clientseitig erkennbar, serverseitig nicht): Nutzer mit prefers-reduced-motion oder saveData laden die
       Libs der Startseite trotzdem (ca. 42 KB br). Sie per Head-Skript nachzuladen würde den Normalfall verlangsamen
       (kein Preload-Scan, keine feste defer-Reihenfolge vor motion.js), daher bewusst nicht gemacht.
