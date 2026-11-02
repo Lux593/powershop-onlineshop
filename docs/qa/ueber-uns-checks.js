@@ -793,17 +793,8 @@
     var rr = rect(rail), railTop = cw() < 900;
     if (!railTop && !at2(innerWidth / 2, rr.top + rr.height / 2)) f.push('Halbe Strecke: Das Team deckt den Balken nicht zu');
     if (at2(innerWidth / 2, hh + S / 4)) f.push('Halbe Strecke: Team schon über der oberen Hälfte der Bühne');
-    // Streifen für die Leiste von Safari: im Übergang da, am Handy fest am unteren Rand, voll breit, in der Farbe des Teams
-    var edge = document.querySelector('.about-story__edge');
-    if (!edge) f.push('Halbe Strecke: Streifen für die Leiste von Safari fehlt');
-    else if (railTop) {
-      var ground = t, gb = 'rgba(0, 0, 0, 0)';
-      while (ground && (gb = getComputedStyle(ground).backgroundColor) === 'rgba(0, 0, 0, 0)') ground = ground.parentElement;
-      var es = getComputedStyle(edge), er = rect(edge);
-      if (es.position !== 'fixed' || es.display === 'none') f.push('Halbe Strecke, Handy: Streifen nicht fest oder ausgeblendet (' + es.position + ', ' + es.display + ')');
-      if (!(er.top < innerHeight && er.bottom >= innerHeight) || er.height < 12 || er.width < innerWidth * .8) f.push('Halbe Strecke, Handy: Streifen nicht am unteren Rand oder zu klein (' + er.top.toFixed(1) + ' bis ' + er.bottom.toFixed(1) + ', ' + er.width + ' breit)');
-      if (es.backgroundColor !== gb) f.push('Halbe Strecke, Handy: Streifen ' + es.backgroundColor + ' statt wie das Team (' + gb + ')');
-    } else if (getComputedStyle(edge).display !== 'none') f.push('Halbe Strecke, Desktop: Streifen für die Leiste von Safari sichtbar');
+    // Den schwarzen Streifen für die Leiste von Safari gibt es seit dem 2.11. nicht mehr (Safari behielt das Schwarz nach dem Zurückscrollen)
+    if (document.querySelector('.about-story__edge')) f.push('Halbe Strecke: Streifen für die Leiste von Safari ist wieder da');
     // Unterkante der stehenden Kopfleiste, auf halber Strecke gemessen. Am Ende steht sie noch: guard gibt sie erst eine Kopfleistenhöhe
     // später frei (toTeam.end + hh, story:header Teil 2).
     // Ohne ihre 1-px-Linie unten (.site-header ist --header-h plus Linie hoch): Die Linie liegt über dem Inhalt darunter, wie beim Pinnen.

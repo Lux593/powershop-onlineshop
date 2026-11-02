@@ -186,8 +186,6 @@ html:has(.about-story) { --stage-h: max(520px, calc(100svh - var(--header-h) - e
 .about-story.is-live .leaf__media { min-height: 0; }
 /* Der Abstandshalter des Pinnens ist schwarz wie die Bühne: Während die Kopfleiste einfährt, blitzt über der Bühne nichts Weißes auf */
 .about-story .pin-spacer { background: var(--c-black); }
-/* Streifen für die Leiste von Safari im Übergang zum Team (about-story.js), zu sehen nur am Handy (unten) */
-.about-story__edge { display: none; }
 /* ScrollTrigger setzt die Scrollposition beim Neuberechnen selbst. Mit dem weichen Scrollen aus base.css glitte sie dorthin. Der Sprung
    über den Balken scrollt ausdrücklich weich (about-story.js). */
 html:has(.about-story.is-live) { scroll-behavior: auto; }
@@ -301,13 +299,10 @@ html:has(.about-story.is-live) { scroll-behavior: auto; }
   /* Die Fläche hinter seiner Leiste färbt Safari 26 nach dem festen Inhalt am unteren Rand, hier der gepinnten Bühne mit der Etappe
      (im iOS-Simulator geprüft, 30.10.: Seiten- und Abstandshalter-Farbe wirkten dort nicht). Am Handy ist ihr Grund darum weiß wie die
      Etappe, der Balken oben hat seinen eigenen schwarzen Grund. Der Abstandshalter des Pinnens ist ebenfalls weiß, falls ein Browser
-     dort die Seite zeigt. Oben deckt ihn die stehende Kopfleiste. Im Übergang zum Team übernimmt ein schwarzer Streifen (unten). */
+     dort die Seite zeigt. Oben deckt ihn die stehende Kopfleiste. Im Übergang zum Team bleibt die Leiste weiß: Der schwarze Streifen
+     dafür (bis 2.11.) ließ sie in Safari auch nach dem Zurückscrollen schwarz. */
   .has-motion .about-story.is-live .about-story__stage { background: var(--c-white); } /* so spezifisch wie die Vorstufe (oben) */
   .about-story .pin-spacer { background: var(--c-white); }
-  /* Fährt das Team über die stehende Bühne hoch, setzt about-story.js diesen Streifen in body ein: Safari nimmt dann seine Farbe für den
-     Streifen hinter der Leiste, wie das Team schwarz, statt der weißen Etappe. Er liegt ganz unter der Leiste (eingeklappt wie
-     ausgeklappt), voll breit und 12 px im Bild, wie im iOS-Simulator geprüft (30.10.). */
-  .about-story__edge { display: block; position: fixed; left: 0; right: 0; bottom: -8px; z-index: 1; height: 20px; background: var(--c-black); pointer-events: none; }
 }
 
 /* ---------------- Platz für die Vorschau bei wenig Höhe ----------------
