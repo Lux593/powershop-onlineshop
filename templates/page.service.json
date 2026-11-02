@@ -64,7 +64,7 @@
     "standort": {
       "type": "visit",
       "settings": {
-        "heading": "Standort & Kontakt",
+        "heading": "Komm vorbei.",
         "anchor": "standort",
         "note": "Im Stadtteil Haltingen, mitten im Dreiländereck.",
         "show_map": true,

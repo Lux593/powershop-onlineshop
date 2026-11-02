@@ -116,7 +116,7 @@
       "blocks": {
         "area_werkstatt": { "type": "area", "settings": { "title": "Werkstatt", "subtitle": "Inspektion, Umbau & Eintragung", "url": "shopify://pages/werkstatt", "image_asset": "umbau-falk-2-1920.webp", "image_srcset": "umbau-falk-2-720.webp 720w, umbau-falk-2-1280.webp 1280w, umbau-falk-2-1920.webp 1920w", "image_position": "50% 70%" } },
         "area_dienstleistungen": { "type": "area", "settings": { "title": "Dienstleistungen", "subtitle": "Probefahrt, Inzahlungnahme, Finanzierung & Versicherung", "url": "shopify://pages/dienstleistungen", "image_asset": "tuer-dienstleistungen-1920.webp", "image_srcset": "tuer-dienstleistungen-720.webp 720w, tuer-dienstleistungen-1280.webp 1280w, tuer-dienstleistungen-1920.webp 1920w", "image_position": "50% 60%" } },
-        "area_ueber_uns": { "type": "area", "settings": { "title": "Über uns", "subtitle": "Team & Geschichte seit 1985", "url": "shopify://pages/ueber-uns", "image_asset": "tuer-ueber-uns-1600.webp", "image_srcset": "tuer-ueber-uns-720.webp 720w, tuer-ueber-uns-1280.webp 1280w, tuer-ueber-uns-1600.webp 1600w", "image_position": "50% 55%" } },
+        "area_ueber_uns": { "type": "area", "settings": { "title": "Über uns", "subtitle": "Team & Geschichte seit 1985", "url": "shopify://pages/ueber-uns", "image_asset": "ueber-uns-crew-1600.jpg", "image_srcset": "ueber-uns-crew-720.jpg 720w, ueber-uns-crew-1280.jpg 1280w, ueber-uns-crew-1600.jpg 1600w", "image_position": "50% 40%" } },
         "years": { "type": "stat", "settings": { "value": "45+", "label": "Jahre Erfahrung" } },
         "masters": { "type": "stat", "settings": { "value": "2", "label": "Motorrad-Meister" } },
         "friends": { "type": "stat", "settings": { "value": "∞", "label": "Kunden & Freunde" } },

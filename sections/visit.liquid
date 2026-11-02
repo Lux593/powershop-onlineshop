@@ -7,6 +7,9 @@
   Die Karte ist ein vorskaliertes WebP der OpenStreetMap mit Pin auf Burghölzle 15 (assets/karte-dreilaendereck-*.webp) und
   steht im Snippet visit-map, das auch die Über-uns-Seite nutzt (sections/about-visit.liquid). Pin, Länder und Dreiländereck
   stehen in Prozent der Kartendatei; pages.css hält sie bei jedem Seitenverhältnis im Bild.
+  Kopf wie beim Team der Über-uns-Seite (sections/about-team.liquid): die Überschrift („Komm vorbei.“) groß und waagrecht über der
+  ganzen Breite, optional ein Satz darunter, beides blendet ein (data-split, data-reveal). Wo bis zum 2.11. die Überschrift stand
+  (neben bzw. über den Angaben), steht jetzt der Name des Ladens („Harley-Davidson Power Shop“, Einstellung „Name über der Adresse“).
   „Route planen“ öffnet Google Maps in einem neuen Fenster, eingebettet wird nichts. Die Öffnungszeiten stehen hier, die
   Kontakt-Box zeigt sie darum nicht noch einmal (hours: false). Styles in assets/pages.css.
 {%- endcomment -%}
@@ -27,8 +30,16 @@
 
 {%- if has_data -%}
   <section class="visit{% if section.settings.scheme == 'dark' %} visit--dark on-dark textured{% endif %}" id="{{ anchor | escape }}" aria-labelledby="visit-title-{{ section.id }}">
+    <div class="container visit__head">
+      <h2 class="visit__heading" id="visit-title-{{ section.id }}" data-split="words">{{ section.settings.heading | escape }}</h2>
+      {%- if section.settings.intro != blank -%}
+        <p class="visit__intro" data-reveal data-reveal-delay="200">{{ section.settings.intro | escape }}</p>
+      {%- endif -%}
+    </div>
     <div class="container visit__grid">
-      <h2 class="visit__title" id="visit-title-{{ section.id }}">{{ section.settings.heading | escape }}</h2>
+      {%- if section.settings.name != blank -%}
+        <p class="visit__title">{{ section.settings.name | escape }}</p>
+      {%- endif -%}
 
       {%- if section.settings.show_map -%}
         {%- render 'visit-map' -%}
@@ -71,7 +82,9 @@
   "name": "Komm vorbei",
   "settings": [
     { "type": "paragraph", "content": "Adresse, Telefon, WhatsApp, E-Mail und Öffnungszeiten kommen aus den Theme-Einstellungen unter „Händlerdaten“." },
-    { "type": "text", "id": "heading", "label": "Überschrift", "default": "Komm vorbei." },
+    { "type": "text", "id": "heading", "label": "Überschrift", "default": "Komm vorbei.", "info": "Steht groß oben über dem ganzen Abschnitt." },
+    { "type": "textarea", "id": "intro", "label": "Text unter der Überschrift", "info": "Optional." },
+    { "type": "text", "id": "name", "label": "Name über der Adresse", "default": "Harley-Davidson Power Shop" },
     { "type": "text", "id": "anchor", "label": "Anker (ohne #)", "default": "standort", "info": "Sprungziel, z. B. /pages/service#standort. Der Menüpunkt „Standort & Kontakt“ zeigt darauf." },
     { "type": "text", "id": "note", "label": "Satz unter der Adresse", "default": "Im Stadtteil Haltingen, mitten im Dreiländereck." },
     { "type": "checkbox", "id": "show_map", "label": "Karte des Dreiländerecks zeigen", "default": true },
