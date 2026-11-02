@@ -1056,6 +1056,8 @@
   }), function () { var t = teamEl(); return t && t.querySelectorAll('.spot__card').length === 1 ? '' : 'nur mit einer Person in der Vorlage'; });
 
   // ---- Task 7: Komm vorbei ----
+  // Seit dem 2.11. steht auf Über uns sections/visit.liquid wie auf Service, nicht mehr .about-visit: Die visit:*-Prüfungen gelten nur,
+  // wenn sections/about-visit.liquid wieder in der Vorlage steht, sonst melden sie „.about-visit fehlt“.
   // Vergleich der Karte (Bash, kein Browser), damit der Umbau von sections/visit.liquid nichts ändert:
   //   curl -s http://127.0.0.1:9293/pages/service | python3 -I docs/qa/karte-ausschneiden.py > "$Q/karte-nachher.html"
   //   diff "$Q/karte-vorher.html" "$Q/karte-nachher.html"     (keine Ausgabe heißt gleich)

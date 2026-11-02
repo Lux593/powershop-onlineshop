@@ -195,11 +195,15 @@
       }
     },
     "visit": {
-      "type": "about-visit",
+      "type": "visit",
       "settings": {
-        "heading": "Komm vorbei",
-        "where": "Im Stadtteil Haltingen, mitten im Dreiländereck.",
-        "foot": "Zu weit für einen Besuch? Wir liefern Motorräder auf Wunsch in ganz Deutschland, in die Schweiz und nach Frankreich und übernehmen Export und Verzollung."
+        "heading": "Komm vorbei.",
+        "anchor": "besuch",
+        "note": "Im Stadtteil Haltingen, mitten im Dreiländereck.",
+        "show_map": true,
+        "scheme": "light",
+        "contact_title": "Schreib uns",
+        "foot": "Zu weit für einen Besuch? Wir <a href=\"/pages/dienstleistungen#lieferung\">liefern dein Motorrad</a> bundesweit, in die Schweiz und nach Frankreich."
       }
     }
   },
