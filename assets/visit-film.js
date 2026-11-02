@@ -37,7 +37,9 @@
     var con = navigator.connection || {};
     var slow = con.saveData || /(^|-)2g$/.test(con.effectiveType || '');
     var mobile = window.matchMedia('(max-width: 767px)').matches;
-    var startSrcset = still.getAttribute('srcset'), startAlt = still.getAttribute('alt');
+    // Standbild im <picture>: am Handy (bis 767 px) die 720er aus <source>, sonst die 1088er im <img>, wie die Filme
+    var source = still.parentElement && still.parentElement.tagName === 'PICTURE' ? still.parentElement.querySelector('source') : null;
+    var startSrc = still.getAttribute('src'), startSet = source ? source.getAttribute('srcset') : '', startAlt = still.getAttribute('alt');
     var state = 'map'; // map | hin | shop | zurueck
     var loaded = false, io = null;
     map.__film = true;
@@ -82,8 +84,8 @@
       back.classList.toggle('is-shown', v === back);
     }
     function setStill(end) {
-      if (end) still.setAttribute('srcset', still.getAttribute('data-end-srcset'));
-      else still.setAttribute('srcset', startSrcset);
+      if (source) source.setAttribute('srcset', end ? source.getAttribute('data-end-srcset') : startSet);
+      still.setAttribute('src', end ? still.getAttribute('data-end-src') : startSrc);
       still.setAttribute('alt', end ? still.getAttribute('data-alt-end') : startAlt);
     }
     function rewind() {
@@ -100,16 +102,30 @@
       ret.hidden = false;
       ret.focus({ preventScroll: true });
     }
-    // Zurück auf der Karte
+    // Wartet, bis das Standbild nach dem Tausch des srcset angezeigt werden kann, höchstens 600 ms
+    function stillReady() {
+      return new Promise(function (resolve) {
+        var t = setTimeout(resolve, 600);
+        function done() { clearTimeout(t); resolve(); }
+        if (!still.decode) { done(); return; }
+        still.decode().then(done, done);
+      });
+    }
+    // Zurück auf der Karte. Das Standbild wechselt von „Laden“ auf „Karte“; der Film (am Ende des Rückflugs auf der Karte) bleibt
+    // sichtbar stehen, bis das neue Standbild bereit ist. Sonst blitzte für einen Moment noch das alte Standbild (der Laden) auf
+    // (Rückmeldung vom 2.11.). Erst ausblenden, dann zurückspulen: Bild 0 des Rückwärtsfilms ist wieder der Laden.
+    // Die Klickfläche erscheint erst danach: Ein Klick in der Wartezeit startete sonst den Hinflug vom Ende des Films.
     function atMap() {
       state = 'map';
       setStill(false);
-      show(null);
-      rewind();
-      map.classList.remove('is-busy', 'is-there');
       ret.hidden = true;
-      fly.hidden = false;
-      fly.focus({ preventScroll: true });
+      stillReady().then(function () {
+        show(null);
+        rewind();
+        map.classList.remove('is-busy', 'is-there');
+        fly.hidden = false;
+        fly.focus({ preventScroll: true });
+      });
     }
     function jump(toShop) {
       map.classList.add('is-calm');

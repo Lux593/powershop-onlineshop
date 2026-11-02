@@ -389,10 +389,27 @@
        Scrollen nach unten und kam am iPhone nicht hinterher, es ruckelte; die Verkleinerung fand der Nutzer unnötig).
        Ende: Die Oberkante des Teams erreicht die Unterkante der stehenden Kopfleiste, im selben Moment endet das Pinnen, und die Bühne
        liegt genau hinter dem Team. Ohne Team (keine Section [data-about-team] direkt danach) gibt es keinen Übergang. */
-    // Leiste von Safari (iOS 26): Safari färbt den Streifen hinter ihr nach dem festen Inhalt am unteren Rand. Vom 30.10. bis 2.11.
-    // stand im Übergang ein schwarzer Streifen am unteren Rand (.about-story__edge), damit die Leiste zum hereinfahrenden Team passt.
-    // Safari behielt das Schwarz aber auch nach dem Zurückscrollen in die Geschichte (Rückmeldung vom iPhone, 2.11.), darum entfernt:
-    // Im Übergang bleibt die Leiste weiß wie die Etappe, danach zeigt Safari die Seite selbst.
+    // Leiste von Safari (iOS 26): Safari färbt den Streifen hinter ihr nach dem festen Inhalt am unteren Rand, auf der gepinnten Bühne
+    // die weiße Etappe. Fährt das schwarze Team herein, bliebe dort Weiß. Darum steht dann ein schwarzer Streifen am unteren Rand
+    // (.about-story__edge, nur am Handy sichtbar, ganz unter der Leiste), aber nur, solange das Team wirklich am unteren Bildrand zu sehen
+    // ist (seine Oberkante über der Fensterunterkante) und gepinnt wird. Bis 2.11. hing er am Fortschritt des Übergangs (größer 0): Hielt
+    // man beim Zurückscrollen knapp davor an, war vom Team nichts zu sehen, die Leiste aber schwarz. Ganz ohne Streifen blieb sie dagegen
+    // weiß, während das Team hereinfuhr (beides Rückmeldungen vom iPhone, 2.11.). Nach dem Pinnen ist nichts mehr fest, Safari zeigt
+    // dann die Seite selbst.
+    var edge = null;
+    function setEdge(on) {
+      if (on === !!edge) return;
+      if (edge) { edge.remove(); edge = null; return; }
+      edge = document.createElement('div');
+      edge.className = 'about-story__edge';
+      edge.setAttribute('aria-hidden', 'true');
+      document.body.appendChild(edge);
+    }
+    var covered = function (self) {
+      // innerHeight ist am iPhone der Bereich über der Leiste (ausgeklappt kleiner): Steckt das Team noch hinter ihr, bleibt sie weiß.
+      // 8 px Schwelle: der weiche Schatten über dem Team allein zählt nicht.
+      setEdge(self.progress > 0 && self.progress < 1 && team.getBoundingClientRect().top < window.innerHeight - 8);
+    };
     var toTeam = null;
     if (team) {
       toTeam = gsap.timeline({
@@ -401,7 +418,11 @@
           start: function () { return pin.end - tail(); },
           end: function () { return pin.end; },
           scrub: true,
-          invalidateOnRefresh: true
+          invalidateOnRefresh: true,
+          onUpdate: covered,
+          onRefresh: covered,
+          onLeave: function () { setEdge(false); },
+          onLeaveBack: function () { setEdge(false); }
         }
       })
         .fromTo(section, { '--cover': 0 }, { '--cover': 0.75, ease: 'none' }, 0)
@@ -498,6 +519,7 @@
       if (section.__gallery) section.__gallery.finish();
       if (thumbs) thumbs.forEach(function (list) { list.forEach(function (b) { b.removeAttribute('tabindex'); }); });
       section.classList.remove('is-live');
+      setEdge(false);
       if (PS.headerHold) PS.headerHold(false);
       delete section.__story;
       fill.style.removeProperty('transform');

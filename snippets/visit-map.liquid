@@ -17,9 +17,12 @@
   @param {boolean} [film] - true zeigt statt der Karte den Film „Flug zum Laden“ (seit dem 2.11.): Startbild ist die Karte mit Bar & Shield
     und Schild „Power Shop“ (eingebrannt, darum ohne Länder, Pin und Schild als HTML). Ein Klick auf Logo oder Schild fliegt zum Laden
     (Film vorwärts), am Ende steht das Bild still und „Zurück zur Karte“ erscheint; der Knopf spielt den umgedrehten Film. Ablauf in
-    assets/visit-film.js, Styles in assets/pages.css. Dateien: visit-film-1080/-720.mp4 (vorwärts), visit-film-rueck-1080/-720.mp4
-    (rückwärts), visit-film-start-*/-ende-*.webp (erstes und letztes Bild). Alle ohne Ton, unten um die eingebrannte Quellenangabe
-    gekürzt (1392 × 1440 aus dem Original 1392 × 1488); die Quellenangabe steht als Link darüber. Ohne Skript bleibt das Startbild stehen.
+    assets/visit-film.js, Styles in assets/pages.css. Dateien: visit-film-1088/-720.mp4 (vorwärts), visit-film-rueck-1088/-720.mp4
+    (rückwärts), visit-film-start-*/-ende-*.webp (erstes und letztes Bild, je in derselben Größe wie der Film, am Handy bis 767 px die
+    720er wie im Skript). Alle ohne Ton, unten um die eingebrannte Quellenangabe gekürzt; die Quellenangabe steht als Link darüber.
+    Maße 1088 × 1120 und 720 × 736: Vielfache von 16, damit H.264 kein Abschneiden braucht. Mit 1080 × 1118 (bis 2.11.) stand im Film
+    die Anweisung, rechts 8 px und unten 2 px wegzuschneiden; Windows-Decoder ignorierten sie, rechts und unten blieb ein schwarzer Rand.
+    Ohne Skript bleibt das Startbild stehen.
     Unter Logo und Schild steht ein Hinweis, dass man klicken kann (Wiedergabe-Symbol und film_hint); er ist Teil der Klickfläche und ihr Name.
   @param {string} [film_hint] - Text des Hinweises unter dem Logo, Standard „Glide to Shop“ (bis 2.11. „Zum Laden fliegen“).
 
@@ -33,22 +36,29 @@
         {%- assign hint = film_hint | default: 'Glide to Shop' -%}
         <div class="visit__map visit__map--film" data-reveal="clip" data-visit-film>
           <div class="visit__frame">
+              <picture>
+                <source
+                  media="(max-width: 767px)"
+                  srcset="{{ 'visit-film-start-720.webp' | asset_url }}"
+                  data-end-srcset="{{ 'visit-film-ende-720.webp' | asset_url }}"
+                  width="720"
+                  height="736"
+                >
               <img
                 class="visit__still"
-                src="{{ 'visit-film-start-1080.webp' | asset_url }}"
-                srcset="{{ 'visit-film-start-720.webp' | asset_url }} 720w, {{ 'visit-film-start-1080.webp' | asset_url }} 1080w"
-                data-end-srcset="{{ 'visit-film-ende-720.webp' | asset_url }} 720w, {{ 'visit-film-ende-1080.webp' | asset_url }} 1080w"
-                sizes="(min-width: 1280px) 720px, 100vw"
-                width="1080"
-                height="1118"
+                src="{{ 'visit-film-start-1088.webp' | asset_url }}"
+                data-end-src="{{ 'visit-film-ende-1088.webp' | asset_url }}"
+                width="1088"
+                height="1120"
                 alt="Karte des Dreiländerecks mit Weil am Rhein, Basel und Saint-Louis. Markiert ist der Power Shop in Weil am Rhein-Haltingen."
                 data-alt-end="Der Power Shop von außen: weißes Haus mit großem Harley-Davidson-Schriftzug, davor das Team und Motorräder."
                 loading="lazy"
               >
+              </picture>
               <video class="visit__video" data-film="hin" muted playsinline preload="none" disablepictureinpicture aria-hidden="true" tabindex="-1"
-                data-src="{{ 'visit-film-1080.mp4' | asset_url }}" data-src-m="{{ 'visit-film-720.mp4' | asset_url }}"></video>
+                data-src="{{ 'visit-film-1088.mp4' | asset_url }}" data-src-m="{{ 'visit-film-720.mp4' | asset_url }}"></video>
               <video class="visit__video" data-film="zurueck" muted playsinline preload="none" disablepictureinpicture aria-hidden="true" tabindex="-1"
-                data-src="{{ 'visit-film-rueck-1080.mp4' | asset_url }}" data-src-m="{{ 'visit-film-rueck-720.mp4' | asset_url }}"></video>
+                data-src="{{ 'visit-film-rueck-1088.mp4' | asset_url }}" data-src-m="{{ 'visit-film-rueck-720.mp4' | asset_url }}"></video>
             <div class="visit__film">
               <button class="visit__fly" type="button" hidden>
                 <i class="visit__ring"></i>
