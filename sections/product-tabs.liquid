@@ -12,7 +12,7 @@
 <section class="section product-tabs" aria-labelledby="news-title-{{ section.id }}" style="padding-top:var(--s-4)" data-section-id="{{ section.id }}">
   <div class="container">
     <div class="section-head">
-      <h2 id="news-title-{{ section.id }}">{{ section.settings.heading }}</h2>
+      <h2 class="section-title" id="news-title-{{ section.id }}">{{ section.settings.heading }}</h2>
       {%- if section.settings.subheading != blank -%}
         <p class="muted">{{ section.settings.subheading }}</p>
       {%- endif -%}

@@ -31,7 +31,7 @@
 {%- if has_data -%}
   <section class="visit{% if section.settings.scheme == 'dark' %} visit--dark on-dark textured{% endif %}" id="{{ anchor | escape }}" aria-labelledby="visit-title-{{ section.id }}">
     <div class="container visit__head">
-      <h2 class="visit__heading" id="visit-title-{{ section.id }}" data-split="words">{{ section.settings.heading | escape }}</h2>
+      <h2 class="visit__heading section-title" id="visit-title-{{ section.id }}" data-split="words">{{ section.settings.heading | escape }}</h2>
       {%- if section.settings.intro != blank -%}
         <p class="visit__intro" data-reveal data-reveal-delay="200">{{ section.settings.intro | escape }}</p>
       {%- endif -%}

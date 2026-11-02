@@ -13,9 +13,8 @@
 
 .spot { position: relative; overflow: hidden; padding-block: var(--s-12); border-top: 1px solid var(--c-steel); }
 .spot__empty { color: var(--c-muted-dark); }
-/* Kopf: Überschrift und Einleitung, wie Überschrift und Satz im Seitenkopf (about-head.css) */
+/* Kopf: Überschrift (.section-title, Größe aus tokens.css wie auf der Startseite) und Einleitung wie der Satz im Seitenkopf (about-head.css) */
 .spot__head { grid-area: head; display: grid; gap: var(--s-3); }
-.spot__title { font-size: clamp(44px, 12vw, 64px); font-weight: 800; line-height: .88; }
 .spot__intro { max-width: 72ch; font-size: clamp(17px, 1.35vw, 20px); line-height: 1.55; color: var(--c-on-dark); }
 
 /* ---------------- Vorschau: das ganze Team, schwarz-weiß, die gewählte und die unter dem Zeiger farbig ---------------- */
@@ -140,7 +139,6 @@
     align-items: stretch;
     gap: 24px clamp(24px, 3vw, 48px);
   }
-  .spot__title { font-size: clamp(56px, 5vw, 76px); }
   .spot.is-ready .spot__head { margin-bottom: var(--s-8); }
   .spot.is-ready .spot__roster { align-self: end; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 6px; }
   /* justify-self: stretch, sonst nimmt ein Element mit Seitenverhältnis seine Breite aus der Höhe und ragt aus der Spalte.

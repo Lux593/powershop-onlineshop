@@ -45,7 +45,7 @@
       stehen darunter (Raster in home.css).
     {%- endcomment -%}
     <div class="section-head showroom__head">
-      <h2 class="showroom__title" id="showroom-title-{{ section.id }}">{{ section.settings.heading }}</h2>
+      <h2 class="showroom__title section-title" id="showroom-title-{{ section.id }}">{{ section.settings.heading }}</h2>
       {%- if bikes.size > 0 or request.design_mode -%}
         <div class="segmented showroom__modes" role="group" aria-label="Fahrzeugzustand">
           <button type="button" data-showroom-mode="neu" aria-pressed="true">Neu</button>

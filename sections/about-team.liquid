@@ -26,7 +26,7 @@
 <section class="spot on-dark textured" id="team" data-about-team aria-labelledby="{{ title_id }}">
   <div class="container spot__grid">
     <div class="spot__head">
-      <h2 class="spot__title" id="{{ title_id }}" data-split="words">{{ heading | escape }}</h2>
+      <h2 class="spot__title section-title" id="{{ title_id }}" data-split="words">{{ heading | escape }}</h2>
       {%- if section.settings.text != blank -%}
         <p class="spot__intro" data-reveal data-reveal-delay="200">{{ section.settings.text | escape }}</p>
       {%- endif -%}

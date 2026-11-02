@@ -40,6 +40,8 @@ h1, .h1 { font-size: var(--fs-h1); font-weight: 800; }
 h2, .h2 { font-size: var(--fs-h2); }
 h3, .h3 { font-size: var(--fs-h3); }
 h4, .h4 { font-size: var(--fs-h4); letter-spacing: 0.03em; }
+/* Abschnitts-Überschrift: Startseite, Über uns, „Komm vorbei.“ (Größe: --fs-section, tokens.css) */
+.section-title { font-size: var(--fs-section); font-weight: 800; line-height: .88; }
 .lead { font-size: 18px; line-height: 1.6; }
 .small { font-size: var(--fs-small); }
 .caption { font-size: var(--fs-caption); }
