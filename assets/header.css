@@ -237,9 +237,15 @@ html:not(:has(.announce)) { --announce-h: 0px; }
 /* Fußzeile: links der Weg zum Hauptpunkt, rechts Aufruf-Zeile (Motorräder) oder Kontakt (Service) */
 .mega__foot { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 32px; margin-top: 20px; padding-top: 12px; border-top: 1px solid var(--c-steel); }
 .mega__foot:not(:has(> *)) { display: none; }
-.mega__all { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-size: 15px; font-weight: 600; color: var(--c-white); }
-.mega__all .icon { width: 18px; height: 18px; color: var(--c-orange); transition: transform var(--t-fast) var(--ease); }
-.mega__all:hover { color: var(--c-orange); }
+/* „Alle Herren“ usw.: orange mit schwarzer Schrift wie der Hero-Knopf, damit die Übersicht sofort ins Auge fällt (6.11.2026) */
+.mega__all {
+  display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 18px;
+  font-family: var(--f-head); font-size: 16px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--c-black); background: var(--c-orange); border: 0; border-radius: var(--radius);
+  transition: background-color var(--t-fast), color var(--t-fast);
+}
+.mega__all .icon { width: 18px; height: 18px; color: currentColor; transition: transform var(--t-fast) var(--ease); }
+.mega__all:hover { background: var(--c-orange-dark); color: var(--c-black); }
 .mega__all:hover .icon { transform: translateX(4px); }
 .mega__cta { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; margin-left: auto; }
 .mega__cta p { color: var(--c-muted-dark); font-size: var(--fs-small); }
@@ -264,6 +270,12 @@ html:not(:has(.announce)) { --announce-h: 0px; }
 .mobile-menu .acc__body { padding: 0 24px 16px; color: var(--c-on-dark-strong); }
 .mobile-menu .acc__body a { display: flex; align-items: center; min-height: 44px; }
 .mobile-menu .acc__body strong { color: var(--c-white); }
+/* Übersicht oben in jeder Gruppe: orange, mit Pfeil und Linie darunter */
+.mobile-menu .acc__body .mobile-menu__all {
+  justify-content: space-between; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid var(--c-steel);
+  font-family: var(--f-head); font-size: 17px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--c-orange);
+}
+.mobile-menu__all .icon { width: 18px; height: 18px; }
 /* Gruppen wie die Spalten im Megamenü, aber zugeklappt wie die Hauptpunkte: Titel weiß in Barlow, größer als die Einträge,
    ein Tipp klappt die Links darunter auf (eingerückt) */
 .mobile-menu__group {

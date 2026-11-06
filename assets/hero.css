@@ -280,12 +280,13 @@
   bottom: calc(24px + var(--hero-ui));
   display: grid; place-items: center;
   width: 44px; height: 44px; padding: 0;
-  color: var(--c-white); background: rgb(10 10 10 / 0.45);
-  border: 1.5px solid rgb(255 255 255 / 0.75); border-radius: 50%;
+  /* Dezent (6.11.2026 auf Wunsch): ohne Rand und Fläche, nur das Zeichen halb deckend; 44 px Trefferfläche bleibt (WCAG 2.5.8) */
+  color: rgb(255 255 255 / 0.6); background: transparent;
+  border: 0; border-radius: 50%;
   transition: background-color var(--t-fast), color var(--t-fast);
 }
-.hero__pause:hover { background: var(--c-white); color: var(--c-black); }
-.hero__pause .icon { width: 18px; height: 18px; }
+.hero__pause:hover, .hero__pause:focus-visible { background: rgb(10 10 10 / 0.35); color: var(--c-white); }
+.hero__pause .icon { width: 16px; height: 16px; filter: drop-shadow(0 1px 3px rgb(0 0 0 / 0.5)); }
 .hero__pause[aria-pressed="false"] .hero__pause-play,
 .hero__pause[aria-pressed="true"] .hero__pause-pause { display: none; }
 

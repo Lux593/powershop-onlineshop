@@ -126,6 +126,8 @@
         <details class="acc">
           <summary>{{ link.title | escape }}{% render 'icon', name: 'plus' %}</summary>
           <div class="acc__body">
+            {%- comment -%} Übersicht („Alle Herren“) zuerst und hervorgehoben: so findet man sie sofort (6.11.2026) {%- endcomment -%}
+            <a class="mobile-menu__all" href="{{ link.url }}" style="--i: 0">{{ overview_label | escape }}{% render 'icon', name: 'arrow-right' %}</a>
             {%- for group in link.links -%}
               {%- liquid
                 assign tile_block = nil
@@ -178,7 +180,6 @@
                 </details>
               {%- endif -%}
             {%- endfor -%}
-            <a href="{{ link.url }}" style="--i: {{ link.links.size }}"><strong>{{ overview_label | escape }}</strong></a>
           </div>
         </details>
       {%- else -%}

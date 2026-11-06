@@ -36,12 +36,13 @@
 /* Pause: kleine Fläche unten rechts im Film (44px Trefferfläche) */
 .film-banner__toggle {
   position: absolute; right: 12px; bottom: 12px; width: 44px; height: 44px;
-  display: grid; place-items: center; color: var(--c-white);
-  background: rgba(10, 10, 10, 0.72); border-radius: var(--radius);
-  transition: background-color var(--t-fast);
+  /* Dezent wie im Hero der Startseite (6.11.2026): ohne Fläche, nur das Zeichen halb deckend */
+  display: grid; place-items: center; color: rgb(255 255 255 / 0.6);
+  background: transparent; border-radius: 50%;
+  transition: background-color var(--t-fast), color var(--t-fast);
 }
-.film-banner__toggle:hover { background: var(--c-black); }
-.film-banner__toggle .icon { width: 20px; height: 20px; }
+.film-banner__toggle:hover, .film-banner__toggle:focus-visible { background: rgb(10 10 10 / 0.35); color: var(--c-white); }
+.film-banner__toggle .icon { width: 16px; height: 16px; filter: drop-shadow(0 1px 3px rgb(0 0 0 / 0.5)); }
 .film-banner__toggle[data-state="playing"] .film-banner__icon--play,
 .film-banner__toggle[data-state="paused"] .film-banner__icon--pause { display: none; }
 
