@@ -3,7 +3,10 @@
   Display-Größe, darunter links Bild, Text, Stichpunkte, Links und Beratung, rechts die Kontakt-Box des Shops, eine
   Ansprechpartner-Karte oder die Kontakt-Karte des Shops (gleicher Aufbau wie der Ansprechpartner: Foto, Titel, Adresse
   des Shops, Anrufen, WhatsApp, E-Mail mit festem Thema).
-  Hell (Offwhite) oder dunkel mit Körnung, immer über die volle Breite (eigener Container).
+  Hell (Offwhite), hell abgesetzt (Stone, wenn davor schon ein heller Abschnitt steht) oder dunkel mit Körnung, immer über die
+  volle Breite (eigener Container).
+  Ein oranger Knopf je Abschnitt: Trägt die rechte Spalte einen direkten Draht (Anrufen oder Telefon in Orange), wird Button 1
+  (Rechner, „Motorräder ansehen“) zur Kontur. Ohne Kanäle bleibt er orange.
   Mit Bewegung leuchten die Wörter der Aussage beim Scrollen nacheinander auf wie im Willkommensblock der Startseite
   (data-split aus assets/motion.js, data-scrub aus assets/pages.js). Ohne Bewegung steht die Aussage in voller Farbe da.
   Partner-Logos gibt es in zwei Fassungen: weiße Schrift für dunkel, dunkle Schrift für hell (Orange bleibt in beiden).
@@ -24,6 +27,10 @@
   assign dark = false
   if s.scheme == 'dark'
     assign dark = true
+  endif
+  assign stone = false
+  if s.scheme == 'stone'
+    assign stone = true
   endif
   assign anchor = s.anchor | default: block.id
   assign fallback_default = pages['service'].url | append: '#standort'
@@ -71,7 +78,7 @@
       {%- endcapture -%}
       {%- assign person_photo = person_photo | strip -%}
       {%- assign address_lines = s.person_address | newline_to_br | split: '<br />' -%}
-      <article class="agent" aria-labelledby="agent-{{ block.id }}">
+      <article class="agent{% if person_photo == blank %} agent--plain{% endif %}" aria-labelledby="agent-{{ block.id }}">
         {%- if person_photo != blank -%}
           <div class="agent__photo" data-reveal="clip" style="--photo-pos: {{ photo_pos | escape }}">{{ person_photo }}</div>
         {%- endif -%}
@@ -137,7 +144,7 @@
       {%- endcapture -%}
       {%- assign card_buttons = card_buttons | strip -%}
       {%- assign address_lines = settings.address | newline_to_br | split: '<br />' -%}
-      <article class="agent" id="{{ card_anchor | escape }}" aria-labelledby="agent-{{ block.id }}">
+      <article class="agent{% if card_photo == blank %} agent--plain{% endif %}" id="{{ card_anchor | escape }}" aria-labelledby="agent-{{ block.id }}">
         {%- if card_photo != blank -%}
           <div class="agent__photo" data-reveal="clip" style="--photo-pos: {{ photo_pos | escape }}">{{ card_photo }}</div>
         {%- endif -%}
@@ -163,9 +170,16 @@
   {%- endcase -%}
 {%- endcapture -%}
 {%- assign offer_aside = offer_aside | strip -%}
+{%- liquid
+  # Direkter Draht rechts (oranger Anrufen- oder Telefon-Knopf): dann führt er, Button 1 wird Kontur
+  assign aside_leads = false
+  if offer_aside contains 'btn--primary'
+    assign aside_leads = true
+  endif
+-%}
 
 <section
-  class="section offer{% if dark %} offer--dark on-dark textured{% endif %}"
+  class="section offer{% if dark %} offer--dark on-dark textured{% elsif stone %} offer--stone{% endif %}"
   id="{{ anchor | escape }}"
   aria-labelledby="offer-title-{{ block.id }}"
   {{ block.shopify_attributes }}
@@ -208,7 +222,7 @@
                 if url contains '://'
                   assign external = true
                 endif
-                if i == 1
+                if i == 1 and aside_leads == false
                   assign btn_class = 'btn--primary'
                 elsif dark
                   assign btn_class = 'btn--outline-light'

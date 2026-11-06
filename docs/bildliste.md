@@ -70,7 +70,7 @@ Austausch den Dateinamen aus der Liste streichen (siehe `README.md`).
 | `event-2.jpg` | 800 × 500 | Lifestyle/Marke | Platzhalter | Bike Night im Hof, Lichterketten, Community | Homepage · Event-Kachel 2 |
 | `event-3.jpg` | 800 × 500 | Lifestyle/Marke | Platzhalter | Winter-Check in der Werkstatt, Kunden mit Kaffee | Homepage · Event-Kachel 3 |
 | `team-verkauf.jpg` | 400 × 400 | Lifestyle/Marke | Platzhalter | Porträt Verkaufsberater, freundlich, im Showroom | Kontakt-Box · Ansprechpartner |
-| `service-probefahrt.jpg` | 1200 × 800 | Lifestyle/Marke | echt | Lenker und Scheinwerfer eines Bikes in der Frontansicht, ohne Person | Service · Probefahrt (Foto der Kontakt-Karte, 4 : 5) |
+| `service-probefahrt.jpg` | 1200 × 800 | Lifestyle/Marke | echt | Lenker und Scheinwerfer eines Bikes in der Frontansicht, ohne Person | Dienstleistungen · Seitenkopf (seit 6.11., vorher Banner und Foto der Kontakt-Karte bei Probefahrt). Für Bildschirme ab etwa 2560 px wäre ein Original ab 1920 px Breite schärfer, dann mit -720/-1280/-1600 wie `werkstatt-kopf-*` |
 | `service-finanzierung.jpg` | 1200 × 800 | Lifestyle/Marke | Platzhalter | Beratungsgespräch am Tisch, Bike im Hintergrund | Service · Finanzierung |
 | `service-werkstatt.jpg` | 1200 × 800 | Lifestyle/Marke | echt | Werkstatt mit Bike auf der Hebebühne, schwarze Werkbänke mit oranger Rückwand, ohne Person | Service · Werkstatt |
 | `service-inzahlungnahme.jpg` | 1200 × 800 | Lifestyle/Marke | Platzhalter | Handschlag vor Gebrauchtbike | Service · Inzahlungnahme |

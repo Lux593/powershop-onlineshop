@@ -10,6 +10,8 @@
    --offer-sticky: Oberkante der stehenbleibenden Textspalte; klebt die Service-Navigation, zählt sie mit (--subnav-h). */
 .offer { --scrub-dim: var(--c-dim-light); --scrub-lit: var(--c-black); --offer-sticky: calc(var(--header-offset) + var(--subnav-h, 0px) + var(--s-4)); }
 .offer--dark { --scrub-dim: var(--c-dim-dark); --scrub-lit: var(--c-white); }
+/* Hell abgesetzt (Schema „stone“): eine Flächenstufe statt einer Linie, wenn zwei helle Schritte aufeinander folgen (Inzahlungnahme, Finanzierung) */
+.offer--stone { background: var(--c-stone); }
 
 .offer__head { display: grid; gap: var(--s-3); margin-bottom: var(--s-6); }
 @media (min-width: 1024px) { .offer__head { gap: var(--s-4); margin-bottom: var(--s-8); } }
@@ -17,8 +19,9 @@
 @media (min-width: 1024px) { .offer__logo img { height: 26px; } }
 
 /* Aussage in Größe und Schrift der Willkommens-Aussage (home.css). Die Breite in em hält sie bei jeder Schriftgröße auf
-   drei bis vier Zeilen, solange der Container breit genug ist. */
-.offer__claim {
+   drei bis vier Zeilen, solange der Container breit genug ist. Die Themenblöcke des Kaufwegs (.step-claim, Inzahlungnahme und
+   Lieferung) tragen dieselbe Größe: Alle fünf Schritte stehen auf einer Ebene. */
+.offer__claim, .step-claim {
   --split-pad: 0.2em; /* Luft für Umlaute in den Wortmasken */
   max-width: 15em;
   font-family: var(--f-head); font-weight: 800; font-size: calc(var(--fs-display) * 0.4); line-height: 0.96;
@@ -33,7 +36,9 @@
    mit Bild steht es links und der Text rechts daneben, ohne Bild rückt die Beratung neben Text und Buttons
    (dense füllt die erste Zeile). */
 @media (min-width: 1024px) {
-  .offer__grid:not(.offer__grid--single) .offer__main { position: sticky; top: var(--offer-sticky); transition: top var(--t-med) var(--ease); }
+  /* Beide Spalten kleben: Es läuft immer die kürzere mit (Probefahrt, Versicherung: der Text; Finanzierung: die Kontakt-Karte),
+     die längere bestimmt die Höhe und scrollt normal. */
+  .offer__grid:not(.offer__grid--single) :is(.offer__main, .offer__aside) { position: sticky; top: var(--offer-sticky); transition: top var(--t-med) var(--ease); }
   .offer__grid--single .offer__main { max-width: none; }
   .offer__grid--single .offer__main:has(> .offer__media) { grid-template-columns: 7fr 5fr; column-gap: 56px; align-items: start; }
   .offer__grid--single .offer__main:not(:has(> .offer__media)) .offer__body { grid-template-columns: 7fr 5fr; grid-auto-flow: dense; column-gap: 56px; }
@@ -69,6 +74,12 @@
 .agent__photo { position: relative; aspect-ratio: 4 / 5; overflow: hidden; background: var(--c-anthracite); }
 .agent__photo img { width: 100%; height: 100%; object-fit: cover; object-position: var(--photo-pos, 50% 50%); }
 .agent__photo::after { content: ""; position: absolute; left: 0; bottom: 0; width: 96px; height: 6px; background: var(--c-orange); }
+/* Ab 1024 px steht die Karte neben dem Text: quadratisch statt 4 : 5, sonst streckt das Porträt die Spalte weit über den Text hinaus
+   (Versicherung). Am Handy und Tablet bleibt es 4 : 5. */
+@media (min-width: 1024px) { .offer__aside .agent__photo { aspect-ratio: 1 / 1; } }
+/* Karte ohne Foto (Kontakt-Karte bei Probefahrt und Finanzierung): Der orange Balken des Fotos steht allein über dem Titel */
+.agent--plain::before { content: ""; width: 96px; height: 6px; background: var(--c-orange); }
+@media (min-width: 640px) and (max-width: 1023px) { .agent--plain { grid-template-columns: minmax(0, 1fr); } }
 .agent__body { display: grid; gap: 12px; }
 .agent h3 { font-size: 32px; }
 .agent address { font-style: normal; line-height: 1.6; color: var(--c-muted); }
@@ -77,6 +88,12 @@
 /* Kontakt-Karte des Shops: Nummer wie beim Ansprechpartner in der Grundschrift (contact-box blendet sie am Handy aus) */
 .agent__actions .contact-box__phone { font-family: var(--f-body); font-weight: 600; letter-spacing: 0; text-transform: none; }
 .agent__number { font-family: var(--f-body); font-weight: 600; letter-spacing: 0; text-transform: none; }
+/* Handy: Anrufen über die ganze Breite, WhatsApp und E-Mail teilen sich die Zeile darunter (die Nummer blendet contact-box dort aus).
+   Gilt für die Kanäle des Shops (data-cb), nicht für die Telefonnummern des Ansprechpartners, die brauchen die volle Breite. */
+@media (max-width: 639px) {
+  .agent__actions:has(> [data-cb]) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .agent__actions:has(> [data-cb]) > :first-child:nth-last-child(odd) { grid-column: 1 / -1; }
+}
 
 /* ---------- Scrub der Aussagen (assets/pages.js setzt .is-scrub und .is-lit) ----------
    Wie im Willkommensblock: Solange der Scrub läuft, entfällt das Hochgleiten der Wörter, nur die Farbe wechselt.
@@ -90,10 +107,12 @@
    Unter dem Banner die Türen zu Werkstatt und Über uns, darunter der Kaufweg: nummerierte Schritte, getrennt durch
    Haarlinien. Handy und Tablet: Nummer, Titel, Bild (16:9), Text, Anfrage-Zeile. Ab 1024 px steht der Text links und
    das Bild rechts; ohne Bild steht der Text auf Lesebreite, ohne leere Spalte daneben. */
-.service-block { display: grid; grid-template-areas: "head" "media" "body"; gap: var(--s-3); padding-block: var(--s-8); border-bottom: 1px solid var(--c-line); }
+/* Abstände wie die Partner-Abschnitte (.section, .offer__head): Die Schritte trennt der Wechsel der Fläche, keine Linie. */
+.service-block { display: grid; grid-template-areas: "head" "media" "body"; gap: var(--s-3); padding-block: var(--section-y); }
 .service-block > * { min-width: 0; }
-.service-block__head { grid-area: head; display: grid; gap: var(--s-2); }
-.service-block__head h2 { max-width: 20ch; overflow-wrap: break-word; }
+.service-block--text { grid-template-areas: "head" "body"; } /* ohne Bild keine leere Zeile, sonst zählte der Abstand doppelt */
+.service-block__head { grid-area: head; display: grid; gap: var(--s-3); margin-bottom: calc(var(--s-6) - var(--s-3)); }
+@media (min-width: 1024px) { .service-block__head { gap: var(--s-4); margin-bottom: calc(var(--s-8) - var(--s-3)); } }
 .service-block__media { grid-area: media; aspect-ratio: 16 / 9; overflow: hidden; background: var(--c-stone); }
 .service-block__media img { width: 100%; height: 100%; object-fit: cover; }
 .service-block__body { grid-area: body; display: grid; gap: var(--s-2); align-content: start; max-width: 68ch; }
@@ -146,14 +165,14 @@
 }
 
 /* Checkliste (Inzahlungnahme: „Das brauchen wir von dir“): eigene weiße Fläche mit Haarlinie wie die Kacheln, Häkchen wie in
-   den Stichpunkten. Ab 640 px zwei Spalten, ab 1024 px steht die Überschrift links daneben. */
+   den Stichpunkten. Die Überschrift steht darüber, ab 640 px zwei Spalten über die volle Breite (daneben wären die Spalten so
+   schmal, dass „Zulassungsbescheinigung Teil I“ umbricht). */
 .checklist { display: grid; gap: var(--s-2); padding: var(--s-3); background: var(--c-white); border: 1px solid var(--c-line); }
 .checklist__title { font-size: 20px; line-height: 1.1; }
 .checklist__items { display: grid; gap: 10px var(--s-3); }
 .checklist__items li { display: flex; gap: 10px; }
 .checklist__items .icon { flex: none; width: 18px; height: 18px; margin-top: 3px; color: var(--c-success); }
 @media (min-width: 640px) { .checklist__items { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (min-width: 1024px) { .checklist { grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); column-gap: var(--s-4); align-items: start; } }
 
 /* Events: Die Karten bringen ihre dunkle Fläche selbst mit (sections.css) und stehen direkt auf dem hellen Grund. Spalten ab
    320 px Breite statt fester Drei: Ein einzelner Termin bleibt eine Karte und wird kein Balken über die ganze Breite.

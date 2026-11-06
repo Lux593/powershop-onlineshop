@@ -106,6 +106,18 @@ Stand 2026-10-27.
 - `snippets/link-order.liquid`: Die eigene Reihenfolge galt nur für den ersten Titel der Liste (Schleifenvariable überschrieben).
   Nach dem Push stehen Modellfamilien und Kollektionen in der Reihenfolge des Menüs.
 
+**Dienstleistungen, 6.11. (Feinschliff nach Startseite, Über uns und Werkstatt)**
+- Seitenkopf wie Werkstatt und Über uns (`about-head`): „Unsere *Dienstleistungen.*“, Scheinwerfer-Foto rechts, „Weiter“, ohne Rolltor
+  (die Leiste klebt hier, und alle Sprungziele liegen direkt hinter dem Kopf). Der Banner der Service-Seite ist dort aus
+  (neue Einstellung „Banner zeigen“). Am Handy ohne Safari-Saum, weil nichts hinter dem Kopf liegt.
+- Alle fünf Schritte gleich: Aussage in Display-Größe (`.step-claim` wie `.offer__claim`, mit Aufleuchten), gleiche Abstände,
+  Rhythmus `--section-y`, keine Trennlinien mehr; Finanzierung hell abgesetzt (Schema „Hell, abgesetzt“, Stone).
+- Kontakt: Probefahrt und Finanzierung mit der Kontakt-Karte des Shops (ohne Foto, oranger Balken über dem Titel), Versicherung
+  mit Ansprechpartner (ab 1024 px quadratisch), Inzahlungnahme und Lieferung mit der Anfrage-Zeile. Je Abschnitt ein oranger Knopf:
+  Steht rechts ein direkter Draht, werden Rechner und „Motorräder ansehen“ zur Kontur. Beide Spalten kleben, die kürzere läuft mit.
+- Checkliste der Inzahlungnahme: Überschrift über den Punkten, zwei Spalten über die volle Breite.
+- Handy: Anrufen über die ganze Breite, WhatsApp und E-Mail nebeneinander darunter.
+
 **Startseite, 27.10. abends**
 - „Mehr als ein Shop“ (`sections/story-events.liquid`) ohne Teamfoto: Text oben, darunter die drei Türen wie auf Service
   (Blocktyp „Bereich“, Regeln `.doors` jetzt in `assets/home.css`, das überall lädt), darunter die Kennzahlen.

@@ -92,6 +92,8 @@ unter `/pages/service#finanzierung` und `#versicherung` (Blöcke „Partner-Ange
     Veröffentlichung im Onlineshop einverstanden?
 37. **Unterzeile Finanzierung** (Wichtig): „Hier klicken, um zu sehen, was unser Finanzrechner für Dich tun kann.“ stammt aus der alten Seite, dort war die
     Überschrift ein Link. Jetzt stehen die Buttons direkt darunter. Soll der Satz so bleiben?
+    **Stand 6.11.:** Ersetzt durch „Welche Rate zu deinem Wunsch-Modell passt, rechnest du mit dem Finanzierungsrechner von Harley-Davidson in Ruhe
+    aus.“, die Aussage darüber heißt jetzt „Laufzeit und Rate, wie sie zu dir passen“. Passt das so?
 38. **Bilder und Logos** (Wichtig): Das Breakout-Foto ist Harley-Davidson-Werbematerial (Modelljahr 2026). Für den hellen Abschnitt wurde aus dem weißen
     Finance-Logo eine Fassung mit schwarzer Schrift abgeleitet (Orange unverändert). Ist das nach den Händler-Vorgaben in Ordnung?
 
