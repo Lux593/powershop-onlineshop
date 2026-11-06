@@ -7,12 +7,12 @@
      gerade läuft oder am Ende steht (is-shown). So gibt es beim Umschalten keinen Sprung: Bild 0 des einen Films ist das letzte des
      anderen bzw. das Standbild.
    - Laden: beide Filme, sobald die Karte in die Nähe des Bildschirms kommt (halbe Bildschirmhöhe vorher), am Handy (bis 767 px) die
-     720er. Bei Datensparen oder 2G erst beim Klick, wie die Filme im Hero (assets/hero.js). Kein Ton (die Dateien haben keine Tonspur).
+     1280er (beide Querformat 16 : 9, seit 6.11.). Bei Datensparen oder 2G erst beim Klick, wie die Filme im Hero (assets/hero.js). Kein Ton (die Dateien haben keine Tonspur).
    - Ohne Bewegung (html.has-motion fehlt, reduzierte Bewegung, Theme-Editor) und wenn play() abgelehnt wird (iPhone im Stromsparmodus)
      oder die Filme nicht laden: harter Wechsel zwischen den Standbildern, mit denselben Knöpfen.
    - Fokus: Nach dem Hinflug steht er auf „Zurück zur Karte“, nach dem Rückflug wieder auf der Klickfläche. Das Standbild trägt jeweils
      den passenden Alternativtext (Karte bzw. Laden).
-   Am Laden trägt die Karte is-there (Ausschnitt rückt nach oben, Quellenangabe blendet aus), während eines Flugs is-busy.
+   Am Laden trägt die Karte is-there (Ausschnitt schwenkt vom Logo auf den Laden, Quellenangabe blendet aus), während eines Flugs is-busy.
    ========================================================================== */
 (function () {
   // Das Skript-Tag steht in der Section und läuft deshalb vor theme.js (beide defer): PS.on gibt es erst danach
@@ -37,7 +37,7 @@
     var con = navigator.connection || {};
     var slow = con.saveData || /(^|-)2g$/.test(con.effectiveType || '');
     var mobile = window.matchMedia('(max-width: 767px)').matches;
-    // Standbild im <picture>: am Handy (bis 767 px) die 720er aus <source>, sonst die 1088er im <img>, wie die Filme
+    // Standbild im <picture>: am Handy (bis 767 px) die 1280er aus <source>, sonst die 1536er im <img>, wie die Filme
     var source = still.parentElement && still.parentElement.tagName === 'PICTURE' ? still.parentElement.querySelector('source') : null;
     var startSrc = still.getAttribute('src'), startSet = source ? source.getAttribute('srcset') : '', startAlt = still.getAttribute('alt');
     var state = 'map'; // map | hin | shop | zurueck
@@ -145,7 +145,7 @@
         if (state !== 'hin') return;
         if (!ok) { jump(true); return; }
         show(hin); // Bild 0 = Standbild, kein Sprung
-        map.classList.add('is-there'); // Schwenk des Ausschnitts, beginnt mit Verzögerung (pages.css)
+        map.classList.add('is-there'); // Schwenk des Ausschnitts vom Logo auf den Laden (pages.css)
         fly.hidden = true;
         var p = hin.play();
         if (p && p.catch) p.catch(function () { if (state === 'hin') jump(true); });

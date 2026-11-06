@@ -28,9 +28,9 @@
             "subtitle": "Inspektion, Umbau & Eintragung",
             "url": "shopify://pages/werkstatt",
             "anchor": "werkstatt",
-            "image_asset": "umbau-falk-2-1920.webp",
-            "image_srcset": "umbau-falk-2-720.webp 720w, umbau-falk-2-1280.webp 1280w, umbau-falk-2-1920.webp 1920w",
-            "image_position": "50% 70%"
+            "image_asset": "tuer-werkstatt-1920.webp",
+            "image_srcset": "tuer-werkstatt-720.webp 720w, tuer-werkstatt-1280.webp 1280w, tuer-werkstatt-1920.webp 1920w",
+            "image_position": "50% 40%"
           }
         },
         "tuer_dienstleistungen": {
