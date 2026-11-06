@@ -5,11 +5,14 @@
   assets/film-banner.js): Brotkrumen, Titel, Einleitung, rechts der Film im Fenster 4 : 3 über seinem Standbild. Ohne Film
   bleibt das Standbild. Unter 1024 px entfallen die Brotkrumen, dort zeigt die Service-Navigation darüber den Weg (pages.css).
   CSS und JS des Umbau-Buchs laden nur mit dieser Section. Ohne Skript stehen alle Umbauten offen untereinander.
+  Ohne Seitenkopf (Einstellung „Seitenkopf anzeigen“ aus, seit 6.11. auf der Werkstatt): Den Kopf stellt dann der „Seitenkopf Über uns“
+  davor (sections/about-head.liquid), mit Rolltor. Band und Umbauten stehen dafür in einer Hülle [data-roll-target]: Sie klebt unter
+  der Kopfleiste, während der Kopf über ihr hochfährt (about-head.css). Das Band trägt den Anker #umbauten (Menü, Service-Leiste).
   Entwurf und Messungen: docs/architecture.md, docs/research/werkstatt-umbau-buch.md.
 {%- endcomment -%}
 {{ 'build-book.css' | asset_url | stylesheet_tag }}
 <script src="{{ 'build-book.js' | asset_url }}" defer></script>
-<script src="{{ 'film-banner.js' | asset_url }}" defer></script>
+{%- if section.settings.show_banner -%}<script src="{{ 'film-banner.js' | asset_url }}" defer></script>{%- endif -%}
 
 {%- liquid
   assign heading = section.settings.heading | default: page.title | default: 'Werkstatt'
@@ -28,7 +31,10 @@
   assign book_label = 'bb-title-' | append: section.id
   if builds_heading != blank
     assign book_label = 'bb-lead-' | append: section.id
+  elsif section.settings.show_banner == false
+    assign book_label = ''
   endif
+  assign builds_anchor = section.settings.builds_anchor | strip | handleize
 -%}
 {%- capture banner_media -%}
   {%- render 'media',
@@ -45,6 +51,7 @@
 {%- endcapture -%}
 {%- assign banner_media = banner_media | strip -%}
 
+{%- if section.settings.show_banner -%}
 <section class="page-banner page-banner--film on-dark textured">
   <div class="container page-banner__inner">
     <div class="page-banner__text">
@@ -87,14 +94,16 @@
     </div>
   </div>
 </section>
+{%- endif -%}
 
+<div class="bb-roll" data-roll-target>
 {%- if builds_heading != blank or section.settings.builds_text != blank or section.settings.builds_more != blank -%}
   {%- comment -%}
     Schrift wie der Willkommensblock der Startseite (Regeln .statement__title und .statement__text in home.css), aber
     ruhig: kein Bar & Shield, keine Gebäudezeichnung, kein Aufleuchten beim Scrollen. Das Band steht direkt unter dem
     Seitenkopf schon beim Laden im Bild, ein Scrub hätte dort nichts zu zeigen.
   {%- endcomment -%}
-  <div class="bb-lead">
+  <div class="bb-lead"{% if builds_anchor != blank %} id="{{ builds_anchor }}"{% endif %}>
     <div class="container">
       {%- if builds_heading != blank -%}
         <h2 class="statement__title" id="bb-lead-{{ section.id }}">{{ builds_heading | escape }}</h2>
@@ -109,7 +118,7 @@
   </div>
 {%- endif -%}
 
-<section class="build-book on-dark textured" data-build-book aria-labelledby="{{ book_label }}">
+<section class="build-book on-dark textured" data-build-book {% if book_label != blank %}aria-labelledby="{{ book_label }}"{% else %}aria-label="Custom-Umbauten"{% endif %}>
   <div class="bb-bays" data-bb-bays>{% content_for 'blocks' %}</div>
   <p class="sr-only" aria-live="polite" data-bb-live></p>
 
@@ -130,6 +139,7 @@
     </div>
   </dialog>
 </section>
+</div>
 
 {% schema %}
 {
@@ -138,6 +148,7 @@
   "blocks": [{ "type": "build" }],
   "settings": [
     { "type": "header", "content": "Seitenkopf" },
+    { "type": "checkbox", "id": "show_banner", "label": "Seitenkopf anzeigen", "default": true, "info": "Aus, wenn davor ein „Seitenkopf Über uns“ steht (Werkstatt): Dann gelten die Felder bis „Einleitung zu den Umbauten“ nicht." },
     { "type": "text", "id": "heading", "label": "Überschrift", "info": "Leer = Titel der Seite." },
     { "type": "textarea", "id": "intro", "label": "Einleitung", "default": "Inspektion, Einbau, Custom-Umbau und Eintragung: Unsere Meisterwerkstatt kümmert sich um dein Bike." },
     { "type": "page", "id": "parent_page", "label": "Übergeordnete Seite", "info": "Steht in den Brotkrumen zwischen Home und dieser Seite, z. B. Service." },
@@ -152,7 +163,8 @@
     { "type": "paragraph", "content": "Helles Band zwischen Seitenkopf und Umbauten, in der Schrift des Willkommensblocks der Startseite. Alle Felder leer = kein Band." },
     { "type": "text", "id": "builds_heading", "label": "Überschrift", "default": "Custom-Umbauten aus unserer Meisterwerkstatt" },
     { "type": "textarea", "id": "builds_text", "label": "Aussage (optional)", "info": "Großer Satz unter der Überschrift. Leer = nur Überschrift und Text darunter." },
-    { "type": "textarea", "id": "builds_more", "label": "Text darunter", "default": "Du bringst die Idee mit, wir setzen sie in unserer Meisterwerkstatt um, vom neuen Lenker bis zum kompletten Umbau. In der Galerie kannst du dir Umbauprojekte aus dem Power Shop anschauen." }
+    { "type": "textarea", "id": "builds_more", "label": "Text darunter", "default": "Du bringst die Idee mit, wir setzen sie in unserer Meisterwerkstatt um, vom neuen Lenker bis zum kompletten Umbau. In der Galerie kannst du dir Umbauprojekte aus dem Power Shop anschauen." },
+    { "type": "text", "id": "builds_anchor", "label": "Anker (ohne #)", "default": "umbauten", "info": "Sprungziel für Menü und Service-Leiste, z. B. /pages/werkstatt#umbauten." }
   ],
   "presets": [{ "name": "Umbau-Buch", "blocks": [{ "type": "build" }] }]
 }

@@ -56,6 +56,28 @@ Ersetzt den Street-Glide-Slide (Foto). Jeder Slide kann seit diesem Tag einen ei
 
 Der Film lädt erst, wenn sein Slide zum ersten Mal drankommt. Preis „ab 16.300 €“ als Preistext (vom Nutzer genannt, 21.10.2026; kein Sportster-Produkt im Shop).
 
+## Custom Bike (dritter Slide, seit 6. November 2026)
+
+Ersetzt den CVO-Slide (Foto mit CVO Road Glide ST). Der Slide wirbt für Umbauten aus der Meisterwerkstatt und führt ohne
+Produkt und Preis zur Seite Werkstatt (`/pages/werkstatt`) mit der Umbau-Galerie.
+
+| | |
+|---|---|
+| Quelle | `custom-video.mp4`, vom Nutzer geliefert. Laut Metadaten Export aus DaVinci Resolve Studio, erstellt am 6. November 2026. Zeigt den Chopper aus Project Falk |
+| Rohmaterial | 3840 × 2160 (schon 16:9), HEVC Main, 29,97 fps, 33,11 s, mit Ton |
+| Schnitt | Nur Bild 0–818 (27,33 s). Ab Bild 819 folgt mit hartem Schnitt eine schwarze Abspann-Tafel (Bar & Shield, „Jetzt im Power Shop erhältlich!“, Adresse), die auf Wunsch des Nutzers wegfällt |
+| Kodierung | wie oben: ohne Ausschnitt, Lanczos, ohne Ton, Metadaten und Zeitcode; MP4 CRF 26 (`-g 48`), WebM VP9 CRF 38. Poster aus Bild 0 mit `cwebp -q 80` (das lokale ffmpeg hat kein libwebp) |
+
+| Datei | Format | Größe |
+|---|---|---|
+| `assets/custom-bike.mp4` | H.264, 1280 × 720 | 8,2 MB |
+| `assets/custom-bike-720.mp4` | H.264, 960 × 540 | 5,6 MB |
+| `assets/custom-bike.webm` | VP9, 1280 × 720 | 6,8 MB |
+| `assets/custom-bike-poster.webp` | 1920 × 1080 | 108 KB |
+| `assets/custom-bike-poster-960.webp` | 960 × 540 | 37 KB |
+
+Größer als die beiden anderen Filme, weil der Clip länger ist (27 statt 20 s) und viel Bewegung hat.
+
 ## Vor dem Livegang klären
 
 - **Nutzungsrechte:** Rechte am Film und Einverständnis der gezeigten Person für die Nutzung im Shop klären.

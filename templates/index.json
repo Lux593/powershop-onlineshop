@@ -31,20 +31,21 @@
             "url": "/collections/motorraeder"
           }
         },
-        "cvo": {
+        "custom": {
           "type": "slide",
           "settings": {
-            "label": "CVO",
-            "blurb": "Die CVO-Ausstattung für die große Tour.",
-            "image_asset": "hero-ride-cvo.jpg",
-            "image_alt": "Fahrer auf einer grauen CVO Road Glide, unterwegs auf einer Landstraße",
-            "cta_label": "CVO Road Glide ST ansehen",
-            "product": "cvo-road-glide-st-2026",
-            "url": "/collections/motorraeder"
+            "label": "Custom Bike",
+            "blurb": "Lass dein Bike nach deinen Wünschen umbauen.",
+            "image_asset": "custom-bike-poster.webp",
+            "image_alt": "Custom-Chopper mit orangem Flammen-Tank und verchromter Gabel in voller Fahrt",
+            "video_asset": "custom-bike",
+            "poster_asset": "custom-bike-poster.webp",
+            "cta_label": "Umbauten ansehen",
+            "url": "/pages/werkstatt"
           }
         }
       },
-      "block_order": ["road", "sportster", "cvo"],
+      "block_order": ["road", "sportster", "custom"],
       "settings": {
         "aria_label": "Modelle 2026",
         "scroll_target": "nach-hero",

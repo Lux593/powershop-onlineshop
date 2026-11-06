@@ -66,7 +66,7 @@ html:has(.about-head):has(.service-subnav) {
 /* Die Fotokante sitzt genau über der Teilung der Etappen darunter (Spalten 1.08fr | 1fr): oben Text | Foto, darunter Foto | Text */
 .about-head__photo { position: absolute; inset: 0 0 0 calc(108% / 2.08); margin: 0; overflow: hidden; background: var(--c-black); }
 /* absolut: das Querformat des Fotos bestimmt nicht die Höhe */
-.about-head__photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 72%; }
+.about-head__photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: var(--photo-pos, 50% 72%); }
 
 /* Abdunkeln, während der Kopf über der Bühne wegscrollt (0 bis 0,75, about-story.js). Liegt über Text und Foto. */
 .about-head::after {
@@ -122,6 +122,31 @@ html:has(.about-head):has(.service-subnav) {
 }
 /* Anker am Ende des Kopfs: Ziel des Hinweises ohne Bühne */
 .about-head__end { height: 0; }
+
+/* ---------- Rolltor über den nächsten Abschnitt (Einstellung „roll“, Werkstatt) ----------
+   Wie der Auftritt der Geschichte auf Über uns (about-story.css/.js), aber ohne GSAP: Der nächste Abschnitt ist um die Höhe des Kopfs
+   hochgezogen und liegt hinter ihm (der Kopf hat z-index 2). Sein Inhalt ([data-roll-target], beim Umbau-Buch die Hülle um Band und
+   Umbauten) klebt unter der Kopfleiste (sticky), solange der Kopf über ihm wegscrollt: Der Weg dafür ist ein unsichtbarer Abstandhalter
+   (::after) von genau der Höhe des Kopfs am Ende des Abschnitts. Danach scrollt alles normal weiter. Nichts wird gegen das Scrollen
+   verschoben, der Browser hält den Inhalt selbst fest: kein Ruckeln, auch am iPhone, und es funktioniert ohne Skript.
+   Gleiche Bedingungen wie die Bühne (Bewegung, ab 600 px Fensterhöhe). about-head.js dunkelt den Kopf ab, blendet „Weiter“ aus und hält
+   die Kopfleiste. :has lässt sich nicht verschachteln, darum steht die Bedingung an der Section des Kopfs. */
+@media (prefers-reduced-motion: no-preference) and (min-height: 600px) {
+  .has-motion .section-about-head:has(.about-head--roll) + .shopify-section {
+    position: relative;
+    z-index: 1;
+    margin-top: calc(-1 * var(--about-head-h, 0px));
+  }
+  .has-motion .section-about-head:has(.about-head--roll) + .shopify-section::after {
+    content: "";
+    display: block;
+    height: var(--about-head-h, 0px);
+  }
+  .has-motion .section-about-head:has(.about-head--roll) + .shopify-section > [data-roll-target] {
+    position: sticky;
+    top: var(--header-h);
+  }
+}
 
 /* Handy: das Foto über die volle Breite oben, es nimmt den Platz über dem Text ein, darunter der Text */
 @media (max-width: 899.98px) {

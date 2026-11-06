@@ -6,6 +6,8 @@
   beim Scrollen umblättern. Nur dort lädt layout/theme.liquid GSAP und ScrollTrigger; auf jeder anderen Seitenvorlage bleibt die
   Section statisch und ohne Balken. Ohne Blöcke gibt die Section außerhalb des Editors nichts aus. Bei einer Etappe gibt es keinen
   Balken. Das Skript lädt nur mit Bühne oder Galerie (siehe unten).
+  Anker #geschichte: Sprungziel „Unsere Geschichte“ im Menü. Mit Bühne liegt sie hinter dem Kopf, assets/about-head.js lenkt den Sprung
+  dann an die Stelle, an der der Kopf ganz weg ist.
   Fotos: ein im Editor gewähltes Bild oder eine Standarddatei aus assets/. Für die mitgelieferten Dateien kennt die Section Maße
   und kleinere Fassungen; eine andere Standarddatei steht ohne srcset und mit dem Seitenverhältnis 4 : 3 im Markup.
   Fotogalerie: Hat eine Etappe mindestens zwei Fotos (das Foto oben, dazu „Weiteres Foto 2–4“ oder sonst „Weitere Fotos im Theme“,
@@ -43,6 +45,7 @@
 
 <section
   class="about-story{% if stage %} about-story--stage{% endif %}"
+  id="geschichte"
   data-story
   aria-labelledby="{{ title_id }}"
   style="--count: {{ count | at_least: 1 }}"

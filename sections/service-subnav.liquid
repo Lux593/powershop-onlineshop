@@ -1,7 +1,9 @@
 {%- comment -%}
   Unternavigation der Service-Seiten: die Unterpunkte des Hauptmenüpunkts „Service“ aus dem gewählten Menü.
-  Gruppen (Ebene 2 mit Unterpunkten, z. B. „Dienstleistungen“) stehen nicht selbst in der Leiste, sondern ihre Unterpunkte
-  an ihrer Stelle: Werkstatt · Probefahrt · Inzahlungnahme · … · Über uns.
+  Gruppen (Ebene 2 mit Unterpunkten, z. B. „Dienstleistungen“) zeigen auf ihrer eigenen Seite ihre Unterpunkte an ihrer Stelle,
+  auf allen anderen Seiten nur sich selbst als einen Link (seit 6.11.: Werkstatt und Über uns haben auch Unterpunkte, sonst wäre die
+  Leiste zehn Punkte lang). Auf Dienstleistungen: Werkstatt · Probefahrt · Inzahlungnahme · … · Über uns; auf der Werkstatt:
+  Custom-Umbauten · Leistungen · Termin anfragen · Dienstleistungen · Über uns.
   Aktiv ist der Punkt, dessen Link auf die aktuelle Seite zeigt, auch als Anker der Übersicht (/pages/service#werkstatt).
   Zeigt der Hauptpunkt selbst auf die aktuelle Seite (Service), ist der Crumb davor aktuell.
   Anker auf derselben Seite (Probefahrt, Finanzierung … auf Service) verlinken nur „#anker“, damit ein Klick die Seite nicht
@@ -29,7 +31,8 @@
       <ul class="service-subnav__links">
         {%- for group in parent.links -%}
           {%- liquid
-            if group.links.size > 0
+            assign group_path = group.url | split: '#' | first
+            if group.links.size > 0 and group_path == page_path
               assign entries = group.links
             else
               assign entries = parent.links | where: 'title', group.title

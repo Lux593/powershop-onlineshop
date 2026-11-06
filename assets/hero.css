@@ -198,22 +198,29 @@
 }
 .hero__actions { display: flex; flex-wrap: wrap; gap: 12px; }
 .hero__actions .btn { min-height: 56px; padding: 10px 24px; font-size: 18px; white-space: normal; text-align: center; line-height: 1.1; -webkit-hyphens: auto; hyphens: auto; overflow-wrap: anywhere; }
+/* Handy: drei Tabs (auch „Custom Bike“) passen ab 360 px in eine Zeile; darunter brechen sie weiter um */
+@media (max-width: 639px) {
+  .hero__chips { column-gap: 20px; }
+  .hero__chip { font-size: clamp(16px, 4.5vw, 20px); }
+}
 @media (min-width: 640px) {
-  .hero__chip { font-size: 24px; }
-  .hero__chips { column-gap: 32px; }
+  .hero__chip { font-size: 21px; }
+  .hero__chips { column-gap: 28px; }
+}
+/* Desktop (6.11.2026 auf Wunsch kleiner, der Textblock nahm zu viel Fläche ein): Die Headline (Modellname) liegt links unten, das Fahrzeug
+   rechts davon. Früher höchstens 9 vw (1440 px: 130 px), jetzt 7,2 vw (1440 px: 104 px), nie höher als 16 % des Fensters. */
+@media (min-width: 768px) {
+  .hero__poster { font-size: min(clamp(60px, 7.2vw, 160px), 16svh); }
+  .hero__blurb { font-size: 19px; max-width: 46ch; } /* kurze Claims bleiben einzeilig */
 }
 @media (min-width: 1024px) {
-  .hero__content { gap: clamp(18px, 3.5svh, 36px); }
-  .hero__chip { font-size: 26px; }
-  .hero__sub { gap: clamp(12px, 2.4svh, 22px); }
-  .hero__blurb { font-size: 26px; }
-  .hero__offer { flex-direction: row; align-items: center; flex-wrap: nowrap; gap: 18px 36px; }
-  .hero__price { font-size: 56px; }
-  /* Die Headline (Modellname) liegt links unten, das Fahrzeug rechts davon. Mit 11 vw (bis 200 px) lief sie bei Road Glide und Street Glide über Verkleidung und
-     Vorderrad: ab hier höchstens 9 vw (1440 px: 130 statt 158 px), das Motiv bleibt frei, die Headline bleibt das Größte im Bild. */
-  .hero__poster { font-size: min(var(--fs-display), 20svh, 9vw); }
-  .hero__actions { flex-wrap: nowrap; gap: 14px; }
-  .hero__actions .btn { min-height: 64px; padding: 0 32px; font-size: 20px; white-space: nowrap; }
+  .hero__content { gap: clamp(14px, 2.8svh, 28px); }
+  .hero__sub { gap: clamp(10px, 2svh, 18px); }
+  .hero__blurb { font-size: 21px; }
+  .hero__offer { flex-direction: row; align-items: center; flex-wrap: nowrap; gap: 14px 28px; }
+  .hero__price { font-size: 44px; }
+  .hero__actions { flex-wrap: nowrap; gap: 12px; }
+  .hero__actions .btn { min-height: 54px; padding: 0 28px; font-size: 17px; white-space: nowrap; }
 }
 
 /* Kompakt: Telefone und niedrige Fenster (Querformat, Zoom). Dort füllt der Text die ganze Höhe und verdeckt den Film. Engere Abstände

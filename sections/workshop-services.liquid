@@ -3,7 +3,7 @@
   (snippets/service-tile, ohne Link, 2 × 2) und die Termin-Box (snippets/contact-box, Anker #termin, „Anrufen“ ohne Nummer).
   Ab 1024 px stehen Text und Kacheln links, die Termin-Box rechts (7 : 5 wie „Komm vorbei“). Styles in assets/pages.css.
 {%- endcomment -%}
-<section class="workshop-services" aria-labelledby="ws-title-{{ section.id }}">
+<section class="workshop-services"{% if section.settings.anchor != blank %} id="{{ section.settings.anchor | strip | handleize }}"{% endif %} aria-labelledby="ws-title-{{ section.id }}">
   <div class="container workshop-services__grid">
     <div class="workshop-services__main">
       <h2 class="workshop-services__title" id="ws-title-{{ section.id }}">{{ section.settings.heading | escape }}</h2>
@@ -32,6 +32,7 @@
   "name": "Werkstatt-Leistungen",
   "settings": [
     { "type": "text", "id": "heading", "label": "Überschrift", "default": "Was die Werkstatt für dich macht" },
+    { "type": "text", "id": "anchor", "label": "Anker (ohne #)", "default": "leistungen", "info": "Sprungziel für Menü und Service-Leiste, z. B. /pages/werkstatt#leistungen. Die Termin-Box hat ihren eigenen Anker #termin." },
     { "type": "textarea", "id": "intro", "label": "Einleitung" },
     { "type": "text", "id": "contact_title", "label": "Termin-Box: Überschrift", "default": "Werkstatt-Termin anfragen" },
     { "type": "text", "id": "contact_intro", "label": "Termin-Box: Text", "default": "Schreib uns per WhatsApp oder E-Mail, oder ruf einfach an. Wir melden uns mit einem Termin." }

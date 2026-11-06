@@ -8,10 +8,16 @@
   Der Anker führt ans Ende des Kopfs (about-head__end), also zur Geschichte darunter. Mit der Bühne (sections/about-story.liquid) gleitet
   assets/about-story.js an die Stelle, an der der Kopf ganz weg ist, und blendet den Hinweis beim Wegscrollen aus.
   Foto: Standarddatei ist die Crew auf ihren Bikes in der Halle (ueber-uns-crew-1600.jpg, Querformat), mit den kleineren Fassungen
-  720 und 1280 im srcset; ein im Editor gewähltes Bild ersetzt sie. Wer unter „Standarddatei“ eine andere Datei einträgt, hat kein srcset.
+  720 und 1280 im srcset; ein im Editor gewähltes Bild ersetzt sie. Jede Standarddatei, die auf -1600.jpg endet, bekommt ihre
+  -720.jpg und -1280.jpg ins srcset (alle drei müssen in assets/ liegen), andere Namen haben kein srcset.
+  Rolltor (Einstellung „roll“, seit 6.11. auf der Werkstatt): Folgt keine Geschichte (die baut ihren Auftritt selbst, about-story.js),
+  liegt der nächste Abschnitt hinter dem Kopf und bleibt unter der Kopfleiste stehen, während der Kopf über ihm wegscrollt, wie auf
+  Über uns. Nur CSS (position: sticky, about-head.css); assets/about-head.js dunkelt dabei ab, blendet „Weiter“ aus und hält die Kopfleiste.
+  Sprungziele (Menü, Service-Leiste) im Abschnitt hinter dem Kopf lenkt about-head.js an die Stelle, an der der Kopf ganz weg ist.
   Entwurf: entwuerfe/ueber-uns/design-ueber-uns-h.md, Abschnitt 4.2.
 {%- endcomment -%}
 {{ 'about-head.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'about-head.js' | asset_url }}" defer></script>
 
 {%- liquid
   comment
@@ -22,15 +28,16 @@
   assign heading_parts = heading | split: '*'
 
   comment
-    Kleinere Fassungen nur für die mitgelieferte Datei: für eine andere Standarddatei wären sie falsch. Ihr Name steht im Code nur hier,
-    die Größen hängen sich an; dazu passen muss nur der Standardwert von „Standard-Foto im Theme“ im Schema unten.
+    Kleinere Fassungen nur für Standarddateien nach dem Muster name-1600.jpg (Crew, Werkstatt): Zu ihnen gehören name-720.jpg und
+    name-1280.jpg. Für andere Namen gibt es keine, ein srcset wäre falsch.
   endcomment
-  assign crew = 'ueber-uns-crew-'
-  assign crew_large = crew | append: '1600.jpg'
+  assign photo_asset = section.settings.asset | strip
   assign photo_srcset = ''
-  if section.settings.asset == crew_large
-    assign photo_srcset = crew | append: '720.jpg 720w, ' | append: crew | append: '1280.jpg 1280w, ' | append: crew_large | append: ' 1600w'
+  if photo_asset contains '-1600.jpg'
+    assign photo_base = photo_asset | remove_last: '1600.jpg'
+    assign photo_srcset = photo_base | append: '720.jpg 720w, ' | append: photo_base | append: '1280.jpg 1280w, ' | append: photo_asset | append: ' 1600w'
   endif
+  assign roll = section.settings.roll
 -%}
 {%- capture photo -%}
   {%- render 'media',
@@ -47,7 +54,12 @@
 {%- endcapture -%}
 {%- assign photo = photo | strip -%}
 
-<section class="about-head on-dark" data-about-head aria-labelledby="about-head-title-{{ section.id }}">
+<section
+  class="about-head on-dark{% if roll %} about-head--roll{% endif %}"
+  data-about-head
+  aria-labelledby="about-head-title-{{ section.id }}"
+  {% if section.settings.position != blank %}style="--photo-pos: {{ section.settings.position | escape }}"{% endif %}
+>
   <div class="about-head__text">
     <h1 id="about-head-title-{{ section.id }}" data-split="words">
       {%- for part in heading_parts -%}
@@ -79,7 +91,9 @@
     { "type": "image_picker", "id": "image", "label": "Foto (Querformat)", "info": "Steht rechts, am Handy oben. Am besten im Format 1600 × 983 oder ähnlich. Rechts und links wird beschnitten, mittig bleibt alles; auf sehr breiten Bildschirmen bleibt eher der untere Teil." },
     { "type": "text", "id": "asset", "label": "Standard-Foto im Theme", "default": "ueber-uns-crew-1600.jpg", "info": "Datei in assets/, wenn oben kein Foto gewählt ist." },
     { "type": "text", "id": "alt", "label": "Bildbeschreibung", "default": "Vier Fahrerinnen und Fahrer auf Custom-Harleys in einer Halle, die Scheinwerfer an" },
-    { "type": "checkbox", "id": "scroll_cue", "label": "„Weiter“-Hinweis unten", "default": true, "info": "Zeigt unten im Kopf, dass es darunter weitergeht, wie auf der Startseite. Ein Klick scrollt zum nächsten Abschnitt." }
+    { "type": "text", "id": "position", "label": "Bildausschnitt", "info": "Welcher Punkt des Fotos sichtbar bleibt, z. B. 45% 60% (waagrecht, senkrecht). Leer = 50% 72%." },
+    { "type": "checkbox", "id": "scroll_cue", "label": "„Weiter“-Hinweis unten", "default": true, "info": "Zeigt unten im Kopf, dass es darunter weitergeht, wie auf der Startseite. Ein Klick scrollt zum nächsten Abschnitt." },
+    { "type": "checkbox", "id": "roll", "label": "Rolltor über den nächsten Abschnitt", "default": false, "info": "Der nächste Abschnitt liegt hinter dem Kopf und bleibt stehen, während der Kopf beim Scrollen über ihm hochfährt. Nur mit Animationen. Vor der Geschichte auf Über uns nicht nötig, die macht das selbst." }
   ],
   "presets": [{ "name": "Seitenkopf Über uns" }],
   "enabled_on": { "templates": ["page"] }

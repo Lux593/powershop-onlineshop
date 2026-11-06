@@ -135,6 +135,18 @@
       if (owner) owner.close();
       return;
     }
+    // Anker zur selben Seite aus einem offenen Fenster (Handy-Menü: „Finanzierung“ auf Dienstleistungen, „Das Team“ auf Über uns):
+    // Solange das Fenster offen ist, sperrt is-locked das Scrollen, der Sprung verpuffte und das Menü blieb offen. Erst schließen,
+    // dann denselben Link noch einmal klicken: Dann gleitet motion.js (Lenis) bzw. springt der Browser, about-head.js lenkt um.
+    var jump = !e.defaultPrevented && !e.button && !(e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) && e.target.closest('a[href*="#"]');
+    var box = jump && jump.closest('dialog[open]');
+    if (box && !jump.target && jump.hash.length > 1 && jump.origin === location.origin && jump.pathname === location.pathname &&
+        jump.search === location.search) {
+      e.preventDefault();
+      box.addEventListener('close', function () { setTimeout(function () { jump.click(); }, 0); }, { once: true });
+      box.close();
+      return;
+    }
     // Klick auf den Hintergrund schließt
     if (e.target.tagName === 'DIALOG') {
       var r = e.target.getBoundingClientRect();
