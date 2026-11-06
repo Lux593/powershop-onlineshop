@@ -377,6 +377,14 @@ html:has(.service-subnav--sticky) { --subnav-h: 57px; scroll-padding-top: calc(v
 /* Zurück zur Karte: unten links im Bild, erscheint, wenn der Film am Laden steht */
 .visit__back { position: absolute; z-index: 3; left: 16px; bottom: 16px; }
 .visit__back .icon { scale: -1 1; }
+/* Am Handy (16:9-Bild, gut 340 × 190 px) wäre der volle Knopf zu groß fürs Bild. Dort steht nur „Zurück“, klein, unten links.
+   „zur Karte“ bleibt im Namen für Screenreader, die Trefferfläche ist trotz 30 px Höhe 44 px hoch (::after). */
+@media (max-width: 767px) {
+  .visit__back { left: 8px; bottom: 8px; min-height: 30px; gap: 6px; padding: 0 12px; font-size: 13px; }
+  .visit__back::after { content: ""; position: absolute; inset: -7px -4px; }
+  .visit__back .icon { width: 13px; height: 13px; }
+  .visit__back-rest { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+}
 /* Die Quellenangabe gehört zur Karte: am Laden blendet sie aus */
 .visit__map--film .visit__credit { transition: opacity var(--t-fast) var(--ease); }
 .visit__map--film.is-there .visit__credit { opacity: 0; pointer-events: none; }
