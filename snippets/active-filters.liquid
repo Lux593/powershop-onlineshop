@@ -1,6 +1,6 @@
 {% doc %}
-  Kopfzeile mit Trefferzahl (links) und „Alle zurücksetzen“ (rechts), darunter die aktiven Filter als Chips.
-  Jeder Chip ist ein Link, funktioniert also auch ohne JavaScript.
+  Kopfzeile mit Trefferzahl (links) und „Alle zurücksetzen“ (rechts, nur mit aktiven Filtern).
+  Einzelne Filter zeigt die Zeile bewusst nicht: angepasst werden sie im Filter (Menüs bzw. Filter-Fenster).
 
   @param {object} results - collection oder search
   @param {string} reset_url - URL ohne Filter
@@ -14,8 +14,7 @@
 {%- liquid
   assign result_count = results.products_count | default: results.results_count
   comment
-    Erst prüfen, ob ein Filter aktiv ist: „Alle zurücksetzen“ steht in der Kopfzeile rechts neben der Trefferzahl,
-    die Chips folgen darunter.
+    Ist ein Filter aktiv, steht „Alle zurücksetzen“ rechts neben der Trefferzahl.
   endcomment
   assign any_active = false
   for filter in results.filters
@@ -35,27 +34,4 @@
       <a class="reset" href="{{ reset_url }}" data-filter-link>Alle zurücksetzen</a>
     {%- endif -%}
   </div>
-  {%- if any_active -%}
-    <div class="active-filters__chips">
-      {%- for filter in results.filters -%}
-        {%- for value in filter.active_values -%}
-          <a class="chip" href="{{ value.url_to_remove }}" data-filter-link>
-            {{ filter.label | escape }}: {{ value.label | escape }}
-            {% render 'icon', name: 'x' %}<span class="sr-only"> entfernen</span>
-          </a>
-        {%- endfor -%}
-        {%- if filter.type == 'price_range' -%}
-          {%- if filter.min_value.value != nil or filter.max_value.value != nil -%}
-            <a class="chip" href="{{ filter.url_to_remove }}" data-filter-link>
-              {{ filter.label | escape }}:
-              {% if filter.min_value.value != nil %}{{ filter.min_value.value | money_without_trailing_zeros }}{% else %}…{% endif %}
-              –
-              {% if filter.max_value.value != nil %}{{ filter.max_value.value | money_without_trailing_zeros }}{% else %}…{% endif %}
-              {% render 'icon', name: 'x' %}<span class="sr-only"> entfernen</span>
-            </a>
-          {%- endif -%}
-        {%- endif -%}
-      {%- endfor -%}
-    </div>
-  {%- endif -%}
 </div>
