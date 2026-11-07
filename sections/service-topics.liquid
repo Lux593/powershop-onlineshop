@@ -1,0 +1,310 @@
+{%- comment -%}
+  Dienstleistungen: Themen (Seite /pages/dienstleistungen, Entwurf C „Kompakt“, vom Nutzer am 7.11.2026 freigegeben; Quelle des
+  Entwurfs: entwuerfe/dienstleistungen/bauen.py). Aufbau wie „Was die Werkstatt für dich macht“ (pages.css .workshop-services):
+  links Überschrift, Satz und die Themen als Aufklappbereiche, rechts die Kontakt-Box (ab 1024 px, dort klebt sie beim Scrollen).
+  Beim Laden sind alle Themen zu, mehrere dürfen offen sein. Das zuletzt geöffnete Thema stellt die Kontakt-Box ein (service-topics.js).
+
+  Jedes Thema (Block „Thema“) hat denselben Aufbau, damit die Themen zusammengehören:
+    Kopf: Symbol, Titel, ggf. kleines Partner-Logo dahinter, Plus
+    ein Einleitungssatz
+    Zeilen „Stichwort | Text“ in einem weißen Block, auf Wunsch nummeriert (Ablauf); optional ein zweiter Block mit Haken-Liste
+    Fuß: oranger Knopf (optional) und darunter „Kontaktiere uns“ (Umriss wie WhatsApp und E-Mail; nur unter 1024 px, sonst steht
+    die Box daneben)
+  Ein Ansprechpartner (Foto, Name, Adresse, Telefon, Mobil) steht in der letzten Zeile des ersten Blocks.
+  Sprungziel jedes Themas ist sein Schlüssel (#probefahrt, #finanzierung …), so wie Menü und Service-Leiste verlinken.
+
+  Bewegung (assets/service-topics.css, motion.js): Überschrift, Satz und die Titelzeilen der Themen kommen beim Scrollen von unten, die Box blendet ein;
+  beim Öffnen kommt der Inhalt eines Themas gestaffelt von unten herein. Ohne html.has-motion, bei reduzierter Bewegung und im
+  Theme-Editor steht alles sofort.
+{%- endcomment -%}
+{{ 'service-topics.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'service-topics.js' | asset_url }}" defer></script>
+
+{%- liquid
+  assign topic_keys = ''
+  for block in section.blocks
+    assign topic_keys = topic_keys | append: block.settings.topic | append: ','
+  endfor
+  assign topic_keys = topic_keys | append: 'frage'
+  assign first_topic = section.blocks.first.settings.topic | default: 'frage'
+  assign ask_label = section.settings.ask_label | default: 'Kontaktiere uns'
+-%}
+
+<section class="workshop-services buy" data-roll-target data-topics aria-labelledby="buy-title-{{ section.id }}">
+  <div class="container workshop-services__grid">
+    <div class="workshop-services__main">
+      <h2 class="workshop-services__title" id="buy-title-{{ section.id }}" data-reveal>{{ section.settings.heading | escape }}</h2>
+      {%- if section.settings.intro != blank -%}
+        <p class="workshop-services__intro" data-reveal data-reveal-delay="120">{{ section.settings.intro | escape }}</p>
+      {%- endif -%}
+
+      <div class="buy__list">
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign b = block.settings
+            assign key = b.topic | default: 'frage'
+            assign has_logo = false
+            if b.logo != blank or b.logo_asset != blank
+              assign has_logo = true
+            endif
+            assign rows = b.rows | newline_to_br | split: '<br />'
+            assign checks = b.checklist | newline_to_br | split: '<br />'
+            assign has_checks = false
+            if b.checklist_title != blank and b.checklist != blank
+              assign has_checks = true
+            endif
+            assign row_count = 0
+            for line in rows
+              assign l = line | strip
+              if l != blank
+                assign row_count = row_count | plus: 1
+              endif
+            endfor
+            assign has_rows = false
+            if row_count > 0
+              assign has_rows = true
+            endif
+            comment
+              Staffel beim Öffnen: Satz, je Block, Fuß (--k, service-topics.css)
+            endcomment
+            assign k = 0
+          -%}
+
+          {%- capture person -%}
+            {%- if b.person_name != blank -%}
+              <div class="topic-agent">
+                <div class="topic-agent__photo">
+                  {%- render 'media',
+                    image: b.person_image,
+                    asset: b.person_image_asset,
+                    width: 720,
+                    height: 900,
+                    alt: b.person_image_alt,
+                    sizes: '96px'
+                  -%}
+                </div>
+                <div class="topic-agent__body">
+                  <strong class="topic-agent__name">{{ b.person_name | escape }}</strong>
+                  {%- if b.person_company != blank or b.person_address != blank -%}
+                    <address>
+                      {%- if b.person_company != blank -%}{{ b.person_company | escape }}{%- endif -%}
+                      {%- if b.person_company != blank and b.person_address != blank -%}<br>{%- endif -%}
+                      {%- if b.person_address != blank -%}{{ b.person_address | escape | newline_to_br }}{%- endif -%}
+                    </address>
+                  {%- endif -%}
+                </div>
+                {%- if b.person_phone != blank or b.person_mobile != blank -%}
+                  <div class="topic-agent__tel">
+                    {%- if b.person_phone != blank -%}
+                      <a class="btn btn--text" href="tel:{{ b.person_phone | remove: ' ' | remove: '/' | remove: '-' | escape }}">
+                        {%- render 'icon', name: 'phone' -%}<span>Telefon</span><span class="agent__number">{{ b.person_phone | escape }}</span>
+                      </a>
+                    {%- endif -%}
+                    {%- if b.person_mobile != blank -%}
+                      <a class="btn btn--text" href="tel:{{ b.person_mobile | remove: ' ' | remove: '/' | remove: '-' | escape }}">
+                        {%- render 'icon', name: 'smartphone' -%}<span>Mobil</span><span class="agent__number">{{ b.person_mobile | escape }}</span>
+                      </a>
+                    {%- endif -%}
+                  </div>
+                {%- endif -%}
+              </div>
+            {%- endif -%}
+          {%- endcapture -%}
+          {%- assign person = person | strip -%}
+
+          {%- liquid
+            comment
+              Einblenden beim Scrollen an der Titelzeile, nicht am Thema: Ein verschobenes Sprungziel (#finanzierung) landete sonst
+              um den Weg des Einblendens (32 px) zu hoch, unter der Service-Leiste. Gestaffelt wie data-stagger, höchstens 4 Stufen.
+            endcomment
+            assign step = forloop.index0
+            if step > 4
+              assign step = 4
+            endif
+            assign reveal_delay = step | times: 70
+          -%}
+          <details class="acc buy-acc" id="{{ key | escape }}" data-service-topic="{{ key | escape }}" {{ block.shopify_attributes }}>
+            <summary data-reveal data-reveal-delay="{{ reveal_delay }}">
+              <span class="buy-acc__head">
+                {%- render 'icon', name: b.icon -%}
+                <span>
+                  {%- if has_logo -%}
+                    <span class="buy-acc__titlerow">
+                      <span class="buy-acc__title">{{ b.title | escape }}</span>
+                      {%- render 'media',
+                        image: b.logo,
+                        asset: b.logo_asset,
+                        width: b.logo_width,
+                        height: b.logo_height,
+                        alt: b.logo_alt,
+                        sizes: '200px',
+                        class: 'buy-acc__partner'
+                      -%}
+                    </span>
+                  {%- else -%}
+                    <span class="buy-acc__title">{{ b.title | escape }}</span>
+                  {%- endif -%}
+                </span>
+              </span>
+              {%- render 'icon', name: 'plus' -%}
+            </summary>
+
+            <div class="acc__body buy-acc__body topic">
+              {%- if b.lead != blank -%}
+                <p class="topic__lead" style="--k: {{ k }}">{{ b.lead }}</p>
+                {%- assign k = k | plus: 1 -%}
+              {%- endif -%}
+
+              {%- if has_rows or has_checks -%}
+                <div class="topic__groups">
+                  {%- if has_rows -%}
+                    <dl class="topic__rows" style="--k: {{ k }}">
+                      {%- assign n = 0 -%}
+                      {%- for line in rows -%}
+                        {%- assign l = line | strip -%}
+                        {%- if l == blank -%}{%- continue -%}{%- endif -%}
+                        {%- liquid
+                          assign n = n | plus: 1
+                          assign parts = l | split: '|'
+                          assign term = parts.first | strip
+                          assign text = l | remove_first: parts.first | remove_first: '|' | strip
+                        -%}
+                        <div class="topic__row">
+                          <dt>
+                            {%- if b.numbered -%}<span class="topic__no">{{ n }}</span><span>{{ term | escape }}</span>{%- else -%}{{ term | escape }}{%- endif -%}
+                          </dt>
+                          <dd>{{ text | escape }}{% if n == row_count %}{{ person }}{% endif %}</dd>
+                        </div>
+                      {%- endfor -%}
+                    </dl>
+                    {%- assign k = k | plus: 1 -%}
+                  {%- endif -%}
+                  {%- if has_checks -%}
+                    <dl class="topic__rows" style="--k: {{ k }}">
+                      <div class="topic__row">
+                        <dt>{{ b.checklist_title | escape }}</dt>
+                        <dd>
+                          <ul class="topic__checks">
+                            {%- for item in checks -%}
+                              {%- assign t = item | strip -%}
+                              {%- if t != blank -%}<li>{% render 'icon', name: 'check' %}<span>{{ t | escape }}</span></li>{%- endif -%}
+                            {%- endfor -%}
+                          </ul>
+                        </dd>
+                      </div>
+                    </dl>
+                    {%- assign k = k | plus: 1 -%}
+                  {%- endif -%}
+                </div>
+              {%- endif -%}
+
+              <div class="topic__foot{% if b.button_label == blank or b.button_url == blank %} topic__foot--ask{% endif %}" style="--k: {{ k }}">
+                {%- if b.button_label != blank and b.button_url != blank -%}
+                  {%- if b.button_url contains '://' -%}
+                    <a class="btn btn--primary" href="{{ b.button_url }}" target="_blank" rel="noopener">
+                      {{- b.button_label | escape -}}
+                      {%- render 'icon', name: 'arrow-up-right' -%}<span class="sr-only"> (öffnet neues Fenster)</span>
+                    </a>
+                  {%- else -%}
+                    <a class="btn btn--primary" href="{{ b.button_url }}">{{ b.button_label | escape }}</a>
+                  {%- endif -%}
+                {%- endif -%}
+                <a class="btn btn--outline-dark buy-ask" href="#kontakt" data-ask="{{ key | escape }}">{{ ask_label | escape }} {% render 'icon', name: 'arrow-right' %}</a>
+              </div>
+            </div>
+          </details>
+        {%- endfor -%}
+      </div>
+    </div>
+
+    {%- comment -%} Box nur einblenden (fade), nicht verschieben: Sie ist das Sprungziel von „Kontaktiere uns“ (#kontakt) {%- endcomment -%}
+    <div class="buy__aside" data-reveal="fade" data-reveal-delay="150">
+      {% render 'contact-box',
+        title: section.settings.contact_title,
+        intro: section.settings.contact_intro,
+        topics: topic_keys,
+        topic: first_topic,
+        hours: false,
+        extra: '<p class="sr-only" aria-live="polite" data-topic-live></p>'
+      %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Dienstleistungen: Themen",
+  "class": "section-service-topics",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Überschrift", "default": "Was wir rund um den Kauf für dich machen" },
+    { "type": "textarea", "id": "intro", "label": "Satz darunter", "default": "Von der Probefahrt bis zur Übergabe hast du bei uns einen Ansprechpartner." },
+    { "type": "text", "id": "contact_title", "label": "Kontakt-Box: Überschrift", "default": "Kontaktiere uns" },
+    { "type": "text", "id": "contact_intro", "label": "Kontakt-Box: Text", "default": "Ruf einfach an oder schreib uns per WhatsApp oder E-Mail. Wir melden uns." },
+    { "type": "text", "id": "ask_label", "label": "Knopf zur Kontakt-Box", "default": "Kontaktiere uns", "info": "Steht in jedem Thema unter dem orangen Knopf, nur auf Handy und Tablet (am Desktop steht die Box daneben). Springt zur Box und stellt das Thema ein." }
+  ],
+  "blocks": [
+    {
+      "type": "topic",
+      "name": "Thema",
+      "settings": [
+        {
+          "type": "select",
+          "id": "topic",
+          "label": "Thema",
+          "info": "Sprungziel (z. B. /pages/dienstleistungen#finanzierung) und Thema der Kontakt-Box. Jedes Thema nur einmal verwenden.",
+          "options": [
+            { "value": "probefahrt", "label": "Probefahrt" },
+            { "value": "inzahlungnahme", "label": "Inzahlungnahme" },
+            { "value": "finanzierung", "label": "Finanzierung" },
+            { "value": "versicherung", "label": "Versicherung" },
+            { "value": "lieferung", "label": "Anmeldung & Lieferung" }
+          ],
+          "default": "probefahrt"
+        },
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Symbol",
+          "options": [
+            { "value": "route", "label": "Strecke" },
+            { "value": "handshake", "label": "Handschlag" },
+            { "value": "banknote", "label": "Geldschein" },
+            { "value": "shield-check", "label": "Schild" },
+            { "value": "truck", "label": "Lieferwagen" },
+            { "value": "bike", "label": "Motorrad" },
+            { "value": "badge-check", "label": "Siegel" },
+            { "value": "calendar-check", "label": "Kalender" }
+          ],
+          "default": "route"
+        },
+        { "type": "text", "id": "title", "label": "Titel", "default": "Thema" },
+        { "type": "header", "content": "Partner-Logo (optional)" },
+        { "type": "image_picker", "id": "logo", "label": "Logo", "info": "Steht klein hinter dem Titel." },
+        { "type": "text", "id": "logo_asset", "label": "Standard-Logo im Theme", "info": "Datei in assets/, wenn oben kein Logo gewählt ist." },
+        { "type": "number", "id": "logo_width", "label": "Breite der Standarddatei (px)" },
+        { "type": "number", "id": "logo_height", "label": "Höhe der Standarddatei (px)" },
+        { "type": "text", "id": "logo_alt", "label": "Name des Partners", "info": "Für Screenreader, z. B. Harley-Davidson Finance." },
+        { "type": "header", "content": "Inhalt" },
+        { "type": "inline_richtext", "id": "lead", "label": "Einleitungssatz" },
+        { "type": "textarea", "id": "rows", "label": "Zeilen", "info": "Eine Zeile pro Eintrag: Stichwort | Text, z. B. Führerschein | Gültigen Führerschein mitbringen." },
+        { "type": "checkbox", "id": "numbered", "label": "Zeilen nummerieren (Ablauf)", "default": false },
+        { "type": "text", "id": "checklist_title", "label": "Haken-Liste: Stichwort", "info": "Zweiter Block unter den Zeilen, z. B. Das brauchen wir von dir." },
+        { "type": "textarea", "id": "checklist", "label": "Haken-Liste: Punkte", "info": "Ein Punkt pro Zeile." },
+        { "type": "header", "content": "Ansprechpartner (optional)", "info": "Steht in der letzten Zeile des ersten Blocks." },
+        { "type": "image_picker", "id": "person_image", "label": "Foto" },
+        { "type": "text", "id": "person_image_asset", "label": "Standard-Foto im Theme", "info": "Datei in assets/, wenn oben kein Foto gewählt ist." },
+        { "type": "text", "id": "person_image_alt", "label": "Bildbeschreibung" },
+        { "type": "text", "id": "person_name", "label": "Name" },
+        { "type": "text", "id": "person_company", "label": "Firma" },
+        { "type": "textarea", "id": "person_address", "label": "Adresse" },
+        { "type": "text", "id": "person_phone", "label": "Telefon", "info": "Mit Ländervorwahl, z. B. +49 761 88664460." },
+        { "type": "text", "id": "person_mobile", "label": "Mobil", "info": "Mit Ländervorwahl, z. B. +49 171 6579388." },
+        { "type": "header", "content": "Knopf (optional)" },
+        { "type": "text", "id": "button_label", "label": "Beschriftung" },
+        { "type": "url", "id": "button_url", "label": "Link", "info": "Externe Seiten öffnen in einem neuen Fenster." }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Dienstleistungen: Themen" }]
+}
+{% endschema %}

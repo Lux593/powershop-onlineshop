@@ -9,123 +9,93 @@
         "sticky": true
       }
     },
+    "head": {
+      "type": "about-head",
+      "settings": {
+        "heading": "Unsere *Dienst­leistungen.*",
+        "text": "Probefahrt, Inzahlungnahme, Finanzierung, Versicherung und Lieferung. Ein Ansprechpartner. Ein Ablauf. Kein Stress.",
+        "asset": "service-probefahrt.jpg",
+        "alt": "Frontansicht eines Motorrads mit Rundscheinwerfer, zwei Zusatzscheinwerfern und hohem Lenker",
+        "position": "56% 50%",
+        "scroll_cue": true,
+        "roll": false
+      }
+    },
     "main": {
-      "type": "service-page",
+      "type": "service-topics",
       "blocks": {
         "probefahrt": {
-          "type": "partner",
+          "type": "topic",
           "settings": {
-            "anchor": "probefahrt",
-            "scheme": "dark",
-            "logo_asset": "",
-            "logo_alt": "",
-            "heading": "Erst fahren, dann entscheiden",
-            "image_asset": "",
-            "image_alt": "",
-            "text": "<p>Wähle dein Wunsch-Modell – vom Einsteiger-Bike bis zur CVO. Wir nehmen uns Zeit, erklären dir alles in Ruhe und passen Sitzposition und Lenker für dich an.</p>",
-            "bullets": "Gültiger Führerschein der passenden Klasse (A / A2) mitbringen\nHelm und Schutzkleidung leihen wir dir auf Wunsch\nAuch für Wiedereinsteiger und Neulinge – ohne Druck",
-            "label_1": "Motorräder ansehen",
-            "url_1": "shopify://collections/motorraeder",
-            "label_2": "",
-            "url_2": "",
-            "advice_heading": "",
-            "advice_text": "",
-            "footnote_term": "",
-            "footnote": "",
-            "aside": "shop",
-            "contact_title": "Probefahrt anfragen",
             "topic": "probefahrt",
-            "person_image_asset": "service-probefahrt.jpg",
-            "person_image_alt": "Frontansicht eines Motorrads mit Rundscheinwerfer, zwei Zusatzscheinwerfern und hohem Lenker",
-            "person_image_position": "56% 50%"
+            "icon": "route",
+            "title": "Probefahrt",
+            "lead": "Wähle dein Wunsch-Modell – vom Einsteiger-Bike bis zur CVO. Wir nehmen uns Zeit, erklären dir alles in Ruhe und passen Sitzposition und Lenker für dich an.",
+            "rows": "Führerschein | Gültigen Führerschein der passenden Klasse (A / A2) mitbringen.\nAusrüstung | Helm und Schutzkleidung leihen wir dir auf Wunsch.\nErfahrung | Auch für Wiedereinsteiger und Neulinge – ohne Druck.",
+            "button_label": "Motorräder ansehen",
+            "button_url": "shopify://collections/motorraeder"
           }
         },
         "inzahlungnahme": {
-          "type": "service",
+          "type": "topic",
           "settings": {
-            "anchor": "inzahlungnahme",
-            "image_asset": "service-inzahlungnahme.jpg",
-            "image_alt": "Handschlag vor einem Gebrauchtmotorrad",
-            "title": "Dein altes Bike zählt",
-            "text": "<p>Du steigst um? Dein jetziges Motorrad nehmen wir in Zahlung. So läuft es ab:</p>",
-            "bullets": "Daten schicken: Modell, Baujahr, km-Stand und ein paar Fotos.\nAngebot bekommen: Wir machen dir ein faires Angebot für dein Bike.\nBeim Kauf anrechnen: Den Betrag rechnen wir direkt beim Kauf deines neuen Bikes an.",
-            "note": "",
-            "contact_title": "Bike bewerten lassen",
             "topic": "inzahlungnahme",
-            "list_style": "steps",
+            "icon": "handshake",
+            "title": "Inzahlungnahme",
+            "lead": "Du steigst um? Dein jetziges Motorrad nehmen wir in Zahlung. So läuft es ab:",
+            "rows": "Daten schicken | Modell, Baujahr, km-Stand und ein paar Fotos.\nAngebot bekommen | Wir machen dir ein faires Angebot für dein Bike.\nBeim Kauf anrechnen | Den Betrag rechnen wir direkt beim Kauf deines neuen Bikes an.",
+            "numbered": true,
             "checklist_title": "Das brauchen wir von dir",
             "checklist": "Fahrzeugschein (Zulassungsbescheinigung Teil I)\nFahrzeugbrief (Zulassungsbescheinigung Teil II)\nServiceheft\nAlle Schlüssel"
           }
         },
         "finanzierung": {
-          "type": "partner",
+          "type": "topic",
           "settings": {
-            "anchor": "finanzierung",
-            "scheme": "light",
+            "topic": "finanzierung",
+            "icon": "banknote",
+            "title": "Finanzierung",
             "logo_asset": "logo-hd-financial-services-dunkel.png",
             "logo_width": 423,
             "logo_height": 50,
             "logo_alt": "Harley-Davidson Finance",
-            "heading": "Der Preis sollte nie ein Hindernis sein, seine Träume zu verwirklichen",
-            "image_asset": "finanzierung-breakout.jpg",
-            "image_alt": "Fahrer geht im Abendlicht von seiner Harley-Davidson Breakout weg",
-            "text": "<p>Hole Dir Dein Traum Harley-Davidson® Motorrad für weniger als Du denkst. Hier klicken, um zu sehen, was unser Finanzrechner für Dich tun kann.</p>",
-            "label_1": "Finanzierungsrechner",
-            "url_1": "https://calculator.harley-davidson.com/de/finance/choose-bike/",
-            "label_2": "Mehr erfahren",
-            "url_2": "https://calculator.harley-davidson.com/de/home",
-            "advice_heading": "Persönliche Beratung",
-            "advice_text": "<p>Gerne unterstützen wir dich bei allen Fragen rund um Finanzierung und Versicherung. Wir kalkulieren für dich auf Wunsch ein individuelles Angebot, passend zu deinem Bike und deinen Vorstellungen. Kontaktiere uns einfach, wir beraten dich persönlich.</p>",
-            "footnote_term": "",
-            "footnote": "",
-            "aside": "contact",
-            "contact_title": "Finanzierung anfragen",
-            "topic": "finanzierung"
+            "lead": "Deine Rate rechnest du online selbst aus – oder wir kalkulieren sie dir.",
+            "rows": "Selbst rechnen | Welche Rate zu deinem Wunsch-Modell passt, rechnest du mit dem Finanzierungsrechner von Harley-Davidson in Ruhe aus.\nMit uns rechnen | Auf Wunsch kalkulieren wir dir ein individuelles Angebot, passend zu deinem Bike.",
+            "button_label": "Finanzierungsrechner",
+            "button_url": "https://calculator.harley-davidson.com/de/home"
           }
         },
         "versicherung": {
-          "type": "partner",
+          "type": "topic",
           "settings": {
-            "anchor": "versicherung",
-            "scheme": "dark",
-            "logo_asset": "logo-hd-insurance-services.png",
+            "topic": "versicherung",
+            "icon": "shield-check",
+            "title": "Versicherung",
+            "logo_asset": "logo-hd-insurance-services-dunkel.png",
             "logo_width": 386,
             "logo_height": 52,
             "logo_alt": "Harley-Davidson Insurance Services",
-            "heading": "Maßgeschnei­derter Versicherungs­schutz zu einer fairen Prämie",
-            "image_asset": "",
-            "image_alt": "",
-            "text": "<p>Harley-Davidson Financial Services bietet in Zusammenarbeit mit der ERGO Versicherung unter dem Namen Harley-Davidson Insurance Services allen Harley Besitzern attraktive Versicherungspakete an. Ganz gleich ob Vollkasko, Teilkasko oder Haftpflichtthemen, kontaktiere Daniel Meier. Gerne rechnet er dir die passende Prämie für dein Bike.</p>",
-            "label_1": "Prämienrechner",
-            "url_1": "https://www.ergo-hdis.de/praemienberechnung/allgemeine-daten",
-            "label_2": "Mehr erfahren",
-            "url_2": "https://www.ergo-hdis.de/",
-            "advice_heading": "",
-            "advice_text": "",
-            "footnote_term": "Harley-Davidson Insurance Services",
-            "footnote": "",
-            "aside": "person",
+            "lead": "Harley-Davidson Insurance Services ist das Versicherungsangebot von Harley-Davidson Financial Services und der ERGO für alle Harley-Besitzer.",
+            "rows": "Selbst rechnen | Welche Prämie zu deinem Bike passt, rechnest du mit dem Versicherungsrechner in Ruhe aus.\nPersönlich beraten | Ganz gleich, ob Vollkasko, Teilkasko oder Haftpflichtthemen, kontaktiere Daniel Meier. Gerne rechnet er dir die passende Prämie für dein Bike.",
             "person_image_asset": "versicherung-daniel-meier.jpg",
             "person_image_alt": "Daniel Meier, Versicherungsberater der ERGO für Harley-Davidson Insurance Services",
             "person_name": "Daniel Meier",
             "person_company": "Geschäftsstelle der ERGO Beratung und Vertrieb AG",
             "person_address": "Tullastr. 89\n79108 Freiburg",
-            "person_phone": "0761 88664460",
-            "person_mobile": "0171 6579388"
+            "person_phone": "+49 761 88664460",
+            "person_mobile": "+49 171 6579388",
+            "button_label": "Versicherungsrechner",
+            "button_url": "https://www.ergo-hdis.de/"
           }
         },
         "lieferung": {
-          "type": "service",
+          "type": "topic",
           "settings": {
-            "anchor": "lieferung",
-            "image_asset": "",
-            "image_alt": "",
-            "title": "Vom Kaufvertrag bis vor deine Tür",
-            "text": "<p>Den Kauf kannst du bei uns vor Ort abschließen oder komplett per Telefon und E-Mail. Wir begleiten dich von der Anfrage bis zur Übergabe und kümmern uns um Anmeldung und Abwicklung.</p>",
-            "bullets": "Deutschland: Auf Wunsch liefern wir dein Motorrad bundesweit über die offizielle Harley-Davidson-Spedition SKS bis vor deine Haustür.\nSchweiz: Export und Verzollung übernehmen wir. Auf Wunsch organisieren wir ein Zollkennzeichen bis zu deinem MFK-Termin und machen dir ein individuelles Angebot.\nFrankreich: Die Exportabwicklung übernehmen wir. Auf Wunsch organisieren wir ein WW-Kennzeichen für die Zeit bis zur Zulassung und machen dir ein individuelles Angebot.",
-            "note": "",
-            "contact_title": "Lieferung anfragen",
-            "topic": "lieferung"
+            "topic": "lieferung",
+            "icon": "truck",
+            "title": "Anmeldung & Lieferung",
+            "lead": "Den Kauf kannst du bei uns vor Ort abschließen oder komplett per Telefon und E-Mail. Wir begleiten dich von der Anfrage bis zur Übergabe und kümmern uns um Anmeldung und Abwicklung.",
+            "rows": "Deutschland | Auf Wunsch liefern wir dein Motorrad bundesweit über die offizielle Harley-Davidson-Spedition SKS bis vor deine Haustür.\nSchweiz | Export und Verzollung übernehmen wir. Auf Wunsch organisieren wir ein Zollkennzeichen bis zu deinem MFK-Termin und machen dir ein individuelles Angebot.\nFrankreich | Die Exportabwicklung übernehmen wir. Auf Wunsch organisieren wir ein WW-Kennzeichen für die Zeit bis zur Zulassung und machen dir ein individuelles Angebot."
           }
         }
       },
@@ -137,16 +107,17 @@
         "lieferung"
       ],
       "settings": {
-        "heading": "Dienstleistungen",
-        "intro": "Probefahrt, Inzahlungnahme, Finanzierung, Versicherung und Lieferung. Ein Ansprechpartner. Ein Ablauf. Kein Stress.",
-        "parent_page": "service",
-        "banner_asset": "service-probefahrt.jpg",
-        "numbered": true
+        "heading": "Was wir rund um den Kauf für dich machen",
+        "intro": "Von der Probefahrt bis zur Übergabe hast du bei uns einen Ansprechpartner.",
+        "contact_title": "Kontaktiere uns",
+        "contact_intro": "Ruf einfach an oder schreib uns per WhatsApp oder E-Mail. Wir melden uns.",
+        "ask_label": "Kontaktiere uns"
       }
     }
   },
   "order": [
     "subnav",
+    "head",
     "main"
   ]
 }
