@@ -215,7 +215,7 @@
           var dot = $('[data-dot]', el);
           var freshDot = $('[data-dot]', fresh);
           if (dot && freshDot) {
-            dot.textContent = freshDot.textContent;
+            dot.innerHTML = freshDot.innerHTML; // Zahl samt Screenreader-Zusatz („ausgewählt“)
             dot.hidden = freshDot.hidden;
           }
         });

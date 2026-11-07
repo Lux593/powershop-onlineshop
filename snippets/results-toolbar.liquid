@@ -61,7 +61,7 @@
           <div class="fdrop" data-fdrop="{{ filter.param_name }}">
             <button class="fdrop__btn" type="button" aria-expanded="false" aria-controls="fp-{{ forloop.index }}">
               {{ filter.label | escape }}
-              <span class="dot" data-dot{% if filter_count == 0 %} hidden{% endif %}>{{ filter_count }}</span>
+              <span class="dot" data-dot{% if filter_count == 0 %} hidden{% endif %}>{{ filter_count }}<span class="sr-only"> ausgewählt</span></span>
               {% render 'icon', name: 'chevron-down' %}
             </button>
             <div class="fdrop__panel" id="fp-{{ forloop.index }}" hidden data-lenis-prevent>
@@ -131,8 +131,27 @@
       <div class="modal__body" data-lenis-prevent>
         {%- for filter in results.filters -%}
           {%- if filter.type == 'price_range' or filter.values.size > 0 -%}
-            <details class="acc" data-fdrop="{{ filter.param_name }}"{% if filter.active_values.size > 0 %} open{% endif %}>
-              <summary>{{ filter.label | escape }}{% render 'icon', name: 'plus' %}</summary>
+            {%- liquid
+              assign filter_count = filter.active_values.size
+              if filter.type == 'price_range'
+                assign filter_count = 0
+                if filter.min_value.value != nil or filter.max_value.value != nil
+                  assign filter_count = 1
+                endif
+              endif
+            -%}
+            {%- comment -%}
+              Zugeklappt zeigt der Titel, wie viele Werte darin gewählt sind (.acc__label .dot, offen ausgeblendet: dann stehen die
+              Haken selbst da). assets/collection.js tauscht die Zahl nach jeder Auswahl mit [data-dot] aus.
+            {%- endcomment -%}
+            <details class="acc" data-fdrop="{{ filter.param_name }}"{% if filter_count > 0 %} open{% endif %}>
+              <summary>
+                <span class="acc__label">
+                  {{- filter.label | escape -}}
+                  <span class="dot" data-dot{% if filter_count == 0 %} hidden{% endif %}>{{ filter_count }}<span class="sr-only"> ausgewählt</span></span>
+                </span>
+                {%- render 'icon', name: 'plus' -%}
+              </summary>
               <div class="acc__body">{% render 'filter-controls', filter: filter, id_prefix: 'm' %}</div>
             </details>
           {%- endif -%}
