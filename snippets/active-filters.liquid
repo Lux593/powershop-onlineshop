@@ -1,5 +1,5 @@
 {% doc %}
-  Trefferzahl, aktive Filter als Chips und „Alle zurücksetzen“.
+  Kopfzeile mit Trefferzahl (links) und „Alle zurücksetzen“ (rechts), darunter die aktiven Filter als Chips.
   Jeder Chip ist ein Link, funktioniert also auch ohne JavaScript.
 
   @param {object} results - collection oder search
@@ -13,32 +13,49 @@
 
 {%- liquid
   assign result_count = results.products_count | default: results.results_count
+  comment
+    Erst prüfen, ob ein Filter aktiv ist: „Alle zurücksetzen“ steht in der Kopfzeile rechts neben der Trefferzahl,
+    die Chips folgen darunter.
+  endcomment
   assign any_active = false
+  for filter in results.filters
+    if filter.active_values.size > 0
+      assign any_active = true
+    elsif filter.type == 'price_range'
+      if filter.min_value.value != nil or filter.max_value.value != nil
+        assign any_active = true
+      endif
+    endif
+  endfor
 -%}
 <div class="active-filters" data-active>
-  <span class="active-filters__count"><strong>{{ result_count }}</strong> {% if result_count == 1 %}{{ singular }}{% else %}{{ plural }}{% endif %}</span>
-  {%- for filter in results.filters -%}
-    {%- for value in filter.active_values -%}
-      {%- assign any_active = true -%}
-      <a class="chip" href="{{ value.url_to_remove }}" data-filter-link>
-        {{ filter.label | escape }}: {{ value.label | escape }}
-        {% render 'icon', name: 'x' %}<span class="sr-only"> entfernen</span>
-      </a>
-    {%- endfor -%}
-    {%- if filter.type == 'price_range' -%}
-      {%- if filter.min_value.value != nil or filter.max_value.value != nil -%}
-        {%- assign any_active = true -%}
-        <a class="chip" href="{{ filter.url_to_remove }}" data-filter-link>
-          {{ filter.label | escape }}:
-          {% if filter.min_value.value != nil %}{{ filter.min_value.value | money_without_trailing_zeros }}{% else %}…{% endif %}
-          –
-          {% if filter.max_value.value != nil %}{{ filter.max_value.value | money_without_trailing_zeros }}{% else %}…{% endif %}
-          {% render 'icon', name: 'x' %}<span class="sr-only"> entfernen</span>
-        </a>
-      {%- endif -%}
+  <div class="active-filters__head">
+    <span class="active-filters__count"><strong>{{ result_count }}</strong> {% if result_count == 1 %}{{ singular }}{% else %}{{ plural }}{% endif %}</span>
+    {%- if any_active -%}
+      <a class="reset" href="{{ reset_url }}" data-filter-link>Alle zurücksetzen</a>
     {%- endif -%}
-  {%- endfor -%}
+  </div>
   {%- if any_active -%}
-    <a class="reset" href="{{ reset_url }}" data-filter-link>Alle zurücksetzen</a>
+    <div class="active-filters__chips">
+      {%- for filter in results.filters -%}
+        {%- for value in filter.active_values -%}
+          <a class="chip" href="{{ value.url_to_remove }}" data-filter-link>
+            {{ filter.label | escape }}: {{ value.label | escape }}
+            {% render 'icon', name: 'x' %}<span class="sr-only"> entfernen</span>
+          </a>
+        {%- endfor -%}
+        {%- if filter.type == 'price_range' -%}
+          {%- if filter.min_value.value != nil or filter.max_value.value != nil -%}
+            <a class="chip" href="{{ filter.url_to_remove }}" data-filter-link>
+              {{ filter.label | escape }}:
+              {% if filter.min_value.value != nil %}{{ filter.min_value.value | money_without_trailing_zeros }}{% else %}…{% endif %}
+              –
+              {% if filter.max_value.value != nil %}{{ filter.max_value.value | money_without_trailing_zeros }}{% else %}…{% endif %}
+              {% render 'icon', name: 'x' %}<span class="sr-only"> entfernen</span>
+            </a>
+          {%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
   {%- endif -%}
 </div>
