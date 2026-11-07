@@ -142,8 +142,9 @@
 /* Kopfzeile: Trefferzahl groß links, „Alle zurücksetzen“ rechts am Ende (einzelne Filter nur im Filter selbst) */
 .active-filters { padding-block: 16px 24px; }
 .active-filters__head { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 44px; }
-.active-filters__count { font-family: var(--f-head); font-size: var(--fs-h3); font-weight: 600; line-height: 1.1; letter-spacing: 0.03em; text-transform: uppercase; color: var(--c-text); }
-.active-filters__count strong { font-weight: 700; }
+.active-filters__count { font-family: var(--f-head); font-size: 28px; font-weight: 700; line-height: 1.05; letter-spacing: 0.02em; text-transform: uppercase; color: var(--c-text); }
+.active-filters__count strong { font-weight: 800; }
+@media (min-width: 1024px) { .active-filters__count { font-size: 32px; } }
 .active-filters .reset { flex: none; display: inline-flex; align-items: center; font-size: var(--fs-small); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; min-height: 44px; padding: 0 0 0 6px; }
 .empty { padding: 64px 16px; text-align: center; display: grid; gap: 16px; justify-items: center; }
 .empty p { max-width: 44ch; }
