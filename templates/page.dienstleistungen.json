@@ -14,9 +14,9 @@
       "settings": {
         "heading": "Unsere *Dienst­leistungen.*",
         "text": "Probefahrt, Inzahlungnahme, Finanzierung, Versicherung und Lieferung. Ein Ansprechpartner. Ein Ablauf. Kein Stress.",
-        "asset": "service-probefahrt.jpg",
-        "alt": "Frontansicht eines Motorrads mit Rundscheinwerfer, zwei Zusatzscheinwerfern und hohem Lenker",
-        "position": "56% 50%",
+        "asset": "dienstleistungen-kopf-1600.jpg",
+        "alt": "Verkaufsraum mit Holzvitrine in der Mitte, Theke mit Harley-Davidson-Schriftzug und einem Regal voller T-Shirts",
+        "position": "50% 50%",
         "scroll_cue": true,
         "roll": false
       }
