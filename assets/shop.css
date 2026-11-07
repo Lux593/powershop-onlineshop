@@ -105,6 +105,13 @@
   .filterbar__mobile { display: inline-flex; }
   .filterbar__right { margin-left: auto; }
 }
+/* Zähler am mobilen Filter-Knopf: schwarzer Kreis mit Zahl wie in den Filtermenüs; beim Hover wird der Knopf schwarz, der Kreis dann weiß */
+.filterbar__mobile .dot {
+  position: relative; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 11px; display: grid; place-items: center;
+  background: var(--c-black); color: var(--c-white); font-family: var(--f-body); font-size: 13px; font-weight: 600; letter-spacing: 0; line-height: 1;
+  transition: background-color var(--t-fast), color var(--t-fast);
+}
+.filterbar__mobile:hover .dot { background: var(--c-white); color: var(--c-black); }
 .fdrop { position: relative; }
 .fdrop__btn { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 12px; font-weight: 600; font-size: var(--fs-small); border: 1px solid transparent; border-radius: var(--radius); }
 .fdrop__btn:hover, .fdrop__btn[aria-expanded="true"] { border-color: var(--c-line); background: var(--c-white); }

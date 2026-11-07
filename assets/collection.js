@@ -223,7 +223,7 @@
       var dotAll = $('[data-dot-all]');
       var freshDotAll = $('[data-dot-all]', next);
       if (dotAll && freshDotAll) {
-        dotAll.textContent = freshDotAll.textContent;
+        dotAll.innerHTML = freshDotAll.innerHTML; // Zahl samt Screenreader-Zusatz
         dotAll.hidden = freshDotAll.hidden;
       }
       var show = $('[data-show-count]');
