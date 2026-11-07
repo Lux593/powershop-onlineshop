@@ -29,6 +29,22 @@
 .pagination a[aria-current="page"], .pagination span[aria-current="page"] { background: var(--c-black); color: var(--c-white); pointer-events: none; }
 .pagination .is-disabled { opacity: 0.35; }
 .pagination .icon { width: 20px; height: 20px; }
+/* Schmale Fenster: weniger Nachbarseiten, damit die Leiste in eine Zeile passt (Aufbau in snippets/pagination.liquid).
+   Unter 480 px: Pfeile, erste, aktuelle, letzte Seite = 5 × 44 px + 2 × 20 px „…“ + 6 × 4 px Abstand = 284 px, passt ab 320 px Fensterbreite. */
+.pagination { gap: 4px; }
+.pagination .pagination__gap { min-width: 20px; }
+@media (max-width: 639px) {
+  .pagination .is-far, .pagination .pagination__gap--lg { display: none; }
+}
+@media (max-width: 479px) {
+  .pagination .is-near { display: none; }
+}
+@media (min-width: 480px) {
+  .pagination .pagination__gap--xs { display: none; }
+}
+@media (min-width: 640px) {
+  .pagination .pagination__gap--sm { display: none; }
+}
 
 /* Kollektions-Ergebnisse: beim Nachladen leicht abdunkeln */
 [data-results].is-loading { opacity: 0.5; pointer-events: none; transition: opacity var(--t-fast); }

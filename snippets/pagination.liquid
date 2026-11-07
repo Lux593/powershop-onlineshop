@@ -1,5 +1,10 @@
 {% doc %}
   Seitenzahlen (.pagination). Links statt Buttons, damit es ohne JavaScript geht.
+  Die Leiste passt immer in eine Zeile: Je schmaler das Fenster, desto weniger Nachbarseiten (CSS in theme.css).
+  Erste und letzte Seite, die aktuelle Seite und die Pfeile stehen immer da:
+  unter 480 px „‹ 1 … 38 … 41 ›“, bis 639 px „‹ 1 … 37 38 39 … 41 ›“, ab 640 px das Fenster von Shopify (± 2 Seiten).
+  Die Auslassungspunkte von Shopify gelten nur für das breite Fenster; für die schmalen setzt das Snippet eigene
+  (.pagination__gap--sm bis 639 px, --xs bis 479 px), damit nie eine ausgeblendete Seite ohne „…“ fehlt.
 
   @param {object} paginate - paginate-Objekt aus dem paginate-Tag
 
@@ -8,6 +13,12 @@
 {% enddoc %}
 
 {%- if paginate.pages > 1 -%}
+  {%- liquid
+    assign current = paginate.current_page
+    assign last = paginate.pages
+    assign left = current | minus: 1
+    assign right = last | minus: current
+  -%}
   <nav class="pagination" data-pagination aria-label="Seiten">
     {%- if paginate.previous -%}
       <a href="{{ paginate.previous.url }}" aria-label="Vorherige Seite" data-filter-link>{% render 'icon', name: 'chevron-left' %}</a>
@@ -16,12 +27,37 @@
     {%- endif -%}
 
     {%- for part in paginate.parts -%}
-      {%- if part.is_link -%}
-        <a href="{{ part.url }}" aria-label="Seite {{ part.title }}" data-filter-link>{{ part.title }}</a>
-      {%- elsif part.title == paginate.current_page -%}
-        <span aria-current="page"><span class="sr-only">Seite </span>{{ part.title }}</span>
+      {%- liquid
+        assign n = part.title | plus: 0
+        assign is_gap = false
+        if part.is_link == false and n != current
+          assign is_gap = true
+        endif
+        assign distance = n | minus: current | abs
+        assign size_class = ''
+        unless is_gap or n == 1 or n == last
+          if distance >= 2
+            assign size_class = ' class="is-far"'
+          elsif distance == 1
+            assign size_class = ' class="is-near"'
+          endif
+        endunless
+      -%}
+
+      {%- if n == last and right >= 2 -%}
+        <span class="pagination__gap pagination__gap--{% if right >= 3 %}sm{% else %}xs{% endif %}" aria-hidden="true">…</span>
+      {%- endif -%}
+
+      {%- if is_gap -%}
+        <span class="pagination__gap pagination__gap--lg" aria-hidden="true">…</span>
+      {%- elsif part.is_link -%}
+        <a href="{{ part.url }}"{{ size_class }} aria-label="Seite {{ n }}" data-filter-link>{{ n }}</a>
       {%- else -%}
-        <span aria-hidden="true">{{ part.title }}</span>
+        <span aria-current="page"><span class="sr-only">Seite </span>{{ n }}</span>
+      {%- endif -%}
+
+      {%- if n == 1 and left >= 2 -%}
+        <span class="pagination__gap pagination__gap--{% if left >= 3 %}sm{% else %}xs{% endif %}" aria-hidden="true">…</span>
       {%- endif -%}
     {%- endfor -%}
 
