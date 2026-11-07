@@ -144,8 +144,11 @@
       <div class="pdp__crumbs">{{ breadcrumb_html }}</div>
       <div class="pdp pdp--bike">
         <div class="pdp__media">
-          {%- capture bike_badges -%}{% render 'bike-badge', zustand: zustand, status: status %}{%- endcapture -%}
-          {% render 'pdp-gallery', product: product, wide: true, badges: bike_badges %}
+          {%- comment -%}
+            Kein Zustands-Badge über den Fotos: Der Zustand steht im Titel, „Reserviert“ im Hinweis unter den Fakten.
+            Die Bike-Karten behalten ihr Badge (snippets/bike-card.liquid).
+          {%- endcomment -%}
+          {% render 'pdp-gallery', product: product, wide: true %}
         </div>
         <div class="pdp__info" data-stagger="60">
           <h1 class="pdp__title">{{ product.title | escape }}</h1>
