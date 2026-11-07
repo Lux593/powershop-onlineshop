@@ -109,7 +109,10 @@
     function swap(update, animate) {
       var results = $('[data-results]');
       var html = document.documentElement;
-      if (!animate || !results || !document.startViewTransition || !PS.motion.enabled) { update(false); return; }
+      // Kein Übergang, solange ein Fenster offen ist (Filter- oder Sortier-Sheet, Warenkorb): Die Momentaufnahmen der
+      // View Transition liegen über der obersten Ebene, Ergebnisse und Header schoben sich sonst über das offene Sheet
+      var dialogOpen = !!document.querySelector('dialog[open]');
+      if (!animate || dialogOpen || !results || !document.startViewTransition || !PS.motion.enabled) { update(false); return; }
       results.classList.add('is-vt');
       html.classList.add('is-vt-results');
       var transition = vt = document.startViewTransition(function () { update(true); });
