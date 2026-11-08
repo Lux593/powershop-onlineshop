@@ -127,7 +127,8 @@
 .fgroup__count { margin-left: auto; color: var(--c-muted); font-size: var(--fs-caption); }
 .frange { display: grid; grid-template-columns: 1fr auto 1fr; align-items: end; gap: 8px; min-width: 260px; }
 .frange .input { min-height: 44px; }
-.frange span { padding-bottom: 12px; color: var(--c-muted); }
+/* Nur der Bindestrich zwischen den Feldern: .frange span traf auch den Füllbalken des Reglers (12 px statt 4 px hoch, unter der Linie) */
+.frange > span { padding-bottom: 12px; color: var(--c-muted); }
 .frange__slider[hidden] { display: none; }
 .frange__slider { --thumb: 22px; grid-column: 1 / -1; position: relative; height: 36px; margin-top: 4px; }
 .frange__track { position: absolute; left: calc(var(--thumb) / 2); right: calc(var(--thumb) / 2); top: 50%; height: 4px; margin-top: -2px; border-radius: 2px; background: var(--c-line); }
