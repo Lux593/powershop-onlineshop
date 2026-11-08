@@ -229,28 +229,109 @@
         el.querySelector('.bb-room').inert = !on;
       });
     }
-    function scrollMobile(bi) {
-      // Ziel selbst berechnen: Lage des Umbaus, wenn alle anderen zugeklappt sind, direkt unter dem Header.
-      // scrollIntoView ließe den Abstand aus scroll-padding-top stehen, und der Umbau darüber blitzte durch.
-      var closedH = cssPx('--closed-h') || 136;
+    /* ---------------- Handy: den geöffneten Umbau mit seinem Kopf unter den Header holen ----------------
+       Seit 8.11. in drei Schritten, vorher stand der Kopf am iPhone oft über dem Bildschirm (man landete mitten im Umbau):
+       1. Liegt der bisher offene Umbau darüber, klappt er sofort zu (ohne Übergang), und die Seite rückt um genau so viel nach,
+          dass am Bildschirm nichts springt (snapAbove). Sonst schrumpfte die Seite oberhalb des Ziels um die ganze Höhe des alten
+          Umbaus, während sie gleitet: Safari bricht das Gleiten dann ab, und man sieht das Ende des neuen Umbaus.
+       2. Ziel selbst berechnen (firstTop), auch für das Rolltor der Werkstatt, und hingleiten (scrollMobile).
+       3. Gegenprobe, wenn die Seite steht (settleMobile): Steht der Kopf nicht unter dem Header, gleitet sie nach. Nicht, sobald
+          der Besucher selbst scrollt oder tippt. */
+    function headerOffset() {
       var shown = parseFloat(getComputedStyle(html).getPropertyValue('--header-shown'));
-      var headerH = cssPx('--header-h', html) * (isNaN(shown) ? 1 : shown);
-      var y = els[0].getBoundingClientRect().top + window.scrollY + bi * closedH - headerH;
-      if (PS.headerQuiet) PS.headerQuiet(1600);
+      return cssPx('--header-h', html) * (isNaN(shown) ? 1 : shown);
+    }
+    // Lage des ersten Umbaus im Dokument, so wie sie gilt, wenn ein Umbau unter dem Header steht. Auf der Werkstatt klebt die
+    // Hülle um Band und Umbauten beim Rolltor unter der Kopfleiste (about-head.css, sticky), bis sie über den Abstandhalter
+    // darunter weitergerückt ist. Steht ein Umbau unter dem Header, ist sie immer ganz durch, also unten bündig mit ihrem
+    // Abschnitt. Mit der Lage im Moment landete der erste Umbau sonst bis zur Höhe des Kopfs zu tief.
+    function firstTop() {
+      var y = els[0].getBoundingClientRect().top + window.scrollY;
+      var wrap = root.closest('[data-roll-target]');
+      if (wrap && wrap.parentElement && getComputedStyle(wrap).position === 'sticky') {
+        var host = wrap.parentElement, cs = getComputedStyle(host);
+        var end = host.getBoundingClientRect().bottom - parseFloat(cs.paddingBottom || 0) - parseFloat(cs.borderBottomWidth || 0);
+        y += end - wrap.getBoundingClientRect().bottom;
+      }
+      return y;
+    }
+    // Sofort springen: html hat scroll-behavior: smooth (base.css), ein einfaches scrollTo glitte
+    function jumpTo(y) {
+      if (PS.lenis && !PS.lenis.isStopped) { PS.lenis.scrollTo(y, { immediate: true }); return; }
+      var sb = html.style.scrollBehavior;
+      html.style.scrollBehavior = 'auto';
+      window.scrollTo(0, y);
+      html.style.scrollBehavior = sb;
+    }
+    function glideTo(y) {
       y = Math.max(0, Math.round(y));
+      if (PS.headerQuiet) PS.headerQuiet(1600);
       // Mit Lenis (Maus und Trackpad, schmales Fenster) gleitet Lenis selbst: ein natives Gleiten liefe gegen seines
       if (PS.lenis && !PS.lenis.isStopped && !reduce) PS.lenis.scrollTo(y);
       else window.scrollTo({ top: y, behavior: reduce ? 'auto' : 'smooth' });
     }
+    function scrollMobile(bi) {
+      // Ziel selbst berechnen: Lage des Umbaus, wenn alle anderen zugeklappt sind, direkt unter dem Header.
+      // scrollIntoView ließe den Abstand aus scroll-padding-top stehen, und der Umbau darüber blitzte durch.
+      var closedH = cssPx('--closed-h') || 136;
+      glideTo(firstTop() + bi * closedH - headerOffset());
+    }
+    var settling = null;
+    function settleMobile(bi) {
+      if (settling) settling();
+      var raf = 0, t0 = performance.now(), lastY = NaN, still = 0;
+      var stopEvents = ['touchstart', 'wheel', 'keydown', 'pointerdown'];
+      function done() {
+        cancelAnimationFrame(raf);
+        stopEvents.forEach(function (t) { window.removeEventListener(t, done, true); });
+        settling = null;
+      }
+      function tick() {
+        if (open !== bi || !mobile()) { done(); return; }
+        var y = window.scrollY, t = performance.now() - t0;
+        still = y === lastY ? still + 1 : 0;
+        lastY = y;
+        // Erst nach dem Aufklappen (0,7 s) und wenn die Seite 8 Bilder lang stillsteht, spätestens nach 2,5 s
+        if (t < 750 || (still < 8 && t < 2500)) { raf = requestAnimationFrame(tick); return; }
+        done();
+        var off = els[bi].getBoundingClientRect().top - headerOffset();
+        if (Math.abs(off) > 2) glideTo(window.scrollY + off);
+      }
+      stopEvents.forEach(function (t) { window.addEventListener(t, done, { capture: true, passive: true }); });
+      raf = requestAnimationFrame(tick);
+      settling = done;
+    }
+    // Schritt 1: den offenen Umbau darüber sofort zuklappen, die Seite rückt nach (Lage des neuen Umbaus bleibt am Bildschirm)
+    function snapAbove(prev, bi, apply) {
+      var before = els[bi].getBoundingClientRect().top;
+      var anchor = html.style.overflowAnchor;
+      // Chrome hielte die Lage sonst selbst fest (Scroll-Anker) und das Nachrücken unten käme doppelt
+      html.style.overflowAnchor = 'none';
+      els[prev].style.transition = 'none';
+      apply();
+      var d = els[bi].getBoundingClientRect().top - before;
+      if (Math.abs(d) >= 1) {
+        if (PS.headerQuiet) PS.headerQuiet(1600);
+        jumpTo(window.scrollY + d);
+      }
+      void els[prev].offsetHeight;
+      els[prev].style.transition = '';
+      requestAnimationFrame(function () { html.style.overflowAnchor = anchor; });
+    }
     function openBay(bi, fromEditor) {
       if (bi === open) return;
-      open = bi;
-      eager(bi);
-      setState();
-      place();
-      renderGallery(bi);
-      fitMobile(bi);
-      if (mobile()) scrollMobile(bi);
+      var prev = open;
+      function apply() {
+        open = bi;
+        eager(bi);
+        setState();
+        place();
+        renderGallery(bi);
+        fitMobile(bi);
+      }
+      if (mobile() && prev >= 0 && prev < bi) snapAbove(prev, bi, apply);
+      else apply();
+      if (mobile()) { scrollMobile(bi); settleMobile(bi); }
       if (!reduce) {
         var parts = els[bi].querySelectorAll('.bb-head-box > *, .bb-info > *'), items = els[bi].querySelectorAll('.bb-item:not(.is-extra)');
         [].forEach.call(parts, function (n, k) { n.animate([{ opacity: 0, transform: 'translateY(16px)' }, { opacity: 1, transform: 'none' }], { duration: 600, delay: 280 + k * 60, easing: EASE, fill: 'backwards' }); });
