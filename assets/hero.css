@@ -29,11 +29,17 @@
    durch die Leiste, also der helle Block nach dem Hero, solange man oben steht. Der Hero ist deshalb um --hero-chin länger als der
    Bildschirm (ca. Höhe der Leiste plus Reserve): Dort steht sein dunkler Grund mit dem Schleier, nicht die helle Section. Die Länge
    steckt in --hero-ui, Text, Tabs, Pfeil, Pause-Taste und Schleier bleiben an derselben Stelle wie ohne Verlängerung. Am Desktop, bei Android
-   und in jedem Browser ohne diese Leiste ist --hero-chin 0, dort ändert sich nichts. */
-.hero { --hero-chin: 0px; }
+   und in jedem Browser ohne diese Leiste ist --hero-chin 0, dort ändert sich nichts.
+   Handy hochkant: Der Willkommensblock schiebt sich als Karte um --card-overlap über den Hero (siehe "Karte" unten). Damit er zum
+   Start nicht in den Bildschirm ragt, ist der Hero um genau so viel länger: --hero-chin enthält die Überlappung (auch ohne iOS-Leiste). */
+:root { --card-overlap: 0px; }
+@media (max-width: 767px) and (min-height: 541px) {
+  :root { --card-overlap: 28px; }
+}
+.hero { --hero-chin: var(--card-overlap); }
 @media (max-width: 767px) and (hover: none) {
   @supports (-webkit-touch-callout: none) { /* nur iOS (alle Browser dort sind WebKit) */
-    .hero { --hero-chin: 100px; }
+    .hero { --hero-chin: calc(100px + var(--card-overlap)); }
   }
 }
 /* Header über dem Hero (body[data-header-overlay], nur Startseite): der Hero zieht unter den Header. header.js macht ihn oben transparent. */
@@ -96,15 +102,44 @@
 /* Band (hero.js, nur mit ScrollTrigger): Das Bild läuft beim Scrollen ins Helle aus und geht in den hellen
    Willkommensblock darunter über (gleiche Farbe wie dessen Grund). */
 .hero__fade { position: absolute; z-index: 4; inset: 0; background: var(--c-offwhite); opacity: 0; }
-/* Handy hochkant, nur mit Bewegung: Der Film steht, der Hero ist sein Fenster. Die Filmbilder liegen fest im Bildschirm, der
-   Hero-Kasten scrollt normal und schneidet sie zu: Text, Schleier, Pfeil und Pause-Taste wandern mit der Seite nach oben, der
-   Willkommensblock darunter schiebt sich über den stehenden Film. Der Film zeigt sich nur innerhalb des Heros und kann nie über
-   andere Abschnitte malen. Kein Skript beim Scrollen, Bewegung macht der Browser. Zugeschnitten wird doppelt: clip-path und das
-   ältere clip (wirkt nur an absolut positionierten Elementen wie .hero__media), der bewährte Weg für feste Ebenen in Safari auf
-   dem iPhone. Höhe lvh: Die Bilder füllen auch bei eingeklappter Browserleiste den Bildschirm, nichts springt. */
+/* Handy hochkant: Der Film läuft mit dem Hero mit (kein feststehender Film mehr). So reicht er bis ganz unten, auch hinter die iOS-26-Leiste:
+   feste Ebenen malt Safari dort nicht, mitlaufende schon. Dafür zwei Effekte, beide ohne Skript:
+   1) Parallax: Der Film scrollt etwas langsamer als die Seite (--hero-par, 1 = an, 0 = aus).
+   2) Karte: Der Willkommensblock bekommt runde obere Ecken und schiebt sich um --card-overlap über den Hero. Der Hero tritt dabei zurück
+      und dunkelt leicht ab. Optional wird der Film dabei kleiner (--hero-zoom, z. B. 0.05): standardmäßig aus, denn am Desktop ließ ein
+      Zoom des laufenden Films Bilder ausfallen (docs/research/hero-scroll-performance.md); am iPhone erst prüfen. Nur transform und opacity.
+   Die Bewegung hängt am Scroll-Fortschritt der Seite (animation-timeline: scroll()), nur mit Bewegung (html.has-motion) und nur, wo der
+   Browser das kann (Safari ab 26, Chrome ab 115). Sonst steht der Film still, die Karte liegt trotzdem über dem Hero.
+   Der Film ragt oben --hero-par-lift über den Hero, damit beim Verschieben oben kein Spalt entsteht (er bleibt vom Hero abgeschnitten). */
 @media (max-width: 767px) and (min-height: 541px) {
-  .has-motion .hero__media { clip-path: inset(0); clip: rect(0, auto, auto, 0); }
-  .has-motion .hero__slide { position: fixed; top: 0; right: 0; bottom: auto; left: 0; height: 100vh; height: 100lvh; }
+  .shopify-section:has(> .hero) + .shopify-section > .statement {
+    position: relative; z-index: 2;
+    margin-top: calc(var(--card-overlap) * -1);
+    border-radius: 28px 28px 0 0;
+    background: var(--c-offwhite);
+  }
+  @supports (animation-timeline: scroll()) {
+    .has-motion .hero { --hero-par: 1; --hero-par-lift: 24px; --hero-zoom: 0; }
+    .has-motion .hero__media {
+      top: calc(var(--hero-par-lift) * -1);
+      will-change: transform;
+      animation: hero-par linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0px 100lvh;
+    }
+    .has-motion .hero__media::after {
+      content: ""; position: absolute; inset: 0; z-index: 5; background: var(--c-black); opacity: 0; pointer-events: none;
+      animation: hero-dim linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0px 70lvh;
+    }
+  }
+}
+@keyframes hero-par {
+  to { transform: translate3d(0, calc(var(--hero-par) * 22lvh), 0) scale(calc(1 - var(--hero-par) * var(--hero-zoom))); }
+}
+@keyframes hero-dim {
+  to { opacity: calc(var(--hero-par) * 0.4); }
 }
 
 /* Ken-Burns auf den Foto-Slides: Scale 1 auf 1.08 über die Standzeit plus Überblendung. is-leaving behält die Animation,

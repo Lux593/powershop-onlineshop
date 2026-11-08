@@ -2,7 +2,7 @@
 
 Anlass: Der Übergang vom Startseiten-Hero in den Willkommensblock ruckelt am Desktop (Text wächst nach oben rechts hinaus);
 sobald der Hero weggescrollt ist, läuft die Seite flüssig. Betroffen ist nur der Desktop-Scrub in `assets/hero.js`
-(`PS.motion.add`, ab 768 px). Am Handy gibt es kein Skript, dort steht der Film fest (`hero.css`).
+(`PS.motion.add`, ab 768 px). Am Handy gibt es kein Skript: Der Film läuft per CSS-Scroll-Timeline mit dem Hero mit (`hero.css`).
 
 ## Messaufbau
 

@@ -201,9 +201,9 @@
        Nur Verschieben und Ausblenden, nie Skalieren: Ein Zoom des laufenden Films ließ Bilder ausfallen, und eine wachsende
        Schrift musste der Browser in jedem Bild neu rastern (gemessen: 32 statt 74 fps, docs/research/hero-scroll-performance.md).
        will-change in hero.css hält alle bewegten Ebenen von Anfang an auf der Grafikkarte.
-       Handy (bis 767 px): kein Skript. Der Film steht als feste Ebene, der Hero ist sein Fenster und der Willkommensblock
-       schiebt sich darüber (hero.css). Per Skript gesetzte Zoom- und Versatzwerte kamen auf dem iPhone ein Bild nach dem
-       Scrollen und zitterten gegen die Seite. */
+       Handy (bis 767 px): kein Skript. Der Film läuft mit dem Hero mit (bis unter die iOS-Leiste), etwas langsamer als die Seite,
+       und der Willkommensblock schiebt sich als Karte darüber: reines CSS mit animation-timeline: scroll() (hero.css). Per Skript
+       gesetzte Zoom- und Versatzwerte kamen auf dem iPhone ein Bild nach dem Scrollen und zitterten gegen die Seite. */
     PS.motion.add(hero, function (gsap) {
       var m = hero.querySelector('.hero__media'), f = hero.querySelector('.hero__fade'), c = hero.querySelector('.hero__caption');
       var row = hero.querySelector('.hero__chips'), heads = hero.querySelectorAll('.hero__poster'), subs = hero.querySelectorAll('.hero__sub');
