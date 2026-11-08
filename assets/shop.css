@@ -273,9 +273,19 @@
 /* Abgleich mit der Filterauswahl (Modellfamilie + Baujahr), gefüllt von product.js */
 .compat__fit { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-bottom: 1px solid var(--c-line); }
 .compat__fit[hidden] { display: none; }
-.compat__fit > div { min-width: 0; overflow-wrap: anywhere; }
+.compat__fit > div { display: grid; gap: 10px; min-width: 0; overflow-wrap: anywhere; }
 .compat__fit strong { display: block; }
-.compat__fit p { font-size: var(--fs-small); color: var(--c-text-soft); }
+.compat__fit p { font-size: var(--fs-caption); color: var(--c-muted); }
+/* Das gewählte Motorrad als Kärtchen: Familie fett, Baujahr abgesetzt */
+.compat__fit-bikes { display: grid; gap: 8px; }
+.compat__bikes { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.compat__bikes-label { flex-basis: 100%; font-size: var(--fs-caption); font-weight: 600; color: var(--c-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.compat__bike { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 14px; background: var(--c-white); border: 1px solid var(--c-orange); border-radius: var(--radius); }
+.compat__bike .icon { width: 22px; height: 22px; flex: none; color: var(--c-orange); }
+.compat__bike-name { font-weight: 700; }
+.compat__bike-year { padding-left: 10px; border-left: 1px solid var(--c-line); font-weight: 600; font-variant-numeric: tabular-nums; }
+.compat__bike.is-miss { border-color: var(--c-border-soft); }
+.compat__bike.is-miss .icon { color: var(--c-muted); }
 .compat__fit-icon { display: none; flex: none; }
 .compat__fit-icon .icon { width: 20px; height: 20px; margin-top: 2px; }
 .compat__fit[data-state="ok"], .compat__fit[data-state="partial"] { background: color-mix(in srgb, var(--c-orange) 8%, var(--c-white)); }

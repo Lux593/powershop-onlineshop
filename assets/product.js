@@ -464,15 +464,40 @@
             return tr.dataset.family === family && +tr.dataset.from <= year && year <= +tr.dataset.to;
           });
         };
-        // „Softail 2018“, mehrere Jahre: „Softail (2018, 2019)“, mehrere Familien mit Komma
-        var describe = function (list) {
+        // Je Modellfamilie ein Kärtchen mit den gewählten Jahren: „Softail | 2018, 2019“. Werte aus der Adresse: nur als Text einsetzen
+        var groups = function (list) {
           var order = [];
           var by = {};
           list.forEach(function (c) {
             if (!by[c.f]) { by[c.f] = []; order.push(c.f); }
             by[c.f].push(c.y);
           });
-          return order.map(function (f) { return by[f].length === 1 ? f + ' ' + by[f][0] : f + ' (' + by[f].join(', ') + ')'; }).join(', ');
+          return order.map(function (f) { return { f: f, ys: by[f] }; });
+        };
+        var bikeRow = function (label, list, hit) {
+          var row = document.createElement('div');
+          row.className = 'compat__bikes';
+          if (label) {
+            var l = document.createElement('span');
+            l.className = 'compat__bikes-label';
+            l.textContent = label;
+            row.appendChild(l);
+          }
+          groups(list).forEach(function (g) {
+            var tag = document.createElement('span');
+            tag.className = 'compat__bike' + (hit ? '' : ' is-miss');
+            tag.innerHTML = '<svg class="icon" aria-hidden="true" focusable="false"><use href="#i-bike"></use></svg>';
+            var name = document.createElement('span');
+            name.className = 'compat__bike-name';
+            name.textContent = g.f;
+            var year = document.createElement('span');
+            year.className = 'compat__bike-year';
+            year.textContent = g.ys.join(', ');
+            tag.appendChild(name);
+            tag.appendChild(year);
+            row.appendChild(tag);
+          });
+          return row;
         };
         var hits = [];
         var misses = [];
@@ -480,21 +505,25 @@
           yrs.forEach(function (y) { (fits(f, y) ? hits : misses).push({ f: f, y: y }); });
         });
 
+        var single = fams.length === 1 && yrs.length === 1; // genau ein Motorrad gewählt
+        var bikes = $('[data-compat-fit-bikes]', fit);
         var title;
-        var text;
+        var text = universal ? 'Universell einsetzbar · Angaben laut Hersteller' : 'Angaben laut Hersteller';
         var state;
+        bikes.textContent = '';
         if (!misses.length) {
           state = 'ok';
-          title = 'Passt zu deiner Auswahl';
-          text = describe(hits) + (universal ? ' · universell einsetzbar' : ' · Angaben laut Hersteller');
+          title = single ? 'Passt zu deinem Motorrad' : 'Passt zu deiner Auswahl';
+          bikes.appendChild(bikeRow('', hits, true));
         } else if (hits.length) {
           state = 'partial';
           title = 'Passt zu einem Teil deiner Auswahl';
-          text = 'Passt für ' + describe(hits) + '. Nicht für ' + describe(misses) + '. Angaben laut Hersteller.';
+          bikes.appendChild(bikeRow('Passt', hits, true));
+          bikes.appendChild(bikeRow('Passt nicht', misses, false));
         } else {
           state = 'no';
-          title = 'Passt laut Hersteller nicht zu deiner Auswahl';
-          text = 'Deine Auswahl: ' + describe(misses);
+          title = single ? 'Passt laut Hersteller nicht zu deinem Motorrad' : 'Passt laut Hersteller nicht zu deiner Auswahl';
+          bikes.appendChild(bikeRow('', misses, false));
         }
         $('[data-compat-fit-title]', fit).textContent = title;
         $('[data-compat-fit-text]', fit).textContent = text;
