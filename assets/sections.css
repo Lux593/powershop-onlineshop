@@ -11,8 +11,8 @@
    Spalten dürfen schrumpfen (Reflow bei 200 % Zoom), lange Titel brechen um. */
 .event-grid { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
 @media (min-width: 1180px) { .event-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-.event-card { position: relative; display: grid; background: var(--c-anthracite); color: var(--c-white); border: 1px solid var(--c-steel); transition: border-color var(--t-fast); } /* eigene Textfarbe: die Karte steht auch auf hellem Grund (Blog, Service-Seite) */
-.event-card:hover { border-color: var(--c-orange); }
+.event-card { position: relative; display: grid; background: var(--c-anthracite); color: var(--c-white); border: 1px solid var(--c-steel); } /* eigene Textfarbe: die Karte steht auch auf hellem Grund (Blog, Service-Seite) */
+/* Kein oranger Rahmen beim Überfahren oder Antippen mehr (seit 8.11., Wunsch des Nutzers): am Handy blieb er nach dem Tippen stehen */
 .event-card__media { position: relative; aspect-ratio: 16 / 10; overflow: hidden; }
 .event-card__media img { width: 100%; height: 100%; object-fit: cover; }
 .date-badge { position: absolute; top: 12px; left: 12px; display: grid; place-items: center; width: 60px; padding: 8px 0; background: var(--c-orange); color: var(--c-black); line-height: 1; text-align: center; }
