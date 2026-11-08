@@ -1,0 +1,50 @@
+{% doc %}
+  Kommende Events aus dem Metaobjekt „Event“ (Shopify-Admin → Inhalte → Metaobjekte → Event), nach Datum sortiert.
+  Vergangene (Enddatum, sonst Datum, vor heute) und Entwürfe fehlen; steht nichts an, ist die Ausgabe leer. Wer
+  Überschrift oder Hinweis davon abhängig macht, rendert das Snippet in ein capture und prüft das Ergebnis auf blank.
+
+  Sortieren: Liquid kann Metaobjekte nicht nach einem Feld sortieren, und Einträge per Handle nachzuschlagen ist auf
+  20 je Seite begrenzt. Deshalb wird jede Karte gleich gerendert und mit einem Schlüssel aus Datum und Reihenfolge
+  („20261114-1003“) abgelegt; sortiert wird der Text, ausgegeben der Teil nach dem Schlüssel. Ohne paginate liefert
+  Shopify höchstens 50 Einträge, für Events reicht das.
+
+  @param {number} [limit] - Höchstzahl der Karten (Startseite: 3)
+  @param {string} [layout] - an event-card durchgereicht ("row" für die Seite „Alle Events“)
+  @param {string} [page_url] - Seite „Alle Events“: Karten ohne eigenen Link führen dorthin, direkt zum Event
+  @param {string} [sizes] - an event-card durchgereicht
+{% enddoc %}
+
+{%- liquid
+  assign today_number = 'now' | date: '%Y%m%d' | plus: 0
+  assign max_cards = limit | default: 50
+  assign records = ''
+  for e in metaobjects.event.values
+    assign start_number = e.datum.value | date: '%Y%m%d' | plus: 0
+    if start_number < 20000101
+      continue
+    endif
+    assign end_number = start_number
+    if e.enddatum.value != blank
+      assign end_candidate = e.enddatum.value | date: '%Y%m%d' | plus: 0
+      if end_candidate > end_number
+        assign end_number = end_candidate
+      endif
+    endif
+    if end_number < today_number
+      continue
+    endif
+    assign card_url = blank
+    if page_url != blank
+      assign card_url = page_url | append: '#event-' | append: e.system.handle
+    endif
+    capture card
+      render 'event-card', event: e, url: card_url, layout: layout, sizes: sizes
+    endcapture
+    assign tie = forloop.index | plus: 1000
+    assign records = records | append: start_number | append: '-' | append: tie | append: '<!--k-->' | append: card | append: '<!--e-->'
+  endfor
+  assign records = records | split: '<!--e-->' | sort
+-%}
+{%- for record in records limit: max_cards -%}
+  {{- record | split: '<!--k-->' | last -}}
+{%- endfor -%}

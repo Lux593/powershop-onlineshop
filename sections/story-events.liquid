@@ -50,22 +50,30 @@
       {%- endif -%}
     </div>
 
-    {%- comment -%} Vergangene Events filtert das Snippet event-card. Überschrift und Link erscheinen nur, wenn danach eine Karte übrig bleibt. {%- endcomment -%}
+    {%- comment -%}
+      Events kommen aus Shopify (Inhalte → Metaobjekte → Event): die nächsten drei, sortiert, Vergangene und Entwürfe fehlen
+      (snippets/events-upcoming.liquid). Überschrift und Link erscheinen nur, wenn eine Karte übrig bleibt. Karten ohne
+      eigenen Link führen zur Seite „Alle Events“ (Seite mit dem Handle events), falls es sie gibt.
+    {%- endcomment -%}
+    {%- liquid
+      assign events_url = section.settings.events_url
+      if events_url == blank
+        assign events_page = pages['events']
+        if events_page.url != blank
+          assign events_url = events_page.url
+        endif
+      endif
+    -%}
     {%- capture event_cards -%}
-      {%- for block in section.blocks -%}
-        {%- if block.type == 'event' -%}
-          {%- assign event_url = block.settings.url | default: section.settings.events_url -%}
-          {% render 'event-card', item: block, url: event_url %}
-        {%- endif -%}
-      {%- endfor -%}
+      {%- render 'events-upcoming', limit: 3, page_url: events_url -%}
     {%- endcapture -%}
     {%- assign event_cards_text = event_cards | strip -%}
     {%- if event_cards_text != blank -%}
       <div class="events">
         <div class="section-head">
           <h2 class="h3">{{ section.settings.events_heading }}</h2>
-          {%- if section.settings.events_url != blank -%}
-            <a class="btn btn--text" href="{{ section.settings.events_url }}">Alle Events {% render 'icon', name: 'arrow-right' %}</a>
+          {%- if events_url != blank -%}
+            <a class="btn btn--text" href="{{ events_url }}">Alle Events {% render 'icon', name: 'arrow-right' %}</a>
           {%- endif -%}
         </div>
         <div class="event-grid" data-stagger="90">
@@ -91,8 +99,9 @@
     { "type": "text", "id": "button_label", "label": "Button-Text", "default": "Über uns" },
     { "type": "url", "id": "button_url", "label": "Button-Link" },
     { "type": "header", "content": "Events" },
+    { "type": "paragraph", "content": "Die Events legst du in Shopify an: Inhalte → Metaobjekte → Event. Hier erscheinen die nächsten drei, vergangene und Entwürfe nicht. Steht keins an, fällt der Bereich weg." },
     { "type": "text", "id": "events_heading", "label": "Überschrift", "default": "Nächste Events" },
-    { "type": "url", "id": "events_url", "label": "Link zu allen Events" }
+    { "type": "url", "id": "events_url", "label": "Link zu allen Events", "info": "Leer lassen: Dann führt der Link zur Seite „Events“ (Handle events)." }
   ],
   "blocks": [
     {

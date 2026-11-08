@@ -1,46 +1,132 @@
 {% doc %}
-  Event-Karte mit Datum, Titel, Ort und Bild. Ohne Bild oder bei ausgeblendetem Platzhalterbild
-  wird eine kompakte Textkarte mit dem Datum links gezeigt statt einer leeren Bildfläche.
+  Event-Karte mit Datum, Titel, Ort, Uhrzeit und Bild. Zwei Quellen:
+  - event: Eintrag des Metaobjekts „Event“ (Shopify-Admin → Inhalte → Metaobjekte → Event). So kommen die Events auf die
+    Startseite und auf die Seite „Alle Events“, sortiert und gefiltert von snippets/events-upcoming.liquid.
+  - item: Block vom Typ "event" (nur noch auf der Service-Seite möglich, falls dort Event-Blöcke stehen).
+  Ohne Bild oder bei ausgeblendetem Platzhalterbild erscheint eine kompakte Textkarte mit dem Datum links.
 
-  @param {object} item - Block vom Typ "event" (date, title, place, image, image_asset)
-  @param {string} [url] - Link der Karte. Leer = reine Infokarte, kein toter Link auf „#“
+  @param {object} [event] - Metaobjekt-Eintrag "event" (titel, datum, enddatum, uhrzeit, ort, bild, beschreibung, link)
+  @param {object} [item] - Block vom Typ "event" (date, title, place, image, image_asset)
+  @param {string} [url] - Link der Karte, wenn das Event selbst keinen hat. Leer = reine Infokarte, kein toter Link auf „#“
+  @param {string} [layout] - "row" für die Seite „Alle Events“: Bild links, ganzes Datum, Beschreibung und Link-Knopf
   @param {string} [sizes] - sizes-Attribut für das Bild
 
-  Vergangene Events erscheinen nicht (Ausgabe leer), außer im Theme-Editor. Das Datum ist Freitext (JJJJ-MM-TT) und wird
-  als Zahl mit dem heutigen Tag verglichen. Der Eventtag selbst bleibt sichtbar. Lässt sich das Datum nicht lesen,
-  bleibt die Karte stehen. Wer wissen will, ob überhaupt eine Karte erscheint, rendert das Snippet in ein capture
-  und prüft das Ergebnis auf blank (so tun es story-events und service-page, damit Überschrift und Link entfallen).
-  Grenze: „heute“ gilt zum Renderzeitpunkt auf dem Shopify-Server (nicht im Browser des Besuchers). Fertige Seiten
-  werden gecacht, ein Event kann daher kurz nach Mitternacht noch erscheinen oder eine Weile früher fehlen.
+  Vergangene Events erscheinen nicht (Ausgabe leer), Blöcke im Theme-Editor schon. Maßgeblich ist das Enddatum, sonst das
+  Datum: Der (letzte) Eventtag selbst bleibt sichtbar. Ein Block-Datum ist Freitext (JJJJ-MM-TT); lässt es sich nicht lesen,
+  bleibt die Karte stehen. Wer wissen will, ob überhaupt eine Karte erscheint, rendert das Snippet in ein capture und prüft
+  das Ergebnis auf blank. Grenze: „heute“ gilt zum Renderzeitpunkt auf dem Shopify-Server (nicht im Browser des Besuchers).
+  Fertige Seiten werden gecacht, ein Event kann daher kurz nach Mitternacht noch erscheinen oder eine Weile früher fehlen.
 {% enddoc %}
 
 {%- liquid
+  if event != blank
+    assign ev_date = event.datum.value
+    assign ev_end = event.enddatum.value
+    assign ev_title = event.titel.value
+    assign ev_place = event.ort.value
+    assign ev_time = event.uhrzeit.value
+    assign ev_text = event.beschreibung.value
+    assign ev_image = event.bild.value.preview_image
+    assign ev_asset = blank
+    assign ev_link = event.link.value | strip
+    assign ev_id = 'event-' | append: event.system.handle
+    assign ev_attrs = blank
+  else
+    assign ev_date = item.settings.date
+    assign ev_end = blank
+    assign ev_title = item.settings.title
+    assign ev_place = item.settings.place
+    assign ev_time = blank
+    assign ev_text = blank
+    assign ev_image = item.settings.image
+    assign ev_asset = item.settings.image_asset
+    assign ev_link = blank
+    assign ev_id = blank
+    assign ev_attrs = item.shopify_attributes
+  endif
+
+  assign start_number = ev_date | date: '%Y%m%d' | plus: 0
+  assign end_number = start_number
+  if ev_end != blank
+    assign end_candidate = ev_end | date: '%Y%m%d' | plus: 0
+    if end_candidate > end_number
+      assign end_number = end_candidate
+    endif
+  endif
+
   assign show_event = true
-  unless request.design_mode
-    assign event_number = item.settings.date | date: '%Y%m%d' | plus: 0
+  assign check_past = true
+  if request.design_mode and event == blank
+    assign check_past = false
+  endif
+  if check_past
     assign today_number = 'now' | date: '%Y%m%d' | plus: 0
-    if event_number > 20000101 and event_number < today_number
+    if end_number > 20000101 and end_number < today_number
       assign show_event = false
     endif
-  endunless
-  assign event_day = item.settings.date | date: '%-d'
-  assign event_month_number = item.settings.date | date: '%-m' | plus: 0
+  endif
+
   assign months = 'Jan,Feb,Mär,Apr,Mai,Jun,Jul,Aug,Sep,Okt,Nov,Dez' | split: ','
-  assign month_index = event_month_number | minus: 1
+  assign months_long = 'Januar,Februar,März,April,Mai,Juni,Juli,August,September,Oktober,November,Dezember' | split: ','
+  assign weekdays = 'Sonntag,Montag,Dienstag,Mittwoch,Donnerstag,Freitag,Samstag' | split: ','
+  assign event_day = ev_date | date: '%-d'
+  assign month_index = ev_date | date: '%-m' | plus: 0 | minus: 1
   assign event_month = months[month_index]
+  assign event_year = ev_date | date: '%Y'
+
+  # Mehrtägig: „14.–16. Nov.“ auf der Karte, „14.–16. November 2026“ in der Zeile
+  assign is_range = false
+  if end_number > start_number and start_number > 20000101
+    assign is_range = true
+    assign end_day = ev_end | date: '%-d'
+    assign end_month_index = ev_end | date: '%-m' | plus: 0 | minus: 1
+    assign end_year = ev_end | date: '%Y'
+    if end_year != event_year
+      assign range_short = event_day | append: '. ' | append: event_month | append: ' – ' | append: end_day | append: '. ' | append: months[end_month_index]
+      assign date_long = event_day | append: '. ' | append: months_long[month_index] | append: ' ' | append: event_year | append: ' – ' | append: end_day | append: '. ' | append: months_long[end_month_index] | append: ' ' | append: end_year
+    elsif end_month_index != month_index
+      assign range_short = event_day | append: '. ' | append: event_month | append: ' – ' | append: end_day | append: '. ' | append: months[end_month_index]
+      assign date_long = event_day | append: '. ' | append: months_long[month_index] | append: ' – ' | append: end_day | append: '. ' | append: months_long[end_month_index] | append: ' ' | append: end_year
+    else
+      assign range_short = event_day | append: '.–' | append: end_day | append: '. ' | append: event_month
+      assign date_long = event_day | append: '.–' | append: end_day | append: '. ' | append: months_long[month_index] | append: ' ' | append: event_year
+    endif
+  else
+    assign weekday_index = ev_date | date: '%w' | plus: 0
+    assign date_long = weekdays[weekday_index] | append: ', ' | append: event_day | append: '. ' | append: months_long[month_index] | append: ' ' | append: event_year
+  endif
+
+  # Link: eigener Link des Events, sonst der übergebene (z. B. Seite „Alle Events“). Fremde Seiten öffnen in neuem Tab.
+  assign ev_url = ev_link | default: url
+  assign is_external = false
+  if ev_url contains '://'
+    unless ev_url contains request.host
+      assign is_external = true
+    endunless
+  endif
+
+  assign is_row = false
+  if layout == 'row'
+    assign is_row = true
+  endif
 
   assign event_tag = 'div'
-  if url != blank
+  if is_row
+    assign event_tag = 'article'
+  elsif ev_url != blank
     assign event_tag = 'a'
   endif
   assign event_sizes = sizes | default: '(min-width: 640px) 33vw, 100vw'
+  if is_row and sizes == blank
+    assign event_sizes = '(min-width: 768px) 40vw, 100vw'
+  endif
 
   assign no_image = false
-  if item.settings.image == blank
+  if ev_image == blank
     assign no_image = true
-    if item.settings.image_asset != blank
+    if ev_asset != blank
       capture visible_asset
-        render 'is-placeholder', asset: item.settings.image_asset
+        render 'is-placeholder', asset: ev_asset
       endcapture
       if visible_asset == blank
         assign no_image = false
@@ -49,23 +135,47 @@
   endif
 -%}
 {%- if show_event -%}
-<{{ event_tag }} class="event-card{% if no_image %} event-card--text{% endif %}"{% if url != blank %} href="{{ url }}"{% endif %} {{ item.shopify_attributes }}>
+<{{ event_tag }} class="event-card{% if is_row %} event-card--row{% endif %}{% if no_image %} event-card--text{% endif %}"
+  {%- if ev_id != blank %} id="{{ ev_id }}"{% endif -%}
+  {%- if event_tag == 'a' %} href="{{ ev_url }}"{% if is_external %} target="_blank" rel="noopener"{% endif %}{% endif %} {{ ev_attrs }}>
   {%- if no_image -%}
-    {%- if item.settings.date != blank -%}
+    {%- if ev_date != blank -%}
       <span class="date-badge"><strong>{{ event_day }}</strong><span>{{ event_month }}</span></span>
     {%- endif -%}
   {%- else -%}
     <div class="event-card__media">
-      {%- render 'media', image: item.settings.image, asset: item.settings.image_asset, width: 800, height: 500, sizes: event_sizes -%}
-      {%- if item.settings.date != blank -%}
+      {%- render 'media', image: ev_image, asset: ev_asset, width: 800, height: 500, sizes: event_sizes, alt: '' -%}
+      {%- if ev_date != blank -%}
         <span class="date-badge"><strong>{{ event_day }}</strong><span>{{ event_month }}</span></span>
       {%- endif -%}
     </div>
   {%- endif -%}
   <div class="event-card__body">
-    <h3>{{ item.settings.title | escape }}</h3>
-    {%- if item.settings.place != blank -%}
-      <p>{% render 'icon', name: 'map-pin' %}{{ item.settings.place | escape }}</p>
+    {%- if is_row -%}
+      <p class="event-card__date">{% render 'icon', name: 'calendar' %}<time datetime="{{ ev_date | date: '%Y-%m-%d' }}">{{ date_long }}</time></p>
+      <h2 class="h3">{{ ev_title | escape }}</h2>
+    {%- else -%}
+      <h3>{{ ev_title | escape }}</h3>
+      {%- if is_range -%}
+        <p>{% render 'icon', name: 'calendar' %}{{ range_short }}</p>
+      {%- endif -%}
+    {%- endif -%}
+    {%- if ev_place != blank -%}
+      <p>{% render 'icon', name: 'map-pin' %}{{ ev_place | escape }}</p>
+    {%- endif -%}
+    {%- if ev_time != blank -%}
+      <p>{% render 'icon', name: 'clock' %}{{ ev_time | escape }}</p>
+    {%- endif -%}
+    {%- if is_row -%}
+      {%- if ev_text != blank -%}
+        <div class="event-card__text">{{ ev_text | escape | newline_to_br }}</div>
+      {%- endif -%}
+      {%- if ev_link != blank -%}
+        <a class="btn btn--outline-light btn--sm event-card__link" href="{{ ev_link }}"{% if is_external %} target="_blank" rel="noopener"{% endif %}>
+          Mehr erfahren
+          {%- if is_external %} {% render 'icon', name: 'arrow-up-right' %}<span class="sr-only"> (öffnet in neuem Tab)</span>{% endif -%}
+        </a>
+      {%- endif -%}
     {%- endif -%}
   </div>
 </{{ event_tag }}>
