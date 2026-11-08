@@ -355,13 +355,25 @@
             </div>
           </div>
 
+          {% render 'pdp-buy', product: product %}
+          {% render 'pdp-usp' %}
+
           {%- if families.size > 0 or compat.size > 0 -%}
             <div class="compat">
+              {%- comment -%}
+                Neutrale Info laut Hersteller, kein grüner Haken: Ein „passt“ gibt es erst, wenn die Kundin oder der Kunde
+                das eigene Motorrad gewählt hat (späterer Passt-Check). Universelle Teile tragen „(universell)“ in part.baujahre.
+              {%- endcomment -%}
               <div class="compat__head">
-                {% render 'icon', name: 'circle-check' %}
+                {% render 'icon', name: 'info' %}
                 <div>
-                  <strong>Passt für: {{ families | join: ', ' | escape }}{% if years_label != blank %} {{ years_label | escape }}{% endif %}</strong>
-                  <p>{% if compat.size > 0 %}{{ compat.size }} kompatible Modelle · {% endif %}Angaben laut Hersteller</p>
+                  {%- if years_label == '(universell)' -%}
+                    <strong>Passend für: alle Modelle</strong>
+                    <p>Universell einsetzbar · Angaben laut Hersteller</p>
+                  {%- else -%}
+                    <strong>Passend für: {{ families | join: ', ' | escape }}{% if years_label != blank %} · {{ years_label | escape }}{% endif %}</strong>
+                    <p>{% if compat.size > 0 %}{{ compat.size }} kompatible Modelle · {% endif %}Angaben laut Hersteller</p>
+                  {%- endif -%}
                 </div>
               </div>
               {%- if compat.size > 0 -%}
@@ -375,7 +387,7 @@
                         <thead><tr><th scope="col">Modellfamilie</th><th scope="col">Modell</th><th scope="col">Baujahre</th></tr></thead>
                         <tbody data-compat-rows>
                           {%- for row in compat -%}
-                            <tr><td>{{ row.family | escape }}</td><td>{{ row.model | escape }}</td><td>{{ row.from }}–{{ row.to }}</td></tr>
+                            <tr><td>{{ row.family | escape }}</td><td>{{ row.model | escape }}</td><td>{{ row.from }}{% if row.to != row.from %}–{{ row.to }}{% endif %}</td></tr>
                           {%- endfor -%}
                         </tbody>
                       </table>
@@ -386,13 +398,8 @@
               {%- endif -%}
               {%- if settings.phone != blank or settings.whatsapp != blank or settings.email != blank -%}
                 <div class="compat__foot">
-                  <span>Unsicher? Frag unsere Werkstatt:</span>
-                  {%- if settings.phone != blank -%}
-                    <a class="btn btn--text" href="{% render 'contact-href', kind: 'tel' %}">{% render 'icon', name: 'phone', class: 'icon--sm' %}Anrufen</a>
-                  {%- endif -%}
-                  {%- if settings.whatsapp != blank or settings.email != blank -%}
-                    <a class="btn btn--text" href="#werkstatt-kontakt">{% render 'icon', name: 'message-circle', class: 'icon--sm' %}WhatsApp / E-Mail</a>
-                  {%- endif -%}
+                  <span>Unsicher? Frag unsere Werkstatt.</span>
+                  <a class="btn btn--secondary btn--sm" href="#werkstatt-kontakt">{% render 'icon', name: 'message-circle', class: 'icon--sm' %}Kontaktieren</a>
                 </div>
               {%- endif -%}
             </div>
@@ -412,9 +419,6 @@
             {% render 'icon', name: 'wrench' %}
             <div>Einbau durch Fachwerkstatt empfohlen. <a class="text-link" href="{{ pages['werkstatt'].url | default: '/pages/service#werkstatt' }}">Werkstatt-Termin anfragen</a></div>
           </div>
-
-          {% render 'pdp-buy', product: product %}
-          {% render 'pdp-usp' %}
 
           <div>
             {% render 'product-description', product: product %}

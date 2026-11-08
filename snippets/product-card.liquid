@@ -124,10 +124,15 @@
       {%- assign families = product.metafields.part.modellfamilien.value -%}
       {%- assign years = product.metafields.part.baujahre.value | sort -%}
       {%- if families != blank -%}
+        {%- comment -%} Neutrale Herstellerangabe ohne Haken (siehe Produktseite), universelle Teile: „alle Modelle“ {%- endcomment -%}
         <p class="pcard__fits">
-          {% render 'icon', name: 'check' %}Passt für:
-          {% if families.size > 2 %}{{ families.size }} Modellfamilien{% else %}{{ families | join: ', ' | escape }}{% endif %}
-          {%- if years.size > 1 %} {{ years.first }}–{{ years.last }}{% elsif years.size == 1 %} {{ years.first }}{% endif -%}
+          {%- if years.first == '(universell)' -%}
+            Passend für: alle Modelle
+          {%- else -%}
+            Passend für:
+            {% if families.size > 2 %}{{ families.size }} Modellfamilien{% else %}{{ families | join: ', ' | escape }}{% endif %}
+            {%- if years.size > 1 %} · {{ years.first }}–{{ years.last }}{% elsif years.size == 1 %} · {{ years.first }}{% endif -%}
+          {%- endif -%}
         </p>
       {%- endif -%}
     {%- elsif color_option and color_option.values.size > 1 -%}

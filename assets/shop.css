@@ -231,7 +231,7 @@
 /* Kompatibilitäts-Box */
 .compat { border: 1px solid var(--c-black); background: var(--c-white); }
 .compat__head { display: flex; gap: 12px; padding: 16px; align-items: flex-start; }
-.compat__head > .icon { color: var(--c-success); width: 24px; height: 24px; margin-top: 2px; }
+.compat__head > .icon { color: var(--c-muted); width: 24px; height: 24px; margin-top: 2px; }
 .compat__head > div { min-width: 0; overflow-wrap: anywhere; }
 .compat__head strong { display: block; }
 .compat__head p { font-size: var(--fs-small); color: var(--c-muted); }
@@ -243,7 +243,7 @@
 .compat__table th, .compat__table td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--c-line); }
 .compat__table th { font-weight: 600; color: var(--c-muted); font-size: var(--fs-caption); text-transform: uppercase; letter-spacing: 0.06em; }
 .compat__scroll { max-height: 260px; overflow: auto; }
-.compat__foot { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 12px 16px; border-top: 1px solid var(--c-line); font-size: var(--fs-small); background: var(--c-offwhite); }
+.compat__foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; padding: 12px 16px; border-top: 1px solid var(--c-line); font-size: var(--fs-small); background: var(--c-offwhite); }
 .approval { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .approval .badge { padding: 8px 10px; font-size: 12px; }
 .note { display: flex; gap: 12px; padding: 14px 16px; background: var(--c-white); border: 1px solid var(--c-line); font-size: var(--fs-small); }
