@@ -372,13 +372,13 @@
                 Universelle Teile tragen „(universell)“ in part.baujahre.
               {%- endcomment -%}
               <div class="compat__fit" data-compat-fit hidden>
-                <span class="compat__fit-icon compat__fit-icon--ok">{% render 'icon', name: 'circle-check' %}</span>
-                <span class="compat__fit-icon compat__fit-icon--no">{% render 'icon', name: 'circle-alert' %}</span>
-                <div>
+                <div class="compat__fit-head">
+                  <span class="compat__fit-icon compat__fit-icon--ok">{% render 'icon', name: 'circle-check' %}</span>
+                  <span class="compat__fit-icon compat__fit-icon--no">{% render 'icon', name: 'circle-alert' %}</span>
                   <strong data-compat-fit-title></strong>
-                  <div class="compat__fit-bikes" data-compat-fit-bikes></div>
-                  <p data-compat-fit-text></p>
                 </div>
+                <div class="compat__fit-bikes" data-compat-fit-bikes></div>
+                <p data-compat-fit-text></p>
               </div>
               <div class="compat__head">
                 <div class="compat__title">{% render 'icon', name: 'badge-check' %}<strong>{% if years_label == '(universell)' %}Passt für alle Modelle{% else %}Passt für{% endif %}</strong></div>

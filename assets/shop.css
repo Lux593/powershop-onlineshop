@@ -271,18 +271,21 @@
 .compat__foot { display: flex; gap: 12px; padding: 14px 16px; border-top: 1px solid var(--c-line); font-size: var(--fs-small); }
 .compat__foot > .icon { width: 20px; height: 20px; flex: none; margin-top: 1px; color: var(--c-muted); }
 /* Abgleich mit der Filterauswahl (Modellfamilie + Baujahr), gefüllt von product.js */
-.compat__fit { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-bottom: 1px solid var(--c-line); }
+.compat__fit { display: grid; gap: 12px; padding: 14px 16px 16px; border-bottom: 1px solid var(--c-line); }
 .compat__fit[hidden] { display: none; }
-.compat__fit > div { display: grid; gap: 10px; min-width: 0; overflow-wrap: anywhere; }
-.compat__fit strong { display: block; }
+.compat__fit-head { display: flex; gap: 12px; align-items: flex-start; }
+.compat__fit-head strong { min-width: 0; }
 .compat__fit p { font-size: var(--fs-caption); color: var(--c-muted); }
-/* Das gewählte Motorrad: Kacheln wie die Fakten der Motorrad-Seiten (.bike-facts), immer zwei Spalten, ohne doppelte Außenlinien */
+/* Das gewählte Motorrad: Kacheln wie die Fakten der Motorrad-Seiten (.bike-facts), über die volle Breite, zwei gleiche Spalten,
+   ohne doppelte Außenlinien. Etwas weniger Innenabstand und Sperrung, damit „Modellfamilie“ auch bei 360 px in eine Zeile passt */
 .compat__fit-bikes { display: grid; gap: 12px; }
 .compat__bikes { display: grid; gap: 8px; }
 .compat__bikes-label { font-size: var(--fs-caption); font-weight: 600; color: var(--c-muted); text-transform: uppercase; letter-spacing: 0.06em; }
 .bike-facts.compat__vehicle { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.compat__vehicle div { padding: 14px 12px; }
 .compat__vehicle div:nth-child(2n) { border-right: 0; }
 .compat__vehicle div:nth-last-child(-n + 2) { border-bottom: 0; }
+.compat__vehicle dt { white-space: nowrap; letter-spacing: 0.04em; }
 .compat__vehicle dd { overflow-wrap: anywhere; }
 .compat__vehicle.is-miss dd { color: var(--c-text-soft); font-weight: 400; }
 .compat__fit-icon { display: none; flex: none; }
