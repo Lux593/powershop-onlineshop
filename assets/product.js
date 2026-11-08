@@ -394,16 +394,24 @@
       if (preset) showVariantImages(preset.image);
     }
 
-    /* ---------- Kompatibilitätstabelle durchsuchen ---------- */
+    /* ---------- Kompatibilitätstabelle durchsuchen ----------
+       Die Tabelle ist nach Modellfamilie gruppiert (ein tbody je Familie): ein Treffer im Familiennamen zeigt die ganze
+       Gruppe, Gruppen ohne Treffer verschwinden samt Überschrift. */
     var compat = $('[data-compat-q]');
     if (compat) {
       compat.addEventListener('input', function () {
-        var query = compat.value.toLowerCase();
+        var query = compat.value.toLowerCase().trim();
         var shown = 0;
-        $$('[data-compat-rows] tr').forEach(function (tr) {
-          var on = tr.textContent.toLowerCase().indexOf(query) > -1;
-          tr.hidden = !on;
-          if (on) shown++;
+        $$('[data-compat-rows] tbody').forEach(function (group) {
+          var groupHit = (group.dataset.group || '').toLowerCase().indexOf(query) > -1;
+          var visible = 0;
+          $$('tr[data-family]', group).forEach(function (tr) {
+            var on = groupHit || tr.textContent.toLowerCase().indexOf(query) > -1;
+            tr.hidden = !on;
+            if (on) visible++;
+          });
+          group.hidden = visible === 0;
+          shown += visible;
         });
         var empty = $('[data-compat-empty]');
         if (empty) empty.hidden = shown > 0;
@@ -438,7 +446,7 @@
       yrs.sort(function (a, b) { return a - b; });
       var box = fit.closest('[data-compat]');
       var universal = !!box && box.hasAttribute('data-compat-universal');
-      var rows = $$('[data-compat-rows] tr');
+      var rows = $$('[data-compat-rows] tr[data-family]');
 
       if (fams.length && yrs.length && (universal || rows.length)) {
         var fits = function (family, year) {
@@ -483,13 +491,15 @@
         fit.dataset.state = state;
         fit.hidden = false;
 
-        // Passende Modelle in der Liste hervorheben und nach oben holen
-        var body = $('[data-compat-rows]');
-        var matched = rows.filter(function (tr) {
-          return fams.indexOf(tr.dataset.family) > -1 && yrs.some(function (y) { return +tr.dataset.from <= y && y <= +tr.dataset.to; });
+        // Passende Modelle und Familien hervorheben
+        var yearFits = function (tr) { return yrs.some(function (y) { return +tr.dataset.from <= y && y <= +tr.dataset.to; }); };
+        rows.forEach(function (tr) {
+          if (fams.indexOf(tr.dataset.family) > -1 && yearFits(tr)) tr.classList.add('is-match');
         });
-        matched.forEach(function (tr) { tr.classList.add('is-match'); });
-        if (body && matched.length) matched.slice().reverse().forEach(function (tr) { body.insertBefore(tr, body.firstChild); });
+        $$('[data-fam]').forEach(function (li) {
+          var family = li.dataset.fam;
+          if (fams.indexOf(family) > -1 && yrs.some(function (y) { return fits(family, y); })) li.classList.add('is-match');
+        });
       }
     }
 

@@ -381,36 +381,110 @@
                 </div>
               </div>
               <div class="compat__head">
-                {% render 'icon', name: 'info' %}
-                <div>
-                  {%- if years_label == '(universell)' -%}
-                    <strong>Passend für: alle Modelle</strong>
-                    <p>Universell einsetzbar · Angaben laut Hersteller</p>
-                  {%- else -%}
-                    <strong>Passend für: {{ families | join: ', ' | escape }}{% if years_label != blank %} · {{ years_label | escape }}{% endif %}</strong>
-                    <p>{% if compat.size > 0 %}{{ compat.size }} kompatible Modelle · {% endif %}Angaben laut Hersteller</p>
-                  {%- endif -%}
-                </div>
+                <div class="compat__title">{% render 'icon', name: 'bike' %}<strong>{% if years_label == '(universell)' %}Passt für alle Modelle{% else %}Passt für{% endif %}</strong></div>
+                <span class="compat__src">laut Hersteller</span>
               </div>
-              {%- if compat.size > 0 -%}
+              {%- if years_label == '(universell)' -%}
+                <p class="compat__note">Universell einsetzbar, unabhängig von Modell und Baujahr.</p>
+              {%- elsif compat.size > 0 -%}
+                {%- liquid
+                  comment
+                    Übersicht je Modellfamilie: Baujahre als Spannen mit Lücken („2004–2013, 2016“) und Zahl der Modelle.
+                    Reihenfolge wie part.modellfamilien, Familien nur aus der Modellliste kommen hinten dran.
+                  endcomment
+                  assign compat_fams = compat | map: 'family' | uniq
+                  assign fam_order = '|'
+                  for f in families
+                    if compat_fams contains f
+                      assign fam_order = fam_order | append: f | append: '|'
+                    endif
+                  endfor
+                  for f in compat_fams
+                    assign fam_key = '|' | append: f | append: '|'
+                    unless fam_order contains fam_key
+                      assign fam_order = fam_order | append: f | append: '|'
+                    endunless
+                  endfor
+                  assign fam_list = fam_order | remove_first: '|' | split: '|'
+                -%}
+                <ul class="compat__fams">
+                  {%- for fam in fam_list -%}
+                    {%- liquid
+                      assign fam_rows = compat | where: 'family', fam
+                      assign year_csv = ''
+                      for r in fam_rows
+                        assign y_from = r.from | plus: 0
+                        assign y_to = r.to | plus: 0
+                        if y_to < y_from
+                          assign y_to = y_from
+                        endif
+                        for y in (y_from..y_to)
+                          assign year_csv = year_csv | append: y | append: ','
+                        endfor
+                      endfor
+                      assign fam_years = year_csv | split: ',' | uniq | sort
+                      assign span_label = ''
+                      assign span_start = 0
+                      assign span_prev = 0
+                      for y in fam_years
+                        assign yi = y | plus: 0
+                        assign next_year = span_prev | plus: 1
+                        if span_start == 0
+                          assign span_start = yi
+                        elsif yi != next_year
+                          if span_label != ''
+                            assign span_label = span_label | append: ', '
+                          endif
+                          assign span_label = span_label | append: span_start
+                          if span_prev != span_start
+                            assign span_label = span_label | append: '–' | append: span_prev
+                          endif
+                          assign span_start = yi
+                        endif
+                        assign span_prev = yi
+                      endfor
+                      if span_start != 0
+                        if span_label != ''
+                          assign span_label = span_label | append: ', '
+                        endif
+                        assign span_label = span_label | append: span_start
+                        if span_prev != span_start
+                          assign span_label = span_label | append: '–' | append: span_prev
+                        endif
+                      endif
+                      assign fam_models = fam_rows | map: 'model' | uniq | size
+                    -%}
+                    <li class="compat__fam" data-fam="{{ fam | escape }}">
+                      <span class="compat__fam-name">{{ fam | escape }}</span>
+                      <span class="compat__fam-years">{{ span_label }}</span>
+                      <span class="compat__fam-count">{{ fam_models }} {% if fam_models == 1 %}Modell{% else %}Modelle{% endif %}</span>
+                    </li>
+                  {%- endfor -%}
+                </ul>
                 <details>
-                  <summary>Alle kompatiblen Modelle anzeigen{% render 'icon', name: 'chevron-down', class: 'icon--sm' %}</summary>
+                  <summary><span class="compat__sum">{% render 'icon', name: 'list' %}Alle {{ compat.size }} Modelle anzeigen</span>{% render 'icon', name: 'chevron-down', class: 'icon--sm' %}</summary>
                   <div class="compat__table">
                     <label class="sr-only" for="compat-q">Modell suchen</label>
                     <input class="input" id="compat-q" type="search" placeholder="Modell suchen, z. B. Street Glide" data-compat-q>
                     <div class="compat__scroll" data-lenis-prevent>
-                      <table>
-                        <thead><tr><th scope="col">Modellfamilie</th><th scope="col">Modell</th><th scope="col">Baujahre</th></tr></thead>
-                        <tbody data-compat-rows>
-                          {%- for row in compat -%}
-                            <tr data-family="{{ row.family | escape }}" data-from="{{ row.from }}" data-to="{{ row.to }}"><td>{{ row.family | escape }}</td><td>{{ row.model | escape }}</td><td>{{ row.from }}{% if row.to != row.from %}–{{ row.to }}{% endif %}</td></tr>
-                          {%- endfor -%}
-                        </tbody>
+                      <table data-compat-rows>
+                        <thead><tr><th scope="col">Modell</th><th scope="col">Baujahre</th></tr></thead>
+                        {%- for fam in fam_list -%}
+                          {%- assign fam_rows = compat | where: 'family', fam | sort: 'model' -%}
+                          <tbody data-group="{{ fam | escape }}">
+                            <tr class="compat__group"><th scope="rowgroup" colspan="2">{{ fam | escape }}</th></tr>
+                            {%- for row in fam_rows -%}
+                              <tr data-family="{{ row.family | escape }}" data-from="{{ row.from }}" data-to="{{ row.to }}"><td>{{ row.model | escape }}</td><td>{{ row.from }}{% if row.to != row.from %}–{{ row.to }}{% endif %}</td></tr>
+                            {%- endfor -%}
+                          </tbody>
+                        {%- endfor -%}
                       </table>
                     </div>
                     <p class="small muted" data-compat-empty hidden>Kein passendes Modell gefunden – frag uns kurz, wir prüfen das für dich.</p>
                   </div>
                 </details>
+              {%- elsif families.size > 0 -%}
+                <p class="compat__note">{{ families | join: ', ' | escape }}{% if years_label != blank %} · {{ years_label | escape }}{% endif %}</p>
               {%- endif -%}
               <div class="compat__foot">
                 {% render 'icon', name: 'wrench' %}
