@@ -21,7 +21,24 @@
 .event-card__body { padding: 18px 20px 20px; display: grid; gap: 6px; }
 .event-card__body h3 { font-size: 22px; }
 .event-card__body p { display: flex; align-items: center; gap: 6px; font-size: var(--fs-small); color: var(--c-muted-dark); }
-.event-card__body .icon { width: 16px; height: 16px; }
+.event-card__body .icon { width: 16px; height: 16px; flex: none; }
+
+/* Seite „Alle Events“ (sections/events-page.liquid): eine Karte je Zeile, ab 640 px Bild links über die ganze Kartenhöhe.
+   Doppelte Klasse: home.css (lädt danach) legt zwischen 640 und 1179 px Karten mit Bild mittig, hier füllt das Bild die Zeile. */
+.events-page__list { display: grid; gap: 20px; }
+.events-page__list .event-card { scroll-margin-top: calc(var(--header-offset, 0px) + 24px); }
+.event-card--row .event-card__body { gap: 10px; padding: 22px 20px 24px; }
+.event-card__body .event-card__date { color: var(--c-white); font-weight: 600; }
+.event-card__text { color: var(--c-on-dark); max-width: 62ch; }
+.event-card__link { justify-self: start; margin-top: 6px; }
+@media (min-width: 640px) {
+  .event-card.event-card--row:not(.event-card--text) { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); align-items: stretch; }
+  .event-card--row .event-card__media { aspect-ratio: auto; min-height: 260px; }
+  .event-card--row .event-card__media img { position: absolute; inset: 0; }
+  .event-card--row .event-card__body { align-content: center; padding: 28px 32px; }
+}
+.events-page__empty { display: flex; align-items: flex-start; gap: 10px; max-width: 68ch; color: var(--c-text-soft); }
+.events-page__empty .icon { flex: none; width: 20px; height: 20px; margin-top: 2px; color: var(--c-black); }
 
 /* Service-Seite: Stile in assets/pages.css (lädt auf allen Seiten-Vorlagen) */
 

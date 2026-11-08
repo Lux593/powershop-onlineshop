@@ -1,0 +1,49 @@
+{%- comment -%}
+  Seite „Alle Events“ (Seite mit dem Handle events, Vorlage page.events): alle kommenden Events aus Shopify
+  (Inhalte → Metaobjekte → Event), nach Datum sortiert, eins je Zeile mit Beschreibung und Link (snippets/events-upcoming.liquid).
+  Der Seitentext aus Onlineshop → Seiten steht als Einleitung im Kopf. Steht nichts an, erscheint ein Hinweis statt einer Lücke.
+  Die Karten der Startseite springen über #event-HANDLE direkt zum jeweiligen Event.
+{%- endcomment -%}
+{%- liquid
+  assign lead_text = page.content | strip_html | strip
+-%}
+<section class="page-banner on-dark textured">
+  <div class="container page-banner__inner">
+    <div class="page-banner__text">
+      <nav class="breadcrumb" aria-label="Brotkrumen">
+        <ol>
+          <li><a href="{{ routes.root_url }}">Home</a></li>
+          <li><span aria-current="page">{{ page.title | escape }}</span></li>
+        </ol>
+      </nav>
+      <h1>{{ page.title | escape }}</h1>
+      {%- if lead_text != blank -%}
+        <div class="events-page__lead">{{ page.content }}</div>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{%- capture event_rows -%}
+  {%- render 'events-upcoming', layout: 'row' -%}
+{%- endcapture -%}
+{%- assign event_rows_text = event_rows | strip -%}
+<div class="container section--tight">
+  {%- if event_rows_text != blank -%}
+    <div class="events-page__list" data-stagger="90">
+      {{ event_rows }}
+    </div>
+  {%- else -%}
+    <p class="events-page__empty">{% render 'icon', name: 'calendar' %}<span>{{ section.settings.empty_text | escape }}</span></p>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Alle Events",
+  "settings": [
+    { "type": "paragraph", "content": "Die Events legst du in Shopify an: Inhalte → Metaobjekte → Event. Hier stehen alle kommenden, nach Datum sortiert; vergangene und Entwürfe nicht. Die Einleitung oben ist der Text der Seite (Onlineshop → Seiten → Events)." },
+    { "type": "text", "id": "empty_text", "label": "Hinweis ohne anstehende Termine", "default": "Gerade steht kein Termin an. Neue Ausfahrten, Bike Nights und Werkstatt-Tage findest du hier, sobald sie feststehen." }
+  ]
+}
+{% endschema %}

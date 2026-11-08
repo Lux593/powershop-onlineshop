@@ -1,0 +1,11 @@
+{
+  "sections": {
+    "main": {
+      "type": "events-page",
+      "settings": {
+        "empty_text": "Gerade steht kein Termin an. Neue Ausfahrten, Bike Nights und Werkstatt-Tage findest du hier, sobald sie feststehen."
+      }
+    }
+  },
+  "order": ["main"]
+}
