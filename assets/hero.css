@@ -105,7 +105,7 @@
 /* Handy hochkant: Der Film läuft mit dem Hero mit (kein feststehender Film mehr). So reicht er bis ganz unten, auch hinter die iOS-26-Leiste:
    feste Ebenen malt Safari dort nicht, mitlaufende schon. Dafür zwei Effekte, beide ohne Skript:
    1) Parallax: Der Film scrollt etwas langsamer als die Seite (--hero-par, 1 = an, 0 = aus).
-   2) Karte: Der Willkommensblock bekommt runde obere Ecken und schiebt sich um --card-overlap über den Hero. Der Hero tritt dabei zurück
+   2) Karte: Der Willkommensblock (gerader oberer Rand, keine runden Ecken) schiebt sich um --card-overlap über den Hero. Der Hero tritt dabei zurück
       und dunkelt leicht ab. Optional wird der Film dabei kleiner (--hero-zoom, z. B. 0.05): standardmäßig aus, denn am Desktop ließ ein
       Zoom des laufenden Films Bilder ausfallen (docs/research/hero-scroll-performance.md); am iPhone erst prüfen. Nur transform und opacity.
    Die Bewegung hängt am Scroll-Fortschritt der Seite (animation-timeline: scroll()), nur mit Bewegung (html.has-motion) und nur, wo der
@@ -115,7 +115,6 @@
   .shopify-section:has(> .hero) + .shopify-section > .statement {
     position: relative; z-index: 2;
     margin-top: calc(var(--card-overlap) * -1);
-    border-radius: 28px 28px 0 0;
     background: var(--c-offwhite);
   }
   @supports (animation-timeline: scroll()) {
