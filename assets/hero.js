@@ -27,7 +27,10 @@
     var began = !paused; // Fortschrittslinie läuft erst, wenn die Seite wirklich spielt: sonst steht sie bei 0 und der aktive Tab hat keinen Marker
     var hover = false, focus = false; // Maus über dem Text oder Tastaturfokus darin: Bildwechsel hält an, der Film läuft weiter
 
-    function going() { return !paused && seen && awake && !document.hidden; }
+    // Solange der Intro-Überzug (assets/intro.js) die Startseite verdeckt, läuft weder Film noch Rotation: sonst wäre der Hero beim
+    // Überblenden schon beim zweiten Bild. ps:introdone kommt, wenn der Überzug weicht.
+    function introOn() { return document.documentElement.classList.contains('intro-on'); }
+    function going() { return !paused && seen && awake && !document.hidden && !introOn(); }
     function rolling() { return going() && !hover && !focus; }
 
     function apply() {
@@ -173,6 +176,7 @@
     var ac = new AbortController();
     io.observe(hero);
     document.addEventListener('visibilitychange', apply, { signal: ac.signal });
+    document.addEventListener('ps:introdone', apply, { signal: ac.signal });
     // Zurück-Taste: Die Seite kommt aus dem Zurück-Speicher (bfcache), ohne neues Laden; der Film steht dann meist
     window.addEventListener('pageshow', function (e) { if (e.persisted) apply(); }, { signal: ac.signal });
     // Section-Reload im Editor, Reduced-Motion zur Laufzeit (motion.js ruft es)

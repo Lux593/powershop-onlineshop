@@ -1,6 +1,7 @@
 {%- comment -%}
   Seite „Alle Events“ (Seite mit dem Handle events, Vorlage page.events): alle kommenden Events aus Shopify
-  (Inhalte → Metaobjekte → Event), nach Datum sortiert, eins je Zeile mit Beschreibung und Link (snippets/events-upcoming.liquid).
+  (Inhalte → Metaobjekte → Event), nach Datum sortiert und seit 8.11. nach Monat gruppiert („November 2026“, bleibt beim Scrollen
+  oben stehen, bis die Events des Monats durch sind), eins je Zeile mit Beschreibung und Link (snippets/events-upcoming.liquid).
   Der Seitentext aus Onlineshop → Seiten steht als Einleitung im Kopf. Steht nichts an, erscheint ein Hinweis statt einer Lücke.
   Die Karten der Startseite springen über #event-HANDLE direkt zum jeweiligen Event.
 {%- endcomment -%}
@@ -25,12 +26,12 @@
 </section>
 
 {%- capture event_rows -%}
-  {%- render 'events-upcoming', layout: 'row' -%}
+  {%- render 'events-upcoming', layout: 'row', group: true -%}
 {%- endcapture -%}
 {%- assign event_rows_text = event_rows | strip -%}
 <div class="container section--tight">
   {%- if event_rows_text != blank -%}
-    <div class="events-page__list" data-stagger="90">
+    <div class="events-page__months">
       {{ event_rows }}
     </div>
   {%- else -%}

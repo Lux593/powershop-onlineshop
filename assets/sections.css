@@ -26,7 +26,17 @@
 /* Seite „Alle Events“ (sections/events-page.liquid): eine Karte je Zeile, ab 640 px Bild links über die ganze Kartenhöhe.
    Doppelte Klasse: home.css (lädt danach) legt zwischen 640 und 1179 px Karten mit Bild mittig, hier füllt das Bild die Zeile. */
 .events-page__list { display: grid; gap: 20px; }
-.events-page__list .event-card { scroll-margin-top: calc(var(--header-offset, 0px) + 24px); }
+/* Monate (seit 8.11.): Überschrift wie „Nächste Events“ auf der Startseite (.section-title). Sie klebt unter dem Header, solange
+   Events ihres Monats im Bild sind; am Ende des Abschnitts schiebt die nächste sie hinaus (sticky im eigenen Abschnitt). Der
+   Seitengrund liegt dahinter, damit die Karten darunter durchlaufen. top folgt dem Header, der beim Runterscrollen verschwindet. */
+.events-page__months { display: grid; gap: var(--s-6); }
+.events-month__title {
+  position: sticky; top: var(--header-offset, 0px); z-index: 2;
+  margin: 0 calc(var(--gutter) * -1); padding: 14px var(--gutter) 16px;
+  background: var(--c-offwhite); transition: top var(--t-med) var(--ease);
+}
+.events-page__list .event-card { scroll-margin-top: calc(var(--header-offset, 0px) + 72px); }
+@media (min-width: 1024px) { .events-page__list .event-card { scroll-margin-top: calc(var(--header-offset, 0px) + 104px); } }
 .event-card--row .event-card__body { gap: 10px; padding: 22px 20px 24px; }
 .event-card__body .event-card__date { color: var(--c-white); font-weight: 600; }
 .event-card__text { color: var(--c-on-dark); max-width: 62ch; }

@@ -82,13 +82,16 @@
   /* ---------------- Showroom-Schiene: Fortschritt und Kantenmaske ---------------- */
   // Kein Bewegungszustand, sondern Orientierung: gilt auch ohne has-motion. sections.js stößt nach dem Umschalten
   // Neu/Gebraucht ein scroll-Ereignis an, daher reicht dieser Listener.
-  PS.on('.showroom .rail', function (rail) {
+  // Seit 8.11. auch die Events-Schiene der Startseite. Deren Pfeile (data-rail-nav) entfallen, solange alle Karten passen.
+  PS.on('.showroom .rail, .events__rail', function (rail) {
     var bar = rail.parentElement.querySelector('.rail-progress');
+    var nav = rail.id ? document.querySelector('[data-rail-nav="' + rail.id + '"]') : null;
     function update() {
       var w = rail.clientWidth, all = rail.scrollWidth, x = rail.scrollLeft, fit = all - w <= 2;
       rail.classList.toggle('has-edge', !fit);
       rail.classList.toggle('is-start', x <= 2);
       rail.classList.toggle('is-end', x >= all - w - 2);
+      if (nav && nav.hidden !== fit) { nav.hidden = fit; M.refresh(); }
       if (!bar) return;
       if (bar.hidden !== fit) { bar.hidden = fit; M.refresh(); }
       bar.style.setProperty('--rail-progress', fit ? 1 : (x + w) / all);

@@ -236,14 +236,14 @@ a.service-tile:hover > .icon, .service-tile:focus-visible > .icon { transform: t
 /* Schiene bis an den Bildschirmrand: Karten sitzen per Padding/scroll-padding wie bisher, die nächste Karte schaut in den
    Randstreifen und läuft dort aus (Maske, home.js setzt .has-edge/.is-start/.is-end). Das vertikale Padding gibt
    Fokusringen Luft (die Schiene schneidet sonst ab), der negative Rand gleicht es aus. */
-.showroom .rail { margin: -6px calc(var(--gutter) * -1); padding: 6px var(--gutter); scroll-padding-inline: var(--gutter); }
-.showroom .rail.has-edge {
+.showroom .rail, .events__rail { margin: -6px calc(var(--gutter) * -1); padding: 6px var(--gutter); scroll-padding-inline: var(--gutter); }
+.showroom .rail.has-edge, .events__rail.has-edge {
   --edge-l: var(--gutter); --edge-r: var(--gutter);
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 var(--edge-l), #000 calc(100% - var(--edge-r)), transparent);
   mask-image: linear-gradient(90deg, transparent, #000 var(--edge-l), #000 calc(100% - var(--edge-r)), transparent);
 }
-.showroom .rail.has-edge.is-start { --edge-l: 0px; }
-.showroom .rail.has-edge.is-end { --edge-r: 0px; }
+.showroom .rail.has-edge.is-start, .events__rail.has-edge.is-start { --edge-l: 0px; }
+.showroom .rail.has-edge.is-end, .events__rail.has-edge.is-end { --edge-r: 0px; }
 /* Fortschritt (aria-hidden): wie viel der Schiene schon im Bild war, --rail-progress 0..1 */
 .rail-progress { position: relative; height: 2px; margin-top: var(--s-3); overflow: hidden; background: var(--c-line); }
 .rail-progress span { position: absolute; inset: 0; background: var(--c-orange); transform-origin: left; transform: scaleX(var(--rail-progress, 0)); }
@@ -268,5 +268,18 @@ a.service-tile:hover > .icon, .service-tile:focus-visible > .icon { transform: t
 .stats strong { display: block; font-family: var(--f-head); font-weight: 800; font-size: 34px; line-height: 1; color: var(--c-white); }
 /* „Nächste Events“ ist seit 8.11. so groß wie die Abschnitts-Überschriften: „Alle Events“ steht auf ihrer Grundlinie statt höher */
 .events > .section-head { align-items: baseline; }
+/* Events als Schiene wie der Showroom (Rand, Maske und Fortschritt teilen sich beide, siehe Showroom): eine Karte je 86 % auf dem
+   Handy, zwei ab 640 px, drei ab 1024 px. Die Karte steht hochkant (Bild oben, Text darunter) und alle sind gleich hoch; die Regel
+   oben (Bild links zwischen 640 und 1179 px) gilt in der Schiene nicht. Karten ohne Bild: Datum oben, Text darunter. */
+.events > .events__head { align-items: center; }
+.events__nav { display: flex; align-items: center; gap: 12px 24px; }
+/* Handy: wie beim Showroom „Alle Events“ links und die Pfeile rechts in einer Zeile unter dem Titel */
+@media (max-width: 767px) { .events__nav { flex: 1 1 100%; justify-content: space-between; } }
+.events__rail { grid-auto-columns: 86%; }
+@media (min-width: 640px) { .events__rail { grid-auto-columns: calc((100% - 24px) / 2); } }
+@media (min-width: 1024px) { .events__rail { grid-auto-columns: calc((100% - 48px) / 3); } }
+.events__rail > .event-card { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; align-items: start; align-content: start; }
+.events__rail > .event-card--text .date-badge { margin: 20px 20px 0; }
+.events__rail > .event-card--text .event-card__body { padding-left: 20px; }
 /* Nur die Beschriftung: die Spans im Count-up (strong > span, assets/motion.js) erben Größe und Farbe der Zahl */
 .stats div > span { font-size: var(--fs-small); color: var(--c-muted-dark); }
