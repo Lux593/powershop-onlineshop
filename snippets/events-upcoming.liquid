@@ -12,6 +12,9 @@
   @param {string} [layout] - an event-card durchgereicht ("row" für die Seite „Alle Events“)
   @param {string} [page_url] - Seite „Alle Events“: Karten ohne eigenen Link führen dorthin, direkt zum Event
   @param {string} [sizes] - an event-card durchgereicht
+  @param {boolean} [group] - Nach Monat gruppieren (Seite „Alle Events“): je Monat ein Abschnitt mit Überschrift „November 2026“
+    (h2, .section-title wie „Nächste Events“ auf der Startseite), darin die Karten. Die Überschrift bleibt oben stehen, bis
+    die Events des Monats durch sind; dann schiebt die nächste sie weg (sticky in sections.css). Maßgeblich ist das Startdatum.
 {% enddoc %}
 
 {%- liquid
@@ -45,6 +48,34 @@
   endfor
   assign records = records | split: '<!--e-->' | sort
 -%}
-{%- for record in records limit: max_cards -%}
-  {{- record | split: '<!--k-->' | last -}}
-{%- endfor -%}
+{%- if group -%}
+  {%- comment -%} Erst die Monate in Reihenfolge sammeln, dann je Monat einen Abschnitt mit seinen Karten ausgeben {%- endcomment -%}
+  {%- assign months_long = 'Januar,Februar,März,April,Mai,Juni,Juli,August,September,Oktober,November,Dezember' | split: ',' -%}
+  {%- assign month_keys = '' -%}
+  {%- for record in records limit: max_cards -%}
+    {%- assign month_key = record | slice: 0, 6 -%}
+    {%- unless month_keys contains month_key -%}
+      {%- assign month_keys = month_keys | append: month_key | append: ',' -%}
+    {%- endunless -%}
+  {%- endfor -%}
+  {%- assign month_keys = month_keys | split: ',' -%}
+  {%- for month_key in month_keys -%}
+    {%- assign month_index = month_key | slice: 4, 2 | plus: 0 | minus: 1 -%}
+    {%- assign month_year = month_key | slice: 0, 4 -%}
+    <section class="events-month" aria-labelledby="events-month-{{ month_key }}">
+      <h2 class="section-title events-month__title" id="events-month-{{ month_key }}">{{ months_long[month_index] }} {{ month_year }}</h2>
+      <div class="events-page__list" data-stagger="90">
+        {%- for record in records limit: max_cards -%}
+          {%- assign record_month = record | slice: 0, 6 -%}
+          {%- if record_month == month_key -%}
+            {{- record | split: '<!--k-->' | last -}}
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    </section>
+  {%- endfor -%}
+{%- else -%}
+  {%- for record in records limit: max_cards -%}
+    {{- record | split: '<!--k-->' | last -}}
+  {%- endfor -%}
+{%- endif -%}

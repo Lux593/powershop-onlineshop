@@ -8,7 +8,8 @@
   @param {object} [event] - Metaobjekt-Eintrag "event" (titel, datum, enddatum, uhrzeit, ort, bild, beschreibung, link)
   @param {object} [item] - Block vom Typ "event" (date, title, place, image, image_asset)
   @param {string} [url] - Link der Karte, wenn das Event selbst keinen hat. Leer = reine Infokarte, kein toter Link auf „#“
-  @param {string} [layout] - "row" für die Seite „Alle Events“: Bild links, ganzes Datum, Beschreibung und Link-Knopf
+  @param {string} [layout] - "row" für die Seite „Alle Events“: Bild links, ganzes Datum, Beschreibung und Link-Knopf. Der Titel ist
+    dort h3, unter der Monatsüberschrift (h2) aus snippets/events-upcoming.liquid
   @param {string} [sizes] - sizes-Attribut für das Bild
 
   Vergangene Events erscheinen nicht (Ausgabe leer), Blöcke im Theme-Editor schon. Maßgeblich ist das Enddatum, sonst das
@@ -153,7 +154,7 @@
   <div class="event-card__body">
     {%- if is_row -%}
       <p class="event-card__date">{% render 'icon', name: 'calendar' %}<time datetime="{{ ev_date | date: '%Y-%m-%d' }}">{{ date_long }}</time></p>
-      <h2 class="h3">{{ ev_title | escape }}</h2>
+      <h3 class="h3">{{ ev_title | escape }}</h3>
     {%- else -%}
       <h3>{{ ev_title | escape }}</h3>
       {%- if is_range -%}
