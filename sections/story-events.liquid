@@ -18,7 +18,7 @@
   <div class="container">
     <div class="story">
       <div class="story__text">
-        <h2 class="section-title" id="story-title-{{ section.id }}">{{ section.settings.heading }}</h2>
+        <h2 class="section-title" id="story-title-{{ section.id }}" data-split="words">{{ section.settings.heading }}</h2>
         {{ section.settings.text }}
       </div>
       {%- if has_areas -%}
@@ -74,8 +74,11 @@
       {%- assign events_rail_id = 'events-rail-' | append: section.id -%}
       <div class="events">
         <div class="section-head events__head">
-          {%- comment -%} Seit 8.11. so groß wie die Abschnitts-Überschriften („Mehr als ein Shop“, „Komm vorbei.“) {%- endcomment -%}
-          <h2 class="section-title">{{ section.settings.events_heading }}</h2>
+          {%- comment -%}
+            Seit 8.11. so groß wie die Abschnitts-Überschriften („Mehr als ein Shop“, „Komm vorbei.“). Alle Abschnitts-Überschriften der
+            Startseite steigen seit 8.11. Wort für Wort ein wie „Komm vorbei.“ und die Überschriften auf Über uns (data-split, motion.js).
+          {%- endcomment -%}
+          <h2 class="section-title" data-split="words">{{ section.settings.events_heading }}</h2>
           <div class="events__nav">
             {%- if events_url != blank -%}
               <a class="btn btn--text" href="{{ events_url }}">Alle Events {% render 'icon', name: 'arrow-right' %}</a>
