@@ -322,8 +322,8 @@ html:not(:has(.announce)) { --announce-h: 0px; }
 .mobile-menu__direct { display: flex; align-items: center; justify-content: space-between; padding: 0 24px; min-height: 68px; border-top: 1px solid var(--c-steel); font-family: var(--f-head); font-weight: 700; font-size: 22px; text-transform: uppercase; }
 .mobile-menu__direct--sale { color: var(--c-orange); }
 .mobile-menu__foot { padding: 24px; display: grid; gap: 12px; border-top: 1px solid var(--c-steel); }
-/* Soziale Netze unter „Anmelden“, das erste Logo bündig mit dem Knopf (Tippfläche ragt links über) */
-.mobile-menu__social { margin-left: -12px; }
+/* Soziale Netze mittig unter „Anmelden“ (Wunsch des Nutzers, 8.11.) */
+.mobile-menu__social { justify-content: center; }
 /* Menükopf: H-D Bar & Shield vor der Wortmarke, etwas größer als im Header, mit mehr Luft zu den Menüpunkten */
 .mobile-menu .drawer__head { padding-block: 20px; }
 .mobile-menu__brand { display: flex; align-items: center; gap: 10px; }
