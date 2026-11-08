@@ -12,6 +12,17 @@
     "address": "Burghölzle 15\n79576 Weil am Rhein",
     "phone": "+49 7621 62022",
     "whatsapp": "491743201879",
-    "email": "info@powershop-weil.com"
+    "email": "info@powershop-weil.com",
+    "payment_methods": "PayPal\nKlarna\nVisa\nMastercard",
+    "social_instagram": "https://www.instagram.com/harleydavidson_powershop?exln=MWVvYjF6cnU1bGhsNQ==",
+    "social_facebook": "https://www.facebook.com/powershopweilamrhein/",
+    "social_tiktok": "https://www.tiktok.com/@harleydavidson.po?_r=1&_t=ZG-9BF2aRIUqlV",
+    "sections": {
+      "cart-drawer": {
+        "type": "cart-drawer",
+        "settings": {}
+      }
+    },
+    "content_for_index": []
   }
 }

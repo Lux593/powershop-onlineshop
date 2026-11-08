@@ -95,7 +95,8 @@
       {%- if parent_collection != blank -%}
         <li><a href="{{ parent_collection.url }}">{{ parent_collection.title | escape }}</a></li>
       {%- endif -%}
-      <li><span aria-current="page">{{ product.title | escape }}</span></li>
+      {%- comment -%} Der Titel steht direkt darunter als Überschrift, im Pfad deshalb nur für Screenreader (aktuelle Seite) {%- endcomment -%}
+      <li class="sr-only"><span aria-current="page">{{ product.title | escape }}</span></li>
     </ol>
   </nav>
 {%- endcapture -%}

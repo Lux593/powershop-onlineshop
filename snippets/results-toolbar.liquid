@@ -75,7 +75,6 @@
   {%- endif -%}
 
   {%- if visible_filters > 0 -%}
-    {%- comment -%} Zähler aller gesetzten Filter (schwarzer Kreis, CSS in shop.css); assets/collection.js aktualisiert ihn über [data-dot-all] {%- endcomment -%}
     <button class="btn btn--outline-dark btn--sm filterbar__mobile" type="button" data-open="filter-sheet">
       {% render 'icon', name: 'sliders-horizontal' %}Filter
       <span class="dot" data-dot-all{% if active_total == 0 %} hidden{% endif %}>{{ active_total }}<span class="sr-only"> ausgewählt</span></span>
