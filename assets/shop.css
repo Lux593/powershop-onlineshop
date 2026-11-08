@@ -198,6 +198,7 @@
 /* Bekleidung und Teile: Die Infospalte ist höher als das quadratische Foto, links bliebe beim Lesen eine leere Fläche. Dann läuft die Galerie
    mit (sticky); in der Infospalte hätte Sticky ohne Spielraum keine Wirkung. Motorräder: Galerie steckt in einem Wrapper, dort gilt die Infospalte. */
 @media (min-width: 1024px) { .pdp > .gallery { position: sticky; top: calc(var(--header-offset) + 24px); } }
+/* Der Pfad endet sichtbar bei der Kategorie: den Produkttitel gibt es darin nur für Screenreader (.sr-only in sections/product.liquid). */
 .pdp__crumbs { padding-top: 20px; }
 .pdp__title { font-size: 34px; overflow-wrap: anywhere; }
 @media (min-width: 1024px) { .pdp__title { font-size: 40px; } }
