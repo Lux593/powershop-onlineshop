@@ -36,6 +36,16 @@
   assign footer_cols = 0
   assign footer_size_guide = false
   assign footer_cookie_settings = false
+  comment
+    Shopify führt den Link „Cookie-Einstellungen“ (#shopifyReshowConsentBanner) selbst unter den Richtlinien. Zeigt das Theme
+    seinen eigenen Knopf (Häkchen in einem Link-Block), entfällt der Shopify-Link im Rückfall, sonst stünde er doppelt da.
+  endcomment
+  assign cookie_button = false
+  for block in section.blocks
+    if block.type == 'links' and block.settings.show_cookie_settings
+      assign cookie_button = true
+    endif
+  endfor
   for block in section.blocks
     if block.type == 'links'
       if linklists[block.settings.menu].links.size > 1 or request.design_mode
@@ -153,6 +163,9 @@
         {%- if section.settings.show_policy_fallback -%}
           {%- for policy in shop.policies -%}
             {%- if policy.url == blank or policy.url == shop.shipping_policy.url or menu_urls contains policy.url -%}
+              {%- continue -%}
+            {%- endif -%}
+            {%- if cookie_button and policy.url contains 'shopifyReshowConsentBanner' -%}
               {%- continue -%}
             {%- endif %} · <a href="{{ policy.url }}">{{ policy.title | escape }}</a>
           {%- endfor -%}
