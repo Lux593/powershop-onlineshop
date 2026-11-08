@@ -109,10 +109,13 @@
   /* Das Foto des Streifens bleibt beim Öffnen in Streifenhöhe oben stehen (seit 8.11.): Über die ganze Höhe gezogen zoomte es auf,
      bevor der Inhalt darüber einblendete */
   .build-book.is-ready .bb-cover { bottom: auto; width: 100%; height: var(--closed-h); transform: none; }
-  /* Der Inhalt blendet beim Öffnen gleich ein (ohne Verzögerung), so geht das Foto des Streifens direkt in den Kopf über.
-     Kein Tipp-Highlight: Es läge sonst als Fläche über dem geöffneten Umbau (die Tür füllt den ganzen Umbau) */
-  .bb-bay.is-open .bb-room { transition: opacity .2s, visibility 0s; }
+  /* Kein Tipp-Highlight: Es läge sonst als Fläche über dem geöffneten Umbau (die Tür füllt den ganzen Umbau) */
   .bb-door { -webkit-tap-highlight-color: transparent; }
+  /* Öffnen (seit 8.11.): Der Umbau steht sofort offen da, ohne Übergänge, die Name und Abdunklung des Streifens über dem ganzen
+     Umbau ausblenden (die Tür liegt über dem Inhalt) und das Innere einblenden. Bilder und Text bleiben verborgen (is-entering), bis
+     die Überblendung der Seite fertig ist, dann laden sie herein (build-book.js); der Name steht gleich da. Beim Schließen blenden die Übergänge wie gewohnt. */
+  .bb-bay.is-open .bb-room, .bb-bay.is-open .bb-label, .bb-bay.is-open .bb-door::before { transition: none; }
+  .bb-bay.is-entering .bb-info > *, .bb-bay.is-entering .bb-item { opacity: 0; }
   .bb-cover img { object-position: var(--pos-m, 50% 55%); }
   .bb-door::before { background: linear-gradient(90deg, rgba(10, 10, 10, .85) 0%, rgba(10, 10, 10, .15) 75%); }
   .bb-label--narrow { display: none; }
@@ -129,10 +132,11 @@
 }
 
 /* Handy: Öffnen als Überblendung (View Transition, build-book.js setzt html.is-vt-bay nur dafür). Der Umbau steht sofort an seinem
-   Platz; das alte Bild bleibt darunter stehen, das neue blendet darüber ein und rückt 12 px hoch (ps-vt-in, shop.css). Normal statt
+   Platz (mit Namen, Bilder und Text laden danach herein); das alte Bild bleibt darunter stehen, das neue blendet in 260 ms darüber
+   ein und rückt 12 px hoch (ps-vt-in, shop.css). Normal statt
    plus-lighter gemischt, sonst addierten sich beide Bilder zu einem helleren. Der Header (site-header) bleibt stehen. */
 :root.is-vt-bay::view-transition-old(root) { animation: none; mix-blend-mode: normal; }
-:root.is-vt-bay::view-transition-new(root) { animation: ps-vt-in 380ms var(--ease-out) both; mix-blend-mode: normal; }
+:root.is-vt-bay::view-transition-new(root) { animation: ps-vt-in 260ms var(--ease-out) both; mix-blend-mode: normal; }
 
 /* ---------- Vollbild ---------- */
 .bb-viewer { position: fixed; inset: 0; width: 100vw; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; overflow: hidden; background: rgb(6, 6, 6); color: var(--c-white); }
