@@ -418,6 +418,16 @@
       });
     }
 
+    /* ---------- „Werkstatt-Termin anfragen“: zur Kontakt-Box unten, Thema „Einbau“ gleich gewählt ----------
+       Den Sprung selbst macht der Anker (motion.js gleitet), hier nur der Chip über den Klick-Weg von contact.js. */
+    root.addEventListener('click', function (event) {
+      var link = event.target.closest('a[data-contact-topic]');
+      if (!link || !link.hash) return;
+      var target = document.getElementById(link.hash.slice(1));
+      var chip = target && target.querySelector('[data-topic="' + link.dataset.contactTopic + '"]');
+      if (chip && chip.getAttribute('aria-pressed') !== 'true') chip.click();
+    });
+
     /* ---------- Passt zu deiner Auswahl ----------
        Grundlage ist der Filter der Kollektion oder Suche, aus der man kommt: Modellfamilie (part.modellfamilien) und
        Baujahr (part.baujahre_filter). Kommt man von einer Liste (Referrer, auch nach dem AJAX-Filtern: pushState setzt die
