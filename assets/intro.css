@@ -3,7 +3,8 @@
    Markup: snippets/intro.liquid. Verhalten: assets/intro.js. Gesetzt wird html.intro-on im Head (layout/theme.liquid), nur
    mit Bewegung, ohne Datensparen, nicht im Theme-Editor. Ohne diese Klasse bleibt alles hier aus.
    Die Bühne (.intro__stage) hat das Seitenverhältnis des Films und deckt den Bildschirm wie object-fit: cover. Der Text steht in
-   Prozent der Bühne unter dem Logo und bleibt so bei jedem Fenster an derselben Stelle zum Logo.
+   Prozent der Bühne unter dem Logo und bleibt so bei jedem Fenster an derselben Stelle zum Logo. Die SVG (.intro__zoom, von intro.js
+   gebaut) liegt in denselben Bühnen-Einheiten wie der Film, daher passt ihr erstes Bild genau auf sein letztes.
    ========================================================================== */
 
 .intro {
@@ -19,14 +20,24 @@
   touch-action: none;
   outline: 0;
 }
-html.intro-on .intro, .intro.is-out { display: block; }
+html.intro-on .intro, .intro.is-live, .intro.is-out { display: block; } /* is-live: der Zoom läuft noch, nachdem intro-on schon weg ist */
 .intro.is-out { opacity: 0; pointer-events: none; }
+/* Zoom: der Überzug selbst ist durchsichtig, die SVG liefert Grund und Logo, das Loch im Fenster zeigt die echte Seite dahinter */
+.intro.is-live { background: transparent; }
+.intro.is-released { pointer-events: none; } /* Seite ist frei, der Rest der Fahrt lässt Klicks durch */
 
 /* Seite dahinter: bleibt stehen, bis der Überzug weicht. scrollbar-gutter hält den Platz der Bildlaufleiste, sonst springt der Hero
    beim Zurückgeben des Scrollens um deren Breite. Die Seitenanimationen (Hero-Überschrift, Ken-Burns, Reveals) warten
    (animation-play-state) und starten erst, wenn der Überzug ausblendet: dann sieht man sie, statt dass sie hinter dem Überzug ablaufen. */
 html.intro-on { overflow: hidden; scrollbar-gutter: stable; background: #08080a; } /* dunkel, damit der reservierte Streifen der Bildlaufleiste (Windows, Mausbetrieb) nicht hell neben dem Überzug steht */
 html.intro-on #main *, html.intro-on #main *::before, html.intro-on #main *::after { animation-play-state: paused !important; }
+
+/* Header und Ankündigungsleiste: bleiben unsichtbar, solange der Intro läuft, und gleiten leicht ein, sobald die Seite frei ist
+   (intro.js setzt dann kurz html.intro-in). Nur opacity und translate, daher kein Layoutsprung; transform bleibt dem Wegschieben
+   beim Scrollen (header.css .is-away). */
+html.intro-on .announce, html.intro-on .site-header-wrap { opacity: 0; }
+@keyframes intro-chrome-in { from { opacity: 0; translate: 0 -10px; } }
+html.intro-in .announce, html.intro-in .site-header-wrap { animation: intro-chrome-in 800ms var(--ease-out) 120ms backwards; }
 
 /* ---------- Bühne ---------- */
 .intro__stage {
@@ -45,17 +56,21 @@ html[data-intro-variant="portrait"] .intro__stage {
   html[data-intro-variant="portrait"] .intro__stage { width: max(100cqw, 56.25cqh); height: max(100cqh, 177.78cqw); }
 }
 
-.intro__video, .intro__frame {
+.intro__video {
   position: absolute; inset: 0; width: 100%; height: 100%; max-width: none;
   object-fit: cover; background: transparent;
   pointer-events: none;
+  opacity: 0; transition: opacity 600ms var(--ease);
 }
-.intro__video { opacity: 0; transition: opacity 600ms var(--ease); }
 .intro__video.is-on { opacity: 1; }
-/* Der Zoom-Film startet auf dem letzten Bild des Aufbau-Films: er liegt ohne Überblendung darüber */
-.intro__video--zoom { transition: none; }
-.intro__frame[hidden] { display: none; }
-.intro.is-fallback .intro__frame { display: block; }
+.intro.is-live .intro__video { visibility: hidden; } /* sonst schiene durch das Loch im Fenster der Film statt der Seite */
+
+/* Logo als Vektor: Zoom und Standbild (Notlösung ohne laufenden Film). Liegt über dem Film, unter den Texten. */
+.intro__zoom {
+  position: absolute; inset: 0; width: 100%; height: 100%; display: block;
+  visibility: hidden; pointer-events: none;
+}
+.intro.is-svg .intro__zoom { visibility: visible; }
 
 /* ---------- Text ---------- */
 .intro__text {
@@ -95,7 +110,7 @@ html[data-intro-variant="portrait"] .intro__stage {
 .has-motion .intro__skip { animation: intro-skip-in 700ms var(--ease-out) 1000ms backwards; }
 @keyframes intro-skip-in { from { opacity: 0; } }
 
-/* ---------- Abgang: Texte steigen aus, der Zoom-Film übernimmt ----------
+/* ---------- Abgang: Texte steigen aus, der Zoom übernimmt ----------
    Die Wörter laufen nach oben aus ihrer Maske (die Einstiegs-Animation bleibt die Umkehrung davon); der Button blendet mit. */
 @keyframes intro-word-out { to { translate: 0 -115%; } }
 .intro.is-leaving .intro__title .ps-wi {

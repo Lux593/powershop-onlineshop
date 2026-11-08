@@ -1,13 +1,14 @@
 {%- comment -%}
   Intro / Einlass (nur Startseite): Vollbild über der Seite, beim ersten Aufruf.
   Ablauf: Film „Aufbau“ (das Logo zeichnet sich aus Linien) → Überschrift und Button steigen ein (gleiche Wort-Animation wie
-  die Überschriften der Startseite) → Klick: Texte steigen aus, Film „Zoom“ fährt durch den Balken des Logos auf die Startseite
-  → Überblendung in den echten Hero. Verhalten: assets/intro.js, Stile: assets/intro.css, Doku: docs/intro.md.
+  die Überschriften der Startseite) → Klick: Texte steigen aus, das Logo (Vektor, von intro.js als SVG über den Film gelegt)
+  fährt durch den Balken auf die echte Startseite, die durch das Fenster im Balken scheint. Das Endbild ist damit in jedem
+  Seitenverhältnis die Startseite selbst. Verhalten: assets/intro.js, Stile: assets/intro.css, Doku: docs/intro.md.
 
   Ohne JavaScript, mit reduzierter Bewegung, bei Datensparen, im Theme-Editor und für Suchmaschinen erscheint nichts: der
   Überzug ist per CSS aus und wird nur eingeblendet, wenn das Head-Skript in layout/theme.liquid html.intro-on setzt.
-  Die Filmadressen stehen hier, damit die Dateien hier nicht doppelt gepflegt werden; geladen wird nur die passende Variante
-  (Hochformat oder Querformat, WebM nur wenn sicher abspielbar, sonst MP4).
+  Die Adressen des Aufbau-Films stehen hier, damit die Dateien hier nicht doppelt gepflegt werden; geladen wird nur die passende
+  Variante (Hochformat oder Querformat, WebM nur wenn sicher abspielbar, sonst MP4).
 {%- endcomment -%}
 {%- liquid
   assign heading = settings.intro_heading | default: 'Willkommen im Power Shop'
@@ -17,14 +18,10 @@
 {%- capture sources -%}
   {
     "landscape": {
-      "build": { "mp4": {{ 'intro-build-16x9.mp4' | asset_url | json }}, "webm": {{ 'intro-build-16x9.webm' | asset_url | json }} },
-      "zoom": { "mp4": {{ 'intro-zoom-16x9.mp4' | asset_url | json }}, "webm": {{ 'intro-zoom-16x9.webm' | asset_url | json }} },
-      "frame": {{ 'intro-frame-16x9.webp' | asset_url | json }}
+      "build": { "mp4": {{ 'intro-build-16x9.mp4' | asset_url | json }}, "webm": {{ 'intro-build-16x9.webm' | asset_url | json }} }
     },
     "portrait": {
-      "build": { "mp4": {{ 'intro-build-9x16.mp4' | asset_url | json }}, "webm": {{ 'intro-build-9x16.webm' | asset_url | json }} },
-      "zoom": { "mp4": {{ 'intro-zoom-9x16.mp4' | asset_url | json }}, "webm": {{ 'intro-zoom-9x16.webm' | asset_url | json }} },
-      "frame": {{ 'intro-frame-9x16.webp' | asset_url | json }}
+      "build": { "mp4": {{ 'intro-build-9x16.mp4' | asset_url | json }}, "webm": {{ 'intro-build-9x16.webm' | asset_url | json }} }
     }
   }
 {%- endcapture -%}
@@ -41,9 +38,7 @@
 >
   <div class="intro__stage">
     <video class="intro__video intro__video--build" muted playsinline preload="auto" disablepictureinpicture disableremoteplayback aria-hidden="true" tabindex="-1"></video>
-    {%- comment -%} Standbild des fertigen Logos: nur Notlösung, wenn der Film nicht startet (Autoplay gesperrt, Strom sparen, langsames Netz) {%- endcomment -%}
-    <img class="intro__frame" alt="" width="1920" height="1080" hidden decoding="async">
-    <video class="intro__video intro__video--zoom" muted playsinline preload="auto" disablepictureinpicture disableremoteplayback aria-hidden="true" tabindex="-1"></video>
+    {%- comment -%} Hier setzt intro.js die SVG mit dem Logo ein (Zoom, und als Standbild, wenn der Film nicht startet: Autoplay gesperrt, Strom sparen, langsames Netz) {%- endcomment -%}
     <div class="intro__text" data-intro-text></div>
   </div>
 
