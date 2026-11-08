@@ -12,9 +12,52 @@
     assign current_variant = product.selected_or_first_available_variant
   endif
 
+  # Kategorie des Produkts: die genaueste Kategorie-Kollektion (wenigste Artikel). Zuerst Kategorien mit Präfix
+  # (teile-, herren-, damen-, kinder-, motorraeder-), dann andere Kollektionen, zuletzt Linien (Willie G Skull u. a.).
+  # Sammel-Kollektionen wie „Neuheiten“ (enthält fast alles) zählen nie. Neue Kategorien greifen so von selbst.
+  # Quelle der Schiene „Ähnliche Artikel“ und der Brotkrumen (wenn man nicht über eine Kategorie kam).
+  assign generic_handles = 'all,frontpage,neuheiten,sale,teile,herren,damen,kinder,accessoires,motorraeder,motorraeder-neu,motorraeder-gebraucht,motorraeder-vorfuehrer,geschenkgutscheine' | split: ','
+  assign line_handles = 'willie-g-skull,factory-racing,dickies,realtree,power-shop-kollektion,ride-bells,poker-chips' | split: ','
+  assign category = blank
+  for pass in (1..3)
+    for c in product.collections
+      if generic_handles contains c.handle or c.products_count < 2
+        continue
+      endif
+      assign c_prefix = c.handle | split: '-' | first
+      assign c_pass = 2
+      if line_handles contains c.handle
+        assign c_pass = 3
+      elsif c_prefix != c.handle
+        if c_prefix == 'teile' or c_prefix == 'herren' or c_prefix == 'damen' or c_prefix == 'kinder' or c_prefix == 'motorraeder'
+          assign c_pass = 1
+        endif
+      endif
+      if c_pass == pass
+        if category == blank or c.products_count < category.products_count
+          assign category = c
+        endif
+      endif
+    endfor
+    if category != blank
+      break
+    endif
+  endfor
+  if category == blank
+    assign category = product.collections.first
+  endif
+
+  # Brotkrumen: die Kollektion, über die man kam, sonst die Kategorie; davor die Hauptkategorie (Teile & Zubehör, Herren …)
   assign parent_collection = collection
-  if parent_collection == blank
-    assign parent_collection = product.collections.first
+  if parent_collection == blank or generic_handles contains parent_collection.handle
+    assign parent_collection = category
+  endif
+  assign crumb_parent = blank
+  if parent_collection != blank
+    assign crumb_prefix = parent_collection.handle | split: '-' | first
+    if crumb_prefix != parent_collection.handle and collections[crumb_prefix].title != blank
+      assign crumb_parent = collections[crumb_prefix]
+    endif
   endif
 
   assign is_new = false
@@ -46,6 +89,9 @@
   <nav class="breadcrumb" aria-label="Brotkrumen">
     <ol>
       <li><a href="{{ routes.root_url }}">Home</a></li>
+      {%- if crumb_parent != blank -%}
+        <li><a href="{{ crumb_parent.url }}">{{ crumb_parent.title | escape }}</a></li>
+      {%- endif -%}
       {%- if parent_collection != blank -%}
         <li><a href="{{ parent_collection.url }}">{{ parent_collection.title | escape }}</a></li>
       {%- endif -%}
@@ -136,7 +182,7 @@
       assign bike_topics = bike_topics | append: ',reservierung'
     endif
     assign bike_topics = bike_topics | append: ',frage'
-    assign similar = parent_collection.products
+    assign similar = category.products
   -%}
 
   <div data-pdp="bike" data-section-id="{{ section.id }}">
@@ -319,7 +365,7 @@
       else
         assign approval_class = ''
     endcase
-    assign similar = parent_collection.products
+    assign similar = category.products
   -%}
 
   <div data-pdp="part" data-section-id="{{ section.id }}">
@@ -490,7 +536,7 @@
         <section class="section--tight">{{ app_blocks_html }}</section>
       {%- endif -%}
 
-      {% render 'product-rail', product: product, similar: similar, heading: 'Wird oft zusammen gekauft', section_id: section.id %}
+      {% render 'product-rail', product: product, similar: similar, heading: 'Ähnliche Artikel', families: families, section_id: section.id %}
 
       <section class="section--tight">
         <div style="max-width:560px">
@@ -506,7 +552,7 @@
   {%- liquid
     assign size_type = product.metafields.apparel.groessentabelle.value
     assign sku = current_variant.sku
-    assign similar = parent_collection.products
+    assign similar = category.products
   -%}
 
   <div data-pdp="apparel" data-section-id="{{ section.id }}">

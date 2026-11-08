@@ -2,16 +2,34 @@
   Schiene mit weiteren Produkten unter der Produktseite (Teile, Bekleidung): Überschrift, Pfeile, bis zu acht Produktkarten.
   Die Motorrad-Seite hat eine eigene Schiene mit Bike-Karten (sections/product.liquid).
 
+  Reihenfolge: ab dem aktuellen Produkt weiter durch die Liste (am Ende wieder vorne), damit nicht jede Seite derselben
+  Kategorie dieselben acht zeigt. Mit families (Teile) kommen zuerst Produkte, die zu einer dieser Modellfamilien passen
+  (part.modellfamilien), danach der Rest.
+
   @param {product} product - Aktuelles Produkt (erscheint nicht in der Schiene)
-  @param {object} similar - Produkte, aus denen die Schiene besteht (meist die Kollektion des Produkts)
+  @param {object} similar - Produkte, aus denen die Schiene besteht (die Kategorie des Produkts, sections/product.liquid)
   @param {string} heading - Überschrift der Schiene
+  @param {object} [families] - Modellfamilien des aktuellen Teils (Liste), bevorzugt passende Produkte
   @param {string} section_id - ID der Section (macht die Schiene eindeutig)
 
   @example
-  {% render 'product-rail', product: product, similar: similar, heading: 'Das könnte dir auch gefallen', section_id: section.id %}
+  {% render 'product-rail', product: product, similar: similar, heading: 'Ähnliche Artikel', families: families, section_id: section.id %}
 {% enddoc %}
 
 {%- if similar.size > 1 -%}
+  {%- liquid
+    assign start = 0
+    for item in similar
+      if item.id == product.id
+        assign start = forloop.index
+        break
+      endif
+    endfor
+    assign prefer = false
+    if families != blank and families.size > 0
+      assign prefer = true
+    endif
+  -%}
   <section class="section--tight">
     <div class="section-head" data-reveal>
       <h2>{{ heading }}</h2>
@@ -22,11 +40,37 @@
     </div>
     <div class="rail" id="rail-similar-{{ section_id }}" style="grid-auto-columns:minmax(220px, calc((100% - 72px) / 4))">
       {%- assign shown = 0 -%}
-      {%- for item in similar -%}
-        {%- if item.id != product.id and shown < 8 -%}
-          {%- assign shown = shown | plus: 1 -%}
-          {% render 'product-card', product: item, reveal: true %}
-        {%- endif -%}
+      {%- comment -%}
+        Durchgang 1: passende Modellfamilie (nur mit families), Durchgang 2: alle übrigen. Je Durchgang erst ab dem
+        aktuellen Produkt bis zum Ende, dann vom Anfang bis zum aktuellen Produkt.
+      {%- endcomment -%}
+      {%- for pass in (1..2) -%}
+        {%- if pass == 1 and prefer == false -%}{%- continue -%}{%- endif -%}
+        {%- for part in (1..2) -%}
+          {%- if part == 1 -%}
+            {%- assign from = start -%}
+            {%- assign count = similar.size | minus: start -%}
+          {%- else -%}
+            {%- assign from = 0 -%}
+            {%- assign count = start -%}
+          {%- endif -%}
+          {%- if count < 1 -%}{%- continue -%}{%- endif -%}
+          {%- for item in similar offset: from limit: count -%}
+            {%- if shown >= 8 -%}{%- break -%}{%- endif -%}
+            {%- if item.id == product.id -%}{%- continue -%}{%- endif -%}
+            {%- assign fits = false -%}
+            {%- if prefer -%}
+              {%- assign item_families = item.metafields.part.modellfamilien.value -%}
+              {%- for f in families -%}
+                {%- if item_families contains f -%}{%- assign fits = true -%}{%- break -%}{%- endif -%}
+              {%- endfor -%}
+            {%- endif -%}
+            {%- if prefer and pass == 1 and fits == false -%}{%- continue -%}{%- endif -%}
+            {%- if prefer and pass == 2 and fits -%}{%- continue -%}{%- endif -%}
+            {%- assign shown = shown | plus: 1 -%}
+            {% render 'product-card', product: item, reveal: true %}
+          {%- endfor -%}
+        {%- endfor -%}
       {%- endfor -%}
     </div>
   </section>
