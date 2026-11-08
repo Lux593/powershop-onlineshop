@@ -273,14 +273,14 @@
 .compat__fit .compat__fit-lead { margin: -4px 0 0 32px; font-size: var(--fs-small); color: var(--c-text-soft); }
 .compat__fit-btn { width: 100%; }
 .compat__fit-change { justify-self: start; font-size: var(--fs-small); }
-.compat__fit[data-state="ask"] { background: var(--c-offwhite); }
 .compat__fit[data-state="ask"] .compat__fit-icon--ask { display: flex; color: var(--c-text); }
 /* Das gewählte Motorrad: Kacheln wie die Fakten der Motorrad-Seiten (.bike-facts), über die volle Breite, zwei gleiche Spalten,
    ohne doppelte Außenlinien. Etwas weniger Innenabstand und Sperrung, damit „Modellfamilie“ auch bei 360 px in eine Zeile passt */
 .compat__fit-bikes { display: grid; gap: 12px; }
 .compat__bikes { display: grid; gap: 8px; }
 .compat__bikes-label { font-size: var(--fs-caption); font-weight: 600; color: var(--c-muted); text-transform: uppercase; letter-spacing: 0.06em; }
-.bike-facts.compat__vehicle { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+/* Box weiß wie der Rest der Karte, die Kacheln im beigen Seitenton (umgekehrt zu den Fakten der Motorrad-Seiten) */
+.bike-facts.compat__vehicle { grid-template-columns: repeat(2, minmax(0, 1fr)); background: var(--c-offwhite); }
 .compat__vehicle div { padding: 14px 12px; }
 .compat__vehicle div:nth-child(2n) { border-right: 0; }
 .compat__vehicle div:nth-last-child(-n + 2) { border-bottom: 0; }
@@ -288,9 +288,7 @@
 .compat__vehicle dd { font-family: "Inter Strong", var(--f-body); font-size: var(--fs-small); font-weight: 700; overflow-wrap: anywhere; }
 .compat__fit-icon { display: none; flex: none; }
 .compat__fit-icon .icon { width: 20px; height: 20px; margin-top: 2px; }
-.compat__fit[data-state="ok"], .compat__fit[data-state="partial"] { background: color-mix(in srgb, var(--c-orange) 8%, var(--c-white)); }
 .compat__fit[data-state="ok"] .compat__fit-icon--ok, .compat__fit[data-state="partial"] .compat__fit-icon--ok { display: flex; color: var(--c-orange); }
-.compat__fit[data-state="no"] { background: var(--c-offwhite); }
 .compat__fit[data-state="no"] .compat__fit-icon--no { display: flex; color: var(--c-error); }
 .compat__table tr.is-match td { color: var(--c-orange); }
 .compat__table tr.is-match td:first-child { box-shadow: inset 3px 0 0 var(--c-orange); padding-left: 10px; }
