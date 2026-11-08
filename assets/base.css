@@ -82,7 +82,9 @@ h4, .h4 { font-size: var(--fs-h4); letter-spacing: 0.03em; }
    übersprungen wird. intro-on fällt immer weg (Ende, Überspringen, spätestens 6 s ohne Intro-Skript, layout/theme.liquid), der Banner
    kann also nicht verborgen bleiben. Rechtlich unkritisch: Shopify lädt Analyse und Marketing ohnehin erst nach der Zustimmung. */
 #shopify-pc__banner { transition: opacity 400ms ease, visibility 0s; }
-html.intro-on #shopify-pc__banner { opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; transition: none; }
+html.intro-on #shopify-pc__banner, html.intro-in #shopify-pc__banner { opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; transition: none; }
+/* intro-in: der Intro gibt die Seite bei 60 % der Zoom-Fahrt frei (intro-on fällt dann weg), der Überzug ist aber erst nach der Fahrt weg.
+   intro.js hält html.intro-in 1,5 s lang, die Fahrt braucht danach noch 1,2 s: der Banner kommt, wenn die Animation vorbei ist. */
 
 /* Barrierefreiheit */
 .skip-link {
