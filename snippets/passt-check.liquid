@@ -1,0 +1,46 @@
+{% doc %}
+  Fenster „Passt es zu deinem Motorrad?“ auf Teile-Seiten: Baujahr → Modellfamilie → Modell wählen, das Ergebnis für dieses
+  Teil steht sofort im Fenster, „Motorrad merken“ speichert es im Browser (localStorage ps-motorrad) für alle Teile-Seiten.
+  Geöffnet über data-open="passt-check" (Box in der Passt-für-Karte). Die Logik steht in assets/product.js (Passt-Check),
+  die Fahrzeugliste lädt erst beim Öffnen aus templates/search.passform-fahrzeuge.liquid.
+{% enddoc %}
+
+<dialog class="modal pc-dialog" id="passt-check" aria-labelledby="pc-title" data-lenis-prevent data-pc-src="{{ routes.search_url }}?view=passform-fahrzeuge">
+  <div class="modal__inner">
+    <div class="modal__head">
+      <h2 class="h3" id="pc-title">Passt es zu deinem Motorrad?</h2>
+      <button class="icon-btn" type="button" data-close aria-label="Fenster schließen">{% render 'icon', name: 'x' %}</button>
+    </div>
+    <div class="modal__body" data-lenis-prevent>
+      <p class="pc-intro">Wähle dein Motorrad. Wir prüfen es mit der Modellliste von Harley-Davidson.</p>
+      <div class="pc-fields">
+        <div class="field">
+          <label for="pc-year">Baujahr</label>
+          <select class="select" id="pc-year" data-pc-year><option value="">Baujahr wählen</option></select>
+        </div>
+        <div class="field">
+          <label for="pc-family">Modellfamilie</label>
+          <select class="select" id="pc-family" data-pc-family disabled><option value="">Erst Baujahr wählen</option></select>
+        </div>
+        <div class="field">
+          <label for="pc-model">Modell</label>
+          <select class="select" id="pc-model" data-pc-model disabled><option value="">Erst Modellfamilie wählen</option></select>
+        </div>
+      </div>
+      <div class="pc-result" data-pc-result role="status" aria-live="polite" hidden>
+        <span class="pc-result__icon pc-result__icon--ok">{% render 'icon', name: 'circle-check' %}</span>
+        <span class="pc-result__icon pc-result__icon--no">{% render 'icon', name: 'circle-alert' %}</span>
+        <strong data-pc-result-title></strong>
+      </div>
+      <p class="pc-error" data-pc-error hidden>Die Modellliste lässt sich gerade nicht laden. Versuch es bitte später noch einmal oder frag unsere Werkstatt.</p>
+      <p class="pc-help">
+        Dein Modell fehlt? <a class="text-link" href="#werkstatt-kontakt" data-contact-topic="kompatibilitaet">Frag unsere Werkstatt</a>
+        <button class="text-link pc-forget" type="button" data-pc-forget hidden>Gemerktes Motorrad löschen</button>
+      </p>
+    </div>
+    <div class="modal__foot">
+      <button class="btn btn--outline-dark" type="button" data-close>Schließen</button>
+      <button class="btn btn--primary" type="button" data-pc-save disabled>Motorrad merken</button>
+    </div>
+  </div>
+</dialog>

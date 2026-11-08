@@ -1,0 +1,9 @@
+{%- layout none -%}
+{%- comment -%}
+  Fahrzeugliste für den Passt-Check (Fenster #passt-check, assets/product.js) als JSON:
+  { v, stand, jahre: [1984, …], modelle: [[Familie, Modellcode, Name, von, bis], …] }.
+  Quelle ist das Shop-Metafeld passform.fahrzeuge („H-D Fahrzeugliste (Passt-Check)“), das der n8n-Workflow
+  „Power Shop - H-D Fahrzeugliste aktualisieren“ monatlich aus der H-D Schnittstelle schreibt.
+  Aufruf: /search?view=passform-fahrzeuge (Suche statt Kollektion: diese Vorlage kann im Admin keiner Seite zugewiesen werden).
+{%- endcomment -%}
+{{ shop.metafields.passform.fahrzeuge.value | json }}

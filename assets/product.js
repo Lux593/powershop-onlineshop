@@ -428,15 +428,48 @@
       if (chip && chip.getAttribute('aria-pressed') !== 'true') chip.click();
     });
 
-    /* ---------- Passt zu deiner Auswahl ----------
-       Grundlage ist der Filter der Kollektion oder Suche, aus der man kommt: Modellfamilie (part.modellfamilien) und
-       Baujahr (part.baujahre_filter). Kommt man von einer Liste (Referrer, auch nach dem AJAX-Filtern: pushState setzt die
-       Adresse), zählt deren Auswahl und wird für die Sitzung gemerkt, eine Liste ohne diese Filter löscht sie. Sonst gilt
-       die gemerkte (z. B. nach einem Sprung zu einem anderen Teil). Eine Aussage gibt es erst mit Modellfamilie und
-       Baujahr; geprüft wird gegen die Modellliste des Teils (Angaben laut Hersteller), universelle Teile passen immer. */
+    /* ---------- Passt-Check: passt das Teil zu deinem Motorrad? ----------
+       Drei Quellen, in dieser Reihenfolge:
+       1. Gemerktes Motorrad (localStorage ps-motorrad: Baujahr, Familie, Modellcode, Name), gesetzt im Fenster #passt-check.
+          Genau: Es passt, wenn eine Zeile der Modellliste (part.kompatibilitaet) diesen Modellcode und das Baujahr abdeckt
+          (ohne Code: Familie und Name). Gilt auch, wenn man aus einer gefilterten Liste kommt, die dieses Motorrad enthält.
+       2. Filter der Kollektion oder Suche, aus der man kommt (Modellfamilie + Baujahr; Referrer, auch nach dem AJAX-Filtern,
+          sonst für die Sitzung gemerkt): nur auf Ebene der Familie. Mit der Fahrzeugliste heißt es „alle“ oder „3 von 8“
+          Modellen, dazu „Modell genau prüfen“ (Fenster mit Jahr und Familie vorausgewählt).
+       3. Nichts bekannt: die Box „Passt das zu deinem Motorrad?“ mit „Jetzt prüfen“, so wie sie aus dem Theme kommt.
+       Die Fahrzeugliste (alle H-D Modelle je Baujahr, Shop-Metafeld passform.fahrzeuge, monatlich von n8n) lädt erst, wenn
+       das Fenster aufgeht oder ein Filter gesetzt ist. Werte aus Adresse und Speicher landen nur als Text im Dokument. */
     var fit = $('[data-compat-fit]');
-    if (fit) {
-      var KEY = 'ps-fahrzeug';
+    var fitBox = fit && fit.closest('[data-compat]');
+    if (fit && fitBox) {
+      var BIKE_KEY = 'ps-motorrad';
+      var PICK_KEY = 'ps-fahrzeug';
+      var universal = fitBox.hasAttribute('data-compat-universal');
+      var pcRows = $$('[data-compat-rows] tr[data-family]');
+      var fitButton = $('[data-pc-open]', fit);
+      var fitTitle = $('[data-compat-fit-title]', fit);
+      var fitLead = $('[data-compat-fit-lead]', fit);
+      var fitBikes = $('[data-compat-fit-bikes]', fit);
+      var fitNote = $('[data-compat-fit-text]', fit);
+      var askLead = fitLead ? fitLead.textContent : '';
+      var pcDialog = document.getElementById('passt-check');
+      var openWith = null; // Vorauswahl für das Fenster, je nach Zustand der Box
+
+      var readBike = function () {
+        try {
+          var b = JSON.parse(window.localStorage.getItem(BIKE_KEY) || 'null');
+          if (b && +b.y > 0 && b.f && (b.c || b.m)) return { y: +b.y, f: String(b.f), c: String(b.c || ''), m: String(b.m || b.c) };
+        } catch (e) {}
+        return null;
+      };
+      var writeBike = function (b) {
+        try {
+          if (b) window.localStorage.setItem(BIKE_KEY, JSON.stringify({ v: 1, y: b.y, f: b.f, c: b.c, m: b.m }));
+          else window.localStorage.removeItem(BIKE_KEY);
+        } catch (e) {}
+      };
+
+      // Filter der Liste, aus der man kommt
       var pick = null;
       try {
         var ref = document.referrer ? new URL(document.referrer) : null;
@@ -444,107 +477,318 @@
           /^(\/[a-z]{2}(-[a-z]{2})?)?\/(collections|search)(\/|$)/i.test(ref.pathname) && ref.pathname.indexOf('/products/') === -1;
         if (fromList) {
           pick = { f: ref.searchParams.getAll('filter.p.m.part.modellfamilien'), y: ref.searchParams.getAll('filter.p.m.part.baujahre_filter') };
-          if (pick.f.length || pick.y.length) window.sessionStorage.setItem(KEY, JSON.stringify(pick));
-          else window.sessionStorage.removeItem(KEY);
+          if (pick.f.length || pick.y.length) window.sessionStorage.setItem(PICK_KEY, JSON.stringify(pick));
+          else window.sessionStorage.removeItem(PICK_KEY);
         } else {
-          pick = JSON.parse(window.sessionStorage.getItem(KEY) || 'null');
+          pick = JSON.parse(window.sessionStorage.getItem(PICK_KEY) || 'null');
         }
       } catch (e) { pick = null; }
-
       var fams = pick && Array.isArray(pick.f) ? pick.f.filter(Boolean) : [];
       var yrs = pick && Array.isArray(pick.y) ? pick.y.map(Number).filter(function (n) { return n > 0; }) : [];
       yrs.sort(function (a, b) { return a - b; });
-      var box = fit.closest('[data-compat]');
-      var universal = !!box && box.hasAttribute('data-compat-universal');
-      var rows = $$('[data-compat-rows] tr[data-family]');
 
-      if (fams.length && yrs.length && (universal || rows.length)) {
-        var fits = function (family, year) {
-          return universal || rows.some(function (tr) {
-            return tr.dataset.family === family && +tr.dataset.from <= year && year <= +tr.dataset.to;
-          });
-        };
-        // Je Modellfamilie ein Kärtchen mit den gewählten Jahren: „Softail | 2018, 2019“. Werte aus der Adresse: nur als Text einsetzen
-        var groups = function (list) {
-          var order = [];
-          var by = {};
-          list.forEach(function (c) {
-            if (!by[c.f]) { by[c.f] = []; order.push(c.f); }
-            by[c.f].push(c.y);
-          });
-          return order.map(function (f) { return { f: f, ys: by[f] }; });
-        };
-        // Das gewählte Motorrad als Kacheln wie die Fakten der Motorrad-Seiten (.bike-facts): Modellfamilie und Baujahr
-        var vehicle = function (g, hit) {
-          var dl = document.createElement('dl');
-          dl.className = 'bike-facts compat__vehicle' + (hit ? '' : ' is-miss');
-          [['motorbike', 'Modellfamilie', g.f], ['calendar', g.ys.length > 1 ? 'Baujahre' : 'Baujahr', g.ys.join(', ')]].forEach(function (fact) {
-            var cell = document.createElement('div');
-            var dt = document.createElement('dt');
-            dt.innerHTML = '<svg class="icon" aria-hidden="true" focusable="false"><use href="#i-' + fact[0] + '"></use></svg>';
-            dt.appendChild(document.createTextNode(fact[1]));
-            var dd = document.createElement('dd');
-            dd.textContent = fact[2];
-            cell.appendChild(dt);
-            cell.appendChild(dd);
-            dl.appendChild(cell);
-          });
-          return dl;
-        };
-        var bikeRow = function (label, list, hit) {
-          var row = document.createElement('div');
-          row.className = 'compat__bikes';
-          if (label) {
-            var l = document.createElement('span');
-            l.className = 'compat__bikes-label';
-            l.textContent = label;
-            row.appendChild(l);
-          }
-          groups(list).forEach(function (g) { row.appendChild(vehicle(g, hit)); });
-          return row;
-        };
+      // Fahrzeugliste: { jahre: [...], modelle: [[Familie, Code, Name, von, bis], ...] }
+      var catalog = null;
+      var catalogLoading = null;
+      var loadCatalog = function () {
+        var src = pcDialog && pcDialog.getAttribute('data-pc-src');
+        if (!src) return Promise.reject(new Error('keine Quelle'));
+        if (!catalogLoading) {
+          catalogLoading = fetch(src, { credentials: 'same-origin', headers: { Accept: 'application/json' } })
+            .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+            .then(function (d) {
+              if (!d || !Array.isArray(d.jahre) || !Array.isArray(d.modelle) || !d.modelle.length) throw new Error('leer');
+              catalog = d;
+              return d;
+            })
+            .catch(function (e) { catalogLoading = null; throw e; });
+        }
+        return catalogLoading;
+      };
+
+      var covers = function (tr, year) { return +tr.dataset.from <= year && year <= +tr.dataset.to; };
+      var rowName = function (tr) { return tr.cells[0] ? tr.cells[0].textContent.trim() : ''; };
+      // Zeilen der Modellliste für ein Motorrad: Modellcode + Baujahr (ohne Code: Familie + Name)
+      var bikeRows = function (b) {
+        return pcRows.filter(function (tr) {
+          var same = b.c && tr.dataset.code ? tr.dataset.code === b.c : (tr.dataset.family === b.f && rowName(tr) === b.m);
+          return same && covers(tr, b.y);
+        });
+      };
+      var familyRows = function (f, y) { return pcRows.filter(function (tr) { return tr.dataset.family === f && covers(tr, y); }); };
+      var countKeys = function (list, key) { var seen = {}; list.forEach(function (x) { seen[key(x)] = true; }); return Object.keys(seen).length; };
+      // Modelle einer Familie in einem Jahr: laut Fahrzeugliste (alle) und laut Modellliste des Teils (passend)
+      var familyCount = function (f, y) {
+        if (!catalog) return null;
+        var all = countKeys(catalog.modelle.filter(function (m) { return m[0] === f && m[3] <= y && y <= m[4]; }), function (m) { return m[1] || m[2]; });
+        var fitting = countKeys(familyRows(f, y), function (tr) { return tr.dataset.code || rowName(tr); });
+        return all ? { all: all, fitting: Math.min(fitting, all) } : null;
+      };
+      var familyWord = function (f, ending) { return f.replace(/\s+/g, '-') + '-' + ending; }; // „Revolution-Max-Modellen“
+
+      // Kacheln wie die Fakten der Motorrad-Seiten (.bike-facts)
+      var tiles = function (facts, hit) {
+        var dl = document.createElement('dl');
+        dl.className = 'bike-facts compat__vehicle' + (hit ? '' : ' is-miss');
+        facts.forEach(function (fact) {
+          var cell = document.createElement('div');
+          var dt = document.createElement('dt');
+          dt.innerHTML = '<svg class="icon" aria-hidden="true" focusable="false"><use href="#i-' + fact[0] + '"></use></svg>';
+          dt.appendChild(document.createTextNode(fact[1]));
+          var dd = document.createElement('dd');
+          dd.textContent = fact[2];
+          cell.appendChild(dt);
+          cell.appendChild(dd);
+          dl.appendChild(cell);
+        });
+        return dl;
+      };
+      var labelled = function (label, list, hit) {
+        var row = document.createElement('div');
+        row.className = 'compat__bikes';
+        var l = document.createElement('span');
+        l.className = 'compat__bikes-label';
+        l.textContent = label;
+        row.appendChild(l);
+        list.forEach(function (el) { row.appendChild(el); });
+        return row;
+      };
+      var familyTiles = function (list, hit) {
+        var order = [];
+        var by = {};
+        list.forEach(function (c) {
+          if (!by[c.f]) { by[c.f] = []; order.push(c.f); }
+          by[c.f].push(c.y);
+        });
+        return order.map(function (f) {
+          return tiles([['motorbike', 'Modellfamilie', f], ['calendar', by[f].length > 1 ? 'Baujahre' : 'Baujahr', by[f].join(', ')]], hit);
+        });
+      };
+
+      var markRows = function (test) { pcRows.forEach(function (tr) { tr.classList.toggle('is-match', !!test(tr)); }); };
+      var show = function (state, title, o) {
+        fit.dataset.state = state;
+        fitTitle.textContent = title;
+        if (fitLead) { fitLead.textContent = o.lead || ''; fitLead.hidden = !o.lead; }
+        fitBikes.textContent = '';
+        (o.blocks || []).forEach(function (el) { fitBikes.appendChild(el); });
+        fitNote.textContent = o.note || '';
+        fitNote.hidden = !o.note;
+        if (fitButton) {
+          fitButton.textContent = o.button;
+          fitButton.className = o.link ? 'text-link compat__fit-change' : 'btn btn--secondary btn--sm compat__fit-btn';
+          fitButton.hidden = !pcDialog;
+        }
+        fit.hidden = false;
+      };
+
+      var renderPick = function () {
         var hits = [];
         var misses = [];
         fams.forEach(function (f) {
-          yrs.forEach(function (y) { (fits(f, y) ? hits : misses).push({ f: f, y: y }); });
+          yrs.forEach(function (y) { (universal || familyRows(f, y).length ? hits : misses).push({ f: f, y: y }); });
         });
-
-        var single = fams.length === 1 && yrs.length === 1; // genau ein Motorrad gewählt
-        var bikes = $('[data-compat-fit-bikes]', fit);
-        var title;
-        var text = universal ? 'Universell einsetzbar' : ''; // kein Herstellerhinweis unter dem Motorrad (Wunsch des Händlers)
+        var first = hits[0] || misses[0];
+        openWith = { y: first.y, f: first.f };
+        var o = { note: universal ? 'Universell einsetzbar' : '', button: 'Modell genau prüfen' };
         var state;
-        bikes.textContent = '';
-        if (!misses.length) {
-          state = 'ok';
-          title = single ? 'Passt zu deinem Motorrad!' : 'Passt zu deiner Auswahl!';
-          bikes.appendChild(bikeRow('', hits, true));
+        var title;
+        if (fams.length === 1 && yrs.length === 1) {
+          var f = fams[0];
+          var y = yrs[0];
+          var count = universal ? null : familyCount(f, y);
+          if (!hits.length) {
+            state = 'no';
+            title = 'Passt laut Hersteller zu keinem ' + familyWord(f, 'Modell') + ' von ' + y + '!';
+            o.button = 'Anderes Motorrad prüfen';
+          } else if (universal || (count && count.fitting >= count.all)) {
+            state = 'ok';
+            title = 'Passt zu allen ' + familyWord(f, 'Modellen') + ' von ' + y + '!';
+          } else if (count) {
+            state = 'partial';
+            title = 'Passt zu ' + count.fitting + ' von ' + count.all + ' ' + familyWord(f, 'Modellen') + ' von ' + y + '!';
+          } else {
+            state = 'partial';
+            title = 'Passt zu ' + familyWord(f, 'Modellen') + ' von ' + y + '!';
+          }
+          o.blocks = familyTiles(hits.length ? hits : misses, state !== 'no');
+        } else if (!misses.length) {
+          state = 'partial';
+          title = 'Passt zu Modellen deiner Auswahl!';
+          o.blocks = familyTiles(hits, true);
         } else if (hits.length) {
           state = 'partial';
           title = 'Passt zu einem Teil deiner Auswahl!';
-          bikes.appendChild(bikeRow('Passt', hits, true));
-          bikes.appendChild(bikeRow('Passt nicht', misses, false));
+          o.blocks = [labelled('Passt', familyTiles(hits, true)), labelled('Passt nicht', familyTiles(misses, false))];
         } else {
           state = 'no';
-          title = single ? 'Passt laut Hersteller nicht zu deinem Motorrad!' : 'Passt laut Hersteller nicht zu deiner Auswahl!';
-          bikes.appendChild(bikeRow('', misses, false));
+          title = 'Passt laut Hersteller zu keinem Motorrad deiner Auswahl!';
+          o.blocks = familyTiles(misses, false);
+          o.button = 'Anderes Motorrad prüfen';
         }
-        $('[data-compat-fit-title]', fit).textContent = title;
-        var note = $('[data-compat-fit-text]', fit);
-        note.textContent = text;
-        note.hidden = !text;
-        fit.dataset.state = state;
-        fit.hidden = false;
+        show(state, title, o);
+        markRows(function (tr) { return fams.indexOf(tr.dataset.family) > -1 && yrs.some(function (y) { return covers(tr, y); }); });
+      };
 
-        // Passende Modelle und Familien hervorheben
-        var yearFits = function (tr) { return yrs.some(function (y) { return +tr.dataset.from <= y && y <= +tr.dataset.to; }); };
-        rows.forEach(function (tr) {
-          if (fams.indexOf(tr.dataset.family) > -1 && yearFits(tr)) tr.classList.add('is-match');
+      var render = function () {
+        var bike = readBike();
+        var picked = fams.length > 0 && yrs.length > 0;
+        if (bike && (!picked || (fams.indexOf(bike.f) > -1 && yrs.indexOf(bike.y) > -1))) {
+          var hit = bikeRows(bike);
+          var ok = universal || hit.length > 0;
+          openWith = bike;
+          show(ok ? 'ok' : 'no', ok ? 'Passt zu deinem Motorrad!' : 'Passt laut Hersteller nicht zu deinem Motorrad!', {
+            blocks: [tiles([['motorbike', 'Modell', bike.m], ['calendar', 'Baujahr', String(bike.y)]], ok)],
+            note: universal ? 'Universell einsetzbar' : '',
+            button: 'Anderes Motorrad',
+            link: true
+          });
+          markRows(function (tr) { return hit.indexOf(tr) > -1; });
+          return;
+        }
+        if (picked) {
+          renderPick();
+          // Mit der Fahrzeugliste genauer: „alle“ oder „3 von 8“ Modellen
+          if (!catalog && !universal && fams.length === 1 && yrs.length === 1) loadCatalog().then(render, function () {});
+          return;
+        }
+        openWith = null;
+        markRows(function () { return false; });
+        if (universal) { fit.hidden = true; return; }
+        show('ask', 'Passt das zu deinem Motorrad?', { lead: askLead, button: 'Jetzt prüfen' });
+      };
+      render();
+
+      /* ---------- Fenster „Passt es zu deinem Motorrad?“ (snippets/passt-check.liquid) ---------- */
+      if (pcDialog) {
+        var selYear = $('[data-pc-year]', pcDialog);
+        var selFamily = $('[data-pc-family]', pcDialog);
+        var selModel = $('[data-pc-model]', pcDialog);
+        var pcResult = $('[data-pc-result]', pcDialog);
+        var pcResultTitle = $('[data-pc-result-title]', pcDialog);
+        var pcError = $('[data-pc-error]', pcDialog);
+        var pcSave = $('[data-pc-save]', pcDialog);
+        var pcForget = $('[data-pc-forget]', pcDialog);
+        var models = []; // Modelle in der Auswahlliste (Wert = Index)
+        var prefill = null;
+
+        var option = function (value, text) {
+          var o = document.createElement('option');
+          o.value = value;
+          o.textContent = text;
+          return o;
+        };
+        var fill = function (select, placeholder, items) {
+          select.textContent = '';
+          select.appendChild(option('', placeholder));
+          items.forEach(function (it) { select.appendChild(option(it.value, it.text)); });
+          select.disabled = !items.length;
+        };
+        var chosen = function () { return selModel.value === '' ? null : models[+selModel.value] || null; };
+        var showResult = function () {
+          var m = chosen();
+          pcSave.disabled = !m;
+          if (!m) { pcResult.hidden = true; return; }
+          var b = { y: +selYear.value, f: selFamily.value, c: m.c, m: m.n };
+          var ok = universal || bikeRows(b).length > 0;
+          pcResult.dataset.state = ok ? 'ok' : 'no';
+          pcResultTitle.textContent = (ok ? 'Passt zu deiner ' : 'Passt laut Hersteller nicht zu deiner ') + m.n + ' ' + b.y + '!';
+          pcResult.hidden = false;
+        };
+        var fillModels = function () {
+          models = [];
+          var y = +selYear.value;
+          var f = selFamily.value;
+          if (y && f) {
+            var seen = {};
+            catalog.modelle.forEach(function (m) {
+              if (m[0] !== f || m[3] > y || y > m[4]) return;
+              var k = m[1] + '|' + m[2];
+              if (seen[k]) return;
+              seen[k] = true;
+              models.push({ c: m[1], n: m[2] });
+            });
+            models.sort(function (a, b) { return a.n.localeCompare(b.n, 'de'); });
+          }
+          if (f) fill(selModel, 'Modell wählen', models.map(function (m, i) { return { value: i, text: m.n }; }));
+          else fill(selModel, 'Erst Modellfamilie wählen', []);
+          showResult();
+        };
+        var fillFamilies = function () {
+          var y = +selYear.value;
+          var list = [];
+          if (y) {
+            var seen = {};
+            catalog.modelle.forEach(function (m) { if (m[3] <= y && y <= m[4] && !seen[m[0]]) { seen[m[0]] = true; list.push(m[0]); } });
+            list.sort(function (a, b) { return a.localeCompare(b, 'de'); });
+            fill(selFamily, 'Modellfamilie wählen', list.map(function (f) { return { value: f, text: f }; }));
+          } else {
+            fill(selFamily, 'Erst Baujahr wählen', []);
+          }
+          fillModels();
+        };
+        var applyPick = function (p) {
+          var years = catalog.jahre.slice().sort(function (a, b) { return b - a; });
+          fill(selYear, 'Baujahr wählen', years.map(function (y) { return { value: y, text: y }; }));
+          if (p && years.indexOf(+p.y) > -1) selYear.value = String(p.y);
+          fillFamilies();
+          if (p && p.f && selYear.value) {
+            selFamily.value = p.f;
+            if (selFamily.value !== p.f) selFamily.value = '';
+            fillModels();
+            if (selFamily.value && (p.c || p.m)) {
+              var i = -1;
+              models.some(function (m, n) { if ((p.c && m.c === p.c && (!p.m || m.n === p.m)) || (!p.c && m.n === p.m)) { i = n; return true; } return false; });
+              if (i < 0 && p.c) models.some(function (m, n) { if (m.c === p.c) { i = n; return true; } return false; });
+              if (i > -1) selModel.value = String(i);
+              showResult();
+            }
+          }
+        };
+
+        selYear.addEventListener('change', fillFamilies);
+        selFamily.addEventListener('change', fillModels);
+        selModel.addEventListener('change', showResult);
+
+        // Vorauswahl: gemerktes Motorrad bzw. Familie + Jahr aus dem Filter (Zustand der Box beim Klick)
+        root.addEventListener('click', function (event) {
+          if (event.target.closest('[data-pc-open]')) prefill = openWith;
         });
-        $$('[data-fam]').forEach(function (li) {
-          var family = li.dataset.fam;
-          if (fams.indexOf(family) > -1 && yrs.some(function (y) { return fits(family, y); })) li.classList.add('is-match');
+        pcDialog.addEventListener('ps:open', function () {
+          var p = prefill || readBike();
+          prefill = null;
+          pcError.hidden = true;
+          if (pcForget) pcForget.hidden = !readBike();
+          if (catalog) { applyPick(p); return; }
+          fill(selYear, 'Lädt …', []);
+          fill(selFamily, 'Erst Baujahr wählen', []);
+          fill(selModel, 'Erst Modellfamilie wählen', []);
+          pcResult.hidden = true;
+          pcSave.disabled = true;
+          loadCatalog().then(function () { applyPick(p); }, function () {
+            fill(selYear, 'Nicht verfügbar', []);
+            pcError.hidden = false;
+          });
         });
+
+        pcSave.addEventListener('click', function () {
+          var m = chosen();
+          if (!m) return;
+          writeBike({ y: +selYear.value, f: selFamily.value, c: m.c, m: m.n });
+          // Die eigene Wahl gilt vor dem Filter der Liste, aus der man kam
+          fams = [];
+          yrs = [];
+          try { window.sessionStorage.removeItem(PICK_KEY); } catch (e) {}
+          pcDialog.close();
+          render();
+        });
+        if (pcForget) {
+          pcForget.addEventListener('click', function () {
+            writeBike(null);
+            pcDialog.close();
+            render();
+          });
+        }
       }
     }
 
