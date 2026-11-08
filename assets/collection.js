@@ -235,6 +235,7 @@
 
       var freshSort = $('[data-sort]:checked', next);
       if (freshSort) syncSort(freshSort.value);
+      initPrice();
 
       var title = doc.querySelector('title');
       var text = title ? title.textContent.replace(/\s+/g, ' ').trim() : '';
@@ -242,44 +243,77 @@
     }
 
     /* ---------- Preis: Doppelregler und Zahlenfelder gleichen sich ab ----------
-       Die Felder tragen die Filterwerte, die Regler haben keinen name. Ganz links bzw. rechts bleibt das Feld leer
-       (keine Grenze). Geladen wird erst beim Loslassen (change), siehe unten. */
-    function paintPrice(slider, lo, hi, max) {
-      slider.style.setProperty('--lo', max ? lo.value / max : 0);
-      slider.style.setProperty('--hi', max ? hi.value / max : 1);
-      // Liegen beide Knöpfe aufeinander, muss der passende oben liegen: rechts der untere Wert (zieht nach links), links der obere
-      lo.style.zIndex = +lo.value > max / 2 ? '3' : '';
-      lo.setAttribute('aria-valuetext', lo.value + ' €');
-      hi.setAttribute('aria-valuetext', hi.value + ' €');
+       Die Felder tragen die Filterwerte, die Regler (0–1000, ohne name) nur die Lage. Die Skala ist quadratisch: die
+       ersten 10 % des Wegs decken 1 % der Preisspanne ab, so lassen sich günstige Teile fein eingrenzen. Ganz links bzw.
+       rechts bleibt das Feld leer (keine Grenze). Geladen wird erst beim Loslassen (change), siehe unten. */
+    var STEPS = 1000;
+    function toPrice(pos, max) {
+      if (pos >= STEPS) return max;
+      var v = max * Math.pow(pos / STEPS, 2);
+      var step = v < 100 ? 1 : v < 1000 ? 10 : 50;
+      return Math.min(max, Math.round(v / step) * step);
     }
+    function toPos(price, max) {
+      if (!max) return 0;
+      return Math.round(Math.sqrt(Math.min(Math.max(price, 0), max) / max) * STEPS);
+    }
+    function priceParts(slider) {
+      var frange = slider.closest('.frange');
+      return {
+        lo: $('[data-price-lo]', slider),
+        hi: $('[data-price-hi]', slider),
+        nmin: frange && $('[data-price-min]', frange),
+        nmax: frange && $('[data-price-max]', frange),
+        max: +slider.dataset.max || 0
+      };
+    }
+    function paintPrice(slider, p) {
+      slider.style.setProperty('--lo', p.lo.value / STEPS);
+      slider.style.setProperty('--hi', p.hi.value / STEPS);
+      // Liegen beide Knöpfe aufeinander, muss der passende oben liegen: rechts der untere Wert (zieht nach links), links der obere
+      p.lo.style.zIndex = +p.lo.value > STEPS / 2 ? '3' : '';
+      p.lo.setAttribute('aria-valuetext', toPrice(+p.lo.value, p.max) + ' €');
+      p.hi.setAttribute('aria-valuetext', toPrice(+p.hi.value, p.max) + ' €');
+    }
+    // Regler aus den Feldern stellen: beim Start und nach jedem Austausch der Filterfelder
+    function initPrice() {
+      $$('[data-price-slider]').forEach(function (slider) {
+        var p = priceParts(slider);
+        if (!p.lo || !p.hi || !p.nmin || !p.nmax || !p.max) return;
+        var x = p.nmin.value === '' ? 0 : toPos(+p.nmin.value || 0, p.max);
+        var y = p.nmax.value === '' ? STEPS : toPos(+p.nmax.value || 0, p.max);
+        p.lo.value = Math.min(x, y);
+        p.hi.value = y;
+        paintPrice(slider, p);
+        slider.hidden = false;
+      });
+    }
+    initPrice();
+
     root.addEventListener('input', function (event) {
       var el = event.target;
       var frange = el.closest('.frange');
       var slider = frange && $('[data-price-slider]', frange);
       if (!slider) return;
-      var lo = $('[data-price-lo]', slider);
-      var hi = $('[data-price-hi]', slider);
-      var nmin = $('[data-price-min]', frange);
-      var nmax = $('[data-price-max]', frange);
-      var max = +slider.dataset.max || 0;
-      if (!lo || !hi || !nmin || !nmax) return;
-      if (el === lo || el === hi) {
-        var a = +lo.value;
-        var b = +hi.value;
-        if (a > b) {
-          if (el === lo) { lo.value = b; a = b; } else { hi.value = a; b = a; }
+      var p = priceParts(slider);
+      if (!p.lo || !p.hi || !p.nmin || !p.nmax) return;
+      if (el === p.lo || el === p.hi) {
+        if (+p.lo.value > +p.hi.value) {
+          if (el === p.lo) p.lo.value = p.hi.value; else p.hi.value = p.lo.value;
         }
-        nmin.value = a > 0 ? a : '';
-        nmax.value = b < max ? b : '';
-      } else if (el === nmin || el === nmax) {
-        var x = nmin.value === '' ? 0 : Math.min(Math.max(+nmin.value || 0, 0), max);
-        var y = nmax.value === '' ? max : Math.min(Math.max(+nmax.value || 0, 0), max);
-        lo.value = Math.min(x, y);
-        hi.value = y;
+        var a = toPrice(+p.lo.value, p.max);
+        var b = toPrice(+p.hi.value, p.max);
+        p.nmin.value = a > 0 ? a : '';
+        p.nmax.value = +p.hi.value < STEPS ? b : '';
+      } else if (el === p.nmin || el === p.nmax) {
+        var x = p.nmin.value === '' ? 0 : toPos(+p.nmin.value || 0, p.max);
+        var y = p.nmax.value === '' ? STEPS : toPos(+p.nmax.value || 0, p.max);
+        p.lo.value = Math.min(x, y);
+        p.hi.value = y;
       } else {
         return;
       }
-      paintPrice(slider, lo, hi, max);
+      paintPrice(slider, p);
     });
 
     /* ---------- Eingaben ---------- */
