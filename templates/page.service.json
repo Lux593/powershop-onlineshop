@@ -57,12 +57,25 @@
             "image_srcset": "ueber-uns-crew-720.jpg 720w, ueber-uns-crew-1280.jpg 1280w, ueber-uns-crew-1600.jpg 1600w",
             "image_position": "50% 40%"
           }
+        },
+        "tuer_events": {
+          "type": "door",
+          "settings": {
+            "title": "Events",
+            "subtitle": "Ausfahrten, Bike Nights & Werkstatt-Tage",
+            "url": "shopify://pages/events",
+            "anchor": "events",
+            "image_asset": "tuer-events-1920.webp",
+            "image_srcset": "tuer-events-720.webp 720w, tuer-events-1280.webp 1280w, tuer-events-1920.webp 1920w",
+            "image_position": "50% 55%"
+          }
         }
       },
       "block_order": [
         "tuer_werkstatt",
         "tuer_dienstleistungen",
-        "tuer_ueber_uns"
+        "tuer_ueber_uns",
+        "tuer_events"
       ],
       "settings": {
         "heading": "Service",
