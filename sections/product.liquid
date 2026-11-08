@@ -380,10 +380,10 @@
                 <div class="compat__fit-bikes" data-compat-fit-bikes></div>
                 <p data-compat-fit-text></p>
               </div>
-              <div class="compat__head">
-                <div class="compat__title">{% render 'icon', name: 'badge-check' %}<strong>{% if years_label == '(universell)' %}Passt für alle Modelle{% else %}Passt für{% endif %}</strong></div>
-              </div>
               {%- if years_label == '(universell)' -%}
+                <div class="compat__head">
+                  <div class="compat__title">{% render 'icon', name: 'badge-check' %}<strong>Passt für alle Modelle</strong></div>
+                </div>
                 <p class="compat__note">Universell einsetzbar · Angaben laut Hersteller</p>
               {%- elsif compat.size > 0 -%}
                 {%- liquid
@@ -406,6 +406,15 @@
                   endfor
                   assign fam_list = fam_order | remove_first: '|' | split: '|'
                 -%}
+                {%- comment -%} „Passt für“ klappt wie „Alle kompatiblen Modelle“, standardmäßig zu {%- endcomment -%}
+                <details class="compat__acc">
+                  <summary>
+                    <span class="compat__sum">
+                      {% render 'icon', name: 'badge-check' %}
+                      <span><strong>Passende Modellfamilien anzeigen</strong><small>{{ fam_list.size }} {% if fam_list.size == 1 %}Modellfamilie{% else %}Modellfamilien{% endif %}{% if years_label != blank %} · {{ years_label | escape }}{% endif %}</small></span>
+                    </span>
+                    {%- render 'icon', name: 'chevron-down', class: 'icon--sm' -%}
+                  </summary>
                 <ul class="compat__fams">
                   {%- for fam in fam_list -%}
                     {%- liquid
@@ -458,6 +467,7 @@
                     </li>
                   {%- endfor -%}
                 </ul>
+                </details>
                 <details>
                   <summary>
                     <span class="compat__sum">
@@ -487,6 +497,9 @@
                   </div>
                 </details>
               {%- elsif families.size > 0 -%}
+                <div class="compat__head">
+                  <div class="compat__title">{% render 'icon', name: 'badge-check' %}<strong>Passt für</strong></div>
+                </div>
                 <p class="compat__note">{{ families | join: ', ' | escape }}{% if years_label != blank %} · {{ years_label | escape }}{% endif %} · Angaben laut Hersteller</p>
               {%- endif -%}
               <div class="compat__foot">

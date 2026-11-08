@@ -247,6 +247,7 @@
 .compat__title .icon { width: 20px; height: 20px; flex: none; color: var(--c-muted); }
 .compat__note { padding: 0 16px 16px var(--compat-indent); font-size: var(--fs-small); color: var(--c-text-soft); }
 .compat__fams { list-style: none; margin: 0; padding: 0 16px 8px var(--compat-indent); font-size: var(--fs-small); } /* gleiche Größe wie die Modellliste */
+.compat > .compat__acc:first-child > summary, .compat__fit + .compat__acc > summary { border-top: 0; } /* oben schließt der Rahmen bzw. die Auswahl ab */
 .compat__fam { position: relative; display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 10px 0; border-top: 1px solid var(--c-line); }
 .compat__fam:first-child { border-top: 0; }
 .compat__fam-name { overflow-wrap: anywhere; }
