@@ -35,18 +35,18 @@
 }
 .footer__cols a:hover, .footer__cols a:focus-visible, .footer__cols button:hover, .footer__cols button:focus-visible { color: var(--c-white); background-size: 100% 2px; }
 /* „Folge uns“ (seit 8.11.): über die volle Breite, Überschrift mittig, die Netze darunter in einer Reihe aus gleich breiten Feldern
-   (bei drei Netzen 3 × 1), Symbol über dem Namen. Rahmen wie die Händlerkarte darunter; beim Überfahren füllt sich das Feld. */
+   (bei drei Netzen 3 × 1), Symbol über dem Namen. Ohne Rahmen (Wunsch des Nutzers); beim Überfahren füllt sich das Feld leicht. */
 .footer__follow { grid-column: 1 / -1; text-align: center; }
 .footer__follow h2 { margin-bottom: 16px; }
 .footer__social.social--labels { grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 8px; max-width: 560px; margin-inline: auto; }
 .footer__social .social__link {
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
   width: 100%; height: auto; min-height: 84px; padding: 14px 8px; text-align: center;
-  border: 1px solid var(--c-steel); border-radius: var(--radius); background: none; font-size: var(--fs-small); color: var(--c-on-dark);
-  transition: background-color var(--t-fast), border-color var(--t-fast), color var(--t-fast);
+  border-radius: var(--radius); background: none; font-size: var(--fs-small); color: var(--c-on-dark);
+  transition: background-color var(--t-fast), color var(--t-fast);
 }
 .footer__social .social__link .icon { width: 24px; height: 24px; }
-.footer__social .social__link:hover, .footer__social .social__link:focus-visible { color: var(--c-white); background: var(--c-anthracite); border-color: var(--c-orange); }
+.footer__social .social__link:hover, .footer__social .social__link:focus-visible { color: var(--c-white); background: var(--c-anthracite); }
 /* Händlerkarte (seit 8.11.) immer über die volle Breite unter „Folge uns“; ab 640 px Logo und Text mittig nebeneinander */
 .footer__dealer { grid-column: 1 / -1; display: flex; gap: 16px; align-items: center; padding: 20px; border: 1px solid var(--c-steel); background: var(--c-anthracite); align-self: start; }
 @media (min-width: 640px) { .footer__dealer { justify-content: center; gap: 20px; padding: 24px; } }
