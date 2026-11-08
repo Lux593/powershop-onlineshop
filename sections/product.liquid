@@ -473,7 +473,8 @@
                         {%- endfor -%}
                       </table>
                     </div>
-                    <p class="small muted" data-compat-empty hidden>Kein passendes Modell gefunden – frag uns kurz, wir prüfen das für dich.</p>
+                    {%- comment -%} Leere Suche: Die Liste enthält nur passende Modelle. Wer sein Modell hier nicht findet, soll nicht denken, es fehle im Shop {%- endcomment -%}
+                    <p class="small muted" data-compat-empty hidden>Nicht in der Liste? Dann passt das Teil laut Hersteller nicht zu diesem Modell. <button class="text-link" type="button" data-open="passt-check" data-pc-open>Motorrad genau prüfen</button> oder <a class="text-link" href="#werkstatt-kontakt" data-contact-topic="kompatibilitaet">frag unsere Werkstatt</a>.</p>
                   </div>
                 </details>
               {%- elsif families.size > 0 -%}
