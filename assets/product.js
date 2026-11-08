@@ -517,16 +517,16 @@
         bikes.textContent = '';
         if (!misses.length) {
           state = 'ok';
-          title = single ? 'Passt zu deinem Motorrad' : 'Passt zu deiner Auswahl';
+          title = single ? 'Passt zu deinem Motorrad!' : 'Passt zu deiner Auswahl!';
           bikes.appendChild(bikeRow('', hits, true));
         } else if (hits.length) {
           state = 'partial';
-          title = 'Passt zu einem Teil deiner Auswahl';
+          title = 'Passt zu einem Teil deiner Auswahl!';
           bikes.appendChild(bikeRow('Passt', hits, true));
           bikes.appendChild(bikeRow('Passt nicht', misses, false));
         } else {
           state = 'no';
-          title = single ? 'Passt laut Hersteller nicht zu deinem Motorrad' : 'Passt laut Hersteller nicht zu deiner Auswahl';
+          title = single ? 'Passt laut Hersteller nicht zu deinem Motorrad!' : 'Passt laut Hersteller nicht zu deiner Auswahl!';
           bikes.appendChild(bikeRow('', misses, false));
         }
         $('[data-compat-fit-title]', fit).textContent = title;
