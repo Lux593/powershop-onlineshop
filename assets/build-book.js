@@ -3,7 +3,7 @@
    Liquid rendert alle Umbauten offen untereinander; dieses Modul macht daraus Boxen:
    - Desktop: gleich breite Paneele, die sich überlappen und nur per transform verschieben. Alle zu = schmale Paneele
      (180 bis 260 px) mittig, eins offen = Infos + Bildblock, die anderen 110 bis 220 px.
-   - Handy: Streifen untereinander. Ein angetippter Streifen fährt unter den Header und klappt im selben Takt auf (openMobile).
+   - Handy: Streifen untereinander. Ein angetippter Umbau steht sofort offen unter dem Header, die Seite blendet über (showMobile).
    - Bildblock: Kacheln durch wiederholtes Teilen eines Rechtecks, jedes Foto behält sein Format (kein Beschnitt).
    - Vollbild: <dialog>, Foto wächst aus der Kachel, Wischen, Pfeiltasten, Bildleiste.
    - Infos scrollen nie: Die Box bekommt die Höhe bis zum Bildschirmrand, --fit verkleinert Schrift und Abstände
@@ -229,31 +229,15 @@
         el.querySelector('.bb-room').inert = !on;
       });
     }
-    /* ---------------- Handy: Aufklappen als eine Bewegung ----------------
-       Seit 8.11.: Der angetippte Streifen geht auf wie ein Fenster, das sich über den ganzen Bildschirm öffnet: Seine Oberkante
-       fährt zum Header, seine Unterkante im selben Takt zum unteren Bildschirmrand, der Inhalt wird dabei von oben nach unten
-       sichtbar. Erst am Ende bekommt der Umbau seine volle Höhe (unterhalb des Bildschirms, man sieht es nicht). Höhe und
-       Scrollposition hängen an einem gemeinsamen Zeitstrahl (openMobile, 700 ms, Kurve wie --ease), das Skript setzt beide in
-       jedem Bild. Bis dahin klappte CSS auf, und der Browser glitt getrennt davon mit eigener Dauer und Kurve nach oben: Das
-       Fenster war sofort offen und scrollte danach hoch (am iPhone brach das Gleiten sogar ab, und man landete mitten im Umbau).
-       - Liegt der bisher offene Umbau darüber, klappt er vorher sofort zu, und die Seite rückt um genau so viel nach, dass am
-         Bildschirm nichts springt (snapAbove). Sonst schrumpfte die Seite oberhalb des Streifens, während er hochfährt.
-       - Das Ziel rechnet firstTop, auch für das Rolltor der Werkstatt. Am Ende steht der Kopf genau unter dem Header.
-       - Scrollt oder tippt der Besucher währenddessen, folgt die Seite nicht mehr; das Aufklappen läuft zu Ende.
-       - Ohne Bewegung (reduzierte Bewegung) springt die Seite sofort hin. */
-    var OPEN_MS = 700;
-    // Kurve wie --ease (tokens.css): cubic-bezier(.2, .7, .2, 1), x zu y per Halbierung
-    function easeOpen(x) {
-      if (x <= 0) return 0;
-      if (x >= 1) return 1;
-      function bz(t, p1, p2) { var u = 1 - t; return 3 * u * u * t * p1 + 3 * u * t * t * p2 + t * t * t; }
-      var lo = 0, hi = 1, t = x;
-      for (var k = 0; k < 24; k++) {
-        t = (lo + hi) / 2;
-        if (bz(t, 0.2, 0.2) < x) lo = t; else hi = t;
-      }
-      return bz(t, 0.7, 1);
-    }
+    /* ---------------- Handy: Öffnen ohne Gleiten ----------------
+       Seit 8.11. (zweite Fassung am selben Tag, Wunsch des Nutzers): Beim Antippen steht der Umbau sofort an seinem Platz, der
+       Kopf direkt unter dem Header, egal wo man gerade war. Die Seite blendet dabei über wie beim Seitenwechsel im Shop (View
+       Transition: Der Header behält seinen Namen site-header und bleibt stehen, der Rest blendet über, build-book.css), dann
+       lädt der Inhalt herein (Kopf, Bilder, Text nacheinander). Kein Scrollen, das man sieht: Davor fuhr der Streifen nach oben
+       (erst vom Browser, dann im Takt mit dem Aufklappen), je nach Scrollstand mal weit, mal kurz, das wirkte unruhig.
+       - Alles in einem Schritt (showMobile): offener Umbau zu, neuer auf, Seite springt zum Ziel, jeweils ohne Übergang.
+       - Das Ziel rechnet firstTop, auch für das Rolltor der Werkstatt.
+       - Ohne View Transitions (ältere Browser), ohne Bewegung und im Theme-Editor dasselbe ohne Überblendung. */
     function headerOffset() {
       var shown = parseFloat(getComputedStyle(html).getPropertyValue('--header-shown'));
       return cssPx('--header-h', html) * (isNaN(shown) ? 1 : shown);
@@ -285,67 +269,30 @@
       window.scrollTo(0, y);
       html.style.scrollBehavior = sb;
     }
-    // Den offenen Umbau darüber sofort zuklappen, die Seite rückt nach (Lage des neuen Umbaus bleibt am Bildschirm)
-    function snapAbove(prev, bi, apply) {
-      var before = els[bi].getBoundingClientRect().top;
+    // Endzustand in einem Schritt: Höhen ohne Übergang, dann zum Ziel springen
+    function showMobile(prev, bi, apply) {
       var anchor = html.style.overflowAnchor;
-      // Chrome hielte die Lage sonst selbst fest (Scroll-Anker) und das Nachrücken unten käme doppelt
+      // Chrome hielte sonst die Lage des sichtbaren Inhalts fest (Scroll-Anker) und verschöbe das Ziel
       html.style.overflowAnchor = 'none';
-      els[prev].style.transition = 'none';
+      var moved = prev >= 0 ? [els[prev], els[bi]] : [els[bi]];
+      moved.forEach(function (el) { el.style.transition = 'none'; });
+      if (PS.headerQuiet) PS.headerQuiet(1200);
       apply();
-      var d = els[bi].getBoundingClientRect().top - before;
-      if (Math.abs(d) >= 1) jumpTo(window.scrollY + d);
-      void els[prev].offsetHeight;
-      els[prev].style.transition = '';
-      requestAnimationFrame(function () { html.style.overflowAnchor = anchor; });
+      jumpTo(goalMobile(bi));
+      void els[bi].offsetHeight;
+      moved.forEach(function (el) { el.style.transition = ''; });
+      // Gegenprobe im nächsten Bild: Lief beim Antippen noch ein weiches Scrollen (Anker, scrollIntoView), schiebt Chrome dessen Rest
+      // auf den Sprung drauf. Dann noch einmal hin (in der Überblendung, bevor das neue Bild steht)
+      requestAnimationFrame(function () {
+        var off = els[bi].getBoundingClientRect().top - headerOffset();
+        if (open === bi && Math.abs(off) >= 1) jumpTo(goalMobile(bi));
+        html.style.overflowAnchor = anchor;
+      });
     }
-    var opening = null; // laufendes Aufklappen am Handy: Funktion zum Abbrechen
-    function openMobile(bi, h0) {
-      var el = els[bi];
-      var h1 = parseFloat(el.style.getPropertyValue('--open-h')) || el.querySelector('.bb-room').scrollHeight;
-      var y0 = window.scrollY, y1 = goalMobile(bi);
-      // Höhe am Ende der Bewegung: bis zum unteren Bildschirmrand (Unterkante des Fensters), höchstens die volle Höhe
-      var hv = Math.min(h1, Math.max(h0, window.innerHeight - headerOffset()));
-      if (PS.headerQuiet) PS.headerQuiet(OPEN_MS + 800);
-      var raf = 0, t0 = 0, follow = true, sb = html.style.scrollBehavior;
-      var stops = ['touchstart', 'wheel', 'keydown'];
-      function letGo() { follow = false; }
-      // instant: Höhe sofort auf das Ziel (Ende, reduzierte Bewegung). Sonst übernimmt CSS ab der jetzigen Höhe (Abbruch).
-      function finish(instant) {
-        cancelAnimationFrame(raf);
-        stops.forEach(function (t) { window.removeEventListener(t, letGo, true); });
-        html.style.scrollBehavior = sb;
-        if (instant) { el.style.height = ''; void el.offsetHeight; el.style.transition = ''; }
-        else { el.style.transition = ''; void el.offsetHeight; el.style.height = ''; }
-        if (opening === finish) opening = null;
-      }
-      function setScroll(y) {
-        if (PS.lenis && !PS.lenis.isStopped) PS.lenis.scrollTo(y, { immediate: true });
-        else window.scrollTo(0, y);
-      }
-      function frame(now) {
-        if (!t0) t0 = now;
-        var x = Math.min(1, (now - t0) / OPEN_MS), p = easeOpen(x);
-        el.style.height = (h0 + (hv - h0) * p).toFixed(1) + 'px';
-        if (follow) setScroll(Math.round(y0 + (y1 - y0) * p));
-        if (x < 1) { raf = requestAnimationFrame(frame); return; }
-        finish(true);
-        // Letzter Abgleich mit der fertigen Seite (z. B. wenn sich die Höhe des Headers geändert hat)
-        if (follow) { var y = goalMobile(bi); if (Math.abs(y - window.scrollY) >= 1) jumpTo(y); }
-      }
-      opening = finish;
-      if (reduce) { finish(true); jumpTo(goalMobile(bi)); return; }
-      html.style.scrollBehavior = 'auto';
-      stops.forEach(function (t) { window.addEventListener(t, letGo, { capture: true, passive: true }); });
-      raf = requestAnimationFrame(frame);
-    }
+    var vt = null; // laufende Überblendung
     function openBay(bi, fromEditor) {
       if (bi === open) return;
-      var prev = open, phone = mobile(), el = els[bi];
-      if (opening) opening();
-      // Handy: Höhe festhalten, bevor is-open greift, damit nicht CSS aufklappt, sondern openMobile im Takt mit dem Scrollen
-      var h0 = phone ? el.getBoundingClientRect().height : 0;
-      if (phone) { el.style.transition = 'none'; el.style.height = h0 + 'px'; }
+      var prev = open, phone = mobile();
       function apply() {
         open = bi;
         eager(bi);
@@ -354,22 +301,34 @@
         renderGallery(bi);
         fitMobile(bi);
       }
-      if (phone && prev >= 0 && prev < bi) snapAbove(prev, bi, apply);
-      else apply();
-      if (phone) openMobile(bi, h0);
+      if (!phone) apply();
+      else {
+        if (vt) vt.skipTransition();
+        var fade = !reduce && !fromEditor && !!document.startViewTransition && !!(PS.motion && PS.motion.enabled) && !document.querySelector('dialog[open]');
+        if (!fade) showMobile(prev, bi, apply);
+        else {
+          html.classList.add('is-vt-bay');
+          var transition = vt = document.startViewTransition(function () { showMobile(prev, bi, apply); });
+          // Nur die jüngste Überblendung räumt auf; übersprungene melden sonst „Uncaught (in promise)“
+          var done = function () { if (vt !== transition) return; vt = null; html.classList.remove('is-vt-bay'); };
+          transition.ready.catch(function () {});
+          transition.updateCallbackDone.catch(function () {});
+          transition.finished.then(done, done);
+        }
+      }
       if (!reduce) {
-        // Am Handy beginnt der Inhalt früher: Er wird sichtbar, während das Fenster aufgeht, nicht erst danach
-        var t = phone ? { pd: 60, ps: 40, pl: 500, id: 140, is: 50, il: 550 } : { pd: 280, ps: 60, pl: 600, id: 360, is: 70, il: 700 };
+        // Inhalt lädt herein: Kopf und Text gleiten nacheinander hoch, die Bilder wachsen leicht. Am Handy etwas früher, er steht
+        // dort schon an seinem Platz.
+        var t = phone ? { pd: 120, ps: 45, pl: 520, id: 180, is: 55, il: 600 } : { pd: 280, ps: 60, pl: 600, id: 360, is: 70, il: 700 };
         var parts = els[bi].querySelectorAll('.bb-head-box > *, .bb-info > *'), items = els[bi].querySelectorAll('.bb-item:not(.is-extra)');
         [].forEach.call(parts, function (n, k) { n.animate([{ opacity: 0, transform: 'translateY(16px)' }, { opacity: 1, transform: 'none' }], { duration: t.pl, delay: t.pd + k * t.ps, easing: EASE, fill: 'backwards' }); });
         [].forEach.call(items, function (n, k) { n.animate([{ opacity: 0, transform: 'scale(.94)' }, { opacity: 1, transform: 'none' }], { duration: t.il, delay: t.id + k * t.is, easing: EASE, fill: 'backwards' }); });
       }
-      if (!fromEditor) setTimeout(function () { els[bi].querySelector('.bb-close').focus({ preventScroll: true }); }, reduce ? 0 : 400);
+      if (!fromEditor) setTimeout(function () { els[bi].querySelector('.bb-close').focus({ preventScroll: true }); }, reduce ? 0 : 450);
       say('Umbau ' + data[bi].name + ' geöffnet, Basis ' + data[bi].base + ', ' + data[bi].photos.length + ' Bilder');
     }
     function closeBay() {
       if (open < 0) return;
-      if (opening) opening();
       var prev = open;
       open = -1;
       setState();
