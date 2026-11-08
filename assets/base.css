@@ -77,6 +77,12 @@ h4, .h4 { font-size: var(--fs-h4); letter-spacing: 0.03em; }
 
 /* Lokale Entwicklung (layout/theme.liquid setzt .is-local-dev nur auf localhost): Cookie-Banner von Shopify ausblenden */
 .is-local-dev #shopify-pc__banner { display: none !important; }
+/* Shopifys Cookie-Banner erst nach dem Intro der Startseite (seit 8.11.): Solange das Intro läuft (html.intro-on, snippets/intro.liquid,
+   assets/intro.js), verdeckte der Banner die Animation. Er bleibt so lange unsichtbar und blendet ein, sobald das Intro fertig ist oder
+   übersprungen wird. intro-on fällt immer weg (Ende, Überspringen, spätestens 6 s ohne Intro-Skript, layout/theme.liquid), der Banner
+   kann also nicht verborgen bleiben. Rechtlich unkritisch: Shopify lädt Analyse und Marketing ohnehin erst nach der Zustimmung. */
+#shopify-pc__banner { transition: opacity 400ms ease, visibility 0s; }
+html.intro-on #shopify-pc__banner { opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; transition: none; }
 
 /* Barrierefreiheit */
 .skip-link {
