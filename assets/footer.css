@@ -47,8 +47,9 @@
 }
 .footer__social .social__link .icon { width: 24px; height: 24px; }
 .footer__social .social__link:hover, .footer__social .social__link:focus-visible { color: var(--c-white); background: var(--c-anthracite); }
-/* Händlerkarte (seit 8.11.) immer über die volle Breite unter „Folge uns“; ab 640 px Logo und Text mittig nebeneinander */
-.footer__dealer { grid-column: 1 / -1; display: flex; gap: 16px; align-items: center; padding: 20px; border: 1px solid var(--c-steel); background: var(--c-anthracite); align-self: start; }
+/* Händlerkarte (seit 8.11.) immer über die volle Breite unter „Folge uns“, ohne Rahmen (Wunsch des Nutzers); ab 640 px Logo und Text
+   mittig nebeneinander */
+.footer__dealer { grid-column: 1 / -1; display: flex; gap: 16px; align-items: center; padding: 20px; background: var(--c-anthracite); align-self: start; }
 @media (min-width: 640px) { .footer__dealer { justify-content: center; gap: 20px; padding: 24px; } }
 .footer__dealer img { height: 56px; width: auto; }
 .footer__dealer p { font-size: var(--fs-small); color: var(--c-muted-dark); }

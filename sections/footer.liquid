@@ -11,8 +11,8 @@
   comment
     Die Spalte „Soziale Netze“ erscheint erst, wenn mindestens ein Profil hinterlegt ist. Seit 8.11. steht sie nicht mehr als Spalte
     neben den Links, sondern darunter über die volle Breite: „Folge uns“ mittig, die Netze in einer Reihe aus gleich breiten Feldern
-    (Symbol über dem Namen), darunter die Händlerkarte, ebenfalls über die volle Breite; sie gleitet beim Reinscrollen von links herein
-    (data-reveal="left", motion.js). Das Raster der Spalten zählt darum nur noch die Link-Spalten.
+    (Symbol über dem Namen), darunter die Händlerkarte, ebenfalls über die volle Breite; sie fährt wie bisher im Takt des Scrollens
+    von rechts herein (footer.css, dealer-in). Das Raster der Spalten zählt darum nur noch die Link-Spalten.
     Eine Link-Spalte erscheint erst ab zwei Menüpunkten. Die angehängten Links (Größentabelle,
     Cookie-Einstellungen) einer ausgeblendeten Spalte wandern in die Fußzeile und bleiben erreichbar.
     Auch der einzelne Menüpunkt einer ausgeblendeten Spalte (z. B. nur „Impressum“) steht dann in der Fußzeile:
@@ -123,8 +123,11 @@
       {%- endcase -%}
     {%- endfor -%}
 
-    {%- comment -%} Händlerkarte über die volle Breite unter allem anderen, gleitet beim Reinscrollen von links herein {%- endcomment -%}
-    <div class="footer__dealer" data-reveal="left">
+    {%- comment -%}
+      Händlerkarte über die volle Breite unter allem anderen. Sie fährt beim Scrollen von rechts herein (footer.css, dealer-in). Kein
+      data-reveal: dessen Animation (motion.css) schlüge die scroll-gesteuerte und ersetzte sie durch ein kurzes Einblenden.
+    {%- endcomment -%}
+    <div class="footer__dealer">
       <img src="{{ 'hd-bar-shield.png' | asset_url }}" alt="Harley-Davidson Bar &amp; Shield" width="69" height="56" loading="lazy">
       <p>
         <strong>Offizieller Vertragshändler</strong>
