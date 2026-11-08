@@ -144,6 +144,19 @@
 /* Die Laufweite hängt auch hinter den letzten Buchstaben Luft an: zurücknehmen, sonst wirkt der Abstand rechts größer als links */
 .visit__hint > span { margin-right: -0.08em; }
 .visit__fly:hover .visit__hint, .visit__fly:focus-visible .visit__hint { color: var(--c-black); background: var(--c-orange-dark); }
+/* Lichtreflex (seit 8.11., Wunsch des Nutzers, damit man den Knopf als klickbar erkennt): Alle 3 s gleitet ein weicher Lichtstreifen
+   schräg über den Knopf, hinter der Schrift (z-index -1 im eigenen Stapel des Knopfs, isolation). Nur mit Bewegung und solange die
+   Karte im Bild ist (is-seen, assets/visit-film.js); ohne Skript, bei reduzierter Bewegung und im Theme-Editor steht der Knopf still. */
+.visit__hint { overflow: hidden; isolation: isolate; }
+.visit__hint::after {
+  content: ""; position: absolute; z-index: -1; top: -40%; bottom: -40%; left: 0; width: 45%; pointer-events: none; opacity: 0;
+  background: linear-gradient(100deg, transparent 15%, rgb(255 255 255 / 0.55) 50%, transparent 85%);
+  transform: translateX(-160%) skewX(-18deg);
+}
+@keyframes visit-shine { 0% { transform: translateX(-160%) skewX(-18deg); } 40%, 100% { transform: translateX(330%) skewX(-18deg); } }
+@media (prefers-reduced-motion: no-preference) {
+  .has-motion .visit__map--film.is-seen .visit__hint::after { opacity: 1; animation: visit-shine 3s cubic-bezier(0.4, 0, 0.2, 1) 0.6s infinite; }
+}
 @media (min-width: 1024px) { .visit__hint { gap: 9px; padding: 11px 20px 10px; font-size: 18px; } .visit__hint .icon { width: 15px; height: 15px; } }
 .visit__map--film.is-busy { cursor: progress; }
 /* Zurück zur Karte: unten links im Bild, erscheint, wenn der Film am Laden steht */
