@@ -276,13 +276,15 @@
 .compat__fit > div { display: grid; gap: 10px; min-width: 0; overflow-wrap: anywhere; }
 .compat__fit strong { display: block; }
 .compat__fit p { font-size: var(--fs-caption); color: var(--c-muted); }
-/* Das gewählte Motorrad als Kärtchen im Stil des Mengenwählers (.qty): gleiche Kontur, Höhe und Schrift */
-.compat__fit-bikes { display: grid; gap: 8px; }
-.compat__bikes { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-.compat__bikes-label { flex-basis: 100%; font-size: var(--fs-caption); font-weight: 600; color: var(--c-muted); text-transform: uppercase; letter-spacing: 0.06em; }
-.compat__bike { display: inline-flex; align-items: center; gap: 16px; min-height: 48px; padding: 0 16px; background: var(--c-white); border: 1px solid var(--c-border-input); border-radius: var(--radius); }
-.compat__bike-year { font-variant-numeric: tabular-nums; }
-.compat__bike.is-miss { border-color: var(--c-border-soft); color: var(--c-text-soft); }
+/* Das gewählte Motorrad: Kacheln wie die Fakten der Motorrad-Seiten (.bike-facts), immer zwei Spalten, ohne doppelte Außenlinien */
+.compat__fit-bikes { display: grid; gap: 12px; }
+.compat__bikes { display: grid; gap: 8px; }
+.compat__bikes-label { font-size: var(--fs-caption); font-weight: 600; color: var(--c-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.bike-facts.compat__vehicle { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.compat__vehicle div:nth-child(2n) { border-right: 0; }
+.compat__vehicle div:nth-last-child(-n + 2) { border-bottom: 0; }
+.compat__vehicle dd { overflow-wrap: anywhere; }
+.compat__vehicle.is-miss dd { color: var(--c-text-soft); font-weight: 400; }
 .compat__fit-icon { display: none; flex: none; }
 .compat__fit-icon .icon { width: 20px; height: 20px; margin-top: 2px; }
 .compat__fit[data-state="ok"], .compat__fit[data-state="partial"] { background: color-mix(in srgb, var(--c-orange) 8%, var(--c-white)); }

@@ -474,6 +474,23 @@
           });
           return order.map(function (f) { return { f: f, ys: by[f] }; });
         };
+        // Das gewählte Motorrad als Kacheln wie die Fakten der Motorrad-Seiten (.bike-facts): Modellfamilie und Baujahr
+        var vehicle = function (g, hit) {
+          var dl = document.createElement('dl');
+          dl.className = 'bike-facts compat__vehicle' + (hit ? '' : ' is-miss');
+          [['motorbike', 'Modellfamilie', g.f], ['calendar', g.ys.length > 1 ? 'Baujahre' : 'Baujahr', g.ys.join(', ')]].forEach(function (fact) {
+            var cell = document.createElement('div');
+            var dt = document.createElement('dt');
+            dt.innerHTML = '<svg class="icon" aria-hidden="true" focusable="false"><use href="#i-' + fact[0] + '"></use></svg>';
+            dt.appendChild(document.createTextNode(fact[1]));
+            var dd = document.createElement('dd');
+            dd.textContent = fact[2];
+            cell.appendChild(dt);
+            cell.appendChild(dd);
+            dl.appendChild(cell);
+          });
+          return dl;
+        };
         var bikeRow = function (label, list, hit) {
           var row = document.createElement('div');
           row.className = 'compat__bikes';
@@ -483,19 +500,7 @@
             l.textContent = label;
             row.appendChild(l);
           }
-          groups(list).forEach(function (g) {
-            var tag = document.createElement('span');
-            tag.className = 'compat__bike' + (hit ? '' : ' is-miss');
-            var name = document.createElement('span');
-            name.className = 'compat__bike-name';
-            name.textContent = g.f;
-            var year = document.createElement('span');
-            year.className = 'compat__bike-year';
-            year.textContent = g.ys.join(', ');
-            tag.appendChild(name);
-            tag.appendChild(year);
-            row.appendChild(tag);
-          });
+          groups(list).forEach(function (g) { row.appendChild(vehicle(g, hit)); });
           return row;
         };
         var hits = [];
