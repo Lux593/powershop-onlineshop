@@ -290,6 +290,12 @@
       });
     }
     var vt = null; // laufende Überblendung
+    // Inhalt lädt herein: Kopf und Text gleiten nacheinander hoch, die Bilder wachsen leicht
+    function enter(bi, t, head) {
+      var parts = els[bi].querySelectorAll(head ? '.bb-head-box > *, .bb-info > *' : '.bb-info > *'), items = els[bi].querySelectorAll('.bb-item:not(.is-extra)');
+      [].forEach.call(parts, function (n, k) { n.animate([{ opacity: 0, transform: 'translateY(16px)' }, { opacity: 1, transform: 'none' }], { duration: t.pl, delay: t.pd + k * t.ps, easing: EASE, fill: 'backwards' }); });
+      [].forEach.call(items, function (n, k) { n.animate([{ opacity: 0, transform: 'scale(.94)' }, { opacity: 1, transform: 'none' }], { duration: t.il, delay: t.id + k * t.is, easing: EASE, fill: 'backwards' }); });
+    }
     function openBay(bi, fromEditor) {
       if (bi === open) return;
       var prev = open, phone = mobile();
@@ -301,28 +307,32 @@
         renderGallery(bi);
         fitMobile(bi);
       }
-      if (!phone) apply();
-      else {
+      if (!phone) {
+        apply();
+        if (!reduce) enter(bi, { pd: 280, ps: 60, pl: 600, id: 360, is: 70, il: 700 }, true);
+      } else {
         if (vt) vt.skipTransition();
+        // Handy, seit 8.11.: erst steht der Umbau mit seinem Namen offen da (Überblendung), dann laden Bilder und Text herein,
+        // nacheinander statt gleichzeitig. Liefen beide zusammen, war am Ende der Überblendung der Inhalt halb eingeblendet, das
+        // alte Bild verschwand auf einen Schlag, und es flackerte einmal nach. Bis zum Hereinladen hält is-entering Bilder und Text
+        // verborgen (build-book.css).
+        var el = els[bi];
+        var go = function () {
+          el.classList.remove('is-entering');
+          if (open === bi && !reduce) enter(bi, { pd: 140, ps: 35, pl: 440, id: 0, is: 40, il: 460 }, false);
+        };
+        if (!reduce) el.classList.add('is-entering');
         var fade = !reduce && !fromEditor && !!document.startViewTransition && !!(PS.motion && PS.motion.enabled) && !document.querySelector('dialog[open]');
-        if (!fade) showMobile(prev, bi, apply);
+        if (!fade) { showMobile(prev, bi, apply); go(); }
         else {
           html.classList.add('is-vt-bay');
           var transition = vt = document.startViewTransition(function () { showMobile(prev, bi, apply); });
           // Nur die jüngste Überblendung räumt auf; übersprungene melden sonst „Uncaught (in promise)“
-          var done = function () { if (vt !== transition) return; vt = null; html.classList.remove('is-vt-bay'); };
+          var done = function () { if (vt === transition) { vt = null; html.classList.remove('is-vt-bay'); } go(); };
           transition.ready.catch(function () {});
           transition.updateCallbackDone.catch(function () {});
           transition.finished.then(done, done);
         }
-      }
-      if (!reduce) {
-        // Inhalt lädt herein: Kopf und Text gleiten nacheinander hoch, die Bilder wachsen leicht. Am Handy etwas früher, er steht
-        // dort schon an seinem Platz.
-        var t = phone ? { pd: 120, ps: 45, pl: 520, id: 180, is: 55, il: 600 } : { pd: 280, ps: 60, pl: 600, id: 360, is: 70, il: 700 };
-        var parts = els[bi].querySelectorAll('.bb-head-box > *, .bb-info > *'), items = els[bi].querySelectorAll('.bb-item:not(.is-extra)');
-        [].forEach.call(parts, function (n, k) { n.animate([{ opacity: 0, transform: 'translateY(16px)' }, { opacity: 1, transform: 'none' }], { duration: t.pl, delay: t.pd + k * t.ps, easing: EASE, fill: 'backwards' }); });
-        [].forEach.call(items, function (n, k) { n.animate([{ opacity: 0, transform: 'scale(.94)' }, { opacity: 1, transform: 'none' }], { duration: t.il, delay: t.id + k * t.is, easing: EASE, fill: 'backwards' }); });
       }
       if (!fromEditor) setTimeout(function () { els[bi].querySelector('.bb-close').focus({ preventScroll: true }); }, reduce ? 0 : 450);
       say('Umbau ' + data[bi].name + ' geöffnet, Basis ' + data[bi].base + ', ' + data[bi].photos.length + ' Bilder');
