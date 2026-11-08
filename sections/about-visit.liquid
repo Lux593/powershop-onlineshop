@@ -25,6 +25,8 @@
   assign route_query = settings.address | newline_to_br | replace: '<br />', ', ' | strip_newlines | strip | url_encode
 -%}
 {%- if has_data -%}
+{%- comment -%} Grundstile der Karte (.visit__*) in visit.css, die Abweichungen danach in about-visit.css {%- endcomment -%}
+{{ 'visit.css' | asset_url | stylesheet_tag }}
 {{ 'about-visit.css' | asset_url | stylesheet_tag }}
 
 <section class="about-visit" id="besuch" aria-labelledby="{{ title_id }}">

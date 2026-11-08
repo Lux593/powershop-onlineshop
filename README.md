@@ -46,7 +46,7 @@ nur für Tests in ein separates, nicht verbundenes Theme nötig.
 layout/     theme.liquid · password.liquid
 templates/  index · collection (+ .motorrad) · product (+ .motorrad, .teil) · page (+ .service) · cart · search · blog · article ·
             list-collections · 404 · password · gift_card
-sections/   Startseite: hero · service-tiles · product-tabs · statement · category-bento · showroom · story-events
+sections/   Startseite: hero · service-tiles · product-tabs · statement · category-bento · showroom · story-events · visit
             Shop: collection · collections · product · cart · cart-drawer · search · predictive-search
             Seiten: page · service-page · blog · article · 404 · password
             Rahmen: header · announcement-bar · footer, dazu header-group.json und footer-group.json
@@ -67,6 +67,7 @@ pics_to_use/ Quellbilder für Kategorien und Team
 |---|---|
 | `tokens.css` · `base.css` · `components.css` | Design-Tokens, Reset und Typografie, wiederverwendbare Bausteine (Karten, Buttons, Tabs, Schienen) |
 | `sections.css` | geteilte Reste: Events (Raster, Karten), Service-Seite |
+| `visit.css` · `visit-film.js` | „Komm vorbei“ (Karte bzw. Film, Adresse, Kontakt-Box), laden mit der Section: Startseite, Service, Über uns |
 | `theme.css` | Ergänzungen fürs Shopify-Theme, Kontrastmodus (`forced-colors`) für gewählte Zustände |
 | `motion.css` · `motion.js` | Motion-Schicht: Einblenden beim Scrollen, Wort-Splitter, Zahlen-Zählen, Parallax, weiches Scrollen |
 | `gsap.min.js` · `ScrollTrigger.min.js` | Bibliotheken der Motion-Schicht (Scrub, Parallax), self-hosted, nur auf der Startseite |

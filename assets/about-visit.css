@@ -3,9 +3,9 @@
    Aufgebaut wie eine Etappe: links die dunkle OSM-Karte mit orangem Pin auf Burghölzle 15, rechts auf hellem Grund die große
    Überschrift, unten Adresse, Route und Kontakt. Am Handy steht die Überschrift oben, darunter die Karte über die volle Breite,
    dann Route, Kontakt und Lieferhinweis.
-   Die Karte kommt aus dem Snippet visit-map und trägt deren Klassen (.visit__*, Grundstile in pages.css). Hier stehen nur die
+   Die Karte kommt aus dem Snippet visit-map und trägt deren Klassen (.visit__*, Grundstile in visit.css, lädt mit der Section davor). Hier stehen nur die
    Abweichungen, alle unter .about-visit, damit die Karte auf der Service-Seite unverändert bleibt:
-   - Pin mittig im Rahmen (--ax: 50) statt bei 66,5 % bzw. 55 % (pages.css), die Höhe richtet sich nach der Spalte;
+   - Pin mittig im Rahmen (--ax: 50) statt bei 66,5 % bzw. 55 % (visit.css), die Höhe richtet sich nach der Spalte;
    - weißes Schild mit Bar & Shield, am Handy mit Adresse;
    - kein Ring, kein Einblenden der Karte: der Pin landet allein (data-reveal am Pin, motion.js).
    Vorlage: entwuerfe/ueber-uns/h-vollbild.html (.visit*, .map*, .pin*), dort mit anderen Klassennamen (siehe kontext im Plan).
@@ -13,10 +13,10 @@
 
 .about-visit { position: relative; display: grid; background: var(--c-white); color: var(--c-black); }
 
-/* ---------------- Karte: Abweichungen von pages.css ---------------- */
+/* ---------------- Karte: Abweichungen von visit.css ---------------- */
 /* Die Kartenebene verhält sich wie ein cover-Bild, der Pin sitzt immer waagrecht in der Mitte des Rahmens.
    150cqw, damit rechts vom Pin nichts frei bleibt; 160cqh füllt die Höhe. Was im schmalen Rahmen keinen Platz hat, blenden die
-   @container-Regeln aus (Container ist .visit__frame, absolut über die ganze Karte gelegt, siehe pages.css). */
+   @container-Regeln aus (Container ist .visit__frame, absolut über die ganze Karte gelegt, siehe visit.css). */
 .about-visit .visit__map { height: auto; }
 .about-visit .visit__layer { --ax: 50; --mw: max(150cqw, 160cqh); }
 .about-visit .visit__label { font: 700 clamp(11px, 1.05vw, 15px)/1 var(--f-head); letter-spacing: .3em; }

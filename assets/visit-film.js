@@ -1,6 +1,6 @@
 /* ==========================================================================
    Power Shop – Karte als Film in „Komm vorbei“ (snippets/visit-map.liquid mit film, sections/visit.liquid). Seit dem 2.11.
-   Lädt nur mit der Section und eingeschaltetem Film. Styles in assets/pages.css (.visit__film …).
+   Lädt nur mit der Section und eingeschaltetem Film. Styles in assets/visit.css (.visit__film …).
    Ablauf: Karte → Klick auf Bar & Shield oder „Power Shop“ → Film vorwärts bis zum Laden, das letzte Bild bleibt stehen →
    „Zurück zur Karte“ → umgedrehter Film (eigene Datei, rückwärts abspielen kann Chrome nicht) → Karte.
    - Unten liegt immer ein Standbild (.visit__still: Anfang oder Ende des Films), darüber die beiden Filme. Sichtbar ist nur der, der
@@ -145,7 +145,7 @@
         if (state !== 'hin') return;
         if (!ok) { jump(true); return; }
         show(hin); // Bild 0 = Standbild, kein Sprung
-        map.classList.add('is-there'); // Schwenk des Ausschnitts vom Logo auf den Laden (pages.css)
+        map.classList.add('is-there'); // Schwenk des Ausschnitts vom Logo auf den Laden (visit.css)
         fly.hidden = true;
         var p = hin.play();
         if (p && p.catch) p.catch(function () { if (state === 'hin') jump(true); });

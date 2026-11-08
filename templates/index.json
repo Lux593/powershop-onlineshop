@@ -133,7 +133,22 @@
         "events_heading": "Nächste Events",
         "events_url": ""
       }
+    },
+    "visit": {
+      "type": "visit",
+      "settings": {
+        "heading": "Komm vorbei.",
+        "intro": "",
+        "name": "Harley-Davidson Power Shop",
+        "anchor": "besuch",
+        "note": "Im Stadtteil Haltingen, mitten im Dreiländereck.",
+        "show_map": true,
+        "film": true,
+        "scheme": "light",
+        "contact_title": "Kontaktiere uns",
+        "foot": "Zu weit für einen Besuch? Wir <a href=\"/pages/dienstleistungen#lieferung\">liefern dein Motorrad</a> bundesweit, in die Schweiz und nach Frankreich."
+      }
     }
   },
-  "order": ["hero", "statement", "news", "bento", "showroom", "story"]
+  "order": ["hero", "statement", "news", "bento", "showroom", "story", "visit"]
 }

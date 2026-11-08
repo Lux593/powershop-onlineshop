@@ -2,11 +2,12 @@
   „Komm vorbei“: Standort mit Karte des Dreiländerecks, Adresse, „Route planen“, Öffnungszeiten und Kontakt-Box. Eine
   Sektion für Service (#standort, „Standort & Kontakt“) und seit dem 2.11. auch Über uns (#besuch, „Komm vorbei.“,
   sonst dieselben Einstellungen wie auf Service: Der Nutzer wollte den Bereich dort identisch und in der Breite des Inhalts statt
-  randlos). sections/about-visit.liquid bleibt als frühere Fassung im Theme. Adresse, Kanäle und Öffnungszeiten
+  randlos). Seit dem 8.11. auch auf der Startseite (#besuch) mit denselben Einstellungen wie auf Über uns, zwischen der Story mit
+  den Events und dem Footer (Newsletter). sections/about-visit.liquid bleibt als frühere Fassung im Theme. Adresse, Kanäle und Öffnungszeiten
   kommen aus den Theme-Einstellungen (Händlerdaten). Ohne jede Angabe erscheint die Sektion im Shop nicht.
   Die Karte ist ein vorskaliertes WebP der OpenStreetMap mit Pin auf Burghölzle 15 (assets/karte-dreilaendereck-*.webp) und
   steht im Snippet visit-map, das auch die Über-uns-Seite nutzt (sections/about-visit.liquid). Pin, Länder und Dreiländereck
-  stehen in Prozent der Kartendatei; pages.css hält sie bei jedem Seitenverhältnis im Bild.
+  stehen in Prozent der Kartendatei; visit.css hält sie bei jedem Seitenverhältnis im Bild.
   Kopf wie beim Team der Über-uns-Seite (sections/about-team.liquid): die Überschrift („Komm vorbei.“) groß und waagrecht über der
   ganzen Breite, optional ein Satz darunter, beides blendet ein (data-split, data-reveal). Wo bis zum 2.11. die Überschrift stand
   (neben bzw. über den Angaben), steht jetzt der Name des Ladens („Harley-Davidson Power Shop“, Einstellung „Name über der Adresse“),
@@ -15,7 +16,9 @@
   Karte als Film (Einstellung, Standard an, seit dem 2.11.): Statt des Kartenbilds steht der Film „Flug zum Laden“, ein Klick auf Logo
   oder Schild fliegt hin, „Zurück zur Karte“ zurück (snippets/visit-map.liquid, assets/visit-film.js). Ausgeschaltet die Karte als Bild.
   „Route planen“ öffnet Google Maps in einem neuen Fenster, eingebettet wird nichts. Die Öffnungszeiten stehen hier, die
-  Kontakt-Box zeigt sie darum nicht noch einmal (hours: false). Styles in assets/pages.css.
+  Kontakt-Box zeigt sie darum nicht noch einmal (hours: false). Styles in assets/visit.css: Die Section lädt sie selbst, weil
+  pages.css nur auf Seiten lädt (bis 8.11. standen sie dort). Die Kontakt-Box braucht assets/contact.js (layout/theme.liquid lädt
+  es auch auf der Startseite).
 {%- endcomment -%}
 {%- liquid
   assign has_channel = false
@@ -33,6 +36,7 @@
 -%}
 
 {%- if has_data -%}
+  {{ 'visit.css' | asset_url | stylesheet_tag }}
   <section class="visit{% if section.settings.scheme == 'dark' %} visit--dark on-dark textured{% endif %}" id="{{ anchor | escape }}" aria-labelledby="visit-title-{{ section.id }}">
     <div class="container visit__head">
       <h2 class="visit__heading section-title" id="visit-title-{{ section.id }}" data-split="words">{{ section.settings.heading | escape }}</h2>
@@ -112,7 +116,7 @@
     { "type": "text", "id": "contact_title", "label": "Titel der Kontakt-Box", "default": "Kontaktiere uns" },
     { "type": "inline_richtext", "id": "foot", "label": "Hinweis unten", "info": "Optional, z. B. zur Lieferung für alle, denen der Weg zu weit ist." }
   ],
-  "enabled_on": { "templates": ["page"] },
+  "enabled_on": { "templates": ["index", "page"] },
   "presets": [{ "name": "Komm vorbei" }]
 }
 {% endschema %}

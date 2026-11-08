@@ -1,23 +1,23 @@
 {% doc %}
   Karte des Dreiländerecks mit dem Pin auf Burghölzle 15 (.visit__map): vorskaliertes WebP der OpenStreetMap, dazu Länder,
   Dreiländereck, Pin (seit dem 2.11. das orange H-D Bar & Shield statt eines Punkts) mit Schild „Power Shop“ und Quellenangabe.
-  Seit dem 2.11. stehen Pin und Schild in der Mitte der Karte (pages.css), die Karte ist dafür stärker vergrößert. Die Länder stehen
+  Seit dem 2.11. stehen Pin und Schild in der Mitte der Karte (visit.css), die Karte ist dafür stärker vergrößert. Die Länder stehen
   darum näher am Pin: Deutschland am Tüllinger Berg, Frankreich am Hafen Huningue, Schweiz in Kleinhüningen (Basel). Pin, Länder und Dreiländereck stehen in Prozent der Kartendatei,
-  die Kartenebene (.visit__layer) hält sie bei jedem Seitenverhältnis im Bild. Styles in assets/pages.css.
-  Ohne Angaben gibt das Snippet genau die Karte aus, die sections/visit.liquid (Service, Über uns) zeigt. Die Einrückung der Zeilen
+  die Kartenebene (.visit__layer) hält sie bei jedem Seitenverhältnis im Bild. Styles in assets/visit.css (bis 8.11. pages.css).
+  Ohne Angaben gibt das Snippet genau die Karte aus, die sections/visit.liquid (Service, Über uns, Startseite) zeigt. Die Einrückung der Zeilen
   ist Teil davon: Ein Vergleich vor und nach einem Umbau (docs/qa/karte-ausschneiden.py) soll Zeichen für Zeichen gleich bleiben.
 
   @param {string} [sizes] - sizes-Attribut des Kartenbilds. Der Standard passt zur Karte in sections/visit.liquid.
   @param {boolean} [ring] - false lässt den auslaufenden Ring um den Pin weg. Standard true.
   @param {boolean} [logo] - true setzt das H-D Bar & Shield (hd-bar-shield.png) vor „Power Shop“ ins Schild.
-  @param {string} [reveal] - data-reveal der ganzen Karte, Standard "clip" (die Karte blendet ein, dann landet der Pin, siehe pages.css).
-    Leer = die Karte steht da (Klasse is-in von Anfang an, damit pages.css Punkt und Schild nicht versteckt), und der Pin trägt
+  @param {string} [reveal] - data-reveal der ganzen Karte, Standard "clip" (die Karte blendet ein, dann landet der Pin, siehe visit.css).
+    Leer = die Karte steht da (Klasse is-in von Anfang an, damit visit.css Punkt und Schild nicht versteckt), und der Pin trägt
     data-reveal und landet allein, sobald er ins Bild kommt (motion.js).
   @param {object} [address_lines] - Liste (Array) der Adresszeilen unter „Power Shop“ im Schild (Über uns, am Handy). Ohne Angabe steht dort keine Adresse.
   @param {boolean} [film] - true zeigt statt der Karte den Film „Flug zum Laden“ (seit dem 2.11.): Startbild ist die Karte mit Bar & Shield
     und Schild „Power Shop“ (eingebrannt, darum ohne Länder, Pin und Schild als HTML). Ein Klick auf Logo oder Schild fliegt zum Laden
     (Film vorwärts), am Ende steht das Bild still und „Zurück zur Karte“ erscheint; der Knopf spielt den umgedrehten Film. Ablauf in
-    assets/visit-film.js, Styles in assets/pages.css. Dateien: visit-film-1536/-1280.mp4 (vorwärts), visit-film-rueck-1536/-1280.mp4
+    assets/visit-film.js, Styles in assets/visit.css. Dateien: visit-film-1536/-1280.mp4 (vorwärts), visit-film-rueck-1536/-1280.mp4
     (rückwärts), visit-film-start-*/-ende-*.webp (erstes und letztes Bild, je in derselben Größe wie der Film, am Handy bis 767 px die
     1280er wie im Skript). Alle ohne Ton; die Quellenangabe der Karte steht als Link darüber.
     Seit dem 6.11. ein neuer Film im Querformat 16 : 9 (vorher fast quadratisch, 1088 × 1120): Maße 1536 × 864 und 1280 × 720, Vielfache
