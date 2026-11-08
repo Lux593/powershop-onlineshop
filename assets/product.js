@@ -486,7 +486,7 @@
           groups(list).forEach(function (g) {
             var tag = document.createElement('span');
             tag.className = 'compat__bike' + (hit ? '' : ' is-miss');
-            tag.innerHTML = '<svg class="icon" aria-hidden="true" focusable="false"><use href="#i-bike"></use></svg>';
+            tag.innerHTML = '<svg class="icon" aria-hidden="true" focusable="false"><use href="#i-motorbike"></use></svg>';
             var name = document.createElement('span');
             name.className = 'compat__bike-name';
             name.textContent = g.f;
