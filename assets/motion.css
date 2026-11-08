@@ -71,6 +71,14 @@ html.lenis { scroll-behavior: auto !important; }
 
 /* ---------- Count-up ---------- */
 [data-countup] { font-variant-numeric: tabular-nums; }
+/* „∞“ als Linie (motion.js, seit 8.11.): so hoch wie die Ziffern, auf der Grundlinie, Strich in der Stärke der Schrift (800).
+   Mit Bewegung zunächst unsichtbar (Strichmuster ganz versetzt), beim Einblenden (is-drawing) zeichnet es sich in --draw entlang
+   der Linie auf; is-done (Druck, Abbau) zeigt es fertig. Ohne has-motion steht es einfach da. */
+.ps-inf { display: inline-block; width: 1.4em; height: 0.7em; vertical-align: baseline; overflow: visible; }
+.ps-inf path { fill: none; stroke: currentColor; stroke-width: 10.5; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1 2; stroke-dashoffset: 0; }
+.has-motion [data-countup]:not(.is-done) .ps-inf path { stroke-dashoffset: 1.02; }
+.has-motion [data-countup].is-drawing:not(.is-done) .ps-inf path { animation: ps-draw var(--draw, 1400ms) cubic-bezier(0.65, 0, 0.35, 1) forwards; }
+@keyframes ps-draw { to { stroke-dashoffset: 0; } }
 
 /* ---------- Reduced-Motion und Druck ---------- */
 /* Falls zur Laufzeit umgeschaltet wird, bevor motion.js abgebaut hat */
