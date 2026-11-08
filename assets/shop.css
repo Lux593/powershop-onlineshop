@@ -244,7 +244,7 @@
 .compat { --compat-indent: 48px; border: 1px solid var(--c-line); background: var(--c-white); }
 .compat__head { display: flex; align-items: center; gap: 12px; padding: 16px 16px 4px; }
 .compat__title { display: flex; align-items: center; gap: 12px; min-width: 0; }
-.compat__title .icon { width: 20px; height: 20px; flex: none; color: var(--c-muted); }
+.compat__title .icon { width: 20px; height: 20px; flex: none; color: var(--c-orange); }
 .compat__note { padding: 0 16px 16px var(--compat-indent); font-size: var(--fs-small); color: var(--c-text-soft); }
 .compat__fams { list-style: none; margin: 0; padding: 0 16px 8px var(--compat-indent); }
 .compat__fam { position: relative; display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 12px 0; border-top: 1px solid var(--c-line); }
@@ -280,12 +280,10 @@
 .compat__fit-bikes { display: grid; gap: 8px; }
 .compat__bikes { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .compat__bikes-label { flex-basis: 100%; font-size: var(--fs-caption); font-weight: 600; color: var(--c-muted); text-transform: uppercase; letter-spacing: 0.06em; }
-.compat__bike { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 14px; background: var(--c-white); border: 1px solid var(--c-orange); border-radius: var(--radius); }
-.compat__bike .icon { width: 22px; height: 22px; flex: none; color: var(--c-orange); }
+.compat__bike { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 14px; background: var(--c-white); border: 1px solid var(--c-black); border-radius: var(--radius); }
 .compat__bike-name { font-weight: 700; }
 .compat__bike-year { padding-left: 10px; border-left: 1px solid var(--c-line); font-weight: 600; font-variant-numeric: tabular-nums; }
-.compat__bike.is-miss { border-color: var(--c-border-soft); }
-.compat__bike.is-miss .icon { color: var(--c-muted); }
+.compat__bike.is-miss { border-color: var(--c-border-soft); color: var(--c-text-soft); }
 .compat__fit-icon { display: none; flex: none; }
 .compat__fit-icon .icon { width: 20px; height: 20px; margin-top: 2px; }
 .compat__fit[data-state="ok"], .compat__fit[data-state="partial"] { background: color-mix(in srgb, var(--c-orange) 8%, var(--c-white)); }
