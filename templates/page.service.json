@@ -62,7 +62,7 @@
           "type": "door",
           "settings": {
             "title": "Events",
-            "subtitle": "Ausfahrten, Bike Nights & Werkstatt-Tage",
+            "subtitle": "Open House, Harley Nights & mehr",
             "url": "shopify://pages/events",
             "anchor": "events",
             "image_asset": "tuer-events-1920.webp",

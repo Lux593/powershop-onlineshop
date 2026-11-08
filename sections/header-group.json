@@ -41,7 +41,7 @@
         "tile_service_werkstatt": { "type": "tile", "settings": { "parent": "Service", "group": "Werkstatt", "text": "Inspektion, Einbau, Custom-Umbau …", "image_asset": "mega-service-werkstatt.webp", "focus": "center" } },
         "tile_service_dienstleistungen": { "type": "tile", "settings": { "parent": "Service", "group": "Dienstleistungen", "image_asset": "mega-service-dienstleistungen.webp", "focus": "center" } },
         "tile_service_ueber_uns": { "type": "tile", "settings": { "parent": "Service", "group": "Über uns", "text": "Geschichte, Team, Anfahrt", "image_asset": "mega-service-ueber-uns.webp", "focus": "center" } },
-        "tile_service_events": { "type": "tile", "settings": { "parent": "Service", "group": "Events", "text": "Ausfahrten, Bike Nights, Werkstatt-Tage", "image_asset": "mega-service-events.webp", "focus": "center" } },
+        "tile_service_events": { "type": "tile", "settings": { "parent": "Service", "group": "Events", "text": "Open House, Harley Nights & mehr", "image_asset": "mega-service-events.webp", "focus": "center" } },
         "contact_service": { "type": "contact", "settings": { "parent": "Service", "title": "Direkter Draht" } }
       },
       "block_order": [
