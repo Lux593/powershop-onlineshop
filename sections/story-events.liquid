@@ -40,7 +40,7 @@
               {%- endcomment -%}
               {%- assign stat_value = block.settings.value | strip -%}
               {%- assign stat_number = stat_value | replace: '.', '' | replace: ',', '.' | replace: '+', '' | plus: 0 -%}
-              <div {{ block.shopify_attributes }}><strong{% if stat_number > 9 or stat_value == '∞' %} data-countup{% endif %}>{{ block.settings.value }}</strong><span>{{ block.settings.label }}</span></div>
+              <div {{ block.shopify_attributes }}><strong{% if stat_number > 9 or stat_value == '∞' %} data-countup="2600"{% endif %}>{{ block.settings.value }}</strong><span>{{ block.settings.label }}</span></div>
             {%- endif -%}
           {%- endfor -%}
         </div>

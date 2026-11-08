@@ -249,11 +249,34 @@
   }
 
   /* ---------------- Count-up ---------------- */
+  // „∞“ (seit 8.11.): statt hochzuzählen zeichnet sich das Zeichen als Linie entlang seiner Form auf (SVG, motion.css .ps-inf),
+  // in derselben Dauer wie die Zahlen. Bis dahin zählte es bis 9.999 und sprang dann hart auf das Zeichen.
+  var INF = 'M50 25C61 11 87 9 87 25C87 41 61 39 50 25C39 11 13 9 13 25C13 41 39 39 50 25';
+  function infinity(el, src) {
+    var NS = 'http://www.w3.org/2000/svg';
+    var svg = doc.createElementNS(NS, 'svg'), path = doc.createElementNS(NS, 'path'), sr = doc.createElement('span');
+    svg.setAttribute('class', 'ps-inf');
+    svg.setAttribute('viewBox', '0 0 100 50');
+    svg.setAttribute('aria-hidden', 'true');
+    svg.setAttribute('focusable', 'false');
+    path.setAttribute('d', INF);
+    path.setAttribute('pathLength', '1');
+    svg.appendChild(path);
+    sr.className = 'sr-only';
+    sr.textContent = src;
+    el.textContent = '';
+    el.appendChild(svg);
+    el.appendChild(sr);
+    el.style.setProperty('--draw', (parseInt(el.getAttribute('data-countup'), 10) || 1400) + 'ms');
+    function fin() { el.classList.add('is-done'); }
+    el._fin = fin;
+    el._count = function () { el.classList.add('is-drawing'); };
+    track(el, fin);
+  }
   function countup(el) {
     var src = el.textContent.trim();
-    // „∞“: zählt immer schneller bis 9.999 hoch und wird am Ende zum Zeichen
-    var endless = src === '\u221E';
-    var m = endless ? ['', '', '9.999', ''] : src.match(/^(\D*?)(\d(?:[\d.,]*\d)?)([\s\S]*)$/);
+    if (src === '\u221E') { infinity(el, src); return; }
+    var m = src.match(/^(\D*?)(\d(?:[\d.,]*\d)?)([\s\S]*)$/);
     if (!m) return;
     var s = m[2], comma = s.indexOf(',') > -1, dot = s.indexOf('.') > -1;
     var grp = comma ? dot : dot && /^\d{1,3}(\.\d{3})+$/.test(s);
@@ -278,7 +301,7 @@
       raf = requestAnimationFrame(function step(t) {
         t0 = t0 || t;
         var p = Math.min((t - t0) / dur, 1);
-        vis.textContent = fmt(end * (endless ? Math.pow(p, 3) : 1 - Math.pow(1 - p, 3))); // ∞ beschleunigt, Zahlen bremsen ab
+        vis.textContent = fmt(end * (1 - Math.pow(1 - p, 3))); // Zahlen bremsen ab
         if (p < 1) raf = requestAnimationFrame(step); else vis.textContent = src;
       });
     };
