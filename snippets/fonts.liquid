@@ -16,6 +16,8 @@
   @font-face { font-family: "Inter"; font-style: normal; font-weight: 400; font-display: swap; src: url("{{ 'inter-latin-400-normal.woff2' | asset_url }}") format("woff2"); }
   @font-face { font-family: "Inter"; font-style: normal; font-weight: 500; font-display: swap; src: url("{{ 'inter-latin-500-normal.woff2' | asset_url }}") format("woff2"); }
   @font-face { font-family: "Inter"; font-style: normal; font-weight: 600; font-display: swap; src: url("{{ 'inter-latin-600-normal.woff2' | asset_url }}") format("woff2"); }
+  {%- comment -%} Inter 700 unter eigenem Namen: nur wo ausdrücklich gesetzt (Motorrad-Kacheln). Als „Inter“ würde jedes <strong> und font-weight: 700 im Shop dicker. {%- endcomment -%}
+  @font-face { font-family: "Inter Strong"; font-style: normal; font-weight: 700; font-display: swap; src: url("{{ 'inter-latin-700-normal.woff2' | asset_url }}") format("woff2"); }
   @font-face { font-family: "Barlow Condensed"; font-style: normal; font-weight: 600; font-display: swap; src: url("{{ 'barlow-condensed-latin-600-normal.woff2' | asset_url }}") format("woff2"); }
   @font-face { font-family: "Barlow Condensed"; font-style: normal; font-weight: 700; font-display: swap; src: url("{{ 'barlow-condensed-latin-700-normal.woff2' | asset_url }}") format("woff2"); }
   @font-face { font-family: "Barlow Condensed"; font-style: normal; font-weight: 800; font-display: swap; src: url("{{ 'barlow-condensed-latin-800-normal.woff2' | asset_url }}") format("woff2"); }

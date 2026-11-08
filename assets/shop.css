@@ -286,8 +286,8 @@
 .compat__vehicle div:nth-child(2n) { border-right: 0; }
 .compat__vehicle div:nth-last-child(-n + 2) { border-bottom: 0; }
 .compat__vehicle dt { white-space: nowrap; letter-spacing: 0.03em; }
-.compat__vehicle dd { font-size: var(--fs-small); font-weight: 700; overflow-wrap: anywhere; }
-.compat__vehicle.is-miss dd { color: var(--c-text-soft); font-weight: 400; }
+.compat__vehicle dd { font-family: "Inter Strong", var(--f-body); font-size: var(--fs-small); font-weight: 700; overflow-wrap: anywhere; }
+.compat__vehicle.is-miss dd { font-family: var(--f-body); color: var(--c-text-soft); font-weight: 400; }
 .compat__fit-icon { display: none; flex: none; }
 .compat__fit-icon .icon { width: 20px; height: 20px; margin-top: 2px; }
 .compat__fit[data-state="ok"], .compat__fit[data-state="partial"] { background: color-mix(in srgb, var(--c-orange) 8%, var(--c-white)); }

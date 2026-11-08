@@ -344,14 +344,35 @@
       }
     });
 
+    // Formular abschicken bzw. „Ergebnisse anzeigen“: nur laden, wenn der Stand vom zuletzt geladenen abweicht (die Filter laden schon
+    // bei jeder Auswahl), dann das Filterfenster schließen
+    function applyForm(form) {
+      clearTimeout(timer);
+      var url = urlFromForm(form);
+      var target = new URL(url, window.location.origin);
+      if (target.pathname + target.search !== last) load(url);
+      var sheet = form.closest('dialog');
+      if (sheet && sheet.open) sheet.close();
+    }
+
     root.addEventListener('submit', function (event) {
       var form = event.target.closest('[data-filter-form]');
       if (!form) return;
       event.preventDefault();
-      clearTimeout(timer);
-      load(urlFromForm(form));
-      var sheet = form.closest('dialog');
-      if (sheet && sheet.open) sheet.close();
+      applyForm(form);
+    });
+
+    // iOS Safari: Nach einer Filterauswahl im Fenster kam der erste Tipp auf „Ergebnisse anzeigen“ teils nicht als click an (erst der
+    // zweite schloss das Fenster). pointerup kommt verlässlich: Ist das Fenster kurz danach noch offen (kein click), hier anwenden und
+    // schließen. Erst nach einer Pause, damit ein normaler click zuerst greift und kein Klick durchs geschlossene Fenster auf eine
+    // Karte darunter fällt. Ein Wischen endet mit pointercancel statt pointerup und löst nichts aus.
+    root.addEventListener('pointerup', function (event) {
+      if (event.pointerType !== 'touch') return;
+      var button = event.target.closest('[data-show-count]');
+      var form = button && button.closest('[data-filter-form]');
+      var sheet = button && button.closest('dialog');
+      if (!form || !sheet || !sheet.open) return;
+      setTimeout(function () { if (sheet.open) applyForm(form); }, 250);
     });
 
     root.addEventListener('click', function (event) {
