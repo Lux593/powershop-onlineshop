@@ -28,11 +28,13 @@
 /* Handy (Touch), iOS 26 Safari: Die Seite endet nicht an der schwebenden Leiste. Unter dem Viewport (lvh = svh) schimmert der Rest der Seite
    durch die Leiste, also der helle Block nach dem Hero, solange man oben steht. Der Hero ist deshalb um --hero-chin länger als der
    Bildschirm (ca. Höhe der Leiste plus Reserve): Dort steht sein dunkler Grund mit dem Schleier, nicht die helle Section. Die Länge
-   steckt in --hero-ui, Text, Tabs, Pfeil, Pause-Taste und Schleier bleiben an derselben Stelle wie ohne Verlängerung. Am Desktop und in
-   Browsern ohne diese Leiste ist --hero-chin 0, dort ändert sich nichts; ein dunkler Streifen unter dem Hero fiele dort kaum auf. */
+   steckt in --hero-ui, Text, Tabs, Pfeil, Pause-Taste und Schleier bleiben an derselben Stelle wie ohne Verlängerung. Am Desktop, bei Android
+   und in jedem Browser ohne diese Leiste ist --hero-chin 0, dort ändert sich nichts. */
 .hero { --hero-chin: 0px; }
 @media (max-width: 767px) and (hover: none) {
-  .hero { --hero-chin: 100px; }
+  @supports (-webkit-touch-callout: none) { /* nur iOS (alle Browser dort sind WebKit) */
+    .hero { --hero-chin: 100px; }
+  }
 }
 /* Header über dem Hero (body[data-header-overlay], nur Startseite): der Hero zieht unter den Header. header.js macht ihn oben transparent. */
 [data-header-overlay] #main > .shopify-section:first-child > .hero {
@@ -85,6 +87,14 @@
    reicht der dunkle Teil wie bisher bis oben. */
 @media (max-width: 767px) and (min-height: 541px) {
   .hero { --g-bottom: linear-gradient(0deg, rgb(10 10 10 / calc(var(--ov) * 1.6)) 0, rgb(10 10 10 / calc(var(--ov) * 1.4)) calc(170px + var(--hero-ui)), rgb(10 10 10 / calc(var(--ov) * 1.12)) calc(360px + var(--hero-ui)), rgb(10 10 10 / calc(var(--ov) * 0.55)) calc(440px + var(--hero-ui)), rgb(10 10 10 / calc(var(--ov) * 0.15)) calc(520px + var(--hero-ui)), transparent calc(600px + var(--hero-ui))); }
+}
+/* iOS (Handy hochkant): Unter der Leiste steht der dunkle Grund des Heros (--hero-chin), denn feste Ebenen, und das ist der Film, malt
+   iOS 26 nicht unter die Leiste. Damit dort kein Balken auffällt, läuft der Film über die letzten 90 px in dasselbe Dunkel aus:
+   unten am Bildschirm ist der Schleier voll deckend, also genau wie der Grund darunter. Der Rest des Verlaufs bleibt wie oben. */
+@media (max-width: 767px) and (min-height: 541px) and (hover: none) {
+  @supports (-webkit-touch-callout: none) {
+    .hero { --g-bottom: linear-gradient(0deg, rgb(10 10 10) 0, rgb(10 10 10) var(--hero-chin), rgb(10 10 10 / calc(var(--ov) * 1.4)) calc(var(--hero-chin) + 90px), rgb(10 10 10 / calc(var(--ov) * 1.4)) calc(170px + var(--hero-ui)), rgb(10 10 10 / calc(var(--ov) * 1.12)) calc(360px + var(--hero-ui)), rgb(10 10 10 / calc(var(--ov) * 0.55)) calc(440px + var(--hero-ui)), rgb(10 10 10 / calc(var(--ov) * 0.15)) calc(520px + var(--hero-ui)), transparent calc(600px + var(--hero-ui))); }
+  }
 }
 .hero__veil { position: absolute; z-index: 3; inset: 0; background: var(--g-bottom); }
 @media (min-width: 768px) {
