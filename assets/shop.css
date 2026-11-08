@@ -242,10 +242,9 @@
 
 /* Kompatibilitäts-Box: eine Icon-Spalte (20 px + 12 px Abstand), Texte und Familienliste daneben bündig */
 .compat { --compat-indent: 48px; border: 1px solid var(--c-line); background: var(--c-white); }
-.compat__head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 16px 16px 4px; }
+.compat__head { display: flex; align-items: center; gap: 12px; padding: 16px 16px 4px; }
 .compat__title { display: flex; align-items: center; gap: 12px; min-width: 0; }
 .compat__title .icon { width: 20px; height: 20px; flex: none; color: var(--c-muted); }
-.compat__src { flex: none; font-size: var(--fs-caption); color: var(--c-muted); }
 .compat__note { padding: 0 16px 16px var(--compat-indent); font-size: var(--fs-small); color: var(--c-text-soft); }
 .compat__fams { list-style: none; margin: 0; padding: 0 16px 8px var(--compat-indent); }
 .compat__fam { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 16px; align-items: center; padding: 10px 0; border-top: 1px solid var(--c-line); }
@@ -257,8 +256,10 @@
 .compat__fam.is-match::before { content: ""; position: absolute; left: -16px; top: 10px; bottom: 10px; width: 3px; border-radius: 2px; background: var(--c-success); }
 .compat details summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; padding: 0 16px; border-top: 1px solid var(--c-line); font-weight: 600; font-size: var(--fs-small); }
 .compat details summary::-webkit-details-marker { display: none; }
-.compat__sum { display: flex; align-items: center; gap: 12px; }
-.compat__sum .icon { width: 20px; height: 20px; flex: none; color: var(--c-muted); }
+.compat__sum { display: flex; align-items: flex-start; gap: 12px; padding-block: 12px; }
+.compat__sum .icon { width: 20px; height: 20px; flex: none; margin-top: 1px; color: var(--c-muted); }
+.compat__sum strong { display: block; font-weight: 600; }
+.compat__sum small { display: block; margin-top: 2px; font-size: var(--fs-caption); font-weight: 400; color: var(--c-muted); }
 .compat details[open] summary > .icon { transform: rotate(180deg); }
 .compat__table { padding: 0 16px 16px; display: grid; gap: 12px; }
 .compat__table table { font-size: var(--fs-small); }

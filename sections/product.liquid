@@ -382,10 +382,9 @@
               </div>
               <div class="compat__head">
                 <div class="compat__title">{% render 'icon', name: 'bike' %}<strong>{% if years_label == '(universell)' %}Passt für alle Modelle{% else %}Passt für{% endif %}</strong></div>
-                <span class="compat__src">laut Hersteller</span>
               </div>
               {%- if years_label == '(universell)' -%}
-                <p class="compat__note">Universell einsetzbar, unabhängig von Modell und Baujahr.</p>
+                <p class="compat__note">Universell einsetzbar · Angaben laut Hersteller</p>
               {%- elsif compat.size > 0 -%}
                 {%- liquid
                   comment
@@ -462,7 +461,13 @@
                   {%- endfor -%}
                 </ul>
                 <details>
-                  <summary><span class="compat__sum">{% render 'icon', name: 'list' %}Alle {{ compat.size }} Modelle anzeigen</span>{% render 'icon', name: 'chevron-down', class: 'icon--sm' %}</summary>
+                  <summary>
+                    <span class="compat__sum">
+                      {% render 'icon', name: 'list' %}
+                      <span><strong>Alle kompatiblen Modelle anzeigen</strong><small>{{ compat.size }} kompatible {% if compat.size == 1 %}Modell{% else %}Modelle{% endif %} · Angaben laut Hersteller</small></span>
+                    </span>
+                    {%- render 'icon', name: 'chevron-down', class: 'icon--sm' -%}
+                  </summary>
                   <div class="compat__table">
                     <label class="sr-only" for="compat-q">Modell suchen</label>
                     <input class="input" id="compat-q" type="search" placeholder="Modell suchen, z. B. Street Glide" data-compat-q>
@@ -484,7 +489,7 @@
                   </div>
                 </details>
               {%- elsif families.size > 0 -%}
-                <p class="compat__note">{{ families | join: ', ' | escape }}{% if years_label != blank %} · {{ years_label | escape }}{% endif %}</p>
+                <p class="compat__note">{{ families | join: ', ' | escape }}{% if years_label != blank %} · {{ years_label | escape }}{% endif %} · Angaben laut Hersteller</p>
               {%- endif -%}
               <div class="compat__foot">
                 {% render 'icon', name: 'wrench' %}
