@@ -54,21 +54,31 @@
 .footer__dealer img { height: 56px; width: auto; }
 .footer__dealer p { font-size: var(--fs-small); color: var(--c-muted-dark); }
 .footer__dealer strong { color: var(--c-white); display: block; font-family: var(--f-head); font-size: 18px; text-transform: uppercase; letter-spacing: 0.03em; }
-/* Händlerkarte fährt beim Runterscrollen von rechts außerhalb des Bildschirms herein und beim Hochscrollen wieder hinaus, im Takt
+/* Händlerkarte (und seit 8.11. „Folge uns“ davor) fährt beim Runterscrollen von rechts außerhalb des Bildschirms herein und beim Hochscrollen wieder hinaus, im Takt
    des Scrollens. Scroll-gesteuerte CSS-Animation: läuft im Browser ohne Skript und ohne Zeitversatz. Start: Oberkante der Karte am
    unteren Bildrand, Ende 200 px Scrollweg später, mobil 240 px (dort liegt die Safari-Leiste unten über den ersten 80 px). So viel
    Weg bleibt auch ganz unten auf der Seite und auf kurzen Seiten (unter der Karte folgen mindestens 48 px Abstand und die Leiste mit
    Zahlarten und Copyright, gemessen 246 px am Desktop, 320 px mobil), die Karte kommt also immer ganz an. Leichtes Ausrollen am Ende.
    Weg: die eigene Breite plus Abstand bis zum Bildrand (wie .page-banner__media). overflow-x: clip verhindert seitliches Scrollen.
-   Browser ohne scroll-gesteuerte Animationen zeigen die Karte einfach an ihrem Platz. Nur unter has-motion. */
+   Browser ohne scroll-gesteuerte Animationen zeigen die Karte einfach an ihrem Platz. Nur unter has-motion.
+   Seit 8.11. fährt „Folge uns“ (Überschrift und Netze) genauso herein, aber davor und nacheinander, nicht gleichzeitig: Der Block
+   ist 116 px hoch, die Karte beginnt 149 px Scrollweg nach ihm. Am Desktop ist er nach 140 px da, bevor die Karte losfährt. Am
+   Handy fährt er von 40 bis 200 px (etwa ab da, wo er über der Safari-Leiste auftaucht), die Karte erst von 60 bis 280 px ab ihrer
+   Oberkante, also ab 209 px: nacheinander. Platz dafür bleibt auch auf kurzen Seiten (nach der Oberkante der Karte gemessen
+   mindestens 317 px Scrollweg am Handy, 251 px am Desktop). Ändert sich die Höhe von „Folge uns“ deutlich, die Wege anpassen. */
 @supports (animation-timeline: view()) {
   .has-motion .site-footer { overflow-x: clip; }
+  .has-motion .footer__follow,
   .has-motion .footer__dealer {
     animation: dealer-in cubic-bezier(0.5, 1, 0.89, 1) both;
     animation-timeline: view();
-    animation-range: cover 0px cover 200px;
   }
-  @media (max-width: 767px) { .has-motion .footer__dealer { animation-range: cover 0px cover 240px; } }
+  .has-motion .footer__follow { animation-range: cover 0px cover 140px; }
+  .has-motion .footer__dealer { animation-range: cover 0px cover 200px; }
+  @media (max-width: 767px) {
+    .has-motion .footer__follow { animation-range: cover 40px cover 200px; }
+    .has-motion .footer__dealer { animation-range: cover 60px cover 280px; }
+  }
 }
 @keyframes dealer-in {
   from { transform: translateX(calc(100% + var(--gutter) + max(0px, (100vw - var(--container)) / 2))); }
