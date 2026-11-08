@@ -118,12 +118,9 @@
           {%- if has_social or request.design_mode -%}
           <div {{ block.shopify_attributes }}>
             <h2>{{ block.settings.title }}</h2>
-            <ul>
-              {%- if settings.social_instagram != blank -%}<li><a href="{{ settings.social_instagram }}" rel="noopener" target="_blank">Instagram</a></li>{%- endif -%}
-              {%- if settings.social_facebook != blank -%}<li><a href="{{ settings.social_facebook }}" rel="noopener" target="_blank">Facebook</a></li>{%- endif -%}
-              {%- if settings.social_youtube != blank -%}<li><a href="{{ settings.social_youtube }}" rel="noopener" target="_blank">YouTube</a></li>{%- endif -%}
-              {%- if settings.social_tiktok != blank -%}<li><a href="{{ settings.social_tiktok }}" rel="noopener" target="_blank">TikTok</a></li>{%- endif -%}
-            </ul>
+            {%- comment -%} Seit 8.11. mit Symbolen (snippets/social-links, wie im Megamenü und Handy-Menü), hier mit Namen daneben {%- endcomment -%}
+            {%- render 'social-links', class: 'footer__social', labels: true -%}
+            {%- if has_social == false -%}<p class="small" role="note">Trage die Adressen unter „Theme-Einstellungen &gt; Footer und Soziale Netze“ ein.</p>{%- endif -%}
           </div>
           {%- endif -%}
       {%- endcase -%}

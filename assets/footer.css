@@ -34,6 +34,14 @@
   transition: color var(--t-fast), background-size var(--t-med) var(--ease);
 }
 .footer__cols a:hover, .footer__cols a:focus-visible, .footer__cols button:hover, .footer__cols button:focus-visible { color: var(--c-white); background-size: 100% 2px; }
+/* „Folge uns“: Logo vor dem Namen, sonst wie die Links daneben (Größe, Farbe, Unterstreichung nur unter dem Namen) */
+.footer__social .social__link { display: inline-flex; width: auto; height: auto; place-items: initial; gap: 10px; border-radius: 0; background: none; }
+.footer__social .social__link .icon { width: 18px; height: 18px; }
+.footer__social .social__link > span:not(.sr-only) {
+  background: linear-gradient(var(--c-orange), var(--c-orange)) no-repeat 0 100% / 0 2px; padding-bottom: 2px;
+  transition: background-size var(--t-med) var(--ease);
+}
+.footer__social .social__link:hover > span, .footer__social .social__link:focus-visible > span { background-size: 100% 2px; }
 .footer__dealer { grid-column: 1 / -1; display: flex; gap: 16px; align-items: center; padding: 20px; border: 1px solid var(--c-steel); background: var(--c-anthracite); align-self: start; }
 @media (min-width: 1024px) { .footer__dealer { grid-column: auto; flex-direction: column; align-items: flex-start; } }
 .footer__dealer img { height: 56px; width: auto; }
