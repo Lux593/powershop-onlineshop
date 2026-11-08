@@ -507,7 +507,7 @@
         var single = fams.length === 1 && yrs.length === 1; // genau ein Motorrad gewählt
         var bikes = $('[data-compat-fit-bikes]', fit);
         var title;
-        var text = universal ? 'Universell einsetzbar · Angaben laut Hersteller' : 'Angaben laut Hersteller';
+        var text = universal ? 'Universell einsetzbar' : ''; // kein Herstellerhinweis unter dem Motorrad (Wunsch des Händlers)
         var state;
         bikes.textContent = '';
         if (!misses.length) {
@@ -525,7 +525,9 @@
           bikes.appendChild(bikeRow('', misses, false));
         }
         $('[data-compat-fit-title]', fit).textContent = title;
-        $('[data-compat-fit-text]', fit).textContent = text;
+        var note = $('[data-compat-fit-text]', fit);
+        note.textContent = text;
+        note.hidden = !text;
         fit.dataset.state = state;
         fit.hidden = false;
 
