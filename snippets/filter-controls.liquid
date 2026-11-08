@@ -71,7 +71,22 @@
           {%- if value.swatch != blank -%}
             <span class="fgroup__swatch" style="background: {% if value.swatch.color %}{{ value.swatch.color }}{% elsif value.swatch.image %}url({{ value.swatch.image | image_url: width: 32 }}) center / cover{% endif %}"></span>
           {%- endif -%}
-          {{ value.label | escape }}
+          {%- liquid
+            # Zustand der Motorräder ist im Metafeld klein und ohne Umlaut gespeichert (neu, gebraucht, vorfuehrer),
+            # die Theme-Logik rechnet damit. Für die Anzeige im Filter die lesbaren Namen.
+            assign value_label = value.label
+            if filter.param_name == 'filter.p.m.bike.zustand'
+              case value.value
+                when 'neu'
+                  assign value_label = 'Neu'
+                when 'gebraucht'
+                  assign value_label = 'Gebraucht'
+                when 'vorfuehrer'
+                  assign value_label = 'Vorführer'
+              endcase
+            endif
+          -%}
+          {{ value_label | escape }}
           <span class="fgroup__count">{{ value.count }}</span>
         </label>
       {%- endfor -%}
