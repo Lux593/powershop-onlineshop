@@ -285,7 +285,7 @@
 .compat__vehicle div { padding: 14px 12px; }
 .compat__vehicle div:nth-child(2n) { border-right: 0; }
 .compat__vehicle div:nth-last-child(-n + 2) { border-bottom: 0; }
-.compat__vehicle dt { white-space: nowrap; letter-spacing: 0.04em; }
+.compat__vehicle dt { white-space: nowrap; letter-spacing: 0.03em; }
 .compat__vehicle dd { overflow-wrap: anywhere; }
 .compat__vehicle.is-miss dd { color: var(--c-text-soft); font-weight: 400; }
 .compat__fit-icon { display: none; flex: none; }
