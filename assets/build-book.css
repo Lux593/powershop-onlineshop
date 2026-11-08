@@ -106,7 +106,13 @@
   .build-book.is-ready .bb-bay { height: var(--closed-h); border-top: 1px solid var(--c-steel); transition: height .7s var(--ease-out); }
   .build-book.is-ready .bb-bay:first-child { border-top: 0; }
   .build-book.is-ready .bb-bay.is-open { height: var(--open-h, 900px); }
-  .build-book.is-ready .bb-cover { width: 100%; transform: none; }
+  /* Das Foto des Streifens bleibt beim Aufklappen in Streifenhöhe oben stehen (seit 8.11.): Über die ganze Höhe gezogen zoomte es
+     während des Aufklappens auf, bevor der Inhalt darüber einblendete */
+  .build-book.is-ready .bb-cover { bottom: auto; width: 100%; height: var(--closed-h); transform: none; }
+  /* Der Inhalt blendet beim Aufklappen gleich ein (ohne Verzögerung), so geht das Foto des Streifens direkt in den Kopf über.
+     Kein Tipp-Highlight: Es läge sonst als Fläche über dem aufgehenden Fenster (die Tür füllt den ganzen Umbau) */
+  .bb-bay.is-open .bb-room { transition: opacity .2s, visibility 0s; }
+  .bb-door { -webkit-tap-highlight-color: transparent; }
   .bb-cover img { object-position: var(--pos-m, 50% 55%); }
   .bb-door::before { background: linear-gradient(90deg, rgba(10, 10, 10, .85) 0%, rgba(10, 10, 10, .15) 75%); }
   .bb-label--narrow { display: none; }
