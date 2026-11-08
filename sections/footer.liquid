@@ -9,7 +9,10 @@
   endif
 
   comment
-    Die Spalte „Soziale Netze“ erscheint erst, wenn mindestens ein Profil hinterlegt ist.
+    Die Spalte „Soziale Netze“ erscheint erst, wenn mindestens ein Profil hinterlegt ist. Seit 8.11. steht sie nicht mehr als Spalte
+    neben den Links, sondern darunter über die volle Breite: „Folge uns“ mittig, die Netze in einer Reihe aus gleich breiten Feldern
+    (Symbol über dem Namen), darunter die Händlerkarte, ebenfalls über die volle Breite; sie gleitet beim Reinscrollen von links herein
+    (data-reveal="left", motion.js). Das Raster der Spalten zählt darum nur noch die Link-Spalten.
     Eine Link-Spalte erscheint erst ab zwei Menüpunkten. Die angehängten Links (Größentabelle,
     Cookie-Einstellungen) einer ausgeblendeten Spalte wandern in die Fußzeile und bleiben erreichbar.
     Auch der einzelne Menüpunkt einer ausgeblendeten Spalte (z. B. nur „Impressum“) steht dann in der Fußzeile:
@@ -34,11 +37,7 @@
   assign footer_size_guide = false
   assign footer_cookie_settings = false
   for block in section.blocks
-    if block.type == 'social'
-      if has_social or request.design_mode
-        assign footer_cols = footer_cols | plus: 1
-      endif
-    elsif block.type == 'links'
+    if block.type == 'links'
       if linklists[block.settings.menu].links.size > 1 or request.design_mode
         assign footer_cols = footer_cols | plus: 1
       else
@@ -51,9 +50,7 @@
       endif
     endif
   endfor
-  assign footer_no_cols = false
   if footer_cols < 1
-    assign footer_no_cols = true
     assign footer_cols = 1
   endif
 -%}
@@ -116,7 +113,7 @@
           {%- endif -%}
         {%- when 'social' -%}
           {%- if has_social or request.design_mode -%}
-          <div {{ block.shopify_attributes }}>
+          <div class="footer__follow" {{ block.shopify_attributes }}>
             <h2>{{ block.settings.title }}</h2>
             {%- comment -%} Seit 8.11. mit Symbolen (snippets/social-links, wie im Megamenü und Handy-Menü), hier mit Namen daneben {%- endcomment -%}
             {%- render 'social-links', class: 'footer__social', labels: true -%}
@@ -126,8 +123,8 @@
       {%- endcase -%}
     {%- endfor -%}
 
-    {%- comment -%} Ohne Link-Spalten wird die Händlerkarte zur durchgehenden Zeile, statt links allein zu stehen. {%- endcomment -%}
-    <div class="footer__dealer"{% if footer_no_cols %} style="grid-column:1 / -1;flex-direction:row;align-items:center;justify-content:center"{% endif %}>
+    {%- comment -%} Händlerkarte über die volle Breite unter allem anderen, gleitet beim Reinscrollen von links herein {%- endcomment -%}
+    <div class="footer__dealer" data-reveal="left">
       <img src="{{ 'hd-bar-shield.png' | asset_url }}" alt="Harley-Davidson Bar &amp; Shield" width="69" height="56" loading="lazy">
       <p>
         <strong>Offizieller Vertragshändler</strong>

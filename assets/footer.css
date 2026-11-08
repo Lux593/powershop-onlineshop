@@ -21,7 +21,7 @@
 /* Zwischen 640 und 1023 px stehen die Link-Spalten nebeneinander (höchstens drei): mit zwei Spalten läge die dritte Liste allein in der zweiten Zeile
    neben einer leeren Fläche. Die Händlerkarte bleibt darunter in voller Breite. */
 @media (min-width: 640px) and (max-width: 1023px) { .footer__cols { grid-template-columns: repeat(var(--footer-cols-md, 3), minmax(0, 1fr)); } }
-@media (min-width: 1024px) { .footer__cols { grid-template-columns: repeat(var(--footer-cols, 4), 1fr) 1.3fr; } }
+@media (min-width: 1024px) { .footer__cols { grid-template-columns: repeat(var(--footer-cols, 4), 1fr); } }
 @media (pointer: coarse) { .footer__cols a, .footer__cols button { min-height: 44px; } }
 .footer__cols h2 { font-size: 16px; letter-spacing: 0.12em; color: var(--c-white); margin-bottom: 14px; }
 .footer__cols ul { display: grid; gap: 2px; }
@@ -34,16 +34,22 @@
   transition: color var(--t-fast), background-size var(--t-med) var(--ease);
 }
 .footer__cols a:hover, .footer__cols a:focus-visible, .footer__cols button:hover, .footer__cols button:focus-visible { color: var(--c-white); background-size: 100% 2px; }
-/* „Folge uns“: Logo vor dem Namen, sonst wie die Links daneben (Größe, Farbe, Unterstreichung nur unter dem Namen) */
-.footer__social .social__link { display: inline-flex; width: auto; height: auto; place-items: initial; gap: 10px; border-radius: 0; background: none; }
-.footer__social .social__link .icon { width: 18px; height: 18px; }
-.footer__social .social__link > span:not(.sr-only) {
-  background: linear-gradient(var(--c-orange), var(--c-orange)) no-repeat 0 100% / 0 2px; padding-bottom: 2px;
-  transition: background-size var(--t-med) var(--ease);
+/* „Folge uns“ (seit 8.11.): über die volle Breite, Überschrift mittig, die Netze darunter in einer Reihe aus gleich breiten Feldern
+   (bei drei Netzen 3 × 1), Symbol über dem Namen. Rahmen wie die Händlerkarte darunter; beim Überfahren füllt sich das Feld. */
+.footer__follow { grid-column: 1 / -1; text-align: center; }
+.footer__follow h2 { margin-bottom: 16px; }
+.footer__social.social--labels { grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 8px; max-width: 560px; margin-inline: auto; }
+.footer__social .social__link {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; height: auto; min-height: 84px; padding: 14px 8px; text-align: center;
+  border: 1px solid var(--c-steel); border-radius: var(--radius); background: none; font-size: var(--fs-small); color: var(--c-on-dark);
+  transition: background-color var(--t-fast), border-color var(--t-fast), color var(--t-fast);
 }
-.footer__social .social__link:hover > span, .footer__social .social__link:focus-visible > span { background-size: 100% 2px; }
+.footer__social .social__link .icon { width: 24px; height: 24px; }
+.footer__social .social__link:hover, .footer__social .social__link:focus-visible { color: var(--c-white); background: var(--c-anthracite); border-color: var(--c-orange); }
+/* Händlerkarte (seit 8.11.) immer über die volle Breite unter „Folge uns“; ab 640 px Logo und Text mittig nebeneinander */
 .footer__dealer { grid-column: 1 / -1; display: flex; gap: 16px; align-items: center; padding: 20px; border: 1px solid var(--c-steel); background: var(--c-anthracite); align-self: start; }
-@media (min-width: 1024px) { .footer__dealer { grid-column: auto; flex-direction: column; align-items: flex-start; } }
+@media (min-width: 640px) { .footer__dealer { justify-content: center; gap: 20px; padding: 24px; } }
 .footer__dealer img { height: 56px; width: auto; }
 .footer__dealer p { font-size: var(--fs-small); color: var(--c-muted-dark); }
 .footer__dealer strong { color: var(--c-white); display: block; font-family: var(--f-head); font-size: 18px; text-transform: uppercase; letter-spacing: 0.03em; }
