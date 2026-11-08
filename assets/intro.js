@@ -50,8 +50,21 @@
     return s.webm && v.canPlayType('video/webm; codecs="vp9"') === 'probably' ? s.webm : s.mp4;
   }
   build.muted = zoom.muted = true;
+  // Fehler beim Laden oder Dekodieren (etwa ein WebM-Profil, das Safari nicht kann, obwohl canPlayType „probably“ sagt):
+  // einmal mit dem MP4 (H.264 geht überall) neu versuchen, erst danach gilt der Film als defekt.
+  function retryMp4(v, s) {
+    if (v.getAttribute('src') === s.mp4) return false;
+    v.src = s.mp4;
+    v.load();
+    return true;
+  }
   build.src = pick(build, S.build);
   zoom.src = pick(zoom, S.zoom);
+  var zoomBroken = false;
+  zoom.addEventListener('error', function () {
+    if (!retryMp4(zoom, S.zoom)) { zoomBroken = true; return; }
+    if (state === 'zoom') { var q = zoom.play(); if (q && q.catch) q.catch(function () {}); } // Fehler erst nach dem Klick: Neustart mit dem MP4
+  });
 
   function showFrame() {
     // Notlösung: Standbild des fertigen Logos, Texte sofort
@@ -66,15 +79,27 @@
   }
 
   var started = later(showFrame, 5000); // der Film kommt in 5 s nicht in Gang
+  var playing = false;
+  function playBuild() {
+    var p = build.play();
+    // Nur gesperrtes Autoplay (iOS Strom sparen) führt gleich zum Standbild. NotSupportedError (Quelle nicht ladbar) kommt vor dem
+    // error-Ereignis und gehört dem MP4-Rückfall unten; AbortError ist ein Neuladen.
+    if (p && p.catch) p.catch(function (e) { if (e && e.name === 'NotAllowedError') showFrame(); });
+  }
   build.addEventListener('playing', function () {
+    playing = true;
     clearTimeout(started);
     build.classList.add('is-on');
     watch();
   }, { once: true });
-  build.addEventListener('error', showFrame);
+  build.addEventListener('error', function () { if (retryMp4(build, S.build)) playBuild(); else showFrame(); });
   build.addEventListener('ended', showText);
-  var p = build.play();
-  if (p && p.catch) p.catch(function (e) { if (e && e.name !== 'AbortError') showFrame(); });
+  playBuild();
+  // Kein Fehlerereignis, aber auch kein Bild (manche Browser): nach 2,2 s das MP4 versuchen
+  later(function () {
+    // networkState 2 = lädt noch (langsames Netz): dann warten, nicht den größeren Film nachladen
+    if (!playing && state === 'build' && build.networkState !== 2 && retryMp4(build, S.build)) playBuild();
+  }, 2200);
   // Zurück im Tab: ein vom Browser angehaltener Film läuft weiter
   doc.addEventListener('visibilitychange', function () {
     if (!doc.hidden && state === 'build' && !fallback && build.paused && !build.ended) { var q = build.play(); if (q && q.catch) q.catch(function () {}); }
@@ -109,10 +134,11 @@
     if (state !== 'ready') return;
     state = 'zoom';
     root.classList.add('is-leaving');
-    if (fallback) { later(finish, 520); return; }
+    if (zoomBroken) { later(finish, 520); return; }
 
+    // Auch wenn der Aufbau-Film nicht lief: Der Zoom beginnt mit dem fertigen Logo, genau wie das Standbild
     zoom.addEventListener('ended', finish);
-    zoom.addEventListener('error', finish);
+    zoom.addEventListener('error', function () { if (zoomBroken) finish(); });
     zoom.addEventListener('playing', function () {
       // Erstes Bild des Zoom-Films ≈ letztes Bild des Aufbaus: Überblenden fällt nicht auf. Erst zeigen, wenn es gemalt wird.
       var on = function () { zoom.classList.add('is-on'); build.pause(); };
@@ -121,7 +147,8 @@
     }, { once: true });
     // play() gleich im Klick: iOS lädt Filme erst auf Abruf, ein Warten auf canplay käme dort nie
     var q = zoom.play();
-    if (q && q.catch) q.catch(function () { finish(); });
+    // AbortError: der Film wurde gerade neu geladen (MP4-Rückfall), kein Fehler
+    if (q && q.catch) q.catch(function (e) { if (!e || e.name !== 'AbortError') finish(); });
     later(function () { if (!zoom.classList.contains('is-on')) finish(); }, 2500); // Film läuft nach 2,5 s nicht: direkt überblenden
     later(finish, 7000); // Notausstieg: der Film ist 3 s lang
   }
