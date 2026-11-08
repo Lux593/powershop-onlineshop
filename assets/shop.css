@@ -246,15 +246,7 @@
 .compat__title { display: flex; align-items: center; gap: 12px; min-width: 0; }
 .compat__title .icon { width: 20px; height: 20px; flex: none; color: var(--c-muted); }
 .compat__note { padding: 0 16px 16px var(--compat-indent); font-size: var(--fs-small); color: var(--c-text-soft); }
-.compat__fams { list-style: none; margin: 0; padding: 0 16px 8px var(--compat-indent); font-size: var(--fs-small); } /* gleiche Größe wie die Modellliste */
-.compat > .compat__acc:first-child > summary, .compat__fit + .compat__acc > summary { border-top: 0; } /* oben schließt der Rahmen bzw. die Auswahl ab */
-.compat__fam { position: relative; display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 10px 0; border-top: 1px solid var(--c-line); }
-.compat__fam:first-child { border-top: 0; }
-.compat__fam-name { overflow-wrap: anywhere; }
-.compat__fam-years { max-width: 12em; text-align: right; font-variant-numeric: tabular-nums; }
-/* Markierung aus der Filterauswahl: Balken und Text im Marken-Orange (Wunsch des Händlers) */
-.compat__fam.is-match .compat__fam-name, .compat__fam.is-match .compat__fam-years { color: var(--c-orange); }
-.compat__fam.is-match::before { content: ""; position: absolute; left: -16px; top: 8px; bottom: 8px; width: 3px; border-radius: 2px; background: var(--c-orange); }
+.compat__fit + details > summary { border-top: 0; } /* die Box darüber schließt mit einer Linie ab */
 .compat details summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; padding: 0 16px; border-top: 1px solid var(--c-line); font-weight: 600; font-size: var(--fs-small); }
 .compat details summary::-webkit-details-marker { display: none; }
 .compat__sum { display: flex; align-items: flex-start; gap: 12px; padding-block: 12px; }
@@ -277,6 +269,12 @@
 .compat__fit-head { display: flex; gap: 12px; align-items: flex-start; }
 .compat__fit-head strong { min-width: 0; }
 .compat__fit p { font-size: var(--fs-caption); color: var(--c-muted); }
+/* Passt-Check, Zustand „ask“: noch kein Motorrad bekannt, Box mit „Jetzt prüfen“ (Fenster #passt-check) */
+.compat__fit .compat__fit-lead { margin: -4px 0 0 32px; font-size: var(--fs-small); color: var(--c-text-soft); }
+.compat__fit-btn { width: 100%; }
+.compat__fit-change { justify-self: start; font-size: var(--fs-small); }
+.compat__fit[data-state="ask"] { background: var(--c-offwhite); }
+.compat__fit[data-state="ask"] .compat__fit-icon--ask { display: flex; color: var(--c-text); }
 /* Das gewählte Motorrad: Kacheln wie die Fakten der Motorrad-Seiten (.bike-facts), über die volle Breite, zwei gleiche Spalten,
    ohne doppelte Außenlinien. Etwas weniger Innenabstand und Sperrung, damit „Modellfamilie“ auch bei 360 px in eine Zeile passt */
 .compat__fit-bikes { display: grid; gap: 12px; }
@@ -649,3 +647,24 @@ html:not(.has-motion) .bcard:hover .bcard__media img { transform: none; }
 @media (min-width: 1024px) { .pdp { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
 .gallery__main { aspect-ratio: 1 / 1; max-height: max(360px, calc(100svh - 200px)); }
 .gallery__thumbs button { aspect-ratio: 1 / 1; }
+
+/* ---------- Passt-Check-Fenster (snippets/passt-check.liquid): Baujahr → Modellfamilie → Modell ---------- */
+@media (min-width: 640px) { .pc-dialog { width: min(520px, calc(100% - 32px)); } }
+.pc-intro { margin-bottom: 20px; font-size: var(--fs-small); color: var(--c-text-soft); }
+.pc-fields { display: grid; gap: 16px; }
+.pc-dialog .select {
+  -webkit-appearance: none; appearance: none; padding-right: 44px; color: var(--c-text);
+  background: var(--c-white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230a0a0a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 14px center / 16px;
+}
+.pc-dialog .select:disabled { background-color: var(--c-offwhite); color: var(--c-muted); cursor: not-allowed; }
+.pc-result { display: flex; gap: 12px; align-items: flex-start; margin-top: 20px; padding: 14px 16px; }
+.pc-result[hidden] { display: none; }
+.pc-result[data-state="ok"] { background: color-mix(in srgb, var(--c-orange) 8%, var(--c-white)); }
+.pc-result[data-state="no"] { background: var(--c-offwhite); }
+.pc-result__icon { display: none; flex: none; }
+.pc-result__icon .icon { width: 20px; height: 20px; margin-top: 2px; }
+.pc-result[data-state="ok"] .pc-result__icon--ok { display: flex; color: var(--c-orange); }
+.pc-result[data-state="no"] .pc-result__icon--no { display: flex; color: var(--c-error); }
+.pc-error { margin-top: 16px; font-size: var(--fs-small); color: var(--c-error); }
+.pc-help { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 16px; margin-top: 20px; font-size: var(--fs-small); color: var(--c-text-soft); }
+@media (max-width: 639px) { .pc-dialog .modal__foot .btn { flex: 1 1 0; } }
