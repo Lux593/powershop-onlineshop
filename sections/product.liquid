@@ -389,7 +389,7 @@
                 {%- liquid
                   comment
                     Übersicht je Modellfamilie: Baujahre als Spannen mit Lücken („2004–2013, 2016“).
-                    Reihenfolge wie part.modellfamilien, Familien nur aus der Modellliste kommen hinten dran.
+                    Familien und Modelle alphabetisch (sort_natural: ohne Rücksicht auf Groß- und Kleinschreibung).
                   endcomment
                   assign compat_fams = compat | map: 'family' | uniq
                   assign fam_order = '|'
@@ -404,7 +404,7 @@
                       assign fam_order = fam_order | append: f | append: '|'
                     endunless
                   endfor
-                  assign fam_list = fam_order | remove_first: '|' | split: '|'
+                  assign fam_list = fam_order | remove_first: '|' | split: '|' | sort_natural
                 -%}
                 {%- comment -%} „Passt für“ klappt wie „Alle kompatiblen Modelle“, standardmäßig zu {%- endcomment -%}
                 <details class="compat__acc">
@@ -483,7 +483,7 @@
                       <table data-compat-rows>
                         <thead><tr><th scope="col">Modell</th><th scope="col">Baujahre</th></tr></thead>
                         {%- for fam in fam_list -%}
-                          {%- assign fam_rows = compat | where: 'family', fam | sort: 'model' -%}
+                          {%- assign fam_rows = compat | where: 'family', fam | sort_natural: 'model' -%}
                           <tbody data-group="{{ fam | escape }}">
                             <tr class="compat__group"><th scope="rowgroup" colspan="2">{{ fam | escape }}</th></tr>
                             {%- for row in fam_rows -%}
