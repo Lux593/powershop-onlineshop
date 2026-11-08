@@ -311,6 +311,10 @@ dialog:focus, dialog:focus-visible { outline: none; }
 .rail-nav button { width: 48px; height: 48px; display: grid; place-items: center; border: 1px solid var(--c-black); border-radius: 50%; }
 .rail-nav button:hover { background: var(--c-black); color: var(--c-white); }
 .rail-nav button[disabled], .rail-nav button[aria-disabled="true"] { opacity: 0.3; pointer-events: none; }
+/* Auf dunklem Grund (Events in „Story und Events“): heller Ring, beim Überfahren weiß gefüllt; der Fortschritt läuft auf Stahl */
+.on-dark .rail-nav button { border-color: var(--c-white); color: var(--c-white); }
+.on-dark .rail-nav button:hover { background: var(--c-white); color: var(--c-black); }
+.on-dark .rail-progress { background: var(--c-steel); }
 
 /* ---------- Tooltip (Info) ----------
    WCAG 1.4.13: Die Blase bleibt sichtbar, solange Zeiger oder Fokus auf Knopf oder Blase liegen (die Brücke ::before füllt den Spalt,

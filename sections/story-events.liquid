@@ -51,9 +51,11 @@
     </div>
 
     {%- comment -%}
-      Events kommen aus Shopify (Inhalte → Metaobjekte → Event): die nächsten drei, sortiert, Vergangene und Entwürfe fehlen
-      (snippets/events-upcoming.liquid). Überschrift und Link erscheinen nur, wenn eine Karte übrig bleibt. Karten ohne
-      eigenen Link führen zur Seite „Alle Events“ (Seite mit dem Handle events), falls es sie gibt.
+      Events kommen aus Shopify (Inhalte → Metaobjekte → Event): die kommenden (bis zu zwölf), sortiert, Vergangene und Entwürfe
+      fehlen (snippets/events-upcoming.liquid). Seit 8.11. als Schiene wie der Showroom: eine Karte je 86 % auf dem Handy, zwei ab
+      640 px, drei ab 1024 px, Pfeile neben „Alle Events“, darunter der Fortschritt (home.css, home.js). Passen alle Karten
+      nebeneinander, entfallen Pfeile und Fortschritt. Überschrift und Link erscheinen nur, wenn eine Karte übrig bleibt. Karten
+      ohne eigenen Link führen zur Seite „Alle Events“ (Seite mit dem Handle events), falls es sie gibt.
     {%- endcomment -%}
     {%- liquid
       assign events_url = section.settings.events_url
@@ -65,21 +67,30 @@
       endif
     -%}
     {%- capture event_cards -%}
-      {%- render 'events-upcoming', limit: 3, page_url: events_url -%}
+      {%- render 'events-upcoming', limit: 12, page_url: events_url, sizes: '(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 86vw' -%}
     {%- endcapture -%}
     {%- assign event_cards_text = event_cards | strip -%}
     {%- if event_cards_text != blank -%}
+      {%- assign events_rail_id = 'events-rail-' | append: section.id -%}
       <div class="events">
-        <div class="section-head">
+        <div class="section-head events__head">
           {%- comment -%} Seit 8.11. so groß wie die Abschnitts-Überschriften („Mehr als ein Shop“, „Komm vorbei.“) {%- endcomment -%}
           <h2 class="section-title">{{ section.settings.events_heading }}</h2>
-          {%- if events_url != blank -%}
-            <a class="btn btn--text" href="{{ events_url }}">Alle Events {% render 'icon', name: 'arrow-right' %}</a>
-          {%- endif -%}
+          <div class="events__nav">
+            {%- if events_url != blank -%}
+              <a class="btn btn--text" href="{{ events_url }}">Alle Events {% render 'icon', name: 'arrow-right' %}</a>
+            {%- endif -%}
+            <div class="rail-nav" data-rail-nav="{{ events_rail_id }}">
+              <button type="button" data-rail-prev="{{ events_rail_id }}" aria-label="Vorherige Events">{% render 'icon', name: 'chevron-left' %}</button>
+              <button type="button" data-rail-next="{{ events_rail_id }}" aria-label="Weitere Events">{% render 'icon', name: 'chevron-right' %}</button>
+            </div>
+          </div>
         </div>
-        <div class="event-grid" data-stagger="90">
+        <div class="rail events__rail" id="{{ events_rail_id }}" data-stagger="80">
           {{ event_cards }}
         </div>
+        {%- comment -%} Fortschritt der Schiene (assets/home.js setzt --rail-progress); nur Orientierung, daher aria-hidden {%- endcomment -%}
+        <div class="rail-progress" aria-hidden="true" hidden><span></span></div>
       </div>
     {%- endif -%}
   </div>
