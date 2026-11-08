@@ -109,5 +109,52 @@
         "info": "Der Header der Startseite liegt transparent über dem Hero und wird nach etwa 40 px Scrollen schwarz. Ausgeschaltet bleibt er durchgehend schwarz."
       }
     ]
+  },
+  {
+    "name": "Intro (Startseite)",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Einlass vor der Startseite: Das Logo zeichnet sich im Film aus Linien, darüber steigen Überschrift und Button ein. Mit „Klicke zum Betreten“ fährt der Film durch das Logo in den Shop. Erscheint nur mit aktivierten Animationen (Einstellung oben), nie bei „Bewegung reduzieren“ oder Datensparen und nie im Theme-Editor. Zum Testen: ?intro=1 an die Adresse der Startseite hängen, dann erscheint er immer."
+      },
+      {
+        "type": "checkbox",
+        "id": "intro_enabled",
+        "label": "Intro auf der Startseite zeigen",
+        "default": true
+      },
+      {
+        "type": "select",
+        "id": "intro_repeat",
+        "label": "Wann erscheint er?",
+        "options": [
+          { "value": "session", "label": "Einmal pro Besuch (neu nach Schließen des Browsers)" },
+          { "value": "day", "label": "Einmal pro Tag" },
+          { "value": "once", "label": "Nur beim allerersten Besuch" },
+          { "value": "always", "label": "Bei jedem Aufruf der Startseite (zum Testen)" }
+        ],
+        "default": "session"
+      },
+      {
+        "type": "text",
+        "id": "intro_heading",
+        "label": "Überschrift",
+        "default": "Willkommen im Power Shop",
+        "info": "Wird in Großbuchstaben gesetzt."
+      },
+      {
+        "type": "text",
+        "id": "intro_button",
+        "label": "Button",
+        "default": "Klicke zum Betreten"
+      },
+      {
+        "type": "text",
+        "id": "intro_skip",
+        "label": "Überspringen-Link",
+        "default": "Überspringen",
+        "info": "Steht klein oben rechts. Escape überspringt ebenfalls."
+      }
+    ]
   }
 ]

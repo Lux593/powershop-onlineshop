@@ -44,6 +44,40 @@
     {%- endunless -%}
 
     {%- comment -%}
+      Intro / Einlass (nur Startseite, beim ersten Aufruf): snippets/intro.liquid, assets/intro.css und intro.js, Doku docs/intro.md.
+      Dieses Skript entscheidet vor dem ersten Bild, ob der Überzug erscheint (html.intro-on), damit die Startseite nicht erst
+      aufblitzt. Er erscheint nur, wenn Animationen an sind (has-motion: Setting, keine reduzierte Bewegung, kein Datensparen, nicht im
+      Theme-Editor), nicht für Suchmaschinen und Prüfroboter, nicht bei Anker-Links und nicht bei echtem 2G. Wiederholung nach Setting:
+      Sitzung, Tag, nur einmal oder immer. ?intro=1 erzwingt ihn (zum Testen), ?intro=0 unterdrückt ihn.
+      Failsafe: setzt intro.js nach 6 s nicht sein Zeichen (data-intro-ready), gibt dieses Skript die Seite wieder frei.
+    {%- endcomment -%}
+    {%- assign intro_on = false -%}
+    {%- if template.name == 'index' and settings.intro_enabled and settings.motion_enabled and request.design_mode == false -%}
+      {%- assign intro_on = true -%}
+      <script>
+        (function (d) {
+          function get(s, k) { try { return s.getItem(k); } catch (e) { return null; } }
+          if (!d.classList.contains('has-motion')) return;
+          var q = location.search;
+          if (/[?&]intro=0(&|$)/.test(q)) return;
+          if (!/[?&]intro=1(&|$)/.test(q)) {
+            var c = navigator.connection;
+            if (location.hash || navigator.webdriver || /bot|crawl|spider|slurp|lighthouse|pagespeed|headless/i.test(navigator.userAgent)) return;
+            if (c && /(^|-)2g$/.test(c.effectiveType || '')) return;
+            var mode = {{ settings.intro_repeat | default: 'session' | json }};
+            var last = mode === 'session' ? get(sessionStorage, 'ps-intro') : get(localStorage, 'ps-intro');
+            if (mode === 'session' && last) return;
+            if (mode === 'once' && last) return;
+            if (mode === 'day' && last && Date.now() - Number(last) < 864e5) return;
+          }
+          d.setAttribute('data-intro-variant', matchMedia('(orientation: portrait), (max-width: 767px)').matches ? 'portrait' : 'landscape');
+          d.classList.add('intro-on');
+          setTimeout(function () { if (!d.hasAttribute('data-intro-ready')) d.classList.remove('intro-on'); }, 6000);
+        })(document.documentElement);
+      </script>
+    {%- endif -%}
+
+    {%- comment -%}
       Nur bei der lokalen Entwicklung (shopify theme dev auf localhost): Shopifys Cookie-Banner ausblenden (base.css,
       .is-local-dev). Dort erscheint er bei jedem Laden neu. Im Shop und in Vorschau-Links greift die Regel nie.
     {%- endcomment -%}
@@ -62,6 +96,9 @@
     {{ 'header.css' | asset_url | stylesheet_tag }}
     {%- if template.name == 'index' %}
     {{ 'hero.css' | asset_url | stylesheet_tag }}
+    {%- endif %}
+    {%- if intro_on %}
+    {{ 'intro.css' | asset_url | stylesheet_tag }}
     {%- endif %}
     {{ 'home.css' | asset_url | stylesheet_tag }}
     {{ 'footer.css' | asset_url | stylesheet_tag }}
@@ -103,6 +140,9 @@
   </head>
 
   <body data-template="{{ template.name }}"{% if template.name == 'index' and settings.header_overlay_home %} data-header-overlay{% endif %}>
+    {%- if intro_on -%}
+      {% render 'intro' %}
+    {%- endif -%}
     <a class="skip-link" href="#main">{{ 'general.skip_to_content' | t }}</a>
 
     {% sections 'header-group' %}
@@ -173,6 +213,9 @@
       {%- endif -%}
     {%- endunless -%}
     <script src="{{ 'motion.js' | asset_url }}" defer onerror="document.documentElement.classList.remove('has-motion', 'has-smooth')"></script>
+    {%- if intro_on -%}
+      <script src="{{ 'intro.js' | asset_url }}" defer></script>
+    {%- endif -%}
     <script src="{{ 'header.js' | asset_url }}" defer></script>
     <script src="{{ 'cart.js' | asset_url }}" defer></script>
     <script src="{{ 'sections.js' | asset_url }}" defer></script>

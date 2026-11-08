@@ -1,0 +1,63 @@
+{%- comment -%}
+  Intro / Einlass (nur Startseite): Vollbild über der Seite, beim ersten Aufruf.
+  Ablauf: Film „Aufbau“ (das Logo zeichnet sich aus Linien) → Überschrift und Button steigen ein (gleiche Wort-Animation wie
+  die Überschriften der Startseite) → Klick: Texte steigen aus, Film „Zoom“ fährt durch den Balken des Logos auf die Startseite
+  → Überblendung in den echten Hero. Verhalten: assets/intro.js, Stile: assets/intro.css, Doku: docs/intro.md.
+
+  Ohne JavaScript, mit reduzierter Bewegung, bei Datensparen, im Theme-Editor und für Suchmaschinen erscheint nichts: der
+  Überzug ist per CSS aus und wird nur eingeblendet, wenn das Head-Skript in layout/theme.liquid html.intro-on setzt.
+  Die Filmadressen stehen hier, damit die Dateien hier nicht doppelt gepflegt werden; geladen wird nur die passende Variante
+  (Hochformat oder Querformat, WebM nur wenn sicher abspielbar, sonst MP4).
+{%- endcomment -%}
+{%- liquid
+  assign heading = settings.intro_heading | default: 'Willkommen im Power Shop'
+  assign button = settings.intro_button | default: 'Klicke zum Betreten'
+  assign skip = settings.intro_skip | default: 'Überspringen'
+-%}
+{%- capture sources -%}
+  {
+    "landscape": {
+      "build": { "mp4": {{ 'intro-build-16x9.mp4' | asset_url | json }}, "webm": {{ 'intro-build-16x9.webm' | asset_url | json }} },
+      "zoom": { "mp4": {{ 'intro-zoom-16x9.mp4' | asset_url | json }}, "webm": {{ 'intro-zoom-16x9.webm' | asset_url | json }} },
+      "frame": {{ 'intro-frame-16x9.webp' | asset_url | json }}
+    },
+    "portrait": {
+      "build": { "mp4": {{ 'intro-build-9x16.mp4' | asset_url | json }}, "webm": {{ 'intro-build-9x16.webm' | asset_url | json }} },
+      "zoom": { "mp4": {{ 'intro-zoom-9x16.mp4' | asset_url | json }}, "webm": {{ 'intro-zoom-9x16.webm' | asset_url | json }} },
+      "frame": {{ 'intro-frame-9x16.webp' | asset_url | json }}
+    }
+  }
+{%- endcapture -%}
+
+<div
+  class="intro on-dark"
+  data-intro-root
+  data-lenis-prevent
+  data-sources="{{ sources | strip_newlines | escape }}"
+  role="dialog"
+  aria-modal="true"
+  aria-label="{{ heading | escape }}"
+  tabindex="-1"
+>
+  <div class="intro__stage">
+    <video class="intro__video intro__video--build" muted playsinline preload="auto" disablepictureinpicture disableremoteplayback aria-hidden="true" tabindex="-1"></video>
+    {%- comment -%} Standbild des fertigen Logos: nur Notlösung, wenn der Film nicht startet (Autoplay gesperrt, Strom sparen, langsames Netz) {%- endcomment -%}
+    <img class="intro__frame" alt="" width="1920" height="1080" hidden decoding="async">
+    <video class="intro__video intro__video--zoom" muted playsinline preload="auto" disablepictureinpicture disableremoteplayback aria-hidden="true" tabindex="-1"></video>
+    <div class="intro__text" data-intro-text></div>
+  </div>
+
+  <button type="button" class="intro__skip" data-intro-skip>{{ skip | escape }}</button>
+
+  {%- comment -%}
+    Die Texte kommen erst, wenn das Logo fast fertig ist: intro.js setzt diesen Inhalt dann ein. Die Bewegungsschicht
+    (assets/motion.js) startet per JS eingefügte data-split / data-reveal-Elemente von selbst, daher dieselbe Animation
+    wie bei den Überschriften der Startseite.
+  {%- endcomment -%}
+  <template data-intro-tpl>
+    <h2 class="intro__title" data-split="words">{{ heading | escape }}</h2>
+    <div class="intro__cta">
+      <button type="button" class="btn btn--primary intro__enter" data-reveal="up" data-reveal-delay="480" data-intro-enter>{{ button | escape }}</button>
+    </div>
+  </template>
+</div>
