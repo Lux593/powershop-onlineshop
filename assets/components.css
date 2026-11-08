@@ -214,8 +214,6 @@
 .pcard__title { font-family: var(--f-body); font-size: 15px; font-weight: 500; line-height: 1.35; text-transform: none; letter-spacing: 0;
   display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; } /* 4 statt 2 Zeilen: Mit den Textabständen aus WCAG 1.4.12 (Zeilenhöhe 1,5, Buchstaben 0,12 em) wird aus zwei Zeilen drei, die dritte wäre abgeschnitten */
 .pcard__title a:hover { text-decoration: underline; text-underline-offset: 3px; }
-.pcard__fits { font-size: var(--fs-caption); color: var(--c-muted); display: flex; align-items: center; gap: 6px; }
-.pcard__fits .icon { width: 14px; height: 14px; }
 .pcard .price { margin-top: 2px; }
 .pcard .swatches { margin-top: 4px; }
 

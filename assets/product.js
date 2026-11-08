@@ -410,6 +410,89 @@
       });
     }
 
+    /* ---------- Passt zu deiner Auswahl ----------
+       Grundlage ist der Filter der Kollektion oder Suche, aus der man kommt: Modellfamilie (part.modellfamilien) und
+       Baujahr (part.baujahre_filter). Kommt man von einer Liste (Referrer, auch nach dem AJAX-Filtern: pushState setzt die
+       Adresse), zählt deren Auswahl und wird für die Sitzung gemerkt, eine Liste ohne diese Filter löscht sie. Sonst gilt
+       die gemerkte (z. B. nach einem Sprung zu einem anderen Teil). Eine Aussage gibt es erst mit Modellfamilie und
+       Baujahr; geprüft wird gegen die Modellliste des Teils (Angaben laut Hersteller), universelle Teile passen immer. */
+    var fit = $('[data-compat-fit]');
+    if (fit) {
+      var KEY = 'ps-fahrzeug';
+      var pick = null;
+      try {
+        var ref = document.referrer ? new URL(document.referrer) : null;
+        var fromList = ref && ref.origin === window.location.origin &&
+          /^(\/[a-z]{2}(-[a-z]{2})?)?\/(collections|search)(\/|$)/i.test(ref.pathname) && ref.pathname.indexOf('/products/') === -1;
+        if (fromList) {
+          pick = { f: ref.searchParams.getAll('filter.p.m.part.modellfamilien'), y: ref.searchParams.getAll('filter.p.m.part.baujahre_filter') };
+          if (pick.f.length || pick.y.length) window.sessionStorage.setItem(KEY, JSON.stringify(pick));
+          else window.sessionStorage.removeItem(KEY);
+        } else {
+          pick = JSON.parse(window.sessionStorage.getItem(KEY) || 'null');
+        }
+      } catch (e) { pick = null; }
+
+      var fams = pick && Array.isArray(pick.f) ? pick.f.filter(Boolean) : [];
+      var yrs = pick && Array.isArray(pick.y) ? pick.y.map(Number).filter(function (n) { return n > 0; }) : [];
+      yrs.sort(function (a, b) { return a - b; });
+      var box = fit.closest('[data-compat]');
+      var universal = !!box && box.hasAttribute('data-compat-universal');
+      var rows = $$('[data-compat-rows] tr');
+
+      if (fams.length && yrs.length && (universal || rows.length)) {
+        var fits = function (family, year) {
+          return universal || rows.some(function (tr) {
+            return tr.dataset.family === family && +tr.dataset.from <= year && year <= +tr.dataset.to;
+          });
+        };
+        // „Softail 2018“, mehrere Jahre: „Softail (2018, 2019)“, mehrere Familien mit Komma
+        var describe = function (list) {
+          var order = [];
+          var by = {};
+          list.forEach(function (c) {
+            if (!by[c.f]) { by[c.f] = []; order.push(c.f); }
+            by[c.f].push(c.y);
+          });
+          return order.map(function (f) { return by[f].length === 1 ? f + ' ' + by[f][0] : f + ' (' + by[f].join(', ') + ')'; }).join(', ');
+        };
+        var hits = [];
+        var misses = [];
+        fams.forEach(function (f) {
+          yrs.forEach(function (y) { (fits(f, y) ? hits : misses).push({ f: f, y: y }); });
+        });
+
+        var title;
+        var text;
+        var state;
+        if (!misses.length) {
+          state = 'ok';
+          title = 'Passt zu deiner Auswahl';
+          text = describe(hits) + (universal ? ' · universell einsetzbar' : ' · Angaben laut Hersteller');
+        } else if (hits.length) {
+          state = 'partial';
+          title = 'Passt zu einem Teil deiner Auswahl';
+          text = 'Passt für ' + describe(hits) + '. Nicht für ' + describe(misses) + '. Angaben laut Hersteller.';
+        } else {
+          state = 'no';
+          title = 'Passt laut Hersteller nicht zu deiner Auswahl';
+          text = 'Deine Auswahl: ' + describe(misses);
+        }
+        $('[data-compat-fit-title]', fit).textContent = title;
+        $('[data-compat-fit-text]', fit).textContent = text;
+        fit.dataset.state = state;
+        fit.hidden = false;
+
+        // Passende Modelle in der Liste hervorheben und nach oben holen
+        var body = $('[data-compat-rows]');
+        var matched = rows.filter(function (tr) {
+          return fams.indexOf(tr.dataset.family) > -1 && yrs.some(function (y) { return +tr.dataset.from <= y && y <= +tr.dataset.to; });
+        });
+        matched.forEach(function (tr) { tr.classList.add('is-match'); });
+        if (body && matched.length) matched.slice().reverse().forEach(function (tr) { body.insertBefore(tr, body.firstChild); });
+      }
+    }
+
     /* ---------- Mobile Kaufleiste (Teile, Bekleidung): sichtbar, sobald der Kaufbereich oben aus dem Bild ist ---------- */
     var sticky = $('[data-sticky-buy]');
     var buyBox = $('.pdp__buy');

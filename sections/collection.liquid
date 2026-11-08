@@ -9,6 +9,10 @@
   assign film_poster = ''
   assign film_lead = ''
   assign film_label = ''
+  comment
+    lead: Untertitel unter der Überschrift für Kollektionen ohne Film. Eine Beschreibung im Admin geht vor.
+  endcomment
+  assign lead = ''
 
   case collection.handle
     when 'herren'
@@ -25,6 +29,7 @@
       assign film_label = 'Bekleidung im Laden.'
     when 'teile'
       assign banner_asset = 'banner-teile.jpg'
+      assign lead = 'Original Harley-Davidson Teile und Zubehör. Mit Modellliste zu jedem Teil, eingebaut auf Wunsch in unserer Werkstatt.'
     when 'accessoires'
       assign banner_asset = 'banner-accessoires.jpg'
     when 'motorraeder'
@@ -67,6 +72,8 @@
           <p class="film-banner__lead">{{ film_lead | escape }}</p>
         {%- elsif collection.description != blank -%}
           <p>{{ collection.description | strip_html | truncate: 240 }}</p>
+        {%- elsif lead != blank -%}
+          <p>{{ lead | escape }}</p>
         {%- endif -%}
       </div>
       <div class="page-banner__media">

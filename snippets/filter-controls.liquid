@@ -1,5 +1,7 @@
 {% doc %}
   Bedienelemente für einen Shopify-Filter (.fgroup, .check, .frange).
+  Preis: zwei Zahlenfelder (sie tragen die Filterwerte) und darunter ein Doppelregler ohne name, den collection.js
+  mit den Feldern abgleicht. Regler ganz links bzw. rechts heißt „keine Grenze“ (Feld bleibt leer).
   Die Filter selbst legst du im Shopify-Admin unter „Search & Discovery“ an.
 
   @param {object} filter - Filter aus collection.filters oder search.filters
@@ -21,6 +23,7 @@
           min="0"
           id="{{ id_prefix }}-{{ filter.param_name | handleize }}-min"
           name="{{ filter.min_value.param_name }}"
+          data-price-min
           value="{% if filter.min_value.value %}{{ filter.min_value.value | divided_by: 100.0 | round }}{% endif %}"
           placeholder="0"
         >
@@ -35,10 +38,57 @@
           min="0"
           id="{{ id_prefix }}-{{ filter.param_name | handleize }}-max"
           name="{{ filter.max_value.param_name }}"
+          data-price-max
           value="{% if filter.max_value.value %}{{ filter.max_value.value | divided_by: 100.0 | round }}{% endif %}"
           placeholder="{{ filter.range_max | divided_by: 100.0 | round }}"
         >
       </div>
+      {%- liquid
+        assign r_max = filter.range_max | divided_by: 100.0 | ceil
+        assign r_lo = 0
+        if filter.min_value.value
+          assign r_lo = filter.min_value.value | divided_by: 100.0 | round
+        endif
+        assign r_hi = r_max
+        if filter.max_value.value
+          assign r_hi = filter.max_value.value | divided_by: 100.0 | round
+        endif
+        if r_hi > r_max
+          assign r_hi = r_max
+        endif
+        if r_lo > r_hi
+          assign r_lo = r_hi
+        endif
+        assign r_half = r_max | divided_by: 2.0
+      -%}
+      {%- if r_max > 0 -%}
+        <div class="frange__slider" data-price-slider data-max="{{ r_max }}" style="--lo: {{ r_lo | times: 1.0 | divided_by: r_max }}; --hi: {{ r_hi | times: 1.0 | divided_by: r_max }};">
+          <div class="frange__track" aria-hidden="true"><span class="frange__fill"></span></div>
+          <input
+            type="range"
+            id="{{ id_prefix }}-{{ filter.param_name | handleize }}-rmin"
+            min="0"
+            max="{{ r_max }}"
+            step="1"
+            value="{{ r_lo }}"
+            aria-label="Preis von"
+            aria-valuetext="{{ r_lo }} €"
+            data-price-lo
+            {% if r_lo > r_half %}style="z-index: 3"{% endif %}
+          >
+          <input
+            type="range"
+            id="{{ id_prefix }}-{{ filter.param_name | handleize }}-rmax"
+            min="0"
+            max="{{ r_max }}"
+            step="1"
+            value="{{ r_hi }}"
+            aria-label="Preis bis"
+            aria-valuetext="{{ r_hi }} €"
+            data-price-hi
+          >
+        </div>
+      {%- endif -%}
     </div>
   {%- else -%}
     <div class="fgroup">

@@ -241,13 +241,55 @@
       if (text) document.title = text;
     }
 
+    /* ---------- Preis: Doppelregler und Zahlenfelder gleichen sich ab ----------
+       Die Felder tragen die Filterwerte, die Regler haben keinen name. Ganz links bzw. rechts bleibt das Feld leer
+       (keine Grenze). Geladen wird erst beim Loslassen (change), siehe unten. */
+    function paintPrice(slider, lo, hi, max) {
+      slider.style.setProperty('--lo', max ? lo.value / max : 0);
+      slider.style.setProperty('--hi', max ? hi.value / max : 1);
+      // Liegen beide Knöpfe aufeinander, muss der passende oben liegen: rechts der untere Wert (zieht nach links), links der obere
+      lo.style.zIndex = +lo.value > max / 2 ? '3' : '';
+      lo.setAttribute('aria-valuetext', lo.value + ' €');
+      hi.setAttribute('aria-valuetext', hi.value + ' €');
+    }
+    root.addEventListener('input', function (event) {
+      var el = event.target;
+      var frange = el.closest('.frange');
+      var slider = frange && $('[data-price-slider]', frange);
+      if (!slider) return;
+      var lo = $('[data-price-lo]', slider);
+      var hi = $('[data-price-hi]', slider);
+      var nmin = $('[data-price-min]', frange);
+      var nmax = $('[data-price-max]', frange);
+      var max = +slider.dataset.max || 0;
+      if (!lo || !hi || !nmin || !nmax) return;
+      if (el === lo || el === hi) {
+        var a = +lo.value;
+        var b = +hi.value;
+        if (a > b) {
+          if (el === lo) { lo.value = b; a = b; } else { hi.value = a; b = a; }
+        }
+        nmin.value = a > 0 ? a : '';
+        nmax.value = b < max ? b : '';
+      } else if (el === nmin || el === nmax) {
+        var x = nmin.value === '' ? 0 : Math.min(Math.max(+nmin.value || 0, 0), max);
+        var y = nmax.value === '' ? max : Math.min(Math.max(+nmax.value || 0, 0), max);
+        lo.value = Math.min(x, y);
+        hi.value = y;
+      } else {
+        return;
+      }
+      paintPrice(slider, lo, hi, max);
+    });
+
     /* ---------- Eingaben ---------- */
     root.addEventListener('change', function (event) {
       var input = event.target;
       var form = input.closest('[data-filter-form]');
       if (form) {
         clearTimeout(timer);
-        var wait = input.type === 'number' ? 600 : 0;
+        // Zahlenfelder: Tippen abwarten; Regler: kurz warten, damit Pfeiltasten nicht je Schritt laden
+        var wait = input.type === 'number' ? 600 : input.type === 'range' ? 250 : 0;
         timer = setTimeout(function () { load(urlFromForm(form)); }, wait);
         return;
       }
