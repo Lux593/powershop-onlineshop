@@ -237,6 +237,8 @@ html:not(:has(.announce)) { --announce-h: 0px; }
 /* Fußzeile: links der Weg zum Hauptpunkt, rechts Aufruf-Zeile (Motorräder) oder Kontakt (Service) */
 .mega__foot { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 32px; margin-top: 20px; padding-top: 12px; border-top: 1px solid var(--c-steel); }
 .mega__foot:not(:has(> *)) { display: none; }
+/* Soziale Netze ganz rechts; die Tippfläche ragt über den Rand, damit das letzte Logo bündig mit dem Inhalt abschließt */
+.mega__social { margin-left: auto; margin-right: -12px; }
 /* „Alle Herren“ usw.: orange mit schwarzer Schrift wie der Hero-Knopf, damit die Übersicht sofort ins Auge fällt (6.11.2026) */
 .mega__all {
   display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 18px;
@@ -320,6 +322,8 @@ html:not(:has(.announce)) { --announce-h: 0px; }
 .mobile-menu__direct { display: flex; align-items: center; justify-content: space-between; padding: 0 24px; min-height: 68px; border-top: 1px solid var(--c-steel); font-family: var(--f-head); font-weight: 700; font-size: 22px; text-transform: uppercase; }
 .mobile-menu__direct--sale { color: var(--c-orange); }
 .mobile-menu__foot { padding: 24px; display: grid; gap: 12px; border-top: 1px solid var(--c-steel); }
+/* Soziale Netze unter „Anmelden“, das erste Logo bündig mit dem Knopf (Tippfläche ragt links über) */
+.mobile-menu__social { margin-left: -12px; }
 /* Menükopf: H-D Bar & Shield vor der Wortmarke, etwas größer als im Header, mit mehr Luft zu den Menüpunkten */
 .mobile-menu .drawer__head { padding-block: 20px; }
 .mobile-menu__brand { display: flex; align-items: center; gap: 10px; }

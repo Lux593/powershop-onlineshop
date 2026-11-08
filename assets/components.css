@@ -32,6 +32,13 @@
   transition: background-color var(--t-fast), color var(--t-fast);
 }
 .icon-btn:hover { background: rgba(255, 255, 255, 0.08); }
+/* Soziale Netze (snippets/social-links.liquid, seit 8.11.): Logos 20 px auf 44 px Tippfläche, hell auf dunkel, beim Überfahren weiß
+   mit leichtem Grund wie die Icon-Knöpfe im Header. Mit Namen (Footer) eine Liste wie die Links daneben (footer.css). */
+.social { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.social__link { display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: var(--radius); color: var(--c-on-dark); transition: background-color var(--t-fast), color var(--t-fast); }
+.social__link .icon { width: 20px; height: 20px; }
+.social__link:hover, .social__link:focus-visible { color: var(--c-white); background: rgba(255, 255, 255, 0.08); }
+.social--labels { display: grid; gap: 2px; }
 .icon-btn .count {
   position: absolute; top: 4px; right: 2px; min-width: 18px; height: 18px; padding: 0 5px;
   display: grid; place-items: center; border-radius: 9px;

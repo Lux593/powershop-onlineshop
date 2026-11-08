@@ -14,7 +14,7 @@
     Alle Gruppen liegen in derselben Zeile, die geschlossenen unsichtbar: das Menü bleibt beim Wechsel gleich hoch
   - Links einer Gruppe stehen alphabetisch, außer die Gruppe steht in keep (snippets/link-order.liquid)
   - Fußzeile: „Alle …“ bei Kollektionen, sonst „… im Überblick“ (gleich lautend wie im Handy-Menü, sections/header.liquid),
-    rechts Aufruf-Zeile oder Kontakt (bei Gruppen) aus den Header-Blöcken
+    rechts Aufruf-Zeile oder Kontakt (bei Gruppen) aus den Header-Blöcken, ganz rechts die Symbole der sozialen Netze (snippets/social-links)
   Bilder der Kacheln kommen aus den Blöcken „Megamenü: Kachelbild“ (Hauptpunkt + Gruppe); ohne Bild bleibt die Kachel anthrazit.
 
   @param {object} link - Hauptmenüpunkt
@@ -214,5 +214,8 @@
         {%- endif -%}
       </div>
     {%- endif -%}
+
+    {%- comment -%} Soziale Netze ganz rechts (seit 8.11.), nur mit eingetragener URL (Theme-Einstellungen) {%- endcomment -%}
+    {%- render 'social-links', class: 'mega__social' -%}
   </div>
 </div>

@@ -188,10 +188,15 @@
         </a>
       {%- endif -%}
     {%- endfor -%}
-    {%- if shop.customer_accounts_enabled -%}
-      {%- comment -%} Unter 490 px fehlt das Konto-Fenster im Header (header.css): hier führt der Knopf zu Shopifys Anmelde- bzw. Kontoseite {%- endcomment -%}
+    {%- capture mobile_social -%}{%- render 'social-links', class: 'mobile-menu__social' -%}{%- endcapture -%}
+    {%- if shop.customer_accounts_enabled or mobile_social != blank -%}
       <div class="mobile-menu__foot">
-        <a class="btn btn--primary btn--block" href="{{ routes.account_url }}">{% render 'icon', name: 'user' %}{% if customer %}Kundenkonto{% else %}Anmelden{% endif %}</a>
+        {%- if shop.customer_accounts_enabled -%}
+          {%- comment -%} Unter 490 px fehlt das Konto-Fenster im Header (header.css): hier führt der Knopf zu Shopifys Anmelde- bzw. Kontoseite {%- endcomment -%}
+          <a class="btn btn--primary btn--block" href="{{ routes.account_url }}">{% render 'icon', name: 'user' %}{% if customer %}Kundenkonto{% else %}Anmelden{% endif %}</a>
+        {%- endif -%}
+        {%- comment -%} Soziale Netze darunter (seit 8.11.), nur mit eingetragener URL (Theme-Einstellungen) {%- endcomment -%}
+        {{- mobile_social -}}
       </div>
     {%- endif -%}
   </div>
