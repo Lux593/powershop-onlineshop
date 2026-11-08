@@ -71,7 +71,8 @@
     {%- if event_cards_text != blank -%}
       <div class="events">
         <div class="section-head">
-          <h2 class="h3">{{ section.settings.events_heading }}</h2>
+          {%- comment -%} Seit 8.11. so groß wie die Abschnitts-Überschriften („Mehr als ein Shop“, „Komm vorbei.“) {%- endcomment -%}
+          <h2 class="section-title">{{ section.settings.events_heading }}</h2>
           {%- if events_url != blank -%}
             <a class="btn btn--text" href="{{ events_url }}">Alle Events {% render 'icon', name: 'arrow-right' %}</a>
           {%- endif -%}
