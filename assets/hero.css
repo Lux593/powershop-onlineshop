@@ -23,7 +23,16 @@
    unter der Leiste weiter. Text, Pfeil und Pause-Taste rücken um den Unterschied (--hero-ui = lvh − svh) nach oben und bleiben,
    wo sie waren. Am Desktop sind lvh und svh gleich, dort ändert sich nichts. */
 @supports (height: 100lvh) {
-  .hero { --hero-ui: calc(100lvh - 100svh); min-height: calc(100lvh - var(--hero-top)); padding-bottom: var(--hero-ui); }
+  .hero { --hero-ui: calc(100lvh - 100svh + var(--hero-chin)); min-height: calc(100lvh - var(--hero-top) + var(--hero-chin)); padding-bottom: var(--hero-ui); }
+}
+/* Handy (Touch), iOS 26 Safari: Die Seite endet nicht an der schwebenden Leiste. Unter dem Viewport (lvh = svh) schimmert der Rest der Seite
+   durch die Leiste, also der helle Block nach dem Hero, solange man oben steht. Der Hero ist deshalb um --hero-chin länger als der
+   Bildschirm (ca. Höhe der Leiste plus Reserve): Dort steht sein dunkler Grund mit dem Schleier, nicht die helle Section. Die Länge
+   steckt in --hero-ui, Text, Tabs, Pfeil, Pause-Taste und Schleier bleiben an derselben Stelle wie ohne Verlängerung. Am Desktop und in
+   Browsern ohne diese Leiste ist --hero-chin 0, dort ändert sich nichts; ein dunkler Streifen unter dem Hero fiele dort kaum auf. */
+.hero { --hero-chin: 0px; }
+@media (max-width: 767px) and (hover: none) {
+  .hero { --hero-chin: 100px; }
 }
 /* Header über dem Hero (body[data-header-overlay], nur Startseite): der Hero zieht unter den Header. header.js macht ihn oben transparent. */
 [data-header-overlay] #main > .shopify-section:first-child > .hero {
