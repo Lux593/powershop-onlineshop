@@ -798,7 +798,8 @@
     if (sticky && buyBox && 'IntersectionObserver' in window) {
       var past = false;
       var atFooter = false;
-      var sync = function () { sticky.classList.toggle('is-shown', past && !atFooter); };
+      var atBox = false;
+      var sync = function () { sticky.classList.toggle('is-shown', past && !atFooter && !atBox); };
       // Wurzel = Streifen über dem Bild: ein Sprung über den Kaufbereich (Anker) würde sonst nie gemeldet
       new IntersectionObserver(function (en) {
         past = en[en.length - 1].boundingClientRect.bottom <= 0;
@@ -810,6 +811,12 @@
         if (footerIO) footerIO.disconnect();
         footerIO = new IntersectionObserver(function (en) { atFooter = en[0].isIntersecting; sync(); });
         footerIO.observe(footer);
+      }
+      // „Jetzt anfragen“ (Anfrage-Artikel, Motorräder): weg, solange die Kontakt-Box, zu der er springt, im Bild ist – sonst doppelt
+      var askLink = sticky.querySelector('a[href^="#"]');
+      var askBox = askLink && document.getElementById(askLink.hash.slice(1));
+      if (askBox) {
+        new IntersectionObserver(function (en) { atBox = en[en.length - 1].isIntersecting; sync(); }).observe(askBox);
       }
     }
 
