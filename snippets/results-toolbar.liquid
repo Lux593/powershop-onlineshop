@@ -1,6 +1,8 @@
 {% doc %}
   Filterleiste, Sortierung, Spaltenwahl und mobile Dialoge für Filter und Sortierung.
   Die Sortierung folgt dem Muster der Filter: am Desktop ein Menü (.fdrop), mobil ein Knopf mit Bottom-Sheet.
+  Sortierung (seit 9.11.): ohne „Ausgewählt“ (manuelle Reihenfolge), eigene, einheitliche Namen (sort-name.liquid). Weicht sie vom
+  Standard der Kollektion ab (Kollektionen: A–Z), steht am Handy ihr Name statt „Sortieren“ im Knopf.
   Funktioniert für Kollektionen und Suchergebnisse. Die Verarbeitung übernimmt assets/collection.js.
 
   @param {object} results - collection oder search
@@ -14,8 +16,14 @@
 {% enddoc %}
 
 {%- liquid
+  # Shopifys Verfügbarkeit (Auf Lager / Nicht vorrätig) zählt seit 9.11. alles mit „Verkauf fortsetzen“ als auf Lager und ist darum
+  # ausgeblendet (außer, sie ist gerade gesetzt). Stattdessen: Filter „Verfügbarkeit“ aus dem Variantenfeld lieferzeit.status
+  # (Auf Lager / Auf Bestellung, n8n), anzulegen in Search & Discovery.
   assign visible_filters = 0
   for filter in results.filters
+    if filter.param_name == 'filter.v.availability' and filter.active_values.size == 0
+      continue
+    endif
     if filter.type == 'price_range' or filter.values.size > 0
       assign visible_filters = visible_filters | plus: 1
     endif
@@ -33,12 +41,14 @@
   endfor
 
   assign current_sort = results.sort_by | default: results.default_sort_by
-  assign current_sort_name = ''
-  for option in results.sort_options
-    if option.value == current_sort
-      assign current_sort_name = option.name
-    endif
-  endfor
+  capture current_sort_name
+    render 'sort-name', value: current_sort
+  endcapture
+  assign current_sort_name = current_sort_name | strip
+  capture current_sort_short
+    render 'sort-name', value: current_sort, short: true
+  endcapture
+  assign current_sort_short = current_sort_short | strip
   assign result_count = results.products_count | default: results.results_count
 -%}
 
@@ -48,6 +58,7 @@
     <form class="filterbar__form" action="{{ action }}" method="get" data-filter-form>
       {%- if terms != blank -%}<input type="hidden" name="q" value="{{ terms | escape }}">{%- endif -%}
       {%- for filter in results.filters -%}
+        {%- if filter.param_name == 'filter.v.availability' and filter.active_values.size == 0 -%}{%- continue -%}{%- endif -%}
         {%- if filter.type == 'price_range' or filter.values.size > 0 -%}
           {%- liquid
             assign filter_count = filter.active_values.size
@@ -92,13 +103,16 @@
           <fieldset class="fgroup" data-sort-group>
             <legend class="sr-only">Sortieren</legend>
             {%- for option in results.sort_options -%}
-              <label class="check"><input type="radio" name="sort-d" value="{{ option.value | escape }}" data-sort{% if option.value == current_sort %} checked{% endif %}>{{ option.name | escape }}</label>
+              {%- if option.value == 'manual' -%}{%- continue -%}{%- endif -%}
+              <label class="check"><input type="radio" name="sort-d" value="{{ option.value | escape }}" data-sort data-sort-short="{% render 'sort-name', value: option.value, short: true %}"{% if option.value == current_sort %} checked{% endif %}>{% render 'sort-name', value: option.value, fallback: option.name %}</label>
             {%- endfor -%}
           </fieldset>
         </div>
       </div>
-      <button class="btn btn--outline-dark btn--sm filterbar__mobile" type="button" data-open="sort-sheet">
-        {% render 'icon', name: 'arrow-up-down' %}Sortieren
+      <button class="btn btn--outline-dark btn--sm filterbar__mobile{% if current_sort != results.default_sort_by %} is-sorted{% endif %}" type="button" data-open="sort-sheet" data-sort-mobile data-sort-default="{{ results.default_sort_by | escape }}">
+        {%- render 'icon', name: 'arrow-up-down' -%}
+        <span data-sort-mobile-label>{% if current_sort != results.default_sort_by %}{{ current_sort_short | escape }}{% else %}Sortieren{% endif %}</span>
+        <span class="sr-only" data-sort-mobile-sr>{% if current_sort != results.default_sort_by %} (sortiert: {{ current_sort_name | escape }}){% endif %}</span>
       </button>
     {%- endif -%}
     <div class="grid-toggle" role="group" aria-label="Spalten">
@@ -130,7 +144,8 @@
       </div>
       <div class="modal__body" data-lenis-prevent>
         {%- for filter in results.filters -%}
-          {%- if filter.type == 'price_range' or filter.values.size > 0 -%}
+          {%- if filter.param_name == 'filter.v.availability' and filter.active_values.size == 0 -%}{%- continue -%}{%- endif -%}
+        {%- if filter.type == 'price_range' or filter.values.size > 0 -%}
             {%- liquid
               assign filter_count = filter.active_values.size
               if filter.type == 'price_range'
@@ -176,7 +191,8 @@
         <fieldset class="fgroup" data-sort-group>
           <legend class="sr-only">Sortieren</legend>
           {%- for option in results.sort_options -%}
-            <label class="check"><input type="radio" name="sort-m" value="{{ option.value | escape }}" data-sort{% if option.value == current_sort %} checked{% endif %}>{{ option.name | escape }}</label>
+            {%- if option.value == 'manual' -%}{%- continue -%}{%- endif -%}
+            <label class="check"><input type="radio" name="sort-m" value="{{ option.value | escape }}" data-sort data-sort-short="{% render 'sort-name', value: option.value, short: true %}"{% if option.value == current_sort %} checked{% endif %}>{% render 'sort-name', value: option.value, fallback: option.name %}</label>
           {%- endfor -%}
         </fieldset>
       </div>

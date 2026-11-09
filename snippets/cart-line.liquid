@@ -49,6 +49,10 @@
           assign line_meta = line_meta | remove_first: ' · '
         -%}
         {%- if line_meta != blank -%}<p class="line-item__meta">{{ line_meta }}</p>{%- endif -%}
+        {%- comment -%} Lager-Status und Lieferzeit der Position (mehr Stück als Bestand: wird bestellt). Nicht bei Anfrage-Artikeln. {%- endcomment -%}
+        {%- unless line_on_request == 'true' or item.product.type == 'Motorrad' or item.product.template_suffix == 'motorrad' -%}
+          {% render 'delivery-info', product: item.product, variant: item.variant, as: 'cart', quantity: item.quantity %}
+        {%- endunless -%}
         {%- if line_on_request == 'true' -%}
           {%- liquid
             # Ziel: die Kontakt-Box der Produktseite (Teile: werkstatt-kontakt, Bekleidung: artikel-kontakt, Motorräder: kontakt)

@@ -1,6 +1,6 @@
 {% doc %}
   Optionszeilen der Produktseite (Farbe, Größe, Räder …) und die Variantendaten für assets/product.js.
-  Farb-Optionen erscheinen als Farbfelder, alle anderen als Auswahl-Chips. Nutzt pdp-buy (im Kaufformular)
+  Farb-Optionen erscheinen als Farbfelder, alle anderen als Auswahl-Chips (mit Bestand: grüner Punkt, product.js). Nutzt pdp-buy (im Kaufformular)
   und die Motorrad-Seite (ohne Formular, die Auswahl steuert dort Preis, Fakten und Anfrage).
 
   @param {product} product - Produkt
@@ -75,6 +75,7 @@
           "id": {{ v.id }},
           "options": {{ v.options | json }},
           "available": {{ v.available | json }},
+          "stock": {% if v.inventory_management == 'shopify' and v.inventory_quantity > 0 %}true{% else %}false{% endif %},
           "image": {{ v.featured_image.id | default: 0 | json }}
         }{% unless forloop.last %},{% endunless %}
       {%- endfor -%}

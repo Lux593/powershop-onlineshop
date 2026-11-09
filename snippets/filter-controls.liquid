@@ -57,8 +57,15 @@
       {%- endif -%}
     </div>
   {%- else -%}
+    {%- liquid
+      # Verfügbarkeit (Variantenfeld lieferzeit.status, n8n): „Auf Lager“ vor „Auf Bestellung“
+      assign filter_values = filter.values
+      if filter.param_name == 'filter.v.m.lieferzeit.status'
+        assign filter_values = filter.values | sort: 'value' | reverse
+      endif
+    -%}
     <div class="fgroup">
-      {%- for value in filter.values -%}
+      {%- for value in filter_values -%}
         <label class="check">
           <input
             type="checkbox"

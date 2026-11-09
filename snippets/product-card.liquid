@@ -126,6 +126,8 @@
     <h3 class="pcard__title"><a href="{{ product.url }}">{{ card_title }}</a></h3>
     {% render 'rating', product: product %}
     {% render 'price', product: product %}
+    {%- comment -%} Nur „Auf Lager“ (Bestand ab 1, bei Größen in mindestens einer), sonst nichts (snippets/delivery-info.liquid) {%- endcomment -%}
+    {%- if card_on_request != 'true' -%}{% render 'delivery-info', product: product, as: 'card' %}{%- endif -%}
 
     {%- if is_part -%}
       {%- comment -%} Teile: keine Passform-Angabe in der Karte, sie steht auf der Produktseite (Passt-für-Karte). Keine Farbfelder. {%- endcomment -%}

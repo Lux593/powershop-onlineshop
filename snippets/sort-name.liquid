@@ -1,0 +1,38 @@
+{% doc %}
+  Einheitlicher Name einer Sortierung (Shopify liefert teils „meistverkauft“ klein und „A-Z“ mit Bindestrich).
+  Kurzform für den schmalen Sortieren-Knopf am Handy (results-toolbar.liquid). Unbekannte Werte: fallback (Name von Shopify).
+
+  @param {string} value - Wert der Sortierung, z. B. price-ascending
+  @param {string} [fallback] - Name, falls der Wert unbekannt ist
+  @param {boolean} [short] - Kurzform, z. B. „Preis ↑“ statt „Preis aufsteigend“
+
+  @example
+  {% render 'sort-name', value: option.value, fallback: option.name %}
+{% enddoc %}
+
+{%- if short -%}
+  {%- case value -%}
+    {%- when 'most-relevant', 'relevance' -%}Relevanz
+    {%- when 'best-selling' -%}Bestseller
+    {%- when 'title-ascending' -%}A–Z
+    {%- when 'title-descending' -%}Z–A
+    {%- when 'price-ascending' -%}Preis ↑
+    {%- when 'price-descending' -%}Preis ↓
+    {%- when 'created-descending' -%}Neueste
+    {%- when 'created-ascending' -%}Älteste
+    {%- else -%}Sortiert
+  {%- endcase -%}
+{%- else -%}
+  {%- case value -%}
+    {%- when 'most-relevant', 'relevance' -%}Relevanz
+    {%- when 'best-selling' -%}Meistverkauft
+    {%- when 'title-ascending' -%}Alphabetisch, A–Z
+    {%- when 'title-descending' -%}Alphabetisch, Z–A
+    {%- when 'price-ascending' -%}Preis aufsteigend
+    {%- when 'price-descending' -%}Preis absteigend
+    {%- when 'created-descending' -%}Neueste zuerst
+    {%- when 'created-ascending' -%}Älteste zuerst
+    {%- when 'manual' -%}Ausgewählt
+    {%- else -%}{{ fallback | escape }}
+  {%- endcase -%}
+{%- endif -%}

@@ -279,6 +279,13 @@
             var available = matching(probe).some(function (v) { return v.available; });
             var isChip = button.classList.contains('size-chip');
             button.classList.toggle('is-soldout', !available);
+            // Auf Lager (Bestand ab 1, delivery-info.liquid): grüner Punkt am Chip, für Screenreader im Namen
+            if (isChip) {
+              var instock = available && matching(probe).some(function (v) { return v.stock && v.available; });
+              button.classList.toggle('is-instock', instock);
+              if (instock) button.setAttribute('aria-label', button.dataset.optionValue + ', auf Lager');
+              else button.removeAttribute('aria-label');
+            }
             if (isChip) {
               if (available) button.removeAttribute('aria-disabled');
               else button.setAttribute('aria-disabled', 'true');

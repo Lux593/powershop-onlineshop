@@ -1,0 +1,133 @@
+{% doc %}
+  Lieferstatus und Lieferzeit eines Artikels (seit 9.11.).
+  - Auf Lager: Der Bestand wird geführt und ist ab 1 (grüner Punkt).
+  - Artikel wird für dich bestellt: Bestand 0, bestellbar dank „Verkauf fortsetzen, wenn nicht vorrätig“ (oranger Punkt).
+  - Nicht lieferbar: Ausführung nicht bestellbar („Verkauf fortsetzen“ aus und Bestand 0).
+  Die Lieferzeiten kommen aus den Lieferzeit-Regeln (Metaobjekt lieferzeit_regel, nur aktive Einträge). Je Angabe gilt die genaueste
+  passende Regel: mit Produkttyp vor Bereich vor „Alle“. Das Feld „Lieferzeit, wenn bestellt“ am Artikel (lieferzeit.bestellt) geht
+  jeder Regel vor. Ohne Regel: 2–3 bzw. 5–7 Werktage. Den Bereich erkennt der Shop wie bei den Anfrage-Regeln (on-request.liquid).
+  Artikel nur auf Anfrage und Motorräder zeigen ihren Status nicht hierüber (die Aufrufer prüfen das vorher).
+
+  @param {product} product - Produkt
+  @param {variant} [variant] - Ausführung. Ohne: der ganze Artikel; mit mehreren Ausführungen „teils auf Lager“, wenn nur manche Bestand haben
+  @param {string} [as] - "line" (Produktseite, Standard), "card" (Produktkarte: nur „Auf Lager“, sonst nichts),
+    "cart" (Warenkorb-Position, mit quantity), "times" (Satz zu den Lieferzeiten für das Versand-Akkordeon)
+  @param {number} [quantity] - Menge im Warenkorb: mehr als der Bestand heißt „wird für dich bestellt“
+
+  @example
+  {% render 'delivery-info', product: product, variant: product.selected_variant %}
+  {% render 'delivery-info', product: item.product, variant: item.variant, as: 'cart', quantity: item.quantity %}
+{% enddoc %}
+
+{%- liquid
+  assign mode = as | default: 'line'
+
+  # Bereich wie in on-request.liquid
+  assign area = 'bekleidung'
+  if product.metafields.part.teilenummer != blank or product.template_suffix == 'teil'
+    assign area = 'teile'
+  elsif product.tags contains 'Accessoires' or product.tags contains 'bereich:accessoires'
+    assign area = 'accessoires'
+  endif
+  assign own_type = product.type | downcase | strip
+
+  # Lieferzeiten: je Angabe die genaueste Regel (Produkttyp 2 Punkte, Bereich 1 Punkt, „Alle“ 0)
+  assign time_stock = ''
+  assign time_order = ''
+  assign score_stock = -1
+  assign score_order = -1
+  for rule in metaobjects.lieferzeit_regel.values
+    assign rule_area = rule.bereich.value | downcase | strip
+    if rule_area != 'alle' and rule_area != area
+      continue
+    endif
+    assign rule_type = rule.produkttyp.value | downcase | strip
+    if rule_type != blank and rule_type != own_type
+      continue
+    endif
+    assign score = 0
+    if rule_area != 'alle'
+      assign score = 1
+    endif
+    if rule_type != blank
+      assign score = score | plus: 2
+    endif
+    assign rule_stock = rule.lieferzeit_lager.value | strip
+    if rule_stock != blank and score > score_stock
+      assign time_stock = rule_stock
+      assign score_stock = score
+    endif
+    assign rule_order = rule.lieferzeit_bestellt.value | strip
+    if rule_order != blank and score > score_order
+      assign time_order = rule_order
+      assign score_order = score
+    endif
+  endfor
+  assign own_order = product.metafields.lieferzeit.bestellt.value | strip
+  if own_order != blank
+    assign time_order = own_order
+  endif
+  if time_stock == blank
+    assign time_stock = '2–3 Werktage'
+  endif
+  if time_order == blank
+    assign time_order = '5–7 Werktage'
+  endif
+
+  # Status: stock, order, mixed (nur ganzer Artikel) oder none
+  assign state = 'order'
+  if variant != blank
+    if variant.available == false
+      assign state = 'none'
+    elsif variant.inventory_management == 'shopify' and variant.inventory_quantity > 0
+      assign state = 'stock'
+      if quantity != blank and quantity > variant.inventory_quantity
+        assign state = 'order'
+      endif
+    endif
+  else
+    assign stocked = 0
+    assign sellable = 0
+    for v in product.variants
+      if v.available
+        assign sellable = sellable | plus: 1
+      endif
+      if v.inventory_management == 'shopify' and v.inventory_quantity > 0
+        assign stocked = stocked | plus: 1
+      endif
+    endfor
+    if sellable == 0
+      assign state = 'none'
+    elsif stocked > 0 and stocked >= sellable
+      assign state = 'stock'
+    elsif stocked > 0
+      assign state = 'mixed'
+    endif
+  endif
+
+  assign kind_label = 'Ausführungen'
+  if area == 'bekleidung'
+    assign kind_label = 'Größen'
+  endif
+-%}
+
+{%- case mode -%}
+  {%- when 'card' -%}
+    {%- if state == 'stock' or state == 'mixed' -%}
+      <p class="stock stock--card">Auf Lager</p>
+    {%- endif -%}
+  {%- when 'cart' -%}
+    {%- case state -%}
+      {%- when 'stock' -%}<p class="stock stock--sm">Auf Lager · Lieferzeit {{ time_stock | escape }}</p>
+      {%- when 'order' -%}<p class="stock stock--sm stock--order">Wird für dich bestellt · Lieferzeit {{ time_order | escape }}</p>
+    {%- endcase -%}
+  {%- when 'times' -%}
+    Lieferzeit {{ time_stock | escape }}, wenn der Artikel auf Lager ist, sonst {{ time_order | escape }} (wir bestellen ihn für dich).
+  {%- else -%}
+    {%- case state -%}
+      {%- when 'stock' -%}<p class="stock">Auf Lager – Lieferzeit {{ time_stock | escape }}</p>
+      {%- when 'order' -%}<p class="stock stock--order">Artikel wird für dich bestellt – Lieferzeit {{ time_order | escape }}</p>
+      {%- when 'mixed' -%}<p class="stock">Einige {{ kind_label }} auf Lager ({{ time_stock | escape }}), die anderen bestellen wir für dich ({{ time_order | escape }})</p>
+      {%- else -%}<p class="stock stock--none">Aktuell nicht lieferbar – frag uns nach dem Liefertermin.</p>
+    {%- endcase -%}
+{%- endcase -%}

@@ -48,7 +48,7 @@
       { "type": "paragraph", "content": "Die tatsächlichen Versandraten stellst du unter Einstellungen > Versand und Lieferung ein. Diese Werte steuern nur die Hinweise im Shop." },
       { "type": "number", "id": "free_shipping_threshold", "label": "Versandkostenfrei ab (Euro)", "default": 100 },
       { "type": "text", "id": "shipping_cost_text", "label": "Versandkosten darunter (Anzeige)", "default": "4,95 €" },
-      { "type": "text", "id": "delivery_time", "label": "Lieferzeit", "default": "2–4 Werktage" },
+      { "type": "paragraph", "content": "Lieferzeiten stellst du seit 9.11. unter Inhalte > Metaobjekte > Lieferzeit-Regeln ein (auf Lager / wird bestellt), einzelne Artikel über das Feld „Lieferzeit, wenn bestellt“ am Artikel." },
       { "type": "number", "id": "return_days", "label": "Freiwillige Rückgabefrist (Tage)", "default": 14, "info": "Das gesetzliche Widerrufsrecht beträgt 14 Tage. Erst ein Wert über 14 erscheint als zusätzliche Rückgabefrist, sonst nennt der Shop nur das Widerrufsrecht." },
       { "type": "number", "id": "reservation_fee", "label": "Reservierungsgebühr Gebrauchtfahrzeug (Euro)", "default": 250 },
       { "type": "number", "id": "reservation_hours", "label": "Reservierung gilt (Stunden)", "default": 48 },

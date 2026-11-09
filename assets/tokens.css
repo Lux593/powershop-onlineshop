@@ -23,7 +23,7 @@
   --c-orange-dark: #d9571a;
   --c-orange-on-light: #a8430f; /* Orange als Textfarbe auf hellem Grund (Über uns: Etappen). Kontrast 6,0 : 1 auf Weiß (Grund der Etappen), 5,5 : 1 auf Offwhite, 5,1 : 1 auf Stone */
   --c-hd-orange: #f3692b;       /* Farbe der Datei hd-bar-shield (H-D Bar & Shield): nur für das Logo, nie für Text oder Flächen (--c-orange bleibt der Akzent) */
-  --c-stock-order: #b26a00;  /* „Auf Bestellung“ */
+  --c-stock-order: var(--c-orange);  /* „Artikel wird für dich bestellt“ (seit 9.11. orange wie gewünscht, vorher #b26a00) */
   --c-mark: #ffe1cf;         /* Trefferfarbe in der Suche */
 
   /* Text */

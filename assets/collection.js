@@ -58,11 +58,24 @@
     /* ---------- Sortierung: zwei Auswahlgruppen (Desktop-Menü, mobiles Sheet) mit einem Stand ---------- */
     function syncSort(value) {
       var label = '';
+      var short = '';
       $$('[data-sort]').forEach(function (radio) {
         radio.checked = radio.value === value;
-        if (radio.checked) label = radio.parentNode.textContent.replace(/\s+/g, ' ').trim();
+        if (radio.checked) {
+          label = radio.parentNode.textContent.replace(/\s+/g, ' ').trim();
+          short = radio.dataset.sortShort || label;
+        }
       });
       $$('[data-sort-label]').forEach(function (el) { el.textContent = label; });
+      // Mobiler Knopf: Name der Sortierung, solange sie vom Standard der Kollektion abweicht, sonst „Sortieren“
+      $$('[data-sort-mobile]').forEach(function (btn) {
+        var changed = value !== btn.dataset.sortDefault;
+        btn.classList.toggle('is-sorted', changed);
+        var text = $('[data-sort-mobile-label]', btn);
+        var sr = $('[data-sort-mobile-sr]', btn);
+        if (text) text.textContent = changed ? short : 'Sortieren';
+        if (sr) sr.textContent = changed ? ' (sortiert: ' + label + ')' : '';
+      });
     }
     // Nur eine Wahl per Zeiger schließt Menü und Sheet; mit den Pfeiltasten bleibt beides offen (jede Taste wählt schon)
     var sortByPointer = false;

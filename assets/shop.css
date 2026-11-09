@@ -218,6 +218,15 @@
 .stock { display: inline-flex; align-items: center; gap: 8px; font-size: var(--fs-small); font-weight: 500; }
 .stock::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--c-success); }
 .stock--order::before { background: var(--c-stock-order); }
+/* Lager-Status (snippets/delivery-info.liquid): klein im Warenkorb, auf der Karte nur „Auf Lager“, grau bei „nicht lieferbar“ */
+.stock--none::before { background: var(--c-muted); }
+.stock--sm { gap: 6px; font-size: var(--fs-caption); line-height: 1.35; }
+.stock--sm::before { flex: none; width: 7px; height: 7px; }
+.stock--card { gap: 6px; margin-top: 2px; font-size: var(--fs-caption); font-weight: 600; color: var(--c-success); }
+.stock--card::before { width: 7px; height: 7px; }
+/* Größen mit Bestand: grüner Punkt oben rechts im Chip (product.js setzt .is-instock je nach Auswahl) */
+.size-chip { position: relative; }
+.size-chip.is-instock::after { content: ""; position: absolute; top: 5px; right: 5px; width: 6px; height: 6px; border-radius: 50%; background: var(--c-success); }
 .partno { display: inline-flex; align-items: center; gap: 4px; font-size: var(--fs-small); }
 .partno code { font-family: var(--f-body); font-weight: 600; color: var(--c-black); }
 .partno button { width: 36px; height: 36px; display: grid; place-items: center; }
@@ -690,3 +699,7 @@ html:not(.has-motion) .bcard:hover .bcard__media img { transform: none; }
 .pc-error { margin-top: 16px; font-size: var(--fs-small); color: var(--c-error); }
 .pc-help { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 16px; margin-top: 20px; font-size: var(--fs-small); color: var(--c-text-soft); }
 @media (max-width: 639px) { .pc-dialog .modal__foot .btn { flex: 1 1 0; } }
+
+/* Sortieren-Knopf am Handy (results-toolbar.liquid): mit geänderter Sortierung steht deren Kurzname drin, schwarz hinterlegt wie eine Auswahl */
+.filterbar__mobile.is-sorted { background: var(--c-black); color: var(--c-white); border-color: var(--c-black); }
+.filterbar__mobile [data-sort-mobile-label] { white-space: nowrap; }

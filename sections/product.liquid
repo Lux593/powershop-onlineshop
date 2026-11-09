@@ -429,22 +429,26 @@
           <div class="pdp__price">
             <div data-pdp-dynamic="price">{% render 'price', product: product, variant: product.selected_variant, long: true %}</div>
             <div data-pdp-dynamic="stock">
+              {%- comment -%}
+                Lager-Status und Lieferzeit (snippets/delivery-info.liquid): je gewählter Ausführung, ohne Auswahl für den ganzen Artikel.
+                product.js lädt den Block bei jeder Auswahl neu (?variant=…).
+              {%- endcomment -%}
               {%- if pdp_on_request == 'true' -%}
                 <p class="stock stock--order">Verfügbarkeit und Lieferzeit auf Anfrage</p>
-              {%- elsif current_variant.available -%}
-                {%- if current_variant.inventory_management != blank and current_variant.inventory_quantity <= 0 -%}
-                  <p class="stock stock--order">Lieferbar in 5–7 Werktagen</p>
-                {%- else -%}
-                  <p class="stock">Auf Lager{% if settings.delivery_time != blank %} – Lieferzeit {{ settings.delivery_time }}{% endif %}</p>
-                {%- endif -%}
               {%- else -%}
-                <p class="stock stock--order">Aktuell nicht lieferbar – frag uns nach dem Liefertermin.</p>
+                {%- liquid
+                  assign stock_variant = product.selected_variant
+                  if product.has_only_default_variant
+                    assign stock_variant = product.variants.first
+                  endif
+                -%}
+                {% render 'delivery-info', product: product, variant: stock_variant %}
               {%- endif -%}
             </div>
           </div>
 
           {% render 'pdp-buy', product: product, contact_anchor: 'werkstatt-kontakt' %}
-          {% render 'pdp-usp', on_request: pdp_on_request %}
+          {% render 'pdp-usp' %}
 
           {%- liquid
             assign show_compat = false
@@ -568,7 +572,7 @@
             {% render 'accordion', title: 'Lieferumfang', body: scope_body %}
             {% render 'pdp-gpsr', product: product %}
             {%- capture ship_body -%}
-              {% render 'pdp-shipping' %}
+              {% render 'pdp-shipping', product: product, on_request: pdp_on_request %}
             {%- endcapture -%}
             {% render 'accordion', title: 'Versand', body: ship_body %}
           </div>
@@ -623,10 +627,29 @@
               <a class="text-link small" href="#bewertungen">Bewertungen lesen</a>
             {%- endif -%}
           </div>
-          <div class="pdp__price" data-pdp-dynamic="price">{% render 'price', product: product, variant: product.selected_variant, long: true %}</div>
+          <div class="pdp__price">
+            <div data-pdp-dynamic="price">{% render 'price', product: product, variant: product.selected_variant, long: true %}</div>
+            <div data-pdp-dynamic="stock">
+              {%- comment -%}
+                Lager-Status und Lieferzeit (snippets/delivery-info.liquid): je gewählter Ausführung, ohne Auswahl für den ganzen Artikel.
+                product.js lädt den Block bei jeder Auswahl neu (?variant=…).
+              {%- endcomment -%}
+              {%- if pdp_on_request == 'true' -%}
+                <p class="stock stock--order">Verfügbarkeit und Lieferzeit auf Anfrage</p>
+              {%- else -%}
+                {%- liquid
+                  assign stock_variant = product.selected_variant
+                  if product.has_only_default_variant
+                    assign stock_variant = product.variants.first
+                  endif
+                -%}
+                {% render 'delivery-info', product: product, variant: stock_variant %}
+              {%- endif -%}
+            </div>
+          </div>
 
           {% render 'pdp-buy', product: product, size_type: size_type, contact_anchor: 'artikel-kontakt' %}
-          {% render 'pdp-usp', on_request: pdp_on_request %}
+          {% render 'pdp-usp' %}
 
           <div>
             {% render 'product-description', product: product %}
@@ -645,7 +668,7 @@
               {% render 'accordion', title: 'Passform', body: fit_body %}
             {%- endif -%}
             {%- capture ship_body -%}
-              {% render 'pdp-shipping', apparel: true %}
+              {% render 'pdp-shipping', apparel: true, product: product, on_request: pdp_on_request %}
             {%- endcapture -%}
             {% render 'accordion', title: 'Versand & Rückgabe', body: ship_body %}
             {% render 'pdp-gpsr', product: product %}

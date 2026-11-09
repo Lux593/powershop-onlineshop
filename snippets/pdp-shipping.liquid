@@ -3,10 +3,14 @@
   leere oder 0-Werte erzeugen keine Aussage (nie „ab 0 €“ oder „ Tage Rückgabe“).
 
   @param {boolean} [apparel] - Bekleidung: mit Versandkosten unter der Grenze und Rückgabefrist. Ohne: Teile, mit Sperrgut-Hinweis.
+  @param {product} [product] - Für die Lieferzeiten aus den Lieferzeit-Regeln (snippets/delivery-info.liquid)
+  @param {string} [on_request] - "true": Artikel nur auf Anfrage, die Lieferzeit klärt die Anfrage
 {% enddoc %}
 
 <p>
-  {%- if settings.delivery_time != blank -%}Lieferzeit {{ settings.delivery_time }}. {% endif -%}
+  {%- if on_request == 'true' -%}Die Lieferzeit klären wir mit dir bei der Anfrage.{{ ' ' }}
+  {%- elsif product != blank -%}{% render 'delivery-info', product: product, as: 'times' %}{{ ' ' }}
+  {%- endif -%}
   {%- if settings.free_shipping_threshold > 0 -%}
     Versandkostenfrei ab {{ settings.free_shipping_threshold | times: 100 | money_without_trailing_zeros }}
     {%- if apparel and settings.shipping_cost_text != blank %}, darunter {{ settings.shipping_cost_text }}{% endif %}.{{ ' ' }}
