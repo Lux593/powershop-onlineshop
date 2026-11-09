@@ -523,6 +523,8 @@ html:not(.has-motion) .bcard:hover .bcard__media img { transform: none; }
     container: pcard-quick / inline-size;
   }
   .pcard__quick--sizes { padding: 10px 52px 0 10px; background: rgba(255, 255, 255, 0.96); clip-path: inset(calc(100% - 44px) 0 0 calc(100% - 44px)); }
+  /* Das „×“ sitzt nur unten neben den Größen: der Hinweis darüber nutzt die volle Breite */
+  .pcard__quick--sizes .pcard__quick-label { margin-right: -42px; }
   .pcard.is-quick-open .pcard__quick { visibility: visible; clip-path: inset(0); transition-delay: 0s; }
   .pcard.is-quick-open .pcard__plus { background: var(--c-black); color: var(--c-white); box-shadow: -1px 0 0 rgba(255, 255, 255, 0.3); }
   /* Der Button läuft unter dem „×“ durch; Text und Tasche stehen links davon */
