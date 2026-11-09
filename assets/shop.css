@@ -353,11 +353,10 @@
      bei wenigen Karten werden sie breiter und die Box endet früher. */
   .pdp-ask { max-width: calc(4 * 220px + 3 * var(--s-3)); }
   .pdp-ask--bike { max-width: calc(3 * 280px + 2 * var(--s-3)); }
-  /* Maße so, dass bei der Bike-Box (888 px) links die fünf Themen in eine Reihe passen und rechts „Anrufen · Nummer“ in den Button */
-  .contact-box--wide { grid-template-columns: minmax(0, 1fr) 268px; gap: 0; padding: 0; }
-  .contact-box__main { display: grid; gap: 16px; align-content: start; min-width: 0; padding: 32px 28px; }
-  .contact-box__side { display: grid; gap: 10px; align-content: center; min-width: 0; padding: 32px 24px; border-left: 1px solid var(--c-line); }
-  .contact-box__side .btn { padding-inline: 12px; }
+  /* Rechts breit genug für „Anrufen · Nummer“ mit Luft, links der Rest (Themen dürfen umbrechen) */
+  .contact-box--wide { grid-template-columns: minmax(0, 1fr) 340px; gap: 0; padding: 0; }
+  .contact-box__main { display: grid; gap: 16px; align-content: start; min-width: 0; padding: 32px; }
+  .contact-box__side { display: grid; gap: 10px; align-content: center; min-width: 0; padding: 32px 28px; border-left: 1px solid var(--c-line); }
   .contact-box__side .contact-box__buttons { grid-template-columns: minmax(0, 1fr); }
 }
 .contact-box__person { display: flex; align-items: center; gap: 12px; padding-top: 16px; border-top: 1px solid var(--c-line); }
