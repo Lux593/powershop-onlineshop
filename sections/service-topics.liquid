@@ -158,7 +158,7 @@
               {%- if has_rows or has_checks -%}
                 <div class="topic__groups">
                   {%- if has_rows -%}
-                    <dl class="topic__rows" style="--k: {{ k }}">
+                    <dl class="topic__rows{% if b.numbered %} topic__rows--steps{% endif %}" style="--k: {{ k }}">
                       {%- assign n = 0 -%}
                       {%- for line in rows -%}
                         {%- assign l = line | strip -%}
