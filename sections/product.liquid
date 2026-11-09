@@ -13,12 +13,17 @@
   endcapture
   assign pdp_on_request = pdp_on_request | strip
   # Betreff der Anfrage in der Kontakt-Box unten: Titel, gewählte Ausführung, Artikelnummer (Teilenummer, sonst SKU)
-  assign request_variant = product.selected_or_first_available_variant
+  # Die SKU nur, wenn sie eindeutig ist (eine Variante oder eine gewählt): sonst stünde z. B. die Größe L im Betreff, ohne dass
+  # jemand L gewählt hat
   assign request_subject = product.title
-  if product.selected_variant != blank and product.has_only_default_variant == false
+  assign request_sku = ''
+  if product.has_only_default_variant
+    assign request_sku = product.variants.first.sku
+  elsif product.selected_variant != blank
     assign request_subject = request_subject | append: ' – ' | append: product.selected_variant.title
+    assign request_sku = product.selected_variant.sku
   endif
-  assign request_no = product.metafields.part.teilenummer.value | default: request_variant.sku
+  assign request_no = product.metafields.part.teilenummer.value | default: request_sku
   if request_no != blank
     assign request_subject = request_subject | append: ' (Art.-Nr. ' | append: request_no | append: ')'
   endif
