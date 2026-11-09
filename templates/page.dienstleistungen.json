@@ -51,10 +51,10 @@
             "topic": "inzahlungnahme",
             "icon": "handshake",
             "title": "Inzahlungnahme",
-            "lead": "Du steigst um? Dein jetziges Motorrad nehmen wir in Zahlung. So läuft es ab:",
+            "lead": "Du willst umsteigen? Dein jetziges Motorrad nehmen wir in Zahlung. So läuft es ab:",
             "rows": "Daten schicken | Modell, Baujahr, km-Stand und ein paar Fotos.\nAngebot bekommen | Wir machen dir ein faires Angebot für dein Bike.\nBeim Kauf anrechnen | Den Betrag rechnen wir direkt beim Kauf deines neuen Bikes an.",
             "numbered": true,
-            "checklist_title": "Das brauchen wir von dir",
+            "checklist_title": "Das brauchen wir von dir für eine erfolgreiche Inzahlungnahme",
             "checklist": "Fahrzeugschein (Zulassungsbescheinigung Teil I)\nFahrzeugbrief (Zulassungsbescheinigung Teil II)\nServiceheft\nAlle Schlüssel"
           }
         },
