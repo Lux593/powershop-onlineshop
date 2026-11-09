@@ -20,6 +20,7 @@
     capture item_on_request
       render 'on-request', product: item.product
     endcapture
+    assign item_on_request = item_on_request | strip
     if item_on_request == 'true'
       assign cart_blocked = true
       break

@@ -24,6 +24,7 @@
   capture card_on_request
     render 'on-request', product: product
   endcapture
+  assign card_on_request = card_on_request | strip
 
   assign size_option = nil
   assign color_option = nil

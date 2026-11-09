@@ -1,8 +1,0 @@
-{%- layout none -%}
-{%- comment -%} Vorübergehend: Prüfausgabe der Anfrage-Regeln, wird gleich wieder entfernt {%- endcomment -%}
-{%- assign p = all_products[search.terms] -%}
-count={{ metaobjects.anfrage_regel.values.size }}
-{% for rule in metaobjects.anfrage_regel.values %}rule: {{ rule.bezeichnung.value }} | bereich={{ rule.bereich.value }} | typ={{ rule.produkttyp.value }} | preis={{ rule.preis_ab.value }} | cents={{ rule.preis_ab.value | times: 100 }}
-{% endfor %}
-product={{ p.title }} | type={{ p.type }} | price_max={{ p.price_max }} | tnr={{ p.metafields.part.teilenummer.value }} | suffix={{ p.template_suffix }} | modus={{ p.metafields.anfrage.modus.value }}
-result=[{% render 'on-request', product: p %}]

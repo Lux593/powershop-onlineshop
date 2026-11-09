@@ -34,6 +34,7 @@
   capture on_request
     render 'on-request', product: product
   endcapture
+  assign on_request = on_request | strip
 
   # Betreff der Anfrage: Titel, gewählte Ausführung, Artikelnummer (Teilenummer, sonst SKU der Variante)
   assign request_subject = product.title

@@ -1,6 +1,8 @@
 {% doc %}
-  Prüft, ob ein Artikel nur auf Anfrage erhältlich ist, und gibt dann „true“ aus, sonst nichts. Aufruf per capture:
-    {% capture on_request %}{% render 'on-request', product: product %}{% endcapture %}  …  if on_request == 'true'
+  Prüft, ob ein Artikel nur auf Anfrage erhältlich ist, und gibt dann „true“ aus, sonst nichts. Aufruf per capture, danach
+  strip (Shopify setzt vor die Ausgabe einen Zeilenumbruch, gesehen am 9.11.):
+    {% capture on_request %}{% render 'on-request', product: product %}{% endcapture %}
+    {% assign on_request = on_request | strip %}  …  if on_request == 'true'
   Genutzt von pdp-buy, pdp-sticky-buy, product-card, cart-line und den Warenkörben (Kasse gesperrt, solange so ein Artikel drin ist).
 
   Reihenfolge:

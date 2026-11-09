@@ -22,6 +22,7 @@
   capture on_request
     render 'on-request', product: product
   endcapture
+  assign on_request = on_request | strip
   assign v = product.selected_or_first_available_variant
   assign show_from = false
   if product.selected_variant == blank and product.price_varies

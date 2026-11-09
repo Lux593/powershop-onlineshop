@@ -16,6 +16,7 @@
   dann keinen Button zur Kasse aus (sections/cart.liquid, sections/cart-drawer.liquid); entfernen geht wie immer.
 {%- endcomment -%}
 {%- capture line_on_request -%}{%- render 'on-request', product: item.product -%}{%- endcapture -%}
+{%- assign line_on_request = line_on_request | strip -%}
 
 <div class="line-item">
   {%- if item.image -%}
