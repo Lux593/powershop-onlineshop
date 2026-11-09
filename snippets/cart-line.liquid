@@ -11,6 +11,11 @@
 {% enddoc %}
 
 {%- assign line_title = item.product.title | escape -%}
+{%- comment -%}
+  Nur auf Anfrage (snippets/on-request.liquid): Die Position bekommt einen Hinweis mit Link zur Anfrage. Die Warenkörbe geben
+  dann keinen Button zur Kasse aus (sections/cart.liquid, sections/cart-drawer.liquid); entfernen geht wie immer.
+{%- endcomment -%}
+{%- capture line_on_request -%}{%- render 'on-request', product: item.product -%}{%- endcapture -%}
 
 <div class="line-item">
   {%- if item.image -%}
@@ -43,6 +48,15 @@
           assign line_meta = line_meta | remove_first: ' · '
         -%}
         {%- if line_meta != blank -%}<p class="line-item__meta">{{ line_meta }}</p>{%- endif -%}
+        {%- if line_on_request == 'true' -%}
+          {%- liquid
+            assign request_anchor = '#artikel-anfrage'
+            if item.product.type == 'Motorrad' or item.product.template_suffix == 'motorrad'
+              assign request_anchor = '#kontakt'
+            endif
+          -%}
+          <p class="line-item__request">{% render 'icon', name: 'circle-alert' %}<span>Nur auf Anfrage erhältlich. <a href="{{ item.url }}{{ request_anchor }}">Jetzt anfragen</a></span></p>
+        {%- endif -%}
       </div>
       <button
         class="remove-btn"

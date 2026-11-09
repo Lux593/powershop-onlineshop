@@ -17,6 +17,8 @@
     umbau: { subj: 'Umbau-Anfrage', text: function () { return 'ich interessiere mich für einen Umbau an meinem Bike. Mein Bike: Modell …, Baujahr …, Idee: …'; } },
     kompatibilitaet: { subj: 'Frage zur Kompatibilität', text: function (x) { return 'passt ' + x + ' an mein Motorrad? Modell …, Baujahr …'; } },
     einbau: { subj: 'Einbau-Anfrage', text: function (x) { return 'könnt ihr ' + x + ' bei mir einbauen? Mein Bike: Modell …, Baujahr …'; } },
+    // Artikel nur auf Anfrage (snippets/on-request.liquid, Anfrage-Zeile im Kaufbereich)
+    anfrage: { subj: 'Artikelanfrage', text: function (x) { return 'ich möchte gerne ' + (x || 'diesen Artikel') + ' bestellen. Ist er verfügbar, und wie geht es weiter?'; } },
     sonstiges: { subj: 'Anfrage an die Werkstatt', text: function () { return 'ich habe ein Anliegen: …'; } },
     frage: { subj: 'Frage', text: function (x) { return 'ich habe eine Frage' + (x ? ' zur ' + x : '') + ': …'; } }
   };

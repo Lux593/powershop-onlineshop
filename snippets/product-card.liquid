@@ -20,6 +20,11 @@
     assign is_part = true
   endif
 
+  # Nur auf Anfrage (snippets/on-request.liquid): kein Schnellkauf, dafür das Etikett „Auf Anfrage“
+  capture card_on_request
+    render 'on-request', product: product
+  endcapture
+
   assign size_option = nil
   assign color_option = nil
   for option in product.options_with_values
@@ -63,15 +68,16 @@
       {%- endif -%}
     </a>
 
-    {%- if is_new or discount > 0 or product.available == false -%}
+    {%- if is_new or discount > 0 or product.available == false or card_on_request == 'true' -%}
       <div class="pcard__badges">
         {%- if product.available == false -%}<span class="badge badge--used">Ausverkauft</span>{%- endif -%}
+        {%- if card_on_request == 'true' and product.available %}<span class="badge badge--request">Auf Anfrage</span>{% endif -%}
         {%- if is_new and product.available %}<span class="badge">Neu</span>{% endif -%}
         {%- if discount > 0 and product.available %}<span class="badge badge--sale">-{{ discount }} %</span>{% endif -%}
       </div>
     {%- endif -%}
 
-    {%- if product.available -%}
+    {%- if product.available and card_on_request != 'true' -%}
       {%- comment -%} Der Schalter steht vor dem Panel: auf Touch und schmal führt Tab nach dem Öffnen direkt in die Größenwahl {%- endcomment -%}
       <button class="pcard__plus" type="button" data-quick-toggle aria-expanded="false" aria-label="Schnell hinzufügen: {{ product.title | escape }}">
         {% render 'icon', name: 'plus' %}

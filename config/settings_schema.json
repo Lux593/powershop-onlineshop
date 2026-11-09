@@ -56,6 +56,13 @@
     ]
   },
   {
+    "name": "Artikel auf Anfrage",
+    "settings": [
+      { "type": "paragraph", "content": "Welche Artikel nur auf Anfrage erhältlich sind, legst du in Shopify fest: unter Inhalte → Metaobjekte → Anfrage-Regel (z. B. Teile ab 1.000 €) und am einzelnen Artikel im Feld „Anfrage“ (Immer oder Nie, geht den Regeln vor). Statt „In den Warenkorb“ stehen dort die Anfrage-Buttons, im Warenkorb ist die Kasse gesperrt, solange so ein Artikel drin liegt." },
+      { "type": "textarea", "id": "on_request_note", "label": "Satz unter „Nur auf Anfrage erhältlich“", "default": "Diesen Artikel bestellen wir persönlich mit dir: Verfügbarkeit, Lieferzeit und Passform klären wir vorab." }
+    ]
+  },
+  {
     "name": "Footer und Soziale Netze",
     "settings": [
       { "type": "textarea", "id": "payment_methods", "label": "Zahlarten (eine pro Zeile)", "default": "PayPal\nKlarna\nVisa\nMastercard\nApple Pay\nGoogle Pay", "info": "Der Shop zeigt automatisch die im Checkout aktiven Zahlarten als offizielle Icons. Diese Liste gilt nur, solange dort noch keine aktiv sind." },

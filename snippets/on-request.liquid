@@ -1,0 +1,59 @@
+{% doc %}
+  Prüft, ob ein Artikel nur auf Anfrage erhältlich ist, und gibt dann „true“ aus, sonst nichts. Aufruf per capture:
+    {% capture on_request %}{% render 'on-request', product: product %}{% endcapture %}  …  if on_request == 'true'
+  Genutzt von pdp-buy, pdp-sticky-buy, product-card, cart-line und den Warenkörben (Kasse gesperrt, solange so ein Artikel drin ist).
+
+  Reihenfolge:
+  1. Motorräder (Produkttyp „Motorrad“ oder Vorlage motorrad): immer, sie laufen über die Bike-Anfrage.
+  2. Schalter am Artikel (Produkt-Metafeld anfrage.modus, im Produkt-Editor „Anfrage“): „Immer auf Anfrage“ oder „Nie auf
+     Anfrage“ gilt vor allen Regeln. Leer oder „Automatisch“: weiter mit 3.
+  3. Anfrage-Regeln (Metaobjekt anfrage_regel, Shopify-Admin → Inhalte → Metaobjekte; Entwürfe zählen nicht): Passt eine,
+     ist der Artikel auf Anfrage. Eine Regel passt, wenn
+     - der Bereich stimmt (Alle, Teile, Bekleidung, Accessoires). Teile: Teilenummer (part.teilenummer) oder Vorlage teil;
+       Accessoires: Tag „Accessoires“ oder „bereich:accessoires“; alles andere zählt als Bekleidung,
+     - der Produkttyp gleich ist, falls die Regel einen nennt (ohne Groß-/Kleinschreibung und Leerraum am Rand),
+     - der höchste Variantenpreis mindestens „Preis ab“ ist: Liegt eine Variante darüber, gilt der ganze Artikel.
+  Grenze: Ohne paginate liest Liquid höchstens 50 Regeln. Ein späterer n8n-Abgleich (Tag auf-anfrage für Admin-Liste und
+  Sperr-App) müsste genau diese Logik nachbauen.
+
+  @param {product} product - Produkt
+{% enddoc %}
+
+{%- liquid
+  assign hit = false
+  assign mode = product.metafields.anfrage.modus.value | default: 'Automatisch'
+  if product.type == 'Motorrad' or product.template_suffix == 'motorrad'
+    assign hit = true
+  elsif mode == 'Immer auf Anfrage'
+    assign hit = true
+  elsif mode == 'Nie auf Anfrage'
+    assign hit = false
+  else
+    assign area = 'bekleidung'
+    if product.metafields.part.teilenummer != blank or product.template_suffix == 'teil'
+      assign area = 'teile'
+    elsif product.tags contains 'Accessoires' or product.tags contains 'bereich:accessoires'
+      assign area = 'accessoires'
+    endif
+    assign own_type = product.type | downcase | strip
+    for rule in metaobjects.anfrage_regel.values
+      assign rule_area = rule.bereich.value | downcase | strip
+      if rule_area != 'alle' and rule_area != area
+        continue
+      endif
+      assign rule_type = rule.produkttyp.value | downcase | strip
+      if rule_type != blank and rule_type != own_type
+        continue
+      endif
+      if rule.preis_ab.value == blank
+        continue
+      endif
+      assign limit_cents = rule.preis_ab.value | times: 100
+      if product.price_max >= limit_cents
+        assign hit = true
+        break
+      endif
+    endfor
+  endif
+-%}
+{%- if hit -%}true{%- endif -%}

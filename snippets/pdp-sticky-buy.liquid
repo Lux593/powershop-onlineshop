@@ -8,6 +8,9 @@
   und ohne Streichpreis. Der Streichpreis samt Erklärung („niedrigster Preis der letzten 30 Tage“) und der Versandlink stehen
   im Kaufbereich. Ein Link in der engen Leiste wäre beim Fokus teils abgeschnitten.
 
+  Artikel nur auf Anfrage (snippets/on-request.liquid): statt des Kaufbuttons „Jetzt anfragen“, ein Link zur Anfrage-Zeile im
+  Kaufbereich (#artikel-anfrage aus pdp-buy.liquid).
+
   @param {product} product - Produkt
 
   @example
@@ -16,6 +19,9 @@
 
 {%- liquid
   assign form_id = 'product-form-' | append: product.id
+  capture on_request
+    render 'on-request', product: product
+  endcapture
   assign v = product.selected_or_first_available_variant
   assign show_from = false
   if product.selected_variant == blank and product.price_varies
@@ -33,7 +39,11 @@
       <span class="price__note">inkl. MwSt., zzgl. Versand</span>
     </p>
   </div>
-  <button class="btn btn--primary" type="submit" form="{{ form_id }}" name="add" data-buy{% unless product.available %} disabled{% endunless %}>
-    {% render 'icon', name: 'shopping-bag' %}<span data-buy-text>{% if product.available %}In den Warenkorb{% else %}Ausverkauft{% endif %}</span>
-  </button>
+  {%- if on_request == 'true' -%}
+    <a class="btn btn--primary" href="#artikel-anfrage">{% render 'icon', name: 'message-circle' %}<span>Jetzt anfragen</span></a>
+  {%- else -%}
+    <button class="btn btn--primary" type="submit" form="{{ form_id }}" name="add" data-buy{% unless product.available %} disabled{% endunless %}>
+      {% render 'icon', name: 'shopping-bag' %}<span data-buy-text>{% if product.available %}In den Warenkorb{% else %}Ausverkauft{% endif %}</span>
+    </button>
+  {%- endif -%}
 </div>

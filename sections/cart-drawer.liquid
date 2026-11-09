@@ -9,6 +9,21 @@
   assign pct = pct | at_most: 100
 -%}
 
+{%- liquid
+  # Kasse gesperrt, solange ein Artikel nur auf Anfrage im Warenkorb liegt (snippets/on-request.liquid). Der Button zur Kasse
+  # wird dann gar nicht ausgegeben, nicht nur versteckt. Direkt-Links zur Kasse schließt das nicht (nur eine Sperr-App).
+  assign cart_blocked = false
+  for item in cart.items
+    capture item_on_request
+      render 'on-request', product: item.product
+    endcapture
+    if item_on_request == 'true'
+      assign cart_blocked = true
+      break
+    endif
+  endfor
+-%}
+
 <dialog class="drawer drawer--cart" id="cart-drawer" aria-labelledby="cart-title" data-cart-drawer data-lenis-prevent>
   <div class="drawer__head">
     <h2 class="h4 drawer__title" id="cart-title"><img class="drawer__hd" src="{{ 'hd-bar-shield.png' | asset_url }}" alt="" width="49" height="40">Warenkorb ({{ cart.item_count }})</h2>
@@ -53,9 +68,13 @@
         Versand{% if threshold > 0 and missing <= 0 %} (kostenlos){% endif %}
         {%- if settings.delivery_time != blank %} · Lieferzeit {{ settings.delivery_time }}{% endif -%}
       </p>
+{%- if cart_blocked -%}
+        <p class="cart-blocked" role="alert">{% render 'icon', name: 'circle-alert' %}<span>Im Warenkorb liegt ein Artikel, den es nur auf Anfrage gibt. Frag ihn bei uns an oder entferne ihn, dann geht es zur Kasse.</span></p>
+      {%- else -%}
       <form action="{{ routes.cart_url }}" method="post">
         <button class="btn btn--primary btn--block" type="submit" name="checkout">Zur Kasse {% render 'icon', name: 'arrow-right' %}</button>
       </form>
+      {%- endif -%}
       <button class="btn btn--outline-light btn--block" type="button" data-close>Weiter einkaufen</button>
     </div>
   {%- endif -%}

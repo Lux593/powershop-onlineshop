@@ -12,7 +12,21 @@
   </nav>
   <h1 class="cart-page__title">Warenkorb{% if cart.item_count > 0 %} ({{ cart.item_count }}){% endif %}</h1>
 
-  {%- if cart.item_count == 0 -%}
+  {%- liquid
+  # Kasse gesperrt, solange ein Artikel nur auf Anfrage im Warenkorb liegt (snippets/on-request.liquid). Der Button zur Kasse
+  # wird dann gar nicht ausgegeben, nicht nur versteckt. Direkt-Links zur Kasse schließt das nicht (nur eine Sperr-App).
+  assign cart_blocked = false
+  for item in cart.items
+    capture item_on_request
+      render 'on-request', product: item.product
+    endcapture
+    if item_on_request == 'true'
+      assign cart_blocked = true
+      break
+    endif
+  endfor
+-%}
+{%- if cart.item_count == 0 -%}
     <div class="empty">
       {% render 'icon', name: 'shopping-bag', class: 'icon--lg' %}
       <h2 class="h3">Dein Warenkorb ist noch leer.</h2>
@@ -34,9 +48,13 @@
           Versand{% if threshold > 0 and missing <= 0 %} (kostenlos){% endif %}
           {%- if settings.delivery_time != blank %} · Lieferzeit {{ settings.delivery_time }}{% endif -%}
         </p>
+{%- if cart_blocked -%}
+          <p class="cart-blocked" role="alert">{% render 'icon', name: 'circle-alert' %}<span>Im Warenkorb liegt ein Artikel, den es nur auf Anfrage gibt. Frag ihn bei uns an oder entferne ihn, dann geht es zur Kasse.</span></p>
+        {%- else -%}
         <form action="{{ routes.cart_url }}" method="post">
           <button class="btn btn--primary btn--block" type="submit" name="checkout">Zur Kasse {% render 'icon', name: 'arrow-right' %}</button>
         </form>
+        {%- endif -%}
         <a class="btn btn--text" href="{{ routes.all_products_collection_url }}" style="justify-self:center">Weiter einkaufen</a>
         {% render 'payments', style: 'justify-content:center', light: true %}
       </aside>

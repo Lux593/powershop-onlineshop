@@ -8,8 +8,8 @@
 
   @param {string} [anchor] - ID der Box, Standard "kontakt"
   @param {string} [title] - Überschrift, kompakt die Beschriftung der Zeile
-  @param {string} [intro] - Kurzer Text unter der Überschrift
-  @param {string} [topics] - Themen, kommagetrennt: probefahrt, finanzierung, versicherung, inzahlungnahme, lieferung, reservierung, werkstatt, service, umbau, kompatibilitaet, einbau, sonstiges, frage
+  @param {string} [intro] - Kurzer Text unter der Überschrift (auch in der kompakten Zeile)
+  @param {string} [topics] - Themen, kommagetrennt: probefahrt, finanzierung, versicherung, inzahlungnahme, lieferung, reservierung, werkstatt, service, umbau, kompatibilitaet, einbau, anfrage, sonstiges, frage
   @param {string} [topic] - Voreingestelltes Thema
   @param {string} [subject] - Fahrzeug oder Artikel, wird in die Nachricht eingesetzt
   @param {string} [ref] - Zusatzzeile in der Nachricht, z. B. Link zur Seite. Leer = Adresse der aktuellen Seite
@@ -92,6 +92,7 @@
       aria-labelledby="{{ box_id }}-title"
     >
       <p class="contact-row__title" id="{{ box_id }}-title">{{ title | default: 'Frag uns' | escape }}</p>
+      {%- if intro != blank -%}<p class="contact-row__intro">{{ intro }}</p>{%- endif -%}
       {%- unless has_channel -%}{{ missing_note }}{%- endunless -%}
       {%- if has_channel -%}<div class="contact-row__buttons">{{ contact_buttons }}</div>{%- endif -%}
     </div>
@@ -140,6 +141,8 @@
                   assign topic_label = 'Passt es?'
                 when 'einbau'
                   assign topic_label = 'Einbau'
+                when 'anfrage'
+                  assign topic_label = 'Artikel anfragen'
                 when 'sonstiges'
                   assign topic_label = 'Sonstiges'
                 else

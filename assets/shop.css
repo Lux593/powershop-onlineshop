@@ -350,6 +350,10 @@
 .contact-row { display: grid; gap: 12px; padding-top: var(--s-3); border-top: 1px solid var(--c-line); }
 .contact-row__title { font-family: var(--f-head); font-weight: 700; font-size: 20px; line-height: 1.1; letter-spacing: 0.02em; text-transform: uppercase; }
 .contact-row__buttons { display: grid; gap: 8px; }
+.contact-row__intro { margin-top: -4px; max-width: 56ch; font-size: var(--fs-small); color: var(--c-text-soft); }
+/* Artikel nur auf Anfrage (snippets/pdp-buy.liquid): Anfrage-Zeile statt Menge und Warenkorb-Button, ohne eigene Trennlinie */
+.pdp__buy--request { display: block; }
+.pdp__buy--request .contact-row { padding-top: 0; border-top: 0; }
 @media (min-width: 640px) { .contact-row__buttons { display: flex; flex-wrap: wrap; } }
 .reserve-note { display: grid; gap: 8px; padding: 16px; background: var(--c-offwhite); border: 1px dashed var(--c-border-soft); font-size: var(--fs-small); }
 .reserve-note strong { display: flex; align-items: center; gap: 8px; font-size: var(--fs-body); }
@@ -385,6 +389,12 @@
 .line-item__top { display: flex; justify-content: space-between; gap: 8px; }
 .line-item__name { min-width: 0; font-weight: 500; font-size: 15px; line-height: 1.35; overflow-wrap: anywhere; }
 .line-item__meta { font-size: var(--fs-caption); color: var(--c-muted); margin-top: 2px; }
+/* Position nur auf Anfrage (snippets/cart-line.liquid) und Hinweis statt „Zur Kasse“ (sections/cart.liquid, cart-drawer.liquid) */
+.line-item__request { display: flex; align-items: flex-start; gap: 6px; margin-top: 6px; font-size: var(--fs-caption); line-height: 1.4; }
+.line-item__request .icon { flex: none; width: 14px; height: 14px; margin-top: 1px; color: var(--c-orange-on-light); }
+.line-item__request a { font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+.cart-blocked { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border: 1px solid var(--c-orange); border-radius: var(--radius); font-size: var(--fs-small); line-height: 1.45; }
+.cart-blocked .icon { flex: none; width: 18px; height: 18px; margin-top: 1px; color: var(--c-orange); }
 .line-item__bottom { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 10px; }
 .line-item__bottom > :last-child { white-space: nowrap; } /* Zeilenpreis bleibt einzeilig („39,95 / €“ brach bei 320 px um) */
 .line-item .qty button, .line-item .qty input { height: 40px; width: 40px; }

@@ -55,7 +55,7 @@
   background: var(--c-black); color: var(--c-white);
 }
 .badge--sale { background: var(--c-orange); color: var(--c-black); }
-.badge--used, .badge--demo { background: var(--c-white); color: var(--c-black); box-shadow: inset 0 0 0 1px var(--c-black); }
+.badge--used, .badge--demo, .badge--request { background: var(--c-white); color: var(--c-black); box-shadow: inset 0 0 0 1px var(--c-black); }
 .badge--reserved { background: var(--c-muted); color: var(--c-white); }
 .badge .icon { width: 13px; height: 13px; stroke-width: 2; }
 /* Zulassung (Teile) */
