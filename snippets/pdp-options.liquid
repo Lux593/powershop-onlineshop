@@ -25,7 +25,7 @@
         assign selected_value = option.values.first.name | default: option.values.first
       endif
       assign is_size = false
-      if option_key == 'größe' or option_key == 'groesse' or option_key == 'size' or option_key == 'weite'
+      if option_key == 'größe' or option_key == 'grösse' or option_key == 'groesse' or option_key == 'size' or option_key == 'weite'
         assign is_size = true
       endif
     -%}

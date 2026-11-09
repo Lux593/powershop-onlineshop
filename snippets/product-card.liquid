@@ -30,7 +30,7 @@
   assign color_option = nil
   for option in product.options_with_values
     assign option_name = option.name | downcase
-    if option_name == 'größe' or option_name == 'groesse' or option_name == 'size' or option_name == 'weite'
+    if option_name == 'größe' or option_name == 'grösse' or option_name == 'groesse' or option_name == 'size' or option_name == 'weite'
       assign size_option = option
     elsif option_name == 'farbe' or option_name == 'color'
       assign color_option = option
