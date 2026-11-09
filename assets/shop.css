@@ -338,7 +338,7 @@
 @media (min-width: 640px) and (max-width: 1023px) { .contact-box__buttons { grid-template-columns: repeat(3, 1fr); } }
 .contact-box__phone { font-family: var(--f-body); font-weight: 600; letter-spacing: 0; text-transform: none; }
 /* Breite Kontakt-Box unten auf der Produktseite (contact-box.liquid mit wide, seit 9.11.): ab 900 px eine Box mit zwei Spalten,
-   links Überschrift, Text und Themen, rechts Anrufen, WhatsApp und E-Mail untereinander. Höchstens 1080 px breit, damit auf
+   links Überschrift, Text und Themen, rechts Anrufen, WhatsApp und E-Mail untereinander. Höchstens 980 px breit, damit auf
    breiten Monitoren keine leere Fläche in der Box entsteht; darunter wie bisher höchstens 560 px.
    Bis 899 px lösen sich die beiden Spalten auf (display: contents): Reihenfolge wie gewohnt, Zusatz (Reservierung) unter den Buttons. */
 .pdp-ask { max-width: 560px; }
@@ -348,7 +348,7 @@
   .contact-box--wide .contact-box__after { order: 1; }
 }
 @media (min-width: 900px) {
-  .pdp-ask { max-width: 1080px; }
+  .pdp-ask { max-width: 980px; } /* links gerade so breit, dass die fünf Bike-Themen in eine Reihe passen */
   .contact-box--wide { grid-template-columns: minmax(0, 1fr) minmax(280px, 340px); gap: 0; padding: 0; }
   .contact-box__main { display: grid; gap: 16px; align-content: start; min-width: 0; padding: 32px 36px; }
   .contact-box__side { display: grid; gap: 10px; align-content: center; min-width: 0; padding: 32px 36px; border-left: 1px solid var(--c-line); }
