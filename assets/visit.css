@@ -86,7 +86,7 @@
    Start zentriert (Wunsch vom 6.11.): Im Film stehen Logo und Schrift rechts der Mitte (vom Logo bis zum Ende von „Power Shop“
    46,2–70,9 % der Breite, Mitte 58,52 %; das schwarze Schild reicht bis 73,2 %; Logo auf 49,9 % der Höhe). Am Start ist der Film darum
    um --s = 1,28 vergrößert und so verschoben (--tx, --ty), dass der ganze Block mittig steht: Logo und Schrift waagrecht in der Mitte,
-   senkrecht samt „Glide to Shop“ darunter (Logo um --d, die halbe Höhe von Abstand und Hinweis, über der Mitte). 1,28 ist mehr als
+   senkrecht samt „Zoom to Shop“ darunter (Logo um --d, die halbe Höhe von Abstand und Hinweis, über der Mitte). 1,28 ist mehr als
    nötig (1,21): Rechts und unten bleibt der Film so am Rand, kein Streifen wird frei.
    Beim Klick zoomt der Ausschnitt mit dem Flug auf das ganze Bild zurück (is-there: --s 1), am Laden steht die Front mit beiden Bikes
    ganz im Bild; zurück zur Karte wieder hinein. transform statt einer größeren Ebene: Bis zum 2.11. lagen Bild und Filme in einer

@@ -184,7 +184,7 @@
       io.observe(map);
     }
 
-    // Lichtreflex auf „Glide to Shop“ (visit.css) nur, solange die Karte im Bild ist: is-seen
+    // Lichtreflex auf „Zoom to Shop“ (visit.css) nur, solange die Karte im Bild ist: is-seen
     if (!calm() && 'IntersectionObserver' in window) {
       new IntersectionObserver(function (entries) {
         entries.forEach(function (e) { map.classList.toggle('is-seen', e.isIntersecting); });
