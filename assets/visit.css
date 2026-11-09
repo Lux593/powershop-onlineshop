@@ -36,8 +36,13 @@
   .visit__head { margin-bottom: calc(var(--s-8) + var(--s-3)); }
 }
 /* Name des Ladens über der Adresse (am Handy unter der Karte), fett wie bis zum 2.11. die Straße, davor das orange Bar & Shield */
-.visit__store { display: flex; align-items: center; gap: 12px; margin-bottom: -6px; font-family: var(--f-head); font-weight: 800; font-size: clamp(28px, 2.4vw, 34px); line-height: 0.95; letter-spacing: 0.01em; text-transform: uppercase; text-wrap: balance; }
-.visit__shield { flex: none; width: auto; height: 1.15em; }
+.visit__store { font-family: var(--f-head); font-weight: 800; font-size: clamp(28px, 2.4vw, 34px); line-height: 0.95; letter-spacing: 0.01em; text-transform: uppercase; text-wrap: balance; }
+/* Briefkopf (seit 9.11.): Logo als Spalte links, Name, Adresse und Hinweis rechts daneben an einer Kante */
+.visit__id { display: grid; gap: 0 14px; align-items: start; }
+.visit__id--logo { grid-template-columns: auto minmax(0, 1fr); }
+.visit__id-text { display: grid; gap: var(--s-2); min-width: 0; }
+.visit__id-text .visit__store { margin-bottom: -6px; }
+.visit__shield { width: auto; height: clamp(34px, 2.9vw, 40px); margin-top: 1px; }
 .visit__map { position: relative; overflow: hidden; height: clamp(300px, 92vw, 440px); background: var(--c-black-soft); }
 .visit__frame { position: absolute; inset: 0; container-type: size; }
 .visit__info { display: grid; gap: var(--s-2); align-content: start; }

@@ -50,22 +50,35 @@
       {%- endif -%}
 
       <div class="visit__info">
-        {%- if section.settings.name != blank -%}
-          <p class="visit__store">
-            <img class="visit__shield" src="{{ 'hd-bar-shield.png' | asset_url }}" alt="" width="49" height="40" loading="lazy">
-            {{- section.settings.name | escape -}}
-          </p>
+        {%- comment -%}
+          Seit 9.11. wie ein Briefkopf: das Bar & Shield als eigene Spalte links, Name, Adresse und Hinweis rechts daneben an einer
+          Kante (vorher rückte das Logo nur den Namen ein, die Adresse begann darunter am Rand). „Route planen“ läuft darunter
+          über die ganze Breite.
+        {%- endcomment -%}
+        {%- if section.settings.name != blank or settings.address != blank -%}
+          <div class="visit__id{% if section.settings.name != blank %} visit__id--logo{% endif %}">
+            {%- if section.settings.name != blank -%}
+              <img class="visit__shield" src="{{ 'hd-bar-shield.png' | asset_url }}" alt="" width="49" height="40" loading="lazy">
+            {%- endif -%}
+            <div class="visit__id-text">
+              {%- if section.settings.name != blank -%}
+                <p class="visit__store">{{ section.settings.name | escape }}</p>
+              {%- endif -%}
+              {%- if settings.address != blank -%}
+                <address class="visit__address">
+                  {%- for line in address_lines -%}
+                    {%- assign item = line | strip | strip_newlines -%}
+                    {%- if item != blank -%}
+                      <span class="{% if forloop.first %}visit__street{% else %}visit__city{% endif %}">{{ item | escape }}</span>
+                    {%- endif -%}
+                  {%- endfor -%}
+                </address>
+                {%- if section.settings.note != blank -%}<p class="visit__note">{{ section.settings.note | escape }}</p>{%- endif -%}
+              {%- endif -%}
+            </div>
+          </div>
         {%- endif -%}
         {%- if settings.address != blank -%}
-          <address class="visit__address">
-            {%- for line in address_lines -%}
-              {%- assign item = line | strip | strip_newlines -%}
-              {%- if item != blank -%}
-                <span class="{% if forloop.first %}visit__street{% else %}visit__city{% endif %}">{{ item | escape }}</span>
-              {%- endif -%}
-            {%- endfor -%}
-          </address>
-          {%- if section.settings.note != blank -%}<p class="visit__note">{{ section.settings.note | escape }}</p>{%- endif -%}
           <a class="btn btn--primary visit__route" href="https://www.google.com/maps/dir/?api=1&amp;destination={{ route_query }}" target="_blank" rel="noopener">
             {%- render 'icon', name: 'route' -%}Route planen<span class="sr-only"> (Google Maps, öffnet neues Fenster)</span>
           </a>
