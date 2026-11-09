@@ -1,7 +1,8 @@
 {% doc %}
   Kontakt-Bereich unten auf der Produktseite (Motorräder, Teile, Bekleidung auf Anfrage), seit 9.11.
-  Ab 900 px eine Karte über die ganze Breite: links „Du fragst an“ mit Bild, Name, Ausführung und Preis des Artikels, darunter
-  der Laden mit Adresse und „Route planen“; rechts die Kontakt-Box. So steht die Box nicht mehr verloren links in der Seite.
+  Ab 900 px eine Karte über die ganze Breite: links „Du fragst an“ mit Bild, Name, Ausführung und Preis des Artikels; rechts die
+  Kontakt-Box, darunter der Laden mit Adresse und „Route planen“. So steht die Box nicht mehr verloren links in der Seite.
+  Das Bild füllt die Höhe, die rechts übrig bleibt (beide Spalten gleich hoch).
   Darunter nur die Kontakt-Box über die volle Breite (die Zusammenfassung stünde dort doppelt zum Kopf der Seite).
   Die linke Spalte trägt data-pdp-dynamic: Bei einer anderen Ausführung tauscht product.js Bild, Angaben und Preis mit aus.
 
@@ -54,20 +55,22 @@
           <p class="pdp-ask__price">{{ price_text | strip }}</p>
         </div>
       </div>
+    </aside>
+    <div class="pdp-ask__side">
+      {{ box }}
       <div class="pdp-ask__store">
         <img class="pdp-ask__shield" src="{{ 'hd-bar-shield.png' | asset_url }}" alt="" width="49" height="40" loading="lazy">
         <div class="pdp-ask__store-text">
           <p class="pdp-ask__store-name">{{ store_name | escape }}</p>
           {%- if address_line != blank -%}<p>{{ address_line | escape }}</p>{%- endif -%}
           {%- if note != blank -%}<p>{{ note | escape }}</p>{%- endif -%}
-          {%- if address_line != blank -%}
-            <a class="pdp-ask__route" href="https://www.google.com/maps/dir/?api=1&amp;destination={{ route_query }}" target="_blank" rel="noopener">
-              {%- render 'icon', name: 'route' -%}Route planen<span class="sr-only"> (Google Maps, öffnet neues Fenster)</span>
-            </a>
-          {%- endif -%}
         </div>
+        {%- if address_line != blank -%}
+          <a class="pdp-ask__route" href="https://www.google.com/maps/dir/?api=1&amp;destination={{ route_query }}" target="_blank" rel="noopener">
+            {%- render 'icon', name: 'route' -%}Route planen<span class="sr-only"> (Google Maps, öffnet neues Fenster)</span>
+          </a>
+        {%- endif -%}
       </div>
-    </aside>
-    {{ box }}
+    </div>
   </div>
 </section>
