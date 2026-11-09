@@ -12,6 +12,11 @@
     render 'on-request', product: product
   endcapture
   assign pdp_on_request = pdp_on_request | strip
+  # Versandklasse (snippets/shipping-class.liquid): Sperrgut bekommt in der Kontakt-Box unten das Thema „Versand anfragen“
+  capture pdp_ship_class
+    render 'shipping-class', product: product
+  endcapture
+  assign pdp_ship_class = pdp_ship_class | strip
   # Betreff der Anfrage in der Kontakt-Box unten: Titel, gewählte Ausführung, Artikelnummer (Teilenummer, sonst SKU)
   # Die SKU nur, wenn sie eindeutig ist (eine Variante oder eine gewählt): sonst stünde z. B. die Größe L im Betreff, ohne dass
   # jemand L gewählt hat
@@ -448,7 +453,14 @@
           </div>
 
           {% render 'pdp-buy', product: product, contact_anchor: 'werkstatt-kontakt' %}
-          {% render 'pdp-usp' %}
+          {%- liquid
+            # „Versand anfragen“ springt zur Kontakt-Box unten; bei Anfrage-Artikeln klärt die Anfrage den Versand mit
+            assign usp_anchor = 'werkstatt-kontakt'
+            if pdp_on_request == 'true'
+              assign usp_anchor = ''
+            endif
+          -%}
+          {% render 'pdp-usp', product: product, contact_anchor: usp_anchor %}
 
           {%- liquid
             assign show_compat = false
@@ -593,6 +605,8 @@
       <section class="section--tight pdp-ask">
           {%- if pdp_on_request == 'true' -%}
             {% render 'contact-box', anchor: 'werkstatt-kontakt', title: 'Artikel anfragen', intro: 'Wir klären Verfügbarkeit, Lieferzeit, Passform und Einbau mit dir. Wähle dein Anliegen, die Nachricht ist vorausgefüllt.', topics: 'anfrage,kompatibilitaet,einbau,frage', subject: request_subject, ref: '', wide: true %}
+          {%- elsif pdp_ship_class == 'sperrgut' -%}
+            {% render 'contact-box', anchor: 'werkstatt-kontakt', title: 'Fragen zu Versand oder Einbau?', intro: 'Sperrgut versenden wir auf Anfrage: Wir holen ein Versandangebot für dich ein. Bei Kompatibilität, Einbau und Eintragung hilft dir unsere Werkstatt.', topics: 'versand,kompatibilitaet,einbau,frage', subject: product.title, ref: '', wide: true %}
           {%- else -%}
             {% render 'contact-box', anchor: 'werkstatt-kontakt', title: 'Fragen zum Einbau?', intro: 'Unsere Werkstatt hilft dir bei Kompatibilität, Einbau und Eintragung.', topics: 'kompatibilitaet,einbau,frage', subject: product.title, ref: '', wide: true %}
           {%- endif -%}
@@ -649,7 +663,8 @@
           </div>
 
           {% render 'pdp-buy', product: product, size_type: size_type, contact_anchor: 'artikel-kontakt' %}
-          {% render 'pdp-usp' %}
+          {%- comment -%} Ohne Kontakt-Box unten (die gibt es hier nur bei Anfrage-Artikeln): kein Link „Versand anfragen“ {%- endcomment -%}
+          {% render 'pdp-usp', product: product %}
 
           <div>
             {% render 'product-description', product: product %}

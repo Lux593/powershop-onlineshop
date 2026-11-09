@@ -1,0 +1,22 @@
+{% doc %}
+  Versandklasse eines Artikels (seit 10.11.). Gibt „sperrgut“ oder „abholung“ aus, bei Paketversand nichts. Aufruf per capture,
+  danach strip (wie on-request.liquid):
+    {% capture ship_class %}{% render 'shipping-class', product: product %}{% endcapture %}
+    {% assign ship_class = ship_class | strip %}
+
+  Quelle ist das Produkt-Metafeld versand.klasse (im Produkt-Editor „Versand“: Paket, Sperrgut, Nur Abholung). Dasselbe Feld
+  steuert den Checkout: Standard- und Express-Versand im Markt Deutschland gelten nur für die Kollektion „Versand: Paket“ (alle
+  Artikel außer den Kollektionen „Versand: Sperrgut“ und „Versand: Nur Abholung“). Sperrgut und Nur Abholung gibt es an der
+  Kasse also nur mit Abholung; Sperrgut-Versand läuft auf Anfrage. Motorräder zählen immer als Abholung.
+
+  @param {product} product - Produkt
+{% enddoc %}
+
+{%- liquid
+  assign ship_value = product.metafields.versand.klasse.value
+  if ship_value == 'Sperrgut'
+    echo 'sperrgut'
+  elsif ship_value == 'Nur Abholung' or product.type == 'Motorrad' or product.template_suffix == 'motorrad'
+    echo 'abholung'
+  endif
+-%}

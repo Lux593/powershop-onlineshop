@@ -21,6 +21,8 @@
     einbau: { subj: 'Einbau-Anfrage', text: function (x) { return 'könnt ihr ' + x + ' bei mir einbauen? Mein Bike: Modell …, Baujahr …'; } },
     // Artikel nur auf Anfrage (snippets/on-request.liquid, Anfrage-Zeile im Kaufbereich)
     anfrage: { subj: 'Artikelanfrage', text: function (x) { return 'ich möchte gerne ' + (x || 'diesen Artikel') + ' bestellen. Ist er verfügbar, und wie geht es weiter?'; } },
+    // Sperrgut (snippets/shipping-class.liquid): Versand gibt es nur auf Anfrage, „Versand anfragen“ in der Liste unter dem Kaufbereich
+    versand: { subj: 'Versandanfrage', text: function (x) { return 'ich möchte gerne ' + (x || 'diesen Artikel') + ' bestellen und liefern lassen. Was kostet der Versand nach PLZ …, Ort …?'; } },
     sonstiges: { subj: 'Anfrage an die Werkstatt', text: function () { return 'ich habe ein Anliegen: …'; } },
     frage: { subj: 'Frage', text: function (x) { return 'ich habe eine Frage' + (x ? ' zur ' + x : '') + ': …'; } }
   };

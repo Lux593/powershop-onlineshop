@@ -2,10 +2,22 @@
   Liste mit Versand, Rückgabe und Abholung auf der Produktseite. Werte kommen aus den Theme-Einstellungen.
   Leere oder 0-Werte erzeugen keine Aussage („versandkostenfrei ab 0 €“, „ Tage Rückgabe“ stehen nie im Shop).
   Die Lieferzeit steht seit 9.11. nicht mehr hier, sondern je Ausführung unter dem Preis (snippets/delivery-info.liquid).
+  Seit 10.11. je Versandklasse (snippets/shipping-class.liquid): Sperrgut mit „Versand auf Anfrage“ (Link zur Kontakt-Box, Thema
+  Versand), Nur Abholung mit „Kein Versand“. Paket wie bisher mit der Gratis-Grenze.
+
+  @param {product} [product] - Für die Versandklasse. Ohne: Paket
+  @param {string} [contact_anchor] - ID der Kontakt-Box auf der Seite, Ziel von „Versand anfragen“ (nur Sperrgut). Leer: kein Link
 {% enddoc %}
 
 {%- liquid
   assign return_days = settings.return_days | default: 0
+  assign ship_class = ''
+  if product != blank
+    capture ship_class
+      render 'shipping-class', product: product
+    endcapture
+    assign ship_class = ship_class | strip
+  endif
   assign ship_line = ''
   if settings.free_shipping_threshold > 0
     assign ship_line = settings.free_shipping_threshold | times: 100 | money_without_trailing_zeros | prepend: 'Versandkostenfrei ab '
@@ -13,9 +25,16 @@
 -%}
 
 <ul class="usp">
-  {%- if ship_line != blank -%}
-    <li>{% render 'icon', name: 'truck' %}{{ ship_line }}</li>
-  {%- endif -%}
+  {%- case ship_class -%}
+    {%- when 'sperrgut' -%}
+      <li>{% render 'icon', name: 'truck' %}<span>Sperrgut: Versand auf Anfrage{% if contact_anchor != blank %} · <a class="text-link" href="#{{ contact_anchor }}" data-contact-topic="versand">Versand anfragen</a>{% endif %}</span></li>
+    {%- when 'abholung' -%}
+      <li>{% render 'icon', name: 'truck' %}Kein Versand, nur Abholung</li>
+    {%- else -%}
+      {%- if ship_line != blank -%}
+        <li>{% render 'icon', name: 'truck' %}{{ ship_line }}</li>
+      {%- endif -%}
+  {%- endcase -%}
   <li>{% render 'icon', name: 'rotate-ccw' %}{% if return_days > 14 %}{{ return_days }} Tage Rückgabe (gesetzliches Widerrufsrecht: 14 Tage){% else %}Gesetzliches Widerrufsrecht: 14 Tage{% endif %}</li>
-  <li>{% render 'icon', name: 'store' %}Abholung im Power Shop möglich</li>
+  <li>{% render 'icon', name: 'store' %}{% if ship_class != blank %}Kostenlose Abholung im Power Shop{% else %}Abholung im Power Shop möglich{% endif %}</li>
 </ul>

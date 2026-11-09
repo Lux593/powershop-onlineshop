@@ -1,0 +1,23 @@
+{% doc %}
+  Versandzeile unter der Zwischensumme (Drawer und Warenkorb-Seite). Werte aus den Theme-Einstellungen, die tatsächlichen Raten
+  stehen im Shopify-Admin (Markt Deutschland, Versand).
+
+  @param {number} threshold - Grenze für kostenlosen Standardversand in Cent (0: keine)
+  @param {number} missing - Betrag bis zur Grenze in Cent
+  @param {boolean} [pickup] - Sperrgut oder Artikel nur zur Abholung im Warenkorb: an der Kasse nur Abholung
+
+  @example
+  {% render 'cart-shipping-line', threshold: threshold, missing: missing, pickup: cart_pickup %}
+{% enddoc %}
+
+{%- liquid
+  if pickup
+    echo 'inkl. MwSt., Abholung im Power Shop kostenlos'
+  elsif threshold > 0 and missing <= 0
+    echo 'inkl. MwSt., Standardversand kostenlos'
+  elsif settings.shipping_cost_text != blank
+    echo 'inkl. MwSt., zzgl. ' | append: settings.shipping_cost_text | append: ' Versand'
+  else
+    echo 'inkl. MwSt., zzgl. Versand'
+  endif
+-%}

@@ -45,9 +45,10 @@
   {
     "name": "Versand, Rückgabe, Reservierung",
     "settings": [
-      { "type": "paragraph", "content": "Die tatsächlichen Versandraten stellst du unter Einstellungen > Versand und Lieferung ein. Diese Werte steuern nur die Hinweise im Shop." },
+      { "type": "paragraph", "content": "Die tatsächlichen Versandraten stehen im Shopify-Admin unter Märkte > Deutschland > Versand (Standard 5,99 €, ab 100 € kostenlos, Express). Diese Werte steuern nur die Hinweise im Shop und müssen dazu passen." },
       { "type": "number", "id": "free_shipping_threshold", "label": "Versandkostenfrei ab (Euro)", "default": 100 },
-      { "type": "text", "id": "shipping_cost_text", "label": "Versandkosten darunter (Anzeige)", "default": "4,95 €" },
+      { "type": "text", "id": "shipping_cost_text", "label": "Versandkosten darunter (Anzeige)", "default": "5,99 €" },
+      { "type": "paragraph", "content": "Sperrgut und Artikel ohne Versand legst du am Artikel im Feld „Versand“ fest (Paket, Sperrgut, Nur Abholung). Shop und Kasse richten sich danach: Diese Artikel gibt es an der Kasse nur mit Abholung, Sperrgut-Versand auf Anfrage." },
       { "type": "paragraph", "content": "Lieferzeiten stellst du seit 9.11. unter Inhalte > Metaobjekte > Lieferzeit-Regeln ein (auf Lager / wird bestellt), einzelne Artikel über das Feld „Lieferzeit, wenn bestellt“ am Artikel." },
       { "type": "number", "id": "return_days", "label": "Freiwillige Rückgabefrist (Tage)", "default": 14, "info": "Das gesetzliche Widerrufsrecht beträgt 14 Tage. Erst ein Wert über 14 erscheint als zusätzliche Rückgabefrist, sonst nennt der Shop nur das Widerrufsrecht." },
       { "type": "number", "id": "reservation_fee", "label": "Reservierungsgebühr Gebrauchtfahrzeug (Euro)", "default": 250 },

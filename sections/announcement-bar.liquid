@@ -29,8 +29,13 @@
     {%- if skip == false -%}
       <span {{ block.shopify_attributes }}{% if block.settings.hide_on_mobile %} class="announce__extra"{% endif %}>
         {%- if shown > 0 %} · {% endif -%}
-        {{- message -}}
-        {%- if block.settings.link_label != blank and block.settings.link_url != blank %} <a href="{{ block.settings.link_url }}">{{ block.settings.link_label }}</a>{% endif -%}
+        {%- comment -%} Link ohne Link-Text: der Hinweis selbst wird zum Link (z. B. „Versandkostenfrei ab 100 €“ zu den Versandinfos) {%- endcomment -%}
+        {%- if block.settings.link_url != blank and block.settings.link_label == blank and message != blank -%}
+          <a href="{{ block.settings.link_url }}">{{- message -}}</a>
+        {%- else -%}
+          {{- message -}}
+          {%- if block.settings.link_label != blank and block.settings.link_url != blank %} <a href="{{ block.settings.link_url }}">{{ block.settings.link_label }}</a>{% endif -%}
+        {%- endif -%}
       </span>
       {%- assign shown = shown | plus: 1 -%}
     {%- elsif request.design_mode -%}
@@ -61,10 +66,10 @@
           "id": "text",
           "label": "Text",
           "info": "{schwelle} wird durch die Gratisversand-Grenze ersetzt, {tage} durch die Rückgabefrist.",
-          "default": "Versandkostenfrei ab {schwelle}*"
+          "default": "Versandkostenfrei ab {schwelle}"
         },
         { "type": "text", "id": "link_label", "label": "Link-Text" },
-        { "type": "url", "id": "link_url", "label": "Link" },
+        { "type": "url", "id": "link_url", "label": "Link", "info": "Ohne Link-Text wird der Hinweis selbst zum Link, z. B. auf /policies/shipping-policy (Versandinfos)." },
         { "type": "checkbox", "id": "hide_on_mobile", "label": "Auf dem Handy ausblenden", "default": false }
       ]
     }

@@ -1,0 +1,19 @@
+{% doc %}
+  Hinweis im Warenkorb (Drawer statt des Versandbalkens, Warenkorb-Seite über dem Button zur Kasse), wenn Sperrgut oder ein Artikel
+  nur zur Abholung drin liegt (snippets/shipping-class.liquid). Dann bietet die Kasse nur Abholung an; ein Teil per Paket und der
+  Rest zur Abholung geht in einer Bestellung nicht.
+
+  @param {boolean} [parcel] - Es liegen auch Artikel für den Paketversand im Warenkorb
+
+  @example
+  {% render 'cart-pickup-note', parcel: cart_parcel %}
+{% enddoc %}
+
+<div class="progress">
+  <p>
+    <strong>Abholung im Power Shop.</strong> Sperrgut und Artikel ohne Versand gibt es an der Kasse nur mit Abholung, kostenlos in
+    Weil am Rhein. Sperrgut verschicken wir auf Anfrage.
+    {%- if parcel %} Mit „Abholung“ holst du alles zusammen ab. Sollen die übrigen Artikel per Paket kommen, bestell sie getrennt.{% endif -%}
+    {%- if shop.shipping_policy.url != blank %} <a class="text-link" href="{{ shop.shipping_policy.url }}">Versandinfos</a>{% endif %}
+  </p>
+</div>

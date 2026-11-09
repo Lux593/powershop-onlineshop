@@ -7,6 +7,22 @@
     assign pct = total | times: 100 | divided_by: threshold
   endif
   assign pct = pct | at_most: 100
+
+  # Versandklassen (snippets/shipping-class.liquid): Liegt Sperrgut oder ein Artikel nur zur Abholung im Warenkorb, gibt es an der
+  # Kasse nur Abholung. Dann kein Balken bis zum kostenlosen Versand, sondern der Hinweis zur Abholung.
+  assign cart_pickup = false
+  assign cart_parcel = false
+  for item in cart.items
+    capture item_ship
+      render 'shipping-class', product: item.product
+    endcapture
+    assign item_ship = item_ship | strip
+    if item_ship == blank
+      assign cart_parcel = true
+    else
+      assign cart_pickup = true
+    endif
+  endfor
 -%}
 
 {%- liquid
@@ -41,7 +57,9 @@
     </div>
   {%- else -%}
     <div class="drawer__body" data-lenis-prevent>
-      {%- if threshold > 0 -%}
+      {%- if cart_pickup -%}
+        {% render 'cart-pickup-note', parcel: cart_parcel %}
+      {%- elsif threshold > 0 -%}
         <div class="progress">
           <span>
             {%- if missing > 0 -%}
@@ -63,12 +81,8 @@
 
     <div class="drawer__foot on-dark">
       <div class="subtotal"><span>Zwischensumme</span><strong>{{ cart.total_price | money }}</strong></div>
-      <p class="caption muted">
-        inkl. MwSt., zzgl.
-        {% if missing > 0 and settings.shipping_cost_text != blank %}{{ settings.shipping_cost_text }} {% endif -%}
-        Versand{% if threshold > 0 and missing <= 0 %} (kostenlos){% endif %}
-        {%- comment -%} Lieferzeit je Position (snippets/cart-line.liquid, delivery-info) {%- endcomment -%}
-      </p>
+      {%- comment -%} Lieferzeit je Position (snippets/cart-line.liquid, delivery-info) {%- endcomment -%}
+      <p class="caption muted">{% render 'cart-shipping-line', threshold: threshold, missing: missing, pickup: cart_pickup %}</p>
 {%- if cart_blocked -%}
         <p class="cart-blocked" role="alert">{% render 'icon', name: 'circle-alert' %}<span>Im Warenkorb liegt ein Artikel, den es nur auf Anfrage gibt. Frag ihn bei uns an oder entferne ihn, dann geht es zur Kasse.</span></p>
       {%- else -%}

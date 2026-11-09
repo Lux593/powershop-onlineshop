@@ -1,24 +1,44 @@
 {% doc %}
   Absatz zu Lieferung, Versand und Rückgabe in den Akkordeons der Produktseite. Werte kommen aus den Theme-Einstellungen,
   leere oder 0-Werte erzeugen keine Aussage (nie „ab 0 €“ oder „ Tage Rückgabe“).
+  Seit 10.11. je Versandklasse (snippets/shipping-class.liquid): Paket mit Gratis-Grenze und Versandkosten, Sperrgut mit Versand
+  auf Anfrage und Abholung, Nur Abholung ohne Versand.
 
-  @param {boolean} [apparel] - Bekleidung: mit Versandkosten unter der Grenze und Rückgabefrist. Ohne: Teile, mit Sperrgut-Hinweis.
-  @param {product} [product] - Für die Lieferzeiten aus den Lieferzeit-Regeln (snippets/delivery-info.liquid)
+  @param {boolean} [apparel] - Bekleidung: mit Satz zu Rückgabefrist bzw. Widerrufsrecht. Ohne: Teile, ohne diesen Satz
+  @param {product} [product] - Für Versandklasse und Lieferzeiten aus den Lieferzeit-Regeln (snippets/delivery-info.liquid)
   @param {string} [on_request] - "true": Artikel nur auf Anfrage, die Lieferzeit klärt die Anfrage
 {% enddoc %}
+
+{%- liquid
+  assign ship_class = ''
+  if product != blank
+    capture ship_class
+      render 'shipping-class', product: product
+    endcapture
+    assign ship_class = ship_class | strip
+  endif
+-%}
 
 <p>
   {%- if on_request == 'true' -%}Die Lieferzeit klären wir mit dir bei der Anfrage.{{ ' ' }}
   {%- elsif product != blank -%}{% render 'delivery-info', product: product, as: 'times' %}{{ ' ' }}
   {%- endif -%}
-  {%- if settings.free_shipping_threshold > 0 -%}
-    Versandkostenfrei ab {{ settings.free_shipping_threshold | times: 100 | money_without_trailing_zeros }}
-    {%- if apparel and settings.shipping_cost_text != blank %}, darunter {{ settings.shipping_cost_text }}{% endif %}.{{ ' ' }}
-  {%- endif -%}
+  {%- case ship_class -%}
+    {%- when 'sperrgut' -%}
+      Dieser Artikel ist Sperrgut und passt nicht in ein normales Paket. Den Versand bieten wir auf Anfrage an: Wir holen ein
+      Angebot für dich ein. Online bestellst du ihn mit kostenloser Abholung im Power Shop in Weil am Rhein.{{ ' ' }}
+    {%- when 'abholung' -%}
+      Diesen Artikel versenden wir nicht. Du bestellst ihn online und holst ihn kostenlos im Power Shop in Weil am Rhein ab.{{ ' ' }}
+    {%- else -%}
+      {%- if settings.free_shipping_threshold > 0 -%}
+        Paketversand innerhalb Deutschlands: versandkostenfrei ab {{ settings.free_shipping_threshold | times: 100 | money_without_trailing_zeros }}
+        {%- if settings.shipping_cost_text != blank %}, darunter {{ settings.shipping_cost_text }}{% endif %}.{{ ' ' }}
+      {%- endif -%}
+      Abholung im Power Shop ist kostenlos.{{ ' ' }}
+  {%- endcase -%}
+  {%- if shop.shipping_policy.url != blank -%}<a class="text-link" href="{{ shop.shipping_policy.url }}">Alle Versandinfos</a>.{{ ' ' }}{%- endif -%}
   {%- if apparel -%}
     {%- if settings.return_days > 14 -%}{{ settings.return_days }} Tage kostenlose Rückgabe; dein gesetzliches Widerrufsrecht (14 Tage) bleibt unberührt.
     {%- else -%}Es gilt dein gesetzliches Widerrufsrecht von 14 Tagen.{%- endif -%}
-  {%- else -%}
-    Sperrgut kann gesondert berechnet werden.
   {%- endif -%}
 </p>

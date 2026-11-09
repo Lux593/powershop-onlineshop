@@ -17,6 +17,12 @@
 {%- endcomment -%}
 {%- capture line_on_request -%}{%- render 'on-request', product: item.product -%}{%- endcapture -%}
 {%- assign line_on_request = line_on_request | strip -%}
+{%- comment -%}
+  Versandklasse (snippets/shipping-class.liquid): Sperrgut und Nur Abholung gehen an der Kasse nur mit Abholung, die Position sagt
+  das selbst. Sperrgut verlinkt die Kontakt-Box der Produktseite (Thema „Versand anfragen“), die es nur bei Teilen gibt.
+{%- endcomment -%}
+{%- capture line_ship_class -%}{%- render 'shipping-class', product: item.product -%}{%- endcapture -%}
+{%- assign line_ship_class = line_ship_class | strip -%}
 
 <div class="line-item">
   {%- if item.image -%}
@@ -52,6 +58,13 @@
         {%- comment -%} Lager-Status und Lieferzeit der Position (mehr Stück als Bestand: wird bestellt). Nicht bei Anfrage-Artikeln. {%- endcomment -%}
         {%- unless line_on_request == 'true' or item.product.type == 'Motorrad' or item.product.template_suffix == 'motorrad' -%}
           {% render 'delivery-info', product: item.product, variant: item.variant, as: 'cart', quantity: item.quantity %}
+          {%- if line_ship_class == 'sperrgut' -%}
+            <p class="line-item__request">{% render 'icon', name: 'store' %}<span>Sperrgut: an der Kasse nur Abholung.
+              {%- if item.product.metafields.part.teilenummer != blank or item.product.template_suffix == 'teil' %} <a href="{{ item.url }}#werkstatt-kontakt">Versand anfragen</a>{% endif -%}
+            </span></p>
+          {%- elsif line_ship_class == 'abholung' -%}
+            <p class="line-item__request">{% render 'icon', name: 'store' %}<span>Kein Versand: an der Kasse nur Abholung.</span></p>
+          {%- endif -%}
         {%- endunless -%}
         {%- if line_on_request == 'true' -%}
           {%- liquid

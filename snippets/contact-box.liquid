@@ -9,7 +9,7 @@
   @param {string} [anchor] - ID der Box, Standard "kontakt"
   @param {string} [title] - Überschrift, kompakt die Beschriftung der Zeile
   @param {string} [intro] - Kurzer Text unter der Überschrift (auch in der kompakten Zeile)
-  @param {string} [topics] - Themen, kommagetrennt: kauf, probefahrt, finanzierung, versicherung, inzahlungnahme, lieferung, reservierung, werkstatt, service, umbau, kompatibilitaet, einbau, anfrage, sonstiges, frage
+  @param {string} [topics] - Themen, kommagetrennt: kauf, probefahrt, finanzierung, versicherung, inzahlungnahme, lieferung, reservierung, werkstatt, service, umbau, kompatibilitaet, einbau, anfrage, versand, sonstiges, frage
   @param {string} [topic] - Voreingestelltes Thema
   @param {string} [subject] - Fahrzeug oder Artikel, wird in die Nachricht eingesetzt
   @param {string} [ref] - Zusatzzeile in der Nachricht, z. B. Link zur Seite. Leer = Adresse der aktuellen Seite
@@ -162,6 +162,8 @@
                   assign topic_label = 'Einbau'
                 when 'anfrage'
                   assign topic_label = 'Artikel anfragen'
+                when 'versand'
+                  assign topic_label = 'Versand anfragen'
                 when 'kauf'
                   assign topic_label = 'Kaufanfrage'
                 when 'sonstiges'
