@@ -212,6 +212,17 @@
     text.appendChild(tpl.content.cloneNode(true));
     var enter = text.querySelector('[data-intro-enter]');
     enter.addEventListener('click', go);
+    // Auch ein Klick aufs Logo betritt (seit 10.11.): unsichtbare Fläche genau über dem Logo, in Prozent der Bühne wie Film und SVG.
+    // Nur für Maus und Touch (aria-hidden, nicht fokussierbar); Tastatur und Screenreader haben den Button und Enter.
+    var hit = doc.createElement('div');
+    hit.className = 'intro__logo-hit';
+    hit.setAttribute('aria-hidden', 'true');
+    hit.style.left = (Z.lx / Z.w * 100) + '%';
+    hit.style.top = (Z.ly / Z.h * 100) + '%';
+    hit.style.width = (Z.lw / Z.w * 100) + '%';
+    hit.style.height = (Z.lw * LOGO.h / LOGO.w / Z.h * 100) + '%';
+    hit.addEventListener('click', go);
+    stage.insertBefore(hit, text);
     // Die Bewegungsschicht startet die neuen Elemente selbst (MutationObserver, motion.js). Kommt sie nicht (Skript fehlt, Fenster zu
     // niedrig für die Beobachtungsgrenze), zeigt dieser Failsafe die Texte nach 1,8 s trotzdem.
     later(function () {

@@ -36,7 +36,8 @@ unterdrückt ihn. Im Theme-Editor selbst läuft er nie; dort über den Vorschau-
 ## Verhalten und Barrierefreiheit
 
 - `role="dialog"`, `aria-modal`. Die Seite dahinter ist während des Intros `inert` und gesperrt (kein Scrollen, Lenis pausiert).
-- Überspringen: Link oben rechts, Escape. Enter betritt. Danach Fokus auf `#main`.
+- Überspringen: Link oben rechts, Escape. Enter betritt, ebenso ein Klick oder Tipp aufs Logo (unsichtbare Fläche `.intro__logo-hit`
+  über dem Logo, ab dem Einstieg der Texte; nur für Maus und Touch, mit der Maus darüber zeigt der Button seinen Hover-Zustand). Danach Fokus auf `#main`.
 - Texte nutzen die Bewegungsschicht des Themes (`data-split="words"`, `data-reveal="up"`) und steigen wie die Überschriften der Startseite ein.
   Der Abgang (Wörter nach oben aus der Maske, Button blendet aus) steht in `intro.css`.
 - Hero-Animationen (Überschrift, Ken-Burns, Reveals) sind per `animation-play-state: paused` angehalten, bis die Seite frei ist. Das

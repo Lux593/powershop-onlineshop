@@ -72,6 +72,14 @@ html[data-intro-variant="portrait"] .intro__stage {
 }
 .intro.is-svg .intro__zoom { visibility: visible; }
 
+/* Klickfläche über dem Logo (intro.js setzt Lage und Größe, sobald die Texte kommen): betritt wie der Button. Mit der Maus
+   darüber zeigt der Button seinen Hover-Zustand, damit klar ist, was der Klick tut. */
+.intro__logo-hit { position: absolute; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.intro.is-leaving .intro__logo-hit { display: none; }
+@media (hover: hover) {
+  .intro__logo-hit:hover ~ .intro__text .intro__enter { background: var(--c-orange-dark); border-color: var(--c-orange-dark); }
+}
+
 /* ---------- Text ---------- */
 .intro__text {
   position: absolute; left: 50%; top: var(--ty); translate: -50% 0;
