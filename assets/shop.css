@@ -337,36 +337,22 @@
 .contact-box__buttons { display: grid; gap: 8px; }
 @media (min-width: 640px) and (max-width: 1023px) { .contact-box__buttons { grid-template-columns: repeat(3, 1fr); } }
 .contact-box__phone { font-family: var(--f-body); font-weight: 600; letter-spacing: 0; text-transform: none; }
-/* Kontakt-Bereich unten auf der Produktseite (snippets/pdp-ask.liquid, seit 9.11.): bis 899 px nur die Box über die volle Breite.
-   Ab 900 px eine Karte über die ganze Breite: links „Du fragst an“ (Bild, Name, Ausführung, Preis), rechts die Kontakt-Box ohne
-   eigenen Rahmen und darunter der Laden. Der orange Streifen oben gehört dann zur ganzen Karte. Beide Spalten sind gleich hoch,
-   links füllt das Bild, was über Name und Preis übrig ist (Bikes: Foto füllt den Rahmen; Teile und Bekleidung sind freigestellt
-   auf Weiß und stehen ganz sichtbar mit etwas Luft auf Weiß).
-   Anrufen über die volle Breite, WhatsApp und E-Mail darunter nebeneinander (wie in „Komm vorbei“). */
-.pdp-ask__summary, .pdp-ask__store { display: none; }
+/* Breite Kontakt-Box unten auf der Produktseite (contact-box.liquid mit wide, seit 9.11.): ab 900 px eine Box mit zwei Spalten,
+   links Überschrift, Text und Themen, rechts Anrufen, WhatsApp und E-Mail untereinander. Höchstens 1080 px breit, damit auf
+   breiten Monitoren keine leere Fläche in der Box entsteht; darunter wie bisher höchstens 560 px.
+   Bis 899 px lösen sich die beiden Spalten auf (display: contents): Reihenfolge wie gewohnt, Zusatz (Reservierung) unter den Buttons. */
+.pdp-ask { max-width: 560px; }
+.contact-box__after { display: grid; gap: 16px; }
+@media (max-width: 899px) {
+  .contact-box__main, .contact-box__side { display: contents; }
+  .contact-box--wide .contact-box__after { order: 1; }
+}
 @media (min-width: 900px) {
-  .pdp-ask__grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); background: var(--c-white); border: 1px solid var(--c-line); border-top: 4px solid var(--c-orange); }
-  .pdp-ask__side { display: flex; flex-direction: column; min-width: 0; }
-  .pdp-ask__side > .contact-box { flex: 1 0 auto; align-content: start; padding: 32px 36px; border: 0; }
-  .pdp-ask .contact-box__buttons { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .pdp-ask .contact-box__buttons > :first-child:nth-last-child(odd) { grid-column: 1 / -1; }
-  .pdp-ask__summary { display: flex; min-width: 0; border-right: 1px solid var(--c-line); }
-  .pdp-ask__item { flex: 1; display: flex; flex-direction: column; }
-  .pdp-ask__media { position: relative; flex: 1 1 auto; min-height: 220px; overflow: hidden; background: var(--c-white); }
-  .pdp-ask__media img { position: absolute; inset: 20px; width: calc(100% - 40px); height: calc(100% - 40px); object-fit: contain; }
-  .pdp-ask--bike .pdp-ask__media { background: var(--c-stone); }
-  .pdp-ask--bike .pdp-ask__media img { inset: 0; width: 100%; height: 100%; object-fit: cover; }
-  .pdp-ask__body { display: grid; gap: 6px; padding: 22px 28px 26px; border-top: 1px solid var(--c-line); }
-  .pdp-ask__eyebrow { font-size: var(--fs-small); font-weight: 600; color: var(--c-muted); }
-  .pdp-ask__title { font: 700 24px/1.05 var(--f-head); letter-spacing: 0.01em; text-transform: uppercase; text-wrap: balance; }
-  .pdp-ask__meta { font-size: var(--fs-small); color: var(--c-text-soft); }
-  .pdp-ask__price { margin-top: 8px; font: 800 28px/1 var(--f-head); }
-  .pdp-ask__store { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: start; gap: 0 14px; padding: 18px 36px 22px; background: var(--c-offwhite); border-top: 1px solid var(--c-line); font-size: var(--fs-small); line-height: 1.5; color: var(--c-text-soft); }
-  .pdp-ask__shield { width: auto; height: 26px; margin-top: 2px; }
-  .pdp-ask__store-text { display: grid; gap: 2px; min-width: 0; }
-  .pdp-ask__store-name { font-weight: 700; color: var(--c-text); }
-  .pdp-ask__route { display: inline-flex; align-items: center; gap: 6px; align-self: center; white-space: nowrap; font-weight: 600; color: var(--c-text); text-decoration: underline; text-underline-offset: 3px; }
-  .pdp-ask__route .icon { width: 16px; height: 16px; color: var(--c-orange-on-light); }
+  .pdp-ask { max-width: 1080px; }
+  .contact-box--wide { grid-template-columns: minmax(0, 1fr) minmax(280px, 340px); gap: 0; padding: 0; }
+  .contact-box__main { display: grid; gap: 16px; align-content: start; min-width: 0; padding: 32px 36px; }
+  .contact-box__side { display: grid; gap: 10px; align-content: center; min-width: 0; padding: 32px 36px; border-left: 1px solid var(--c-line); }
+  .contact-box__side .contact-box__buttons { grid-template-columns: minmax(0, 1fr); }
 }
 .contact-box__person { display: flex; align-items: center; gap: 12px; padding-top: 16px; border-top: 1px solid var(--c-line); }
 .contact-box__person img { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; }

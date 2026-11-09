@@ -27,17 +27,6 @@
   if request_no != blank
     assign request_subject = request_subject | append: ' (Art.-Nr. ' | append: request_no | append: ')'
   endif
-  # Dieselben Angaben als Zeile im Kontakt-Bereich unten (snippets/pdp-ask.liquid)
-  assign ask_meta = ''
-  if product.selected_variant != blank and product.has_only_default_variant == false
-    assign ask_meta = product.selected_variant.title
-  endif
-  if request_no != blank
-    if ask_meta != blank
-      assign ask_meta = ask_meta | append: ' · '
-    endif
-    assign ask_meta = ask_meta | append: 'Art.-Nr. ' | append: request_no
-  endif
 
   assign current_variant = product.selected_variant
   if current_variant == blank
@@ -353,10 +342,10 @@
       {%- endif -%}
 
       {%- comment -%}
-        Kontakt-Bereich wie bei Teilen und Bekleidung: unter „Ähnliche Bikes“, am Desktop mit „Du fragst an“ links
-        (snippets/pdp-ask.liquid). „Jetzt anfragen“ unter den Eckdaten und in der mobilen Leiste springt hierher und wählt „Kaufanfrage“.
+        Kontakt-Box wie bei Teilen und Bekleidung: unter „Ähnliche Bikes“, ab 900 px breit mit zwei Spalten (wide, max. 1080 px).
+        „Jetzt anfragen“ unter den Eckdaten und in der mobilen Leiste springt hierher und wählt „Kaufanfrage“.
       {%- endcomment -%}
-      {%- capture ask_box -%}
+      <section class="section--tight pdp-ask">
           {%- capture reserve_note -%}
             {%- if can_reserve -%}
               <div class="reserve-note">
@@ -372,10 +361,8 @@
               </div>
             {%- endif -%}
           {%- endcapture -%}
-          {% render 'contact-box', anchor: 'kontakt', title: 'Interesse an diesem Bike?', topics: bike_topics, subject: bike_label, primary: true, extra: reserve_note %}
-      {%- endcapture -%}
-      {%- assign bike_meta = label_parts | replace: ', ', ' · ' -%}
-      {% render 'pdp-ask', product: product, variant: current_variant, box: ask_box, kind: 'bike', meta: bike_meta, note: 'Besichtigung und Probefahrt bei uns im Laden.', from: from_price %}
+          {% render 'contact-box', anchor: 'kontakt', title: 'Interesse an diesem Bike?', intro: 'Wähle dein Anliegen, die Nachricht ist vorausgefüllt.', topics: bike_topics, subject: bike_label, primary: true, extra: reserve_note, wide: true %}
+      </section>
     </div>
   </div>
 
@@ -597,16 +584,15 @@
       {%- comment -%}
         Artikel nur auf Anfrage: Die Box ist zugleich die Anfrage, „Artikel anfragen“ ist das erste und gewählte Thema. „Jetzt
         anfragen“ im Kaufbereich und in der mobilen Kaufleiste springt hierher (keine zweite Reihe Buttons oben).
-        Am Desktop mit „Du fragst an“ links (snippets/pdp-ask.liquid).
+        Ab 900 px breit mit zwei Spalten (wide, max. 1080 px).
       {%- endcomment -%}
-      {%- capture ask_box -%}
+      <section class="section--tight pdp-ask">
           {%- if pdp_on_request == 'true' -%}
-            {% render 'contact-box', anchor: 'werkstatt-kontakt', title: 'Artikel anfragen', intro: 'Wir klären Verfügbarkeit, Lieferzeit, Passform und Einbau mit dir. Wähle dein Anliegen, die Nachricht ist vorausgefüllt.', topics: 'anfrage,kompatibilitaet,einbau,frage', subject: request_subject, ref: '' %}
+            {% render 'contact-box', anchor: 'werkstatt-kontakt', title: 'Artikel anfragen', intro: 'Wir klären Verfügbarkeit, Lieferzeit, Passform und Einbau mit dir. Wähle dein Anliegen, die Nachricht ist vorausgefüllt.', topics: 'anfrage,kompatibilitaet,einbau,frage', subject: request_subject, ref: '', wide: true %}
           {%- else -%}
-            {% render 'contact-box', anchor: 'werkstatt-kontakt', title: 'Fragen zum Einbau?', intro: 'Unsere Werkstatt hilft dir bei Kompatibilität, Einbau und Eintragung.', topics: 'kompatibilitaet,einbau,frage', subject: product.title, ref: '' %}
+            {% render 'contact-box', anchor: 'werkstatt-kontakt', title: 'Fragen zum Einbau?', intro: 'Unsere Werkstatt hilft dir bei Kompatibilität, Einbau und Eintragung.', topics: 'kompatibilitaet,einbau,frage', subject: product.title, ref: '', wide: true %}
           {%- endif -%}
-      {%- endcapture -%}
-      {% render 'pdp-ask', product: product, variant: current_variant, box: ask_box, kind: 'part', meta: ask_meta, note: 'Einbau auf Wunsch in unserer Werkstatt.' %}
+      </section>
     </div>
     {%- render 'pdp-sticky-buy', product: product, contact_anchor: 'werkstatt-kontakt' -%}
   </div>
@@ -688,10 +674,9 @@
 
       {%- if pdp_on_request == 'true' -%}
         {%- comment -%} Bekleidung nur auf Anfrage: die Anfrage-Box, zu der „Jetzt anfragen“ oben und in der Kaufleiste springt {%- endcomment -%}
-        {%- capture ask_box -%}
-          {% render 'contact-box', anchor: 'artikel-kontakt', title: 'Artikel anfragen', intro: 'Wir klären Verfügbarkeit, Lieferzeit und Größe mit dir. Die Nachricht ist vorausgefüllt.', topics: 'anfrage,frage', subject: request_subject, ref: '' %}
-        {%- endcapture -%}
-        {% render 'pdp-ask', product: product, variant: current_variant, box: ask_box, kind: 'apparel', meta: ask_meta %}
+        <section class="section--tight pdp-ask">
+          {% render 'contact-box', anchor: 'artikel-kontakt', title: 'Artikel anfragen', intro: 'Wir klären Verfügbarkeit, Lieferzeit und Größe mit dir. Die Nachricht ist vorausgefüllt.', topics: 'anfrage,frage', subject: request_subject, ref: '', wide: true %}
+        </section>
       {%- endif -%}
     </div>
     {%- render 'pdp-sticky-buy', product: product, contact_anchor: 'artikel-kontakt' -%}

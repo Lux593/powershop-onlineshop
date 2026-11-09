@@ -21,6 +21,8 @@
   @param {string} [class] - Klasse des Button-Rahmens bei bare, Standard "contact-box__buttons"
   @param {boolean} [dark] - Auf dunklem Grund: WhatsApp und E-Mail mit heller Kontur
   @param {string} [extra] - Zusätzliches HTML unter den Buttons
+  @param {boolean} [wide] - Ab 900 px zwei Spalten: links Überschrift, Text und Themen (dazu extra, Ansprechperson, Öffnungszeiten),
+    rechts die Buttons untereinander mit dem Hinweis darunter (Produktseiten unten, .contact-box--wide in shop.css). Darunter wie gewohnt.
 
   @example
   {% render 'contact-box', title: 'Interesse an diesem Bike?', topics: 'probefahrt,finanzierung,frage', subject: product.title %}
@@ -98,8 +100,24 @@
     </div>
   {%- endif -%}
 {%- elsif has_channel or request.design_mode -%}
+  {%- capture box_after -%}
+    {{ extra }}
+
+    {%- if settings.contact_person_name != blank -%}
+      <div class="contact-box__person">
+        {%- render 'media', image: settings.contact_person_image, asset: 'team-verkauf.jpg', width: 56, height: 56, alt: '' -%}
+        <div><strong>{{ settings.contact_person_name }}</strong>{% if settings.contact_person_role != blank %}<span>{{ settings.contact_person_role }}</span>{% endif %}</div>
+      </div>
+    {%- endif -%}
+
+    {%- if settings.hours_enabled and hours != false -%}
+      <p class="open-state" data-open-state>Öffnungszeiten siehe unten.</p>
+      <p class="hours">{% render 'opening-hours', as: 'inline' %}</p>
+    {%- endif -%}
+  {%- endcapture -%}
+  {%- assign box_after = box_after | strip -%}
   <section
-    class="contact-box"
+    class="contact-box{% if wide %} contact-box--wide{% endif %}"
     id="{{ box_id }}"
     data-contact
     data-subject="{{ subject | escape }}"
@@ -107,6 +125,7 @@
     {% if primary %}data-primary{% endif %}
     aria-labelledby="{{ box_id }}-title"
   >
+    {%- if wide -%}<div class="contact-box__main">{%- endif -%}
     <h2 class="h3" id="{{ box_id }}-title">{{ title | default: 'Interesse? Sprich mit uns' }}</h2>
     {%- if intro != blank -%}<p class="small muted">{{ intro }}</p>{%- endif -%}
 
@@ -157,23 +176,19 @@
       </fieldset>
     {%- endif -%}
 
+    {%- if wide -%}
+      {%- if box_after != blank -%}<div class="contact-box__after">{{ box_after }}</div>{%- endif -%}
+      </div>
+      <div class="contact-box__side">
+    {%- endif -%}
     <div class="contact-box__buttons">{{ contact_buttons }}</div>
     {%- if has_message_channel -%}
       <p class="caption muted">Nachricht wird mit deinem Anliegen{% if subject != blank %} und dem Fahrzeug/Artikel{% endif %} vorausgefüllt – du kannst sie vor dem Senden anpassen.</p>
     {%- endif -%}
-
-    {{ extra }}
-
-    {%- if settings.contact_person_name != blank -%}
-      <div class="contact-box__person">
-        {%- render 'media', image: settings.contact_person_image, asset: 'team-verkauf.jpg', width: 56, height: 56, alt: '' -%}
-        <div><strong>{{ settings.contact_person_name }}</strong>{% if settings.contact_person_role != blank %}<span>{{ settings.contact_person_role }}</span>{% endif %}</div>
+    {%- if wide -%}
       </div>
-    {%- endif -%}
-
-    {%- if settings.hours_enabled and hours != false -%}
-      <p class="open-state" data-open-state>Öffnungszeiten siehe unten.</p>
-      <p class="hours">{% render 'opening-hours', as: 'inline' %}</p>
+    {%- else -%}
+      {{ box_after }}
     {%- endif -%}
   </section>
 {%- endif -%}
