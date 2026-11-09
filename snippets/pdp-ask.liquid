@@ -1,0 +1,73 @@
+{% doc %}
+  Kontakt-Bereich unten auf der Produktseite (Motorräder, Teile, Bekleidung auf Anfrage), seit 9.11.
+  Ab 900 px eine Karte über die ganze Breite: links „Du fragst an“ mit Bild, Name, Ausführung und Preis des Artikels, darunter
+  der Laden mit Adresse und „Route planen“; rechts die Kontakt-Box. So steht die Box nicht mehr verloren links in der Seite.
+  Darunter nur die Kontakt-Box über die volle Breite (die Zusammenfassung stünde dort doppelt zum Kopf der Seite).
+  Die linke Spalte trägt data-pdp-dynamic: Bei einer anderen Ausführung tauscht product.js Bild, Angaben und Preis mit aus.
+
+  @param {product} product - Produkt
+  @param {variant} variant - Aktuelle Variante
+  @param {string} box - HTML der Kontakt-Box (snippets/contact-box.liquid, per capture)
+  @param {string} [kind] - "bike", "part" oder "apparel" (Bikes: Foto füllt den Rahmen, Preis ohne „,00“)
+  @param {string} [meta] - Zeile unter dem Namen, z. B. „Schwarz · Modelljahr 2024“ oder „L · Art.-Nr. 123“
+  @param {string} [note] - Satz unter der Adresse, z. B. „Besichtigung und Probefahrt bei uns im Laden.“
+  @param {boolean} [from] - Preis mit „ab“ (Ab-Preis laut Harley-Davidson)
+
+  @example
+  {% render 'pdp-ask', product: product, variant: current_variant, box: box_html, kind: 'bike', meta: 'Schwarz · Modelljahr 2024' %}
+{% enddoc %}
+
+{%- liquid
+  assign img = variant.featured_image | default: product.featured_image
+  assign store_name = settings.company | default: 'Harley-Davidson Power Shop'
+  assign address_line = settings.address | newline_to_br | replace: '<br />', ', ' | strip_newlines | strip
+  assign route_query = address_line | url_encode
+
+  capture price_text
+    if kind == 'bike'
+      if from
+        echo 'ab '
+      endif
+      echo variant.price | money_without_trailing_zeros
+    elsif product.selected_variant == blank and product.price_varies
+      echo 'ab '
+      echo product.price_min | money
+    else
+      echo variant.price | money
+    endif
+  endcapture
+-%}
+
+<section class="section--tight pdp-ask{% if kind == 'bike' %} pdp-ask--bike{% endif %}">
+  <div class="pdp-ask__grid">
+    <aside class="pdp-ask__summary" aria-label="Du fragst an">
+      <div class="pdp-ask__item" data-pdp-dynamic="ask-summary">
+        {%- if img != blank -%}
+          <div class="pdp-ask__media">
+            {{- img | image_url: width: 900 | image_tag: loading: 'lazy', widths: '400, 600, 900', sizes: '(min-width: 1400px) 560px, (min-width: 900px) 40vw, 1px', alt: '' -}}
+          </div>
+        {%- endif -%}
+        <div class="pdp-ask__body">
+          <p class="pdp-ask__eyebrow">Du fragst an</p>
+          <p class="pdp-ask__title">{{ product.title | escape }}</p>
+          {%- if meta != blank -%}<p class="pdp-ask__meta">{{ meta | escape }}</p>{%- endif -%}
+          <p class="pdp-ask__price">{{ price_text | strip }}</p>
+        </div>
+      </div>
+      <div class="pdp-ask__store">
+        <img class="pdp-ask__shield" src="{{ 'hd-bar-shield.png' | asset_url }}" alt="" width="49" height="40" loading="lazy">
+        <div class="pdp-ask__store-text">
+          <p class="pdp-ask__store-name">{{ store_name | escape }}</p>
+          {%- if address_line != blank -%}<p>{{ address_line | escape }}</p>{%- endif -%}
+          {%- if note != blank -%}<p>{{ note | escape }}</p>{%- endif -%}
+          {%- if address_line != blank -%}
+            <a class="pdp-ask__route" href="https://www.google.com/maps/dir/?api=1&amp;destination={{ route_query }}" target="_blank" rel="noopener">
+              {%- render 'icon', name: 'route' -%}Route planen<span class="sr-only"> (Google Maps, öffnet neues Fenster)</span>
+            </a>
+          {%- endif -%}
+        </div>
+      </div>
+    </aside>
+    {{ box }}
+  </div>
+</section>
