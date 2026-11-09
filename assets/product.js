@@ -812,7 +812,7 @@
         footerIO = new IntersectionObserver(function (en) { atFooter = en[0].isIntersecting; sync(); });
         footerIO.observe(footer);
       }
-      // „Jetzt anfragen“ (Anfrage-Artikel, Motorräder): weg, solange die Kontakt-Box, zu der er springt, im Bild ist – sonst doppelt
+      // „Jetzt anfragen“ (Anfrage-Artikel, Motorräder): ausgeblendet, solange die Kontakt-Box, zu der er springt, im Bild ist – sonst doppelt
       var askLink = sticky.querySelector('a[href^="#"]');
       var askBox = askLink && document.getElementById(askLink.hash.slice(1));
       if (askBox) {

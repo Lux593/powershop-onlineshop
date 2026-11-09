@@ -332,7 +332,7 @@
           assign sticky_note = 'inkl. 19 % MwSt.'
         endif
       -%}
-      {%- render 'pdp-sticky-buy', product: product, contact_anchor: 'kontakt', topic: 'kauf', note: sticky_note, from: from_price, short_price: true -%}
+      {%- render 'pdp-sticky-buy', product: product, contact_anchor: 'kontakt', topic: 'kauf', note: sticky_note, from: from_price, short_price: true -%}{%- comment -%} mobile Leiste {%- endcomment -%}
 
       {%- if app_blocks_html != blank -%}
         <section class="section--tight">{{ app_blocks_html }}</section>
