@@ -340,7 +340,8 @@
 /* Kontakt-Bereich unten auf der Produktseite (snippets/pdp-ask.liquid, seit 9.11.): bis 899 px nur die Box über die volle Breite.
    Ab 900 px eine Karte über die ganze Breite: links „Du fragst an“ (Bild, Name, Ausführung, Preis), rechts die Kontakt-Box ohne
    eigenen Rahmen und darunter der Laden. Der orange Streifen oben gehört dann zur ganzen Karte. Beide Spalten sind gleich hoch,
-   links füllt das Bild, was über Name und Preis übrig ist (Bikes: Foto füllt den Rahmen, sonst ganz sichtbar auf Steingrau).
+   links füllt das Bild, was über Name und Preis übrig ist (Bikes: Foto füllt den Rahmen; Teile und Bekleidung sind freigestellt
+   auf Weiß und stehen ganz sichtbar mit etwas Luft auf Weiß).
    Anrufen über die volle Breite, WhatsApp und E-Mail darunter nebeneinander (wie in „Komm vorbei“). */
 .pdp-ask__summary, .pdp-ask__store { display: none; }
 @media (min-width: 900px) {
@@ -351,9 +352,10 @@
   .pdp-ask .contact-box__buttons > :first-child:nth-last-child(odd) { grid-column: 1 / -1; }
   .pdp-ask__summary { display: flex; min-width: 0; border-right: 1px solid var(--c-line); }
   .pdp-ask__item { flex: 1; display: flex; flex-direction: column; }
-  .pdp-ask__media { position: relative; flex: 1 1 auto; min-height: 220px; overflow: hidden; background: var(--c-stone); }
-  .pdp-ask__media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
-  .pdp-ask--bike .pdp-ask__media img { object-fit: cover; }
+  .pdp-ask__media { position: relative; flex: 1 1 auto; min-height: 220px; overflow: hidden; background: var(--c-white); }
+  .pdp-ask__media img { position: absolute; inset: 20px; width: calc(100% - 40px); height: calc(100% - 40px); object-fit: contain; }
+  .pdp-ask--bike .pdp-ask__media { background: var(--c-stone); }
+  .pdp-ask--bike .pdp-ask__media img { inset: 0; width: 100%; height: 100%; object-fit: cover; }
   .pdp-ask__body { display: grid; gap: 6px; padding: 22px 28px 26px; border-top: 1px solid var(--c-line); }
   .pdp-ask__eyebrow { font-size: var(--fs-small); font-weight: 600; color: var(--c-muted); }
   .pdp-ask__title { font: 700 24px/1.05 var(--f-head); letter-spacing: 0.01em; text-transform: uppercase; text-wrap: balance; }
