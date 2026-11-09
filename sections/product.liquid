@@ -620,8 +620,11 @@
               <span>{{ product.vendor | escape }}{% if product.vendor != blank and product.type != blank %} · {% endif %}{{ product.type | escape }}</span>
             {%- endif -%}
             <span data-pdp-dynamic="sku">{%- if sku != blank -%}<span class="partno">Art.-Nr. {{ sku | escape }}</span>{%- endif -%}</span>
-            {% render 'rating', product: product %}
-            <a class="text-link small" href="#bewertungen">Bewertungen lesen</a>
+            {%- assign review_count = product.metafields.reviews.rating_count.value | default: 0 -%}
+            {%- if review_count > 0 -%}
+              {% render 'rating', product: product %}
+              <a class="text-link small" href="#bewertungen">Bewertungen lesen</a>
+            {%- endif -%}
           </div>
           <div class="pdp__price" data-pdp-dynamic="price">{% render 'price', product: product, variant: product.selected_variant, long: true %}</div>
 
@@ -653,14 +656,22 @@
         </div>
       </div>
 
-      <section class="section--tight" id="bewertungen">
-        <div class="section-head"><h2>Bewertungen</h2>{% render 'rating', product: product %}</div>
-        {{ app_blocks_html }}
-        <div class="note">
-          {% render 'icon', name: 'badge-check' %}
-          <div><strong>Geprüfte Bewertungen</strong><br>Bewertungen stammen nur von Kund:innen, die das Produkt bei uns gekauft haben (Pflichthinweis nach UWG).</div>
-        </div>
-      </section>
+      {%- comment -%}
+        Bewertungen nur, wenn es welche gibt (Metafeld einer Bewertungs-App, reviews.rating_count). Bis dahin weder Abschnitt noch
+        „Bewertungen lesen“ oben, auch nicht der Hinweis „Geprüfte Bewertungen“. App-Blöcke ohne Bewertungen stehen ohne Überschrift.
+      {%- endcomment -%}
+      {%- if review_count > 0 -%}
+        <section class="section--tight" id="bewertungen">
+          <div class="section-head"><h2>Bewertungen</h2>{% render 'rating', product: product %}</div>
+          {{ app_blocks_html }}
+          <div class="note">
+            {% render 'icon', name: 'badge-check' %}
+            <div><strong>Geprüfte Bewertungen</strong><br>Bewertungen stammen nur von Kund:innen, die das Produkt bei uns gekauft haben (Pflichthinweis nach UWG).</div>
+          </div>
+        </section>
+      {%- elsif app_blocks_html != blank -%}
+        <section class="section--tight">{{ app_blocks_html }}</section>
+      {%- endif -%}
 
       {% render 'product-rail', product: product, similar: similar, heading: 'Das könnte dir auch gefallen', section_id: section.id %}
 
