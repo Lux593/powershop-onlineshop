@@ -8,7 +8,7 @@
   jeder Regel vor. Ohne Regel: 2–3 bzw. 5–7 Werktage. Den Bereich erkennt der Shop wie bei den Anfrage-Regeln (on-request.liquid).
   Artikel nur auf Anfrage und Motorräder zeigen ihren Status nicht hierüber (die Aufrufer prüfen das vorher).
   Sperrgut und Nur Abholung (snippets/shipping-class.liquid, seit 10.11.) gehen an der Kasse nur mit Abholung: Statt „Lieferzeit …“
-  steht dort „Abholung im Power Shop“ (auf Lager) bzw. „abholbereit in …“ (wird bestellt). Die Produktkarte bleibt gleich.
+  steht dort „Abholung im Power Shop“ (auf Lager) bzw. „Abholung nach Lieferung (…)“ (wird bestellt). Die Produktkarte bleibt gleich.
 
   @param {product} product - Produkt
   @param {variant} [variant] - Ausführung. Ohne: der ganze Artikel; mit mehreren Ausführungen „teils auf Lager“, wenn nur manche Bestand haben
@@ -126,10 +126,11 @@
   assign label_stock = 'Lieferzeit ' | append: time_stock
   assign label_order = 'Lieferzeit ' | append: time_order
   assign label_mixed = label_stock | append: ', sonst ' | append: time_order
+  # Die Zeiten sind freie Texte im Nominativ („5–7 Werktage“), darum in Klammern statt „in 5–7 Werktagen“
   if pickup
     assign label_stock = 'Abholung im Power Shop'
-    assign label_order = 'abholbereit in ' | append: time_order
-    assign label_mixed = label_stock | append: ', sonst abholbereit in ' | append: time_order
+    assign label_order = 'Abholung nach Lieferung (' | append: time_order | append: ')'
+    assign label_mixed = label_stock | append: ', sonst nach Lieferung (' | append: time_order | append: ')'
   endif
 -%}
 
@@ -145,7 +146,7 @@
     {%- endcase -%}
   {%- when 'times' -%}
     {%- if pickup -%}
-      Ist der Artikel auf Lager, liegt er nach unserer Bestätigung zur Abholung bereit, sonst bestellen wir ihn für dich (abholbereit in {{ time_order | escape }}).
+      Ist der Artikel auf Lager, liegt er nach unserer Bestätigung zur Abholung bereit. Sonst bestellen wir ihn für dich, und du holst ihn nach der Lieferung ab (Lieferzeit {{ time_order | escape }}).
     {%- else -%}
       Lieferzeit {{ time_stock | escape }}, wenn der Artikel auf Lager ist, sonst {{ time_order | escape }} (wir bestellen ihn für dich).
     {%- endif -%}

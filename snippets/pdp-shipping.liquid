@@ -31,8 +31,8 @@
       Diesen Artikel versenden wir nicht. Du bestellst ihn online und holst ihn kostenlos im Power Shop in Weil am Rhein ab.{{ ' ' }}
     {%- else -%}
       {%- if settings.free_shipping_threshold > 0 -%}
-        Paketversand innerhalb Deutschlands: versandkostenfrei ab {{ settings.free_shipping_threshold | times: 100 | money_without_trailing_zeros }}
-        {%- if settings.shipping_cost_text != blank %}, darunter {{ settings.shipping_cost_text }}{% endif %}.{{ ' ' }}
+        {%- comment -%} In einer Zeile: sonst bleibt vor dem Komma ein Zeilenumbruch stehen (im Shop als Leerzeichen sichtbar) {%- endcomment -%}
+        Paketversand innerhalb Deutschlands: versandkostenfrei ab {{ settings.free_shipping_threshold | times: 100 | money_without_trailing_zeros }}{% if settings.shipping_cost_text != blank %}, darunter {{ settings.shipping_cost_text }}{% endif %}.{{ ' ' }}
       {%- endif -%}
       Abholung im Power Shop ist kostenlos.{{ ' ' }}
   {%- endcase -%}
