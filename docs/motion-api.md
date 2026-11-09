@@ -47,6 +47,9 @@ Attribute (Markup, alles optional)
   data-reveal-delay="200"           Verzögerung in ms (--rd).
   data-stagger[="70"]               Am Elternelement: Kinder blenden nacheinander ein (--i, max. 8 Stufen, Schritt in
                                     ms). Kinder ohne eigenes data-reveal fahren als up ein. Für kurze Gruppen.
+  data-no-reveal                    Am Kind eines data-stagger: steht sofort, ohne Einblenden (seit 10.11.). Titel und
+                                    Meta-Zeile der Produktseite: Am Handy liegen sie beim Aufruf unten am Rand, wo das
+                                    Einblenden erst nach dem Scrollen startet; die Seite wirkte sonst unter den Bildern leer.
   data-split="words"                Überschrift wortweise aus einer Maske, nach document.fonts.ready. Wort-Spans
                                     aria-hidden plus .sr-only-Kopie. Nur Text und Inline-Auszeichnung: mit Link, Button
                                     oder [tabindex] darin wird nicht zerlegt (sonst ohne Namen), der Block blendet dann

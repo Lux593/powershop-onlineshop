@@ -514,6 +514,17 @@ html:not(.has-motion) .bcard:hover .bcard__media img { transform: none; }
 @media (hover: none), (max-width: 1023px) {
   .pcard__quick { visibility: hidden; }
   .pcard.is-quick-open .pcard__quick { visibility: visible; transition-delay: 0s; }
+  /* Offen steht der Inhalt links neben dem runden Schließen-Button (44 px, 8 px vom Rand, dazu 8 px Luft), nicht darunter;
+     unten 8 px wie der Button, damit beide auf einer Höhe stehen (seit 10.11.) */
+  .pcard__quick { padding: 12px 60px 8px 12px; container: pcard-quick / inline-size; }
+}
+/* Button im Quick-Add: Langform braucht mit Tasche rund 180 px. Schmaler (Handy, 2 Spalten: rund 85 bis 105 px) ohne Tasche
+   und mit Kurzform „In den Korb“ bzw. „Optionen“; der Screenreader liest den Artikelnamen dazu (sr-only) */
+.pcard__add-short { display: none; }
+@container pcard-quick (max-width: 179px) {
+  .pcard__add { padding-inline: 6px; font-size: 14px; }
+  .pcard__add .icon, .pcard__add-long { display: none; }
+  .pcard__add-short { display: inline; }
 }
 
 /* Tastaturfokus auf dem Titel: Unterstreichen statt Rahmen (Rahmen gibt es im Shop keine, base.css) */

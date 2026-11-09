@@ -110,10 +110,11 @@
             {%- endfor -%}
           </div>
         {%- elsif product.variants.size == 1 -%}
-          <button class="btn btn--secondary btn--block btn--sm" type="button" data-add-variant="{{ product.selected_or_first_available_variant.id }}">
-            {% render 'icon', name: 'shopping-bag' %}In den Warenkorb<span class="sr-only">: {{ card_title }}</span></button>
+          {%- comment -%} Kurzform für schmale Karten (Handy): Der Button steht dort neben dem runden Schließen-Button (shop.css, Quick-Add) {%- endcomment -%}
+          <button class="btn btn--secondary btn--block btn--sm pcard__add" type="button" data-add-variant="{{ product.selected_or_first_available_variant.id }}">
+            {% render 'icon', name: 'shopping-bag' %}<span class="pcard__add-long">In den Warenkorb</span><span class="pcard__add-short">In den Korb</span><span class="sr-only">: {{ card_title }}</span></button>
         {%- else -%}
-          <a class="btn btn--secondary btn--block btn--sm" href="{{ product.url }}">Optionen wählen<span class="sr-only">: {{ card_title }}</span></a>
+          <a class="btn btn--secondary btn--block btn--sm pcard__add" href="{{ product.url }}"><span class="pcard__add-long">Optionen wählen</span><span class="pcard__add-short">Optionen</span><span class="sr-only">: {{ card_title }}</span></a>
         {%- endif -%}
       </div>
     {%- endif -%}
