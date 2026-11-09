@@ -25,16 +25,21 @@
         assign skip = true
       endif
       assign message = block.settings.text | replace: '{schwelle}', threshold_text | replace: '{tage}', return_days
+      # Der Hinweis mit {schwelle} verlinkt ohne eigenen Link die Versandrichtlinie (Einstellungen > Richtlinien), sobald es sie gibt
+      assign item_url = block.settings.link_url
+      if item_url == blank and block.settings.text contains '{schwelle}' and shop.shipping_policy.url != blank
+        assign item_url = shop.shipping_policy.url
+      endif
     -%}
     {%- if skip == false -%}
       <span {{ block.shopify_attributes }}{% if block.settings.hide_on_mobile %} class="announce__extra"{% endif %}>
         {%- if shown > 0 %} · {% endif -%}
         {%- comment -%} Link ohne Link-Text: der Hinweis selbst wird zum Link (z. B. „Versandkostenfrei ab 100 €“ zu den Versandinfos) {%- endcomment -%}
-        {%- if block.settings.link_url != blank and block.settings.link_label == blank and message != blank -%}
-          <a href="{{ block.settings.link_url }}">{{- message -}}</a>
+        {%- if item_url != blank and block.settings.link_label == blank and message != blank -%}
+          <a href="{{ item_url }}">{{- message -}}</a>
         {%- else -%}
           {{- message -}}
-          {%- if block.settings.link_label != blank and block.settings.link_url != blank %} <a href="{{ block.settings.link_url }}">{{ block.settings.link_label }}</a>{% endif -%}
+          {%- if block.settings.link_label != blank and item_url != blank %} <a href="{{ item_url }}">{{ block.settings.link_label }}</a>{% endif -%}
         {%- endif -%}
       </span>
       {%- assign shown = shown | plus: 1 -%}
@@ -69,7 +74,7 @@
           "default": "Versandkostenfrei ab {schwelle}"
         },
         { "type": "text", "id": "link_label", "label": "Link-Text" },
-        { "type": "url", "id": "link_url", "label": "Link", "info": "Ohne Link-Text wird der Hinweis selbst zum Link, z. B. auf /policies/shipping-policy (Versandinfos)." },
+        { "type": "url", "id": "link_url", "label": "Link", "info": "Ohne Link-Text wird der Hinweis selbst zum Link. Ein Hinweis mit {schwelle} verlinkt ohne eigenen Link automatisch die Versandrichtlinie, sobald sie angelegt ist." },
         { "type": "checkbox", "id": "hide_on_mobile", "label": "Auf dem Handy ausblenden", "default": false }
       ]
     }
