@@ -221,7 +221,10 @@
 .pcard__title { font-family: var(--f-body); font-size: 15px; font-weight: 500; line-height: 1.35; text-transform: none; letter-spacing: 0;
   display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; } /* 4 statt 2 Zeilen: Mit den Textabständen aus WCAG 1.4.12 (Zeilenhöhe 1,5, Buchstaben 0,12 em) wird aus zwei Zeilen drei, die dritte wäre abgeschnitten */
 .pcard__title a:hover { text-decoration: underline; text-underline-offset: 3px; }
-.pcard .price { margin-top: 2px; }
+.pcard .price { margin-top: 4px; }
+/* Preis auf den Karten in der Überschrift-Schrift, damit er sich vom Titel abhebt (seit 9.11.; vorher 600 in der Textschrift) */
+.pcard .price__now { font-family: var(--f-head); font-size: 21px; font-weight: 700; line-height: 1.05; letter-spacing: 0.01em; }
+@media (min-width: 1024px) { .pcard .price__now { font-size: 23px; } }
 .pcard .swatches { margin-top: 4px; }
 
 /* ---------- Bike-Karte ---------- */

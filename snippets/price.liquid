@@ -25,7 +25,8 @@
 <p class="price" data-price>
   <span class="price__now">
     {%- if show_from %}ab {% endif -%}
-    {{ v.price | money }}{% unless long %}*{% endunless -%}
+    {{ v.price | money }}
+    {%- comment -%} Ohne Sternchen (seit 9.11.): „Alle Preise inkl. MwSt.“ steht unten im Footer {%- endcomment -%}
   </span>
   {%- if v.compare_at_price > v.price -%}
     <s class="price__old"><span class="sr-only">Vorher </span>{{ v.compare_at_price | money }}</s>
