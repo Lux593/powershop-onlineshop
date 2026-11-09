@@ -364,25 +364,13 @@
 
 .pdp-sections { max-width: 860px; }
 .pdp-sections .acc > summary { font-size: 20px; }
-/* Motorräder am Desktop: Die Abschnitte (Technische Daten …) stehen rechts unter den Eckdaten-Kacheln, die Kontakt-Box links
-   unter der Galerie und läuft beim Lesen mit (sticky). Mobil gilt die Reihenfolge im Code: Galerie, Infos, Abschnitte,
-   Kontakt-Box direkt über „Ähnliche Bikes“. Die Galerie überspannt Zeile 1 und 2: Ist sie höher als die Infos, geht der Rest
-   in Zeile 2, die Abschnitte rücken ohne Lücke unter die Kacheln und die Kontakt-Box beginnt in Zeile 3 direkt unter der
-   Galerie. Die letzte Zeile (1fr) nimmt den Überhang der höheren Spalte auf. */
+/* Motorräder am Desktop: Die Abschnitte (Technische Daten …) stehen rechts unter den Eckdaten-Kacheln, die Galerie links
+   läuft beim Lesen mit (sticky, wie bei Teilen und Bekleidung). Die Kontakt-Box steht seit 9.11. wie dort unter „Ähnliche Bikes“. */
 @media (min-width: 1024px) {
-  .pdp--bike { grid-template-rows: auto auto 1fr; row-gap: 0; }
-  .pdp--bike > .pdp__media { grid-column: 1; grid-row: 1 / span 2; }
+  .pdp--bike { grid-template-rows: auto 1fr; row-gap: 0; }
+  .pdp--bike > .pdp__media { grid-column: 1; grid-row: 1 / span 2; align-self: start; position: sticky; top: calc(var(--header-offset) + 24px); }
   .pdp--bike > .pdp__info { grid-column: 2; grid-row: 1; position: static; }
-  .pdp--bike > .pdp-sections { grid-column: 2; grid-row: 2 / span 2; margin-top: 32px; }
-  .pdp--bike > .pdp__contact { grid-column: 1; grid-row: 3; margin-top: 40px; position: sticky; top: calc(var(--header-offset) + 24px); }
-}
-/* Kontakt-Box der Motorräder am Desktop: Anrufen, WhatsApp und E-Mail nebeneinander, je eine gleich breite Spalte pro
-   vorhandenem Kanal. Die Nummer passt dann nicht mehr in den Anruf-Button und entfällt dort wie am Tablet; schmalere
-   Innenabstände, damit „WhatsApp“ auch bei 1024 px in seine Spalte passt. */
-@media (min-width: 1024px) {
-  .pdp__contact .contact-box__buttons { grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
-  .pdp__contact .contact-box__buttons .btn { padding-inline: 12px; }
-  .pdp__contact .contact-box__phone { display: none; }
+  .pdp--bike > .pdp-sections { grid-column: 2; grid-row: 2; margin-top: 32px; }
 }
 
 /* Warenkorb-/Merkliste-Drawer */

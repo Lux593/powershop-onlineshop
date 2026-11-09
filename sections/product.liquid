@@ -306,24 +306,6 @@
           {% render 'accordion', title: 'Standort & Übergabe', body: place_body %}
         </div>
 
-        <div class="pdp__contact">
-            {%- capture reserve_note -%}
-              {%- if can_reserve -%}
-                <div class="reserve-note">
-                  <strong>{% render 'icon', name: 'clock' %}Reservierung möglich</strong>
-                  {%- if settings.reservation_hours > 0 and settings.reservation_fee > 0 -%}
-                    <p>{{ settings.reservation_hours }} h Reservierung gegen {{ settings.reservation_fee | times: 100 | money_without_trailing_zeros }} Gebühr – wird beim Kauf angerechnet, sonst erstattet.</p>
-                  {%- endif -%}
-                  <ol>
-                    <li>Wähle oben „Reservierung“ und schreib uns per WhatsApp oder E-Mail.</li>
-                    <li>Wir prüfen die Verfügbarkeit und senden dir einen Zahlungslink.</li>
-                    <li>Nach Zahlung ist das Bike für dich reserviert.</li>
-                  </ol>
-                </div>
-              {%- endif -%}
-            {%- endcapture -%}
-            {% render 'contact-box', anchor: 'kontakt', title: 'Interesse an diesem Bike?', topics: bike_topics, subject: bike_label, primary: true, extra: reserve_note %}
-        </div>
       </div>
       {%- liquid
         if tax == '25a'
@@ -358,6 +340,31 @@
           </div>
         </section>
       {%- endif -%}
+
+      {%- comment -%}
+        Kontakt-Box wie bei Teilen und Bekleidung: unter „Ähnliche Bikes“ (alle Bildschirme). „Jetzt anfragen“ unter den
+        Eckdaten und in der mobilen Leiste springt hierher und wählt „Kaufanfrage“.
+      {%- endcomment -%}
+      <section class="section--tight">
+        <div style="max-width:560px">
+          {%- capture reserve_note -%}
+            {%- if can_reserve -%}
+              <div class="reserve-note">
+                <strong>{% render 'icon', name: 'clock' %}Reservierung möglich</strong>
+                {%- if settings.reservation_hours > 0 and settings.reservation_fee > 0 -%}
+                  <p>{{ settings.reservation_hours }} h Reservierung gegen {{ settings.reservation_fee | times: 100 | money_without_trailing_zeros }} Gebühr – wird beim Kauf angerechnet, sonst erstattet.</p>
+                {%- endif -%}
+                <ol>
+                  <li>Wähle oben „Reservierung“ und schreib uns per WhatsApp oder E-Mail.</li>
+                  <li>Wir prüfen die Verfügbarkeit und senden dir einen Zahlungslink.</li>
+                  <li>Nach Zahlung ist das Bike für dich reserviert.</li>
+                </ol>
+              </div>
+            {%- endif -%}
+          {%- endcapture -%}
+          {% render 'contact-box', anchor: 'kontakt', title: 'Interesse an diesem Bike?', topics: bike_topics, subject: bike_label, primary: true, extra: reserve_note %}
+        </div>
+      </section>
     </div>
   </div>
 
