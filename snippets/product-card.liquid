@@ -83,7 +83,7 @@
       <button class="pcard__plus" type="button" data-quick-toggle aria-expanded="false" aria-label="Schnell hinzufügen: {{ product.title | escape }}">
         {% render 'icon', name: 'plus' %}
       </button>
-      <div class="pcard__quick">
+      <div class="pcard__quick{% if size_option %} pcard__quick--sizes{% endif %}">
         {%- if size_option -%}
           {%- assign size_idx = size_option.position | minus: 1 -%}
           {%- if color_option -%}

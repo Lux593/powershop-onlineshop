@@ -224,9 +224,9 @@
           {% render 'pdp-gallery', product: product, wide: true %}
         </div>
         <div class="pdp__info" data-stagger="60">
-          <h1 class="pdp__title" data-no-reveal>{{ product.title | escape }}</h1>
+          <h1 class="pdp__title" data-reveal-load>{{ product.title | escape }}</h1>
           {%- if family != blank or fzg_nr != blank -%}
-            <p class="pdp__meta" data-no-reveal>
+            <p class="pdp__meta" data-reveal-load>
               {%- if family != blank -%}<span>{{ family | escape }}</span>{%- endif -%}
               {%- if fzg_nr != blank -%}<span>{% if from_price %}Modell {{ fzg_nr | escape }}{% else %}Fzg.-Nr. {{ fzg_nr | escape }}{% endif %}</span>{%- endif -%}
             </p>
@@ -419,8 +419,8 @@
       <div class="pdp">
         {% render 'pdp-gallery', product: product, badges: badges_html %}
         <div class="pdp__info" data-stagger="60">
-          <h1 class="pdp__title" data-no-reveal>{{ product.title | escape }}</h1>
-          <div class="pdp__meta" data-no-reveal>
+          <h1 class="pdp__title" data-reveal-load>{{ product.title | escape }}</h1>
+          <div class="pdp__meta" data-reveal-load>
             {%- if product.vendor != blank -%}
               <span>{{ product.vendor | escape }}{% if product.type != blank %} · {{ product.type | escape }}{% endif %}</span>
             {%- endif -%}
@@ -629,8 +629,8 @@
       <div class="pdp">
         {% render 'pdp-gallery', product: product, badges: badges_html %}
         <div class="pdp__info" data-stagger="60">
-          <h1 class="pdp__title" data-no-reveal>{{ product.title | escape }}</h1>
-          <div class="pdp__meta" data-no-reveal>
+          <h1 class="pdp__title" data-reveal-load>{{ product.title | escape }}</h1>
+          <div class="pdp__meta" data-reveal-load>
             {%- if product.vendor != blank or product.type != blank -%}
               <span>{{ product.vendor | escape }}{% if product.vendor != blank and product.type != blank %} · {% endif %}{{ product.type | escape }}</span>
             {%- endif -%}

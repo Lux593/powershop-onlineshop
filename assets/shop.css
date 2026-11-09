@@ -508,27 +508,37 @@ html:not(.has-motion) .bcard:hover .bcard__media img { transform: none; }
    nicht im Accessibility-Tree (visibility hängt am Zustand des „+“-Buttons, PS.quick in sections.js). Am Desktop
    (Hover, ab 1024 px) zeigt Hover oder Tastaturfokus es wie bisher, dort gibt es kein „+“. */
 .pcard__quick { transition: transform 460ms var(--ease-out), visibility 0s linear 460ms; }
-/* Der „+“ steht im Markup vor dem Panel (Tab-Reihenfolge), liegt aber darüber */
-.pcard__plus { z-index: 1; }
+/* Der „+“ steht im Markup vor dem Panel (Tab-Reihenfolge), liegt aber darüber. Eckig wie der Button (seit 10.11.) */
+.pcard__plus { z-index: 1; border-radius: 0; transition: background-color var(--t-med) var(--ease-out), color var(--t-med) var(--ease-out); }
 .pcard__plus .icon { transition: transform var(--t-med) var(--ease-out); }
+.pcard__add { border-radius: 0; }
 @media (hover: none), (max-width: 1023px) {
-  .pcard__quick { visibility: hidden; }
-  .pcard.is-quick-open .pcard__quick { visibility: visible; transition-delay: 0s; }
-  /* Offen steht der Inhalt links neben dem runden Schließen-Button (44 px, 8 px vom Rand, dazu 8 px Luft), nicht darunter;
-     unten 8 px wie der Button, damit beide auf einer Höhe stehen (seit 10.11.) */
-  .pcard__quick { padding: 12px 60px 8px 12px; container: pcard-quick / inline-size; }
+  /* Seit 10.11.: Der eckige „+“ unten rechts wächst beim Öffnen nach links zum Button „In den Warenkorb“, er selbst wird
+     schwarz mit „×“ am rechten Ende ([IN DEN KORB | ×]). Mit Größen wächst das weiße Größenfeld genauso aus dem „+“ nach
+     links und oben. Geschlossen ist das Panel auf die Fläche des „+“ beschnitten (44 × 44, 8 px vom Rand). */
+  .pcard__quick {
+    left: 8px; right: 8px; bottom: 8px; padding: 0; background: none; border: 0; transform: none;
+    visibility: hidden; clip-path: inset(0 0 0 calc(100% - 44px));
+    transition: clip-path 480ms var(--ease-out), visibility 0s linear 480ms;
+    container: pcard-quick / inline-size;
+  }
+  .pcard__quick--sizes { padding: 10px 52px 0 10px; background: rgba(255, 255, 255, 0.96); clip-path: inset(calc(100% - 44px) 0 0 calc(100% - 44px)); }
+  .pcard.is-quick-open .pcard__quick { visibility: visible; clip-path: inset(0); transition-delay: 0s; }
+  .pcard.is-quick-open .pcard__plus { background: var(--c-black); color: var(--c-white); box-shadow: -1px 0 0 rgba(255, 255, 255, 0.3); }
+  /* Der Button läuft unter dem „×“ durch; Text und Tasche stehen links davon */
+  .pcard__quick .pcard__add { padding-right: 52px; }
 }
-/* Button im Quick-Add: Langform braucht mit Tasche rund 180 px. Schmaler (Handy, 2 Spalten: rund 85 bis 105 px) ohne Tasche
-   und mit Kurzform „In den Korb“ bzw. „Optionen“; der Screenreader liest den Artikelnamen dazu (sr-only) */
+/* Button im Quick-Add: Langform braucht mit Tasche und dem „×“ rund 220 px. Schmaler (Handy, 2 Spalten) ohne Tasche und mit
+   Kurzform „In den Korb“ bzw. „Optionen“; der Screenreader liest den Artikelnamen dazu (sr-only) */
 .pcard__add-short { display: none; }
-@container pcard-quick (max-width: 179px) {
-  .pcard__add { padding-inline: 6px; font-size: 14px; }
+@container pcard-quick (max-width: 218px) {
+  .pcard__add { padding-left: 6px; font-size: 14px; }
   .pcard__add .icon, .pcard__add-long { display: none; }
   .pcard__add-short { display: inline; }
 }
-/* Sehr schmal (320 px breite Geräte, rund 64 px): nur die Tasche, „In den Warenkorb“ bleibt für den Screenreader */
-@container pcard-quick (max-width: 79px) {
-  .pcard__add { padding-inline: 4px; }
+/* Sehr schmal (320 px breite Geräte): nur die Tasche, „In den Warenkorb“ bleibt für den Screenreader */
+@container pcard-quick (max-width: 134px) {
+  .pcard__add { padding-left: 4px; }
   button.pcard__add .icon { display: block; }
   button.pcard__add .pcard__add-short { display: none; }
   button.pcard__add .pcard__add-long { display: block; position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }

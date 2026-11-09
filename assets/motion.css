@@ -35,24 +35,30 @@ html.lenis { scroll-behavior: auto !important; }
 /* Endzustand ist clip-path:none (aus dem Basisstil), nie inset(0): sonst schneidet es Fokusringe ab */
 @keyframes ps-clip { from { opacity: 0; clip-path: inset(var(--rv-clip)); } to { opacity: 1; clip-path: inset(0); } }
 
-/* Startzustand, bis das Element im Bild ist (JS setzt .is-in). Kinder mit data-no-reveal stehen sofort (Titel der Produktseite) */
+/* Startzustand, bis das Element im Bild ist (JS setzt .is-in). Kinder mit data-reveal-load warten nicht darauf (siehe unten) */
 .has-motion [data-reveal]:not(.is-in),
-.has-motion [data-stagger]:not(.is-in) > :not([data-no-reveal]) { opacity: 0; }
+.has-motion [data-stagger]:not(.is-in) > :not([data-reveal-load]) { opacity: 0; }
 .has-motion [data-reveal=""]:not(.is-in),
 .has-motion [data-reveal="up"]:not(.is-in),
-.has-motion [data-stagger]:not(.is-in) > :not([data-reveal]):not([data-no-reveal]) { translate: 0 var(--rv-d); }
+.has-motion [data-stagger]:not(.is-in) > :not([data-reveal]):not([data-reveal-load]) { translate: 0 var(--rv-d); }
 .has-motion [data-reveal="left"]:not(.is-in) { translate: calc(var(--rv-d) * -1) 0; }
 .has-motion [data-reveal="clip"]:not(.is-in) { clip-path: inset(var(--rv-clip)); }
 
 /* Einblenden: --rd = data-reveal-delay, --i = Position im Stagger (max. 7), --step = Schrittweite */
 .has-motion [data-reveal].is-in,
-.has-motion [data-stagger].is-in > :not([data-no-reveal]) {
+.has-motion [data-stagger].is-in > :not([data-reveal-load]) {
   animation: ps-up var(--t-slow) var(--ease-out) backwards;
   animation-delay: calc(var(--rd, 0ms) + var(--i, 0) * var(--step, 70ms));
 }
 .has-motion [data-reveal="left"].is-in { animation-name: ps-left; }
 .has-motion [data-reveal="fade"].is-in { animation-name: ps-fade; }
 .has-motion [data-reveal="clip"].is-in { animation-name: ps-clip; }
+
+/* Beim Seitenaufruf einblenden, ohne aufs Scrollen zu warten (seit 10.11.): Titel und Meta-Zeile der Produktseite. Am Handy liegen
+   sie beim Aufruf unten am Rand, wo der Observer erst nach dem Scrollen auslöst. Reines CSS: läuft mit dem ersten Bild der Seite
+   (has-motion setzt der Kopf vor dem ersten Zeichnen). Ein zweites data-reveal-load direkt dahinter kommt etwas später. */
+.has-motion [data-reveal-load] { animation: ps-up var(--t-slow) var(--ease-out) backwards; animation-delay: var(--rd, 120ms); }
+.has-motion [data-reveal-load] + [data-reveal-load] { --rd: 220ms; }
 
 /* ---------- Wort-Splitter ---------- */
 /* Bis zum Split (nach document.fonts.ready) unsichtbar, sonst springt der Text beim Umbau */
@@ -86,6 +92,6 @@ html.lenis { scroll-behavior: auto !important; }
   [data-motion], [data-parallax] { transition: none !important; animation: none !important; transform: none !important; translate: none !important; }
 }
 @media print {
-  .has-motion [data-reveal], .has-motion [data-stagger] > *, .has-motion [data-split] { opacity: 1 !important; translate: none !important; clip-path: none !important; animation: none !important; }
+  .has-motion [data-reveal], .has-motion [data-reveal-load], .has-motion [data-stagger] > *, .has-motion [data-split] { opacity: 1 !important; translate: none !important; clip-path: none !important; animation: none !important; }
   .ps-wi { translate: none !important; animation: none !important; }
 }
