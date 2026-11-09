@@ -12,6 +12,16 @@
     render 'on-request', product: product
   endcapture
   assign pdp_on_request = pdp_on_request | strip
+  # Betreff der Anfrage in der Kontakt-Box unten: Titel, gewählte Ausführung, Artikelnummer (Teilenummer, sonst SKU)
+  assign request_variant = product.selected_or_first_available_variant
+  assign request_subject = product.title
+  if product.selected_variant != blank and product.has_only_default_variant == false
+    assign request_subject = request_subject | append: ' – ' | append: product.selected_variant.title
+  endif
+  assign request_no = product.metafields.part.teilenummer.value | default: request_variant.sku
+  if request_no != blank
+    assign request_subject = request_subject | append: ' (Art.-Nr. ' | append: request_no | append: ')'
+  endif
 
   assign current_variant = product.selected_variant
   if current_variant == blank
@@ -410,7 +420,7 @@
             </div>
           </div>
 
-          {% render 'pdp-buy', product: product %}
+          {% render 'pdp-buy', product: product, contact_anchor: 'werkstatt-kontakt' %}
           {% render 'pdp-usp', on_request: pdp_on_request %}
 
           {%- liquid
@@ -550,11 +560,19 @@
 
       <section class="section--tight">
         <div style="max-width:560px">
-          {% render 'contact-box', anchor: 'werkstatt-kontakt', title: 'Fragen zum Einbau?', intro: 'Unsere Werkstatt hilft dir bei Kompatibilität, Einbau und Eintragung.', topics: 'kompatibilitaet,einbau,frage', subject: product.title, ref: '' %}
+          {%- comment -%}
+            Artikel nur auf Anfrage: Die Box ist zugleich die Anfrage, „Artikel anfragen“ ist das erste und gewählte Thema. „Jetzt
+            anfragen“ im Kaufbereich und in der mobilen Kaufleiste springt hierher (keine zweite Reihe Buttons oben).
+          {%- endcomment -%}
+          {%- if pdp_on_request == 'true' -%}
+            {% render 'contact-box', anchor: 'werkstatt-kontakt', title: 'Artikel anfragen', intro: 'Wir klären Verfügbarkeit, Lieferzeit, Passform und Einbau mit dir. Wähle dein Anliegen, die Nachricht ist vorausgefüllt.', topics: 'anfrage,kompatibilitaet,einbau,frage', subject: request_subject, ref: '' %}
+          {%- else -%}
+            {% render 'contact-box', anchor: 'werkstatt-kontakt', title: 'Fragen zum Einbau?', intro: 'Unsere Werkstatt hilft dir bei Kompatibilität, Einbau und Eintragung.', topics: 'kompatibilitaet,einbau,frage', subject: product.title, ref: '' %}
+          {%- endif -%}
         </div>
       </section>
     </div>
-    {%- render 'pdp-sticky-buy', product: product -%}
+    {%- render 'pdp-sticky-buy', product: product, contact_anchor: 'werkstatt-kontakt' -%}
   </div>
 
 {%- comment -%} ===================== BEKLEIDUNG / ACCESSOIRES ===================== {%- endcomment -%}
@@ -582,7 +600,7 @@
           </div>
           <div class="pdp__price" data-pdp-dynamic="price">{% render 'price', product: product, variant: product.selected_variant, long: true %}</div>
 
-          {% render 'pdp-buy', product: product, size_type: size_type %}
+          {% render 'pdp-buy', product: product, size_type: size_type, contact_anchor: 'artikel-kontakt' %}
           {% render 'pdp-usp', on_request: pdp_on_request %}
 
           <div>
@@ -620,8 +638,17 @@
       </section>
 
       {% render 'product-rail', product: product, similar: similar, heading: 'Das könnte dir auch gefallen', section_id: section.id %}
+
+      {%- if pdp_on_request == 'true' -%}
+        {%- comment -%} Bekleidung nur auf Anfrage: die Anfrage-Box, zu der „Jetzt anfragen“ oben und in der Kaufleiste springt {%- endcomment -%}
+        <section class="section--tight">
+          <div style="max-width:560px">
+            {% render 'contact-box', anchor: 'artikel-kontakt', title: 'Artikel anfragen', intro: 'Wir klären Verfügbarkeit, Lieferzeit und Größe mit dir. Die Nachricht ist vorausgefüllt.', topics: 'anfrage,frage', subject: request_subject, ref: '' %}
+          </div>
+        </section>
+      {%- endif -%}
     </div>
-    {%- render 'pdp-sticky-buy', product: product -%}
+    {%- render 'pdp-sticky-buy', product: product, contact_anchor: 'artikel-kontakt' -%}
   </div>
 {%- endif -%}
 

@@ -351,9 +351,11 @@
 .contact-row__title { font-family: var(--f-head); font-weight: 700; font-size: 20px; line-height: 1.1; letter-spacing: 0.02em; text-transform: uppercase; }
 .contact-row__buttons { display: grid; gap: 8px; }
 .contact-row__intro { margin-top: -4px; max-width: 56ch; font-size: var(--fs-small); color: var(--c-text-soft); }
-/* Artikel nur auf Anfrage (snippets/pdp-buy.liquid): Anfrage-Zeile statt Menge und Warenkorb-Button, ohne eigene Trennlinie */
-.pdp__buy--request { display: block; }
-.pdp__buy--request .contact-row { padding-top: 0; border-top: 0; }
+/* Artikel nur auf Anfrage (snippets/pdp-buy.liquid): Titel, ein Satz und „Jetzt anfragen“ statt Menge und Warenkorb-Button.
+   Die Kanäle (Anrufen, WhatsApp, E-Mail) stehen nur in der Kontakt-Box unten, der Button springt dorthin. */
+.pdp__buy--request { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+.pdp-request__title { font-family: var(--f-head); font-weight: 700; font-size: 20px; line-height: 1.1; letter-spacing: 0.02em; text-transform: uppercase; }
+.pdp-request__note { margin-top: -4px; max-width: 56ch; font-size: var(--fs-small); color: var(--c-text-soft); }
 @media (min-width: 640px) { .contact-row__buttons { display: flex; flex-wrap: wrap; } }
 .reserve-note { display: grid; gap: 8px; padding: 16px; background: var(--c-offwhite); border: 1px dashed var(--c-border-soft); font-size: var(--fs-small); }
 .reserve-note strong { display: flex; align-items: center; gap: 8px; font-size: var(--fs-body); }

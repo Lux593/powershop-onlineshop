@@ -51,9 +51,12 @@
         {%- if line_meta != blank -%}<p class="line-item__meta">{{ line_meta }}</p>{%- endif -%}
         {%- if line_on_request == 'true' -%}
           {%- liquid
-            assign request_anchor = '#artikel-anfrage'
+            # Ziel: die Kontakt-Box der Produktseite (Teile: werkstatt-kontakt, Bekleidung: artikel-kontakt, Motorräder: kontakt)
+            assign request_anchor = '#artikel-kontakt'
             if item.product.type == 'Motorrad' or item.product.template_suffix == 'motorrad'
               assign request_anchor = '#kontakt'
+            elsif item.product.metafields.part.teilenummer != blank or item.product.template_suffix == 'teil'
+              assign request_anchor = '#werkstatt-kontakt'
             endif
           -%}
           <p class="line-item__request">{% render 'icon', name: 'circle-alert' %}<span>Nur auf Anfrage erhältlich. <a href="{{ item.url }}{{ request_anchor }}">Jetzt anfragen</a></span></p>

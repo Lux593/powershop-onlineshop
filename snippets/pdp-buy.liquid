@@ -3,10 +3,13 @@
   Optionszeilen und Variantendaten kommen aus pdp-options. Die Auswahl steuert assets/product.js.
   Artikel nur auf Anfrage (snippets/on-request.liquid: Regeln unter Inhalte → Metaobjekte → Anfrage-Regel, Schalter „Anfrage“
   am Artikel): kein Warenkorb-Formular im Code, sondern ein div mit denselben Optionen (die Auswahl bleibt, sie landet im
-  Betreff der Anfrage) und statt Menge und Button die Anfrage-Zeile (#artikel-anfrage, Thema „anfrage“ in assets/contact.js).
+  Betreff der Anfrage). Statt Menge und Button: „Nur auf Anfrage erhältlich“, ein Satz und „Jetzt anfragen“. Der Button springt
+  zur Kontakt-Box unten (contact_anchor) und wählt dort das Thema „Artikel anfragen“ (data-contact-topic, assets/product.js).
+  Seit 9.11. stehen die Kanäle nur noch in der Box, nicht doppelt oben. Ohne Telefon, WhatsApp und E-Mail führt er zur Kontaktseite.
 
   @param {product} product - Produkt
   @param {string} [size_type] - Tabelle in der Größentabelle: oberteile, hosen, handschuhe, helme, stiefel
+  @param {string} [contact_anchor] - ID der Kontakt-Box für Artikel auf Anfrage, Standard "werkstatt-kontakt"
 
   @example
   {% render 'pdp-buy', product: product, size_type: 'oberteile' %}
@@ -36,15 +39,6 @@
   endcapture
   assign on_request = on_request | strip
 
-  # Betreff der Anfrage: Titel, gewählte Ausführung, Artikelnummer (Teilenummer, sonst SKU der Variante)
-  assign request_subject = product.title
-  if current_variant != blank and product.has_only_default_variant == false
-    assign request_subject = request_subject | append: ' – ' | append: current_variant.title
-  endif
-  assign request_no = product.metafields.part.teilenummer.value | default: current_variant.sku
-  if request_no != blank
-    assign request_subject = request_subject | append: ' (Art.-Nr. ' | append: request_no | append: ')'
-  endif
 -%}
 
 {%- capture pdp_choice -%}
@@ -59,21 +53,20 @@
 {%- if on_request == 'true' -%}
   <div class="pdp-form" data-product-form data-on-request>
     {{ pdp_choice }}
-    <div class="pdp__buy pdp__buy--request">
-      {%- capture request_row -%}
-        {%- assign request_note = settings.on_request_note | default: 'Diesen Artikel bestellen wir persönlich mit dir: Verfügbarkeit, Lieferzeit und Passform klären wir vorab.' | escape -%}
-        {% render 'contact-box', compact: true, anchor: 'artikel-anfrage', title: 'Nur auf Anfrage erhältlich', intro: request_note, topic: 'anfrage', subject: request_subject %}
-      {%- endcapture -%}
-      {%- assign request_row_text = request_row | strip -%}
-      {%- if request_row_text != blank -%}
-        {{ request_row }}
-      {%- else -%}
-        {%- comment -%} Ohne Telefon, WhatsApp und E-Mail in den Händlerdaten: wenigstens der Weg zur Kontaktseite {%- endcomment -%}
-        <div class="contact-row" id="artikel-anfrage">
-          <p class="contact-row__title">Nur auf Anfrage erhältlich</p>
-          <a class="btn btn--primary" href="{{ pages['contact'].url | default: '/pages/contact' }}">{% render 'icon', name: 'message-circle' %}Jetzt anfragen</a>
-        </div>
-      {%- endif -%}
+    <div class="pdp__buy pdp__buy--request" id="artikel-anfrage">
+      {%- liquid
+        assign request_note = settings.on_request_note | default: 'Diesen Artikel bestellen wir persönlich mit dir: Verfügbarkeit, Lieferzeit und Passform klären wir vorab.'
+        assign request_href = '#' | append: contact_anchor | default: '#werkstatt-kontakt'
+        if contact_anchor == blank
+          assign request_href = '#werkstatt-kontakt'
+        endif
+        if settings.phone == blank and settings.whatsapp == blank and settings.email == blank
+          assign request_href = pages['contact'].url | default: '/pages/contact'
+        endif
+      -%}
+      <p class="pdp-request__title">Nur auf Anfrage erhältlich</p>
+      <p class="pdp-request__note">{{ request_note | escape }}</p>
+      <a class="btn btn--primary btn--block" href="{{ request_href }}" data-contact-topic="anfrage">{% render 'icon', name: 'message-circle' %}Jetzt anfragen</a>
     </div>
   </div>
 {%- else -%}

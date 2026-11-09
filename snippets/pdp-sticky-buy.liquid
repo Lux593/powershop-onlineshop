@@ -8,10 +8,11 @@
   und ohne Streichpreis. Der Streichpreis samt Erklärung („niedrigster Preis der letzten 30 Tage“) und der Versandlink stehen
   im Kaufbereich. Ein Link in der engen Leiste wäre beim Fokus teils abgeschnitten.
 
-  Artikel nur auf Anfrage (snippets/on-request.liquid): statt des Kaufbuttons „Jetzt anfragen“, ein Link zur Anfrage-Zeile im
-  Kaufbereich (#artikel-anfrage aus pdp-buy.liquid).
+  Artikel nur auf Anfrage (snippets/on-request.liquid): statt des Kaufbuttons „Jetzt anfragen“, ein Link zur Kontakt-Box unten
+  (contact_anchor), dort mit dem Thema „Artikel anfragen“ (data-contact-topic, assets/product.js).
 
   @param {product} product - Produkt
+  @param {string} [contact_anchor] - ID der Kontakt-Box für Artikel auf Anfrage, Standard "werkstatt-kontakt"
 
   @example
   {% render 'pdp-sticky-buy', product: product %}
@@ -41,7 +42,7 @@
     </p>
   </div>
   {%- if on_request == 'true' -%}
-    <a class="btn btn--primary" href="#artikel-anfrage">{% render 'icon', name: 'message-circle' %}<span>Jetzt anfragen</span></a>
+    <a class="btn btn--primary" href="#{{ contact_anchor | default: 'werkstatt-kontakt' }}" data-contact-topic="anfrage">{% render 'icon', name: 'message-circle' %}<span>Jetzt anfragen</span></a>
   {%- else -%}
     <button class="btn btn--primary" type="submit" form="{{ form_id }}" name="add" data-buy{% unless product.available %} disabled{% endunless %}>
       {% render 'icon', name: 'shopping-bag' %}<span data-buy-text>{% if product.available %}In den Warenkorb{% else %}Ausverkauft{% endif %}</span>
