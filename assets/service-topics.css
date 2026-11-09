@@ -42,11 +42,11 @@
 .topic__row > dd { margin: 0; max-width: 60ch; font-size: 16px; line-height: 1.55; color: var(--c-text-soft); }
 /* Ablauf: Nummer im orangen Feld mit schwarzer Ziffer, wie die Knöpfe */
 .topic__no { flex: none; display: inline-grid; place-items: center; width: 28px; height: 28px; background: var(--c-orange); color: var(--c-black); font: 700 18px/1 var(--f-head); letter-spacing: 0; }
-/* Nummerierter Ablauf (seit 9.11.): ohne Trennlinien, die Nummern hängen über eine senkrechte orange Linie zusammen, der Text steht
+/* Nummerierter Ablauf (seit 9.11.): ohne Trennlinien, die Nummern hängen über eine senkrechte helle Linie zusammen (wie die früheren Trennlinien), der Text steht
    bündig unter dem Stichwort. Die Nummer sitzt mittig zur ersten Titelzeile. */
 .topic__rows--steps .topic__row { --pt: 14px; position: relative; padding: var(--pt) 0 16px 40px; border-top: 0; }
 .topic__rows--steps .topic__no { position: absolute; left: 0; top: calc(var(--pt) - 3px); }
-.topic__rows--steps .topic__row:not(:last-child)::after { content: ""; position: absolute; left: 13px; top: calc(var(--pt) + 25px); bottom: calc(3px - var(--pt)); width: 2px; background: var(--c-orange); }
+.topic__rows--steps .topic__row:not(:last-child)::after { content: ""; position: absolute; left: 13.5px; top: calc(var(--pt) + 25px); bottom: calc(3px - var(--pt)); width: 1px; background: var(--c-line); }
 .topic .topic__checks { display: grid; gap: 8px var(--s-3); margin: 0; padding: 0; list-style: none; }
 .topic .topic__checks li { display: flex; gap: 10px; margin: 0; }
 .topic__checks .icon { flex: none; width: 18px; height: 18px; margin-top: 3px; color: var(--c-orange); }
