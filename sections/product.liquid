@@ -199,7 +199,7 @@
       assign bike_label = bike_label | append: ' (' | append: label_parts | append: ')'
     endif
 
-    assign bike_topics = 'probefahrt,finanzierung,inzahlungnahme'
+    assign bike_topics = 'kauf,probefahrt,finanzierung,inzahlungnahme'
     if can_reserve
       assign bike_topics = bike_topics | append: ',reservierung'
     endif
@@ -254,6 +254,11 @@
               <span><strong>Reserviert{% if reserved_until != blank %} bis {{ reserved_until | escape }}{% endif %}.</strong> Du kannst uns trotzdem kontaktieren – wir melden uns, falls das Bike wieder frei wird.</span>
             </div>
           {%- endif -%}
+
+          {%- comment -%} Wie bei Artikeln auf Anfrage: ein Button, der zur Kontakt-Box springt und dort „Kaufanfrage“ wählt (assets/product.js) {%- endcomment -%}
+          <div class="pdp__buy pdp__buy--request">
+            <a class="btn btn--primary btn--block" href="#kontakt" data-contact-topic="kauf">{% render 'icon', name: 'message-circle' %}Jetzt anfragen</a>
+          </div>
         </div>
 
         <div class="pdp-sections">
@@ -320,6 +325,14 @@
             {% render 'contact-box', anchor: 'kontakt', title: 'Interesse an diesem Bike?', topics: bike_topics, subject: bike_label, primary: true, extra: reserve_note %}
         </div>
       </div>
+      {%- liquid
+        if tax == '25a'
+          assign sticky_note = 'MwSt. nicht ausweisbar (§ 25a UStG)'
+        else
+          assign sticky_note = 'inkl. 19 % MwSt.'
+        endif
+      -%}
+      {%- render 'pdp-sticky-buy', product: product, contact_anchor: 'kontakt', topic: 'kauf', note: sticky_note, from: from_price -%}
 
       {%- if app_blocks_html != blank -%}
         <section class="section--tight">{{ app_blocks_html }}</section>

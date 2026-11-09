@@ -1,5 +1,5 @@
 {% doc %}
-  Mobile Kaufleiste der Produktseite (Teile, Bekleidung): Preis und „In den Warenkorb“, sobald der Kaufbereich oben aus dem
+  Mobile Kaufleiste der Produktseite (Teile, Bekleidung, Motorräder): Preis und „In den Warenkorb“, sobald der Kaufbereich oben aus dem
   Bild ist. Der Button gehört per form="…" zum Produktformular aus pdp-buy.liquid (gleiche ID); product.js blendet die Leiste
   ein und hält Text und Sperre des Buttons im Gleichlauf, cart.js sperrt beide beim Absenden. Ab 1024 px ausgeblendet.
   Ohne JavaScript bleibt sie versteckt, das Formular im Kaufbereich funktioniert wie gewohnt.
@@ -13,6 +13,9 @@
 
   @param {product} product - Produkt
   @param {string} [contact_anchor] - ID der Kontakt-Box für Artikel auf Anfrage, Standard "werkstatt-kontakt"
+  @param {string} [topic] - Thema, das „Jetzt anfragen“ in der Box wählt, Standard "anfrage" (Motorräder: "kauf")
+  @param {string} [note] - Hinweis unter dem Preis, Standard "inkl. MwSt., zzgl. Versand"
+  @param {boolean} [from] - Preis immer mit „ab“ (Ab-Preis laut Harley-Davidson)
 
   @example
   {% render 'pdp-sticky-buy', product: product %}
@@ -30,6 +33,9 @@
     assign show_from = true
     assign v = product.variants | sort: 'price' | first
   endif
+  if from
+    assign show_from = true
+  endif
 -%}
 <div class="sticky-buy on-dark" data-sticky-buy>
   <div class="sticky-buy__price" data-pdp-dynamic="sticky-price">
@@ -38,11 +44,11 @@
       {%- if v.unit_price_measurement -%}
         <span class="price__unit">({{ v.unit_price | money }} / {{ v.unit_price_measurement.reference_value }} {{ v.unit_price_measurement.reference_unit }})</span>
       {%- endif -%}
-      <span class="price__note">inkl. MwSt., zzgl. Versand</span>
+      <span class="price__note">{{ note | default: 'inkl. MwSt., zzgl. Versand' | escape }}</span>
     </p>
   </div>
   {%- if on_request == 'true' -%}
-    <a class="btn btn--primary" href="#{{ contact_anchor | default: 'werkstatt-kontakt' }}" data-contact-topic="anfrage">{% render 'icon', name: 'message-circle' %}<span>Jetzt anfragen</span></a>
+    <a class="btn btn--primary" href="#{{ contact_anchor | default: 'werkstatt-kontakt' }}" data-contact-topic="{{ topic | default: 'anfrage' }}">{% render 'icon', name: 'message-circle' %}<span>Jetzt anfragen</span></a>
   {%- else -%}
     <button class="btn btn--primary" type="submit" form="{{ form_id }}" name="add" data-buy{% unless product.available %} disabled{% endunless %}>
       {% render 'icon', name: 'shopping-bag' %}<span data-buy-text>{% if product.available %}In den Warenkorb{% else %}Ausverkauft{% endif %}</span>

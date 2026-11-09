@@ -792,7 +792,7 @@
       }
     }
 
-    /* ---------- Mobile Kaufleiste (Teile, Bekleidung): sichtbar, sobald der Kaufbereich oben aus dem Bild ist ---------- */
+    /* ---------- Mobile Kaufleiste (Teile, Bekleidung, Motorräder): sichtbar, sobald der Kaufbereich oben aus dem Bild ist ---------- */
     var sticky = $('[data-sticky-buy]');
     var buyBox = $('.pdp__buy');
     if (sticky && buyBox && 'IntersectionObserver' in window) {

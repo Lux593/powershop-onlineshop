@@ -6,6 +6,8 @@
   var PS = (window.PS = window.PS || {});
 
   var TOPICS = {
+    // Motorräder: „Jetzt anfragen“ unter den Eckdaten wählt dieses Thema (sections/product.liquid)
+    kauf: { subj: 'Kaufanfrage', text: function (x) { return 'ich interessiere mich für ' + (x ? 'die ' + x : 'dieses Motorrad') + ' und möchte sie gerne kaufen. Ist sie noch verfügbar, und wie geht es weiter?'; } },
     probefahrt: { subj: 'Probefahrt', text: function (x) { return 'ich möchte gerne eine Probefahrt' + (x ? ' mit der ' + x : '') + ' vereinbaren. Wann passt es euch?'; } },
     finanzierung: { subj: 'Finanzierung', text: function (x) { return 'ich interessiere mich für eine Finanzierung' + (x ? ' der ' + x : '') + '. Könnt ihr mir ein Angebot machen?'; } },
     versicherung: { subj: 'Versicherung', text: function (x) { return 'ich interessiere mich für eine Versicherung' + (x ? ' für die ' + x : ' für mein Bike') + '. Könnt ihr mich beraten?'; } },
