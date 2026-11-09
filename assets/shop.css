@@ -526,6 +526,13 @@ html:not(.has-motion) .bcard:hover .bcard__media img { transform: none; }
   .pcard__add .icon, .pcard__add-long { display: none; }
   .pcard__add-short { display: inline; }
 }
+/* Sehr schmal (320 px breite Geräte, rund 64 px): nur die Tasche, „In den Warenkorb“ bleibt für den Screenreader */
+@container pcard-quick (max-width: 84px) {
+  .pcard__add { padding-inline: 4px; }
+  button.pcard__add .icon { display: block; }
+  button.pcard__add .pcard__add-short { display: none; }
+  button.pcard__add .pcard__add-long { display: block; position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+}
 
 /* Tastaturfokus auf dem Titel: Unterstreichen statt Rahmen (Rahmen gibt es im Shop keine, base.css) */
 .pcard__title a:focus-visible { text-decoration: underline; text-underline-offset: 3px; }
