@@ -338,8 +338,8 @@
 @media (min-width: 640px) and (max-width: 1023px) { .contact-box__buttons { grid-template-columns: repeat(3, 1fr); } }
 .contact-box__phone { font-family: var(--f-body); font-weight: 600; letter-spacing: 0; text-transform: none; }
 /* Breite Kontakt-Box unten auf der Produktseite (contact-box.liquid mit wide, seit 9.11.): ab 900 px eine Box mit zwei Spalten,
-   links Überschrift, Text und Themen, rechts Anrufen, WhatsApp und E-Mail untereinander. Höchstens 980 px breit, damit auf
-   breiten Monitoren keine leere Fläche in der Box entsteht; darunter wie bisher höchstens 560 px.
+   links Überschrift, Text und Themen, rechts Anrufen, WhatsApp und E-Mail untereinander. Begrenzt auf die Breite von 3 bzw. 4 Karten
+   der Schiene darüber (keine leere Fläche auf breiten Monitoren); darunter wie bisher höchstens 560 px.
    Bis 899 px lösen sich die beiden Spalten auf (display: contents): Reihenfolge wie gewohnt, Zusatz (Reservierung) unter den Buttons. */
 .pdp-ask { max-width: 560px; }
 .contact-box__after { display: grid; gap: 16px; }
@@ -348,10 +348,14 @@
   .contact-box--wide .contact-box__after { order: 1; }
 }
 @media (min-width: 900px) {
-  .pdp-ask { max-width: 980px; } /* links gerade so breit, dass die fünf Bike-Themen in eine Reihe passen */
-  .contact-box--wide { grid-template-columns: minmax(0, 1fr) minmax(280px, 340px); gap: 0; padding: 0; }
-  .contact-box__main { display: grid; gap: 16px; align-content: start; min-width: 0; padding: 32px 36px; }
-  .contact-box__side { display: grid; gap: 10px; align-content: center; min-width: 0; padding: 32px 36px; border-left: 1px solid var(--c-line); }
+  /* Rechte Kante bündig mit einer Karte der Schiene darüber (gerade Linie): Bikes mit der 3. Karte („Ähnliche Bikes“, 280 px breit),
+     Teile und Bekleidung mit der 4. (product-rail.liquid, 220 px). Gilt, solange die Schiene mehr Karten hat, als in die Breite passen;
+     bei wenigen Karten werden sie breiter und die Box endet früher. */
+  .pdp-ask { max-width: calc(4 * 220px + 3 * var(--s-3)); }
+  .pdp-ask--bike { max-width: calc(3 * 280px + 2 * var(--s-3)); }
+  .contact-box--wide { grid-template-columns: minmax(0, 1fr) minmax(260px, 300px); gap: 0; padding: 0; }
+  .contact-box__main { display: grid; gap: 16px; align-content: start; min-width: 0; padding: 32px; }
+  .contact-box__side { display: grid; gap: 10px; align-content: center; min-width: 0; padding: 32px; border-left: 1px solid var(--c-line); }
   .contact-box__side .contact-box__buttons { grid-template-columns: minmax(0, 1fr); }
 }
 .contact-box__person { display: flex; align-items: center; gap: 12px; padding-top: 16px; border-top: 1px solid var(--c-line); }
