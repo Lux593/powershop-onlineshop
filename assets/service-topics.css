@@ -42,8 +42,8 @@
 .topic__row > dd { margin: 0; max-width: 60ch; font-size: 16px; line-height: 1.55; color: var(--c-text-soft); }
 /* Ablauf: Nummer im orangen Feld mit schwarzer Ziffer, wie die Knöpfe */
 .topic__no { flex: none; display: inline-grid; place-items: center; width: 28px; height: 28px; background: var(--c-orange); color: var(--c-black); font: 700 18px/1 var(--f-head); letter-spacing: 0; }
-/* Nummerierter Ablauf (seit 9.11.): ohne Trennlinien, die Nummern hängen über eine senkrechte orange Linie zusammen, Stichwort und
-   Text stehen bündig rechts davon (Handy: Text unter dem Stichwort, ab 640 px daneben). Die Nummer sitzt mittig zur ersten Titelzeile. */
+/* Nummerierter Ablauf (seit 9.11.): ohne Trennlinien, die Nummern hängen über eine senkrechte orange Linie zusammen, der Text steht
+   bündig unter dem Stichwort. Die Nummer sitzt mittig zur ersten Titelzeile. */
 .topic__rows--steps .topic__row { --pt: 14px; position: relative; padding: var(--pt) 0 16px 40px; border-top: 0; }
 .topic__rows--steps .topic__no { position: absolute; left: 0; top: calc(var(--pt) - 3px); }
 .topic__rows--steps .topic__row:not(:last-child)::after { content: ""; position: absolute; left: 13px; top: calc(var(--pt) + 25px); bottom: calc(3px - var(--pt)); width: 2px; background: var(--c-orange); }
@@ -70,7 +70,7 @@
 
 @media (min-width: 640px) {
   .topic__row { grid-template-columns: 216px minmax(0, 1fr); align-items: baseline; } /* Platz für Nummer + „Beim Kauf anrechnen“ in einer Zeile */
-  .topic__rows--steps .topic__row { grid-template-columns: 176px minmax(0, 1fr); } /* die Nummer steht davor, nicht mehr in der Spalte */
+  .topic__rows--steps .topic__row { grid-template-columns: minmax(0, 1fr); } /* auch hier: Text unter dem Stichwort */
   .topic-agent { grid-template-columns: 96px minmax(0, 1fr); }
 }
 @media (max-width: 639px) {
