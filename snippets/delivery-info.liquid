@@ -118,16 +118,17 @@
     {%- endif -%}
   {%- when 'cart' -%}
     {%- case state -%}
-      {%- when 'stock' -%}<p class="stock stock--sm">Auf Lager · Lieferzeit {{ time_stock | escape }}</p>
-      {%- when 'order' -%}<p class="stock stock--sm stock--order">Wird für dich bestellt · Lieferzeit {{ time_order | escape }}</p>
+      {%- when 'stock' -%}<p class="stock stock--sm"><span><span class="stock__state">Auf Lager</span> <span class="stock__time">Lieferzeit {{ time_stock | escape }}</span></span></p>
+      {%- when 'order' -%}<p class="stock stock--sm stock--order"><span><span class="stock__state">Wird für dich bestellt</span> <span class="stock__time">Lieferzeit {{ time_order | escape }}</span></span></p>
     {%- endcase -%}
   {%- when 'times' -%}
     Lieferzeit {{ time_stock | escape }}, wenn der Artikel auf Lager ist, sonst {{ time_order | escape }} (wir bestellen ihn für dich).
   {%- else -%}
+    {%- comment -%} Zustand und Lieferzeit als eigene Teile: am Handy steht die Lieferzeit in der zweiten Zeile, breiter mit „–“ dahinter {%- endcomment -%}
     {%- case state -%}
-      {%- when 'stock' -%}<p class="stock">Auf Lager – Lieferzeit {{ time_stock | escape }}</p>
-      {%- when 'order' -%}<p class="stock stock--order">Artikel wird für dich bestellt – Lieferzeit {{ time_order | escape }}</p>
-      {%- when 'mixed' -%}<p class="stock">Einige {{ kind_label }} auf Lager ({{ time_stock | escape }}), die anderen bestellen wir für dich ({{ time_order | escape }})</p>
-      {%- else -%}<p class="stock stock--none">Aktuell nicht lieferbar – frag uns nach dem Liefertermin.</p>
+      {%- when 'stock' -%}<p class="stock"><span><span class="stock__state">Auf Lager</span> <span class="stock__time">Lieferzeit {{ time_stock | escape }}</span></span></p>
+      {%- when 'order' -%}<p class="stock stock--order"><span><span class="stock__state">Artikel wird für dich bestellt</span> <span class="stock__time">Lieferzeit {{ time_order | escape }}</span></span></p>
+      {%- when 'mixed' -%}<p class="stock"><span><span class="stock__state">Einige {{ kind_label }} auf Lager</span> <span class="stock__time">Lieferzeit {{ time_stock | escape }}, sonst {{ time_order | escape }}</span></span></p>
+      {%- else -%}<p class="stock stock--none"><span><span class="stock__state">Aktuell nicht lieferbar</span> <span class="stock__time">Frag uns nach dem Liefertermin.</span></span></p>
     {%- endcase -%}
 {%- endcase -%}

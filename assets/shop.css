@@ -215,15 +215,22 @@
 .usp { display: grid; gap: 10px; padding: 16px; background: var(--c-white); border: 1px solid var(--c-line); font-size: var(--fs-small); }
 .usp li { display: flex; align-items: center; gap: 10px; }
 .usp .icon { width: 18px; height: 18px; }
-.stock { display: inline-flex; align-items: center; gap: 8px; font-size: var(--fs-small); font-weight: 500; }
-.stock::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--c-success); }
+/* Punkt + Text als Raster: Der Punkt steht mittig zur ersten Zeile, auch wenn der Text umbricht (seit 9.11.) */
+.stock { display: inline-grid; grid-template-columns: auto minmax(0, 1fr); align-items: start; column-gap: 8px; font-size: var(--fs-small); font-weight: 500; line-height: 1.4; }
+.stock::before { content: ""; width: 8px; height: 8px; margin-top: calc(0.7em - 4px); border-radius: 50%; background: var(--c-success); }
+/* Lieferzeit (delivery-info.liquid): am Handy in der zweiten Zeile, ab 640 px in derselben Zeile mit „–“ davor; im Warenkorb immer darunter */
+.stock__time { display: block; font-weight: 400; color: var(--c-text-soft); }
+@media (min-width: 640px) {
+  .stock:not(.stock--sm) .stock__time { display: inline; }
+  .stock:not(.stock--sm) .stock__time::before { content: "– "; }
+}
 .stock--order::before { background: var(--c-stock-order); }
 /* Lager-Status (snippets/delivery-info.liquid): klein im Warenkorb, auf der Karte nur „Auf Lager“, grau bei „nicht lieferbar“ */
 .stock--none::before { background: var(--c-muted); }
-.stock--sm { gap: 6px; font-size: var(--fs-caption); line-height: 1.35; }
-.stock--sm::before { flex: none; width: 7px; height: 7px; }
-.stock--card { gap: 6px; margin-top: 2px; font-size: var(--fs-caption); font-weight: 600; color: var(--c-success); }
-.stock--card::before { width: 7px; height: 7px; }
+.stock--sm { column-gap: 6px; font-size: var(--fs-caption); }
+.stock--sm::before { width: 7px; height: 7px; margin-top: calc(0.7em - 3.5px); }
+.stock--card { column-gap: 6px; margin-top: 2px; font-size: var(--fs-caption); font-weight: 600; color: var(--c-success); }
+.stock--card::before { width: 7px; height: 7px; margin-top: calc(0.7em - 3.5px); }
 /* Größen mit Bestand: grüner Punkt oben rechts im Chip (product.js setzt .is-instock je nach Auswahl) */
 .size-chip { position: relative; }
 .size-chip.is-instock::after { content: ""; position: absolute; top: 5px; right: 5px; width: 6px; height: 6px; border-radius: 50%; background: var(--c-success); }
