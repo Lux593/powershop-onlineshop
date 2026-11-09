@@ -7,6 +7,12 @@
     assign kind = 'part'
   endif
 
+  # Nur auf Anfrage (snippets/on-request.liquid): Lager- und Lieferzeit-Zeilen versprechen dann nichts, das klärt die Anfrage
+  capture pdp_on_request
+    render 'on-request', product: product
+  endcapture
+  assign pdp_on_request = pdp_on_request | strip
+
   assign current_variant = product.selected_variant
   if current_variant == blank
     assign current_variant = product.selected_or_first_available_variant
@@ -390,7 +396,9 @@
           <div class="pdp__price">
             <div data-pdp-dynamic="price">{% render 'price', product: product, variant: product.selected_variant, long: true %}</div>
             <div data-pdp-dynamic="stock">
-              {%- if current_variant.available -%}
+              {%- if pdp_on_request == 'true' -%}
+                <p class="stock stock--order">Verfügbarkeit und Lieferzeit auf Anfrage</p>
+              {%- elsif current_variant.available -%}
                 {%- if current_variant.inventory_management != blank and current_variant.inventory_quantity <= 0 -%}
                   <p class="stock stock--order">Lieferbar in 5–7 Werktagen</p>
                 {%- else -%}
@@ -403,7 +411,7 @@
           </div>
 
           {% render 'pdp-buy', product: product %}
-          {% render 'pdp-usp' %}
+          {% render 'pdp-usp', on_request: pdp_on_request %}
 
           {%- liquid
             assign show_compat = false
@@ -575,7 +583,7 @@
           <div class="pdp__price" data-pdp-dynamic="price">{% render 'price', product: product, variant: product.selected_variant, long: true %}</div>
 
           {% render 'pdp-buy', product: product, size_type: size_type %}
-          {% render 'pdp-usp' %}
+          {% render 'pdp-usp', on_request: pdp_on_request %}
 
           <div>
             {% render 'product-description', product: product %}
