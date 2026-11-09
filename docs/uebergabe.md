@@ -74,7 +74,7 @@ Körnung und Header-Blur weglassen, GSAP weglassen (im Rauschen). Die Warenkorb-
 ## Offen beim Händler und im Shopify-Admin (kein Code)
 
 - Fragenliste: `docs/haendler-fragen.md`; Fundstellen und Status: `docs/freigaben.md`.
-- Besonders wichtig vor Werbung und Verkauf: Kontaktdaten, Rechtstexte und Menüs (`footer`, `customer-service`, `legal`), Versand/Rückgabe/Zahlarten (heute Beispielwerte),
+- Besonders wichtig vor Werbung und Verkauf: Kontaktdaten, Rechtstexte und Menüs (`footer`, `customer-service`, `legal`), Versandrichtlinie (Text in `docs/versand.md`), Rückgabe/Zahlarten (heute Beispielwerte),
   Zusicherungen auf Bike-Seiten, Kennzahlen und Events auf der Startseite, Hero-Preise, Größentabellen, Bewertungen.
 - Seite `/pages/service` (Vorlage `page.service`) anlegen; sie wird vielfach verlinkt.
 - Produkte den Kollektionen zuordnen (heute sind alle leer); Cookie-Banner aktivieren.

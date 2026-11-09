@@ -23,7 +23,7 @@ Wo noch nichts eingetragen ist, zeigt der Shop entweder nichts an oder einen **B
 
 ## B. Versand, Rückgabe, Zahlung und Preise (Pflicht, heute Beispielwerte)
 
-6. **Versand**: Versandkostenfrei ab wie viel Euro (heute 100 €)? Versandkosten (heute 4,95 €)? Lieferzeit (heute 2 bis 4 Werktage; bei Teilen steht fest „5 bis 7 Werktage")?
+6. ~~**Versand**~~ (geklärt am 10.11.: ab 100 € kostenlos, sonst 5,99 €, Express 9,99 €, nur Deutschland, Sperrgut auf Anfrage, Batterien und Öle nur Abholung; `docs/versand.md`): Versandkostenfrei ab wie viel Euro (heute 100 €)? Versandkosten (heute 4,95 €)? Lieferzeit (heute 2 bis 4 Werktage; bei Teilen steht fest „5 bis 7 Werktage")?
    Liefergebiete, Ausnahmen, Sperrgut-Aufschlag? (Das Sternchen hinter „Versandkostenfrei ab 100 €*" braucht eine Fußnote.)
 7. **Rückgabe**: Rückgabefrist (festgelegt: 14 Tage, also das gesetzliche Widerrufsrecht)? Ist die Rückgabe wirklich kostenlos, oder wer trägt die Rücksendekosten? Der Text „kostenlose Rückgabe" steht heute auf Produktseiten.
 8. **Zahlarten**: Welche sind im Checkout wirklich aktiv? Heute genannt: PayPal, Klarna, Visa, Mastercard, Apple Pay, Google Pay.

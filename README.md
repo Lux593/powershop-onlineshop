@@ -12,6 +12,7 @@ geschlossen: eigene Assets, Schriften und Icons, kein Build-Step.
 - **Motion-Schicht (Vertrag, Datei-Aufteilung):** [`docs/motion-api.md`](docs/motion-api.md)
 - **Hero-Clip (Herkunft, offene Rechtsfragen):** [`docs/hero-clip.md`](docs/hero-clip.md)
 - **Freigabeliste (Zahlen, Zusagen, Texte, Rechtliches, Bildrechte des Händlers):** [`docs/freigaben.md`](docs/freigaben.md)
+- **Versand (Tarife, Sperrgut, Abholung, Versandrichtlinie):** [`docs/versand.md`](docs/versand.md)
 
 ## Shopify-Anbindung
 
@@ -52,7 +53,7 @@ sections/   Startseite: hero · service-tiles · product-tabs · statement · ca
             Rahmen: header · announcement-bar · footer, dazu header-group.json und footer-group.json
 snippets/   Karten (product-card, bike-card, result-card, event-card, bento-tile), Produktseite (pdp-gallery, pdp-buy, pdp-options, pdp-sticky-buy,
             pdp-usp, pdp-shipping, pdp-gpsr, size-guide, swatch, rating, price), Shop-Bausteine (results-toolbar, filter-controls,
-            active-filters, pagination, cart-line, contact-box, search-dialog, mega-menu, link-order, accordion), Kleinteile (icon, icons-sprite,
+            active-filters, pagination, cart-line, cart-shipping-line, cart-pickup-note, shipping-class, contact-box, search-dialog, mega-menu, link-order, accordion), Kleinteile (icon, icons-sprite,
             media, is-placeholder, number-de, opening-hours, payments, bike-badge), Kopfbereich (meta-tags, fonts)
 assets/     CSS, JS, Bilder, Videos, Schriften (flach, Shopify kennt keine Unterordner in assets/), Details unten
 config/     settings_schema.json · settings_data.json
@@ -108,13 +109,15 @@ Firmenname, Adresse, Telefon, WhatsApp, E-Mail und Ansprechperson haben **keine 
 unsichtbar: Die Kontaktbox zeigt nur Kanäle, die eingetragen sind, und erscheint ohne jeden Kanal gar nicht (im Theme-Editor steht dann
 ein Hinweis). Die Öffnungszeiten erscheinen erst, wenn **„Öffnungszeiten anzeigen“** eingeschaltet ist. Ohne Firmenname steht im Footer der Shop-Name.
 
+Versandkostenfrei ab 100 € und Versandkosten darunter 5,99 € sind seit dem 10.11. festgelegt und passen zu den Tarifen im Markt
+Deutschland. Sperrgut und Artikel ohne Versand steuert das Feld „Versand“ am Artikel (Paket, Sperrgut, Nur Abholung), Details in
+[`docs/versand.md`](docs/versand.md).
+
 Diese Einstellungen haben noch **Beispielwerte** und erscheinen so im Shop (Ankündigungsleiste, Produktseiten, Warenkorb, Newsletter, Bike-Seite).
 Vor dem Livegang prüfen und anpassen:
 
 | Einstellung | Beispielwert |
 |---|---|
-| Versandkostenfrei ab | 100 € |
-| Versandkosten darunter | 4,95 € |
 | Lieferzeit | 2–4 Werktage |
 | Freiwillige Rückgabefrist | 30 Tage |
 | Reservierungsgebühr Gebrauchtfahrzeug | 250 € |

@@ -14,14 +14,15 @@ Versand, Rückgabe, Reservierung prüfen oder leeren.** Ein leerer oder 0-Wert e
 
 | Fundstelle | Aussage (Beispielwert) | Wo sie erscheint | Status | Freigabe |
 |---|---|---|---|---|
-| `config/settings_schema.json:49` | Versandkostenfrei ab 100 € | Ankündigungsleiste, Produktseite (Lieferung, Versand), Warenkorb-Fortschritt | offen | |
-| `config/settings_schema.json:50` | Versandkosten darunter 4,95 € | Produktseite (Versand und Rückgabe), Warenkorb | offen | |
+| `config/settings_schema.json:49` | Versandkostenfrei ab 100 € | Ankündigungsleiste, Produktseite (Lieferung, Versand), Warenkorb-Fortschritt | erledigt (Luca, 10.11., passt zum Markt Deutschland, `docs/versand.md`) | |
+| `config/settings_schema.json:50` | Versandkosten darunter 5,99 € (vorher 4,95 €) | Produktseite (Versand), Warenkorb | erledigt (Luca, 10.11.) | |
+| Feld „Versand“ am Artikel (`snippets/shipping-class.liquid`) | Sperrgut: „Versand auf Anfrage“, online nur Abholung; Nur Abholung: „Kein Versand“ (Batterien, Öle, Motoren, Motorräder) | Produktseite, Warenkorb, Kasse | erledigt (Luca, 10.11.) | |
 | `config/settings_schema.json:51` | Lieferzeit 2–4 Werktage | Produktseite, Warenkorb | offen | |
 | `config/settings_schema.json:52` | Rückgabefrist 14 Tage (vom Händler festgelegt). Bis 14 Tage nennt die Produktseite nur das gesetzliche Widerrufsrecht; erst ein Wert über 14 erscheint als freiwillige, „kostenlose Rückgabe“. Die Ankündigungsleiste zeigt „14 Tage Rückgabe“. | Ankündigungsleiste, Produktseite | erledigt | |
 | `config/settings_schema.json:53-54` | Reservierung 250 € für 48 h, „wird beim Kauf angerechnet, sonst erstattet“ | Bike-Seite (Gebrauchte) | offen | |
 | `config/settings_schema.json:55` | Newsletter-Rabatt 10 % | Newsletter-Band im Footer | offen | |
 | `config/settings_schema.json:61` | Zahlarten: Footer und Warenkorb zeigen die im Checkout aktiven Zahlarten als offizielle Shopify-Icons. Die Liste PayPal, Klarna, Visa, Mastercard, Apple Pay, Google Pay gilt nur, solange dort noch keine aktiv sind. | Footer, Warenkorb | offen | |
-| `sections/header-group.json:8-9` | Texte der Ankündigungsleiste („Versandkostenfrei ab {schwelle}*“, „{tage} Tage Rückgabe“) | alle Seiten | offen | |
+| `sections/header-group.json:17-18` | Texte der Ankündigungsleiste („Versandkostenfrei ab {schwelle}“, seit 10.11. ohne Sternchen und als Link zur Versandrichtlinie, sobald sie angelegt ist; „{tage} Tage Rückgabe“) | alle Seiten | offen | |
 
 ## 2. Newsletter
 
@@ -35,7 +36,7 @@ Versand, Rückgabe, Reservierung prüfen oder leeren.** Ein leerer oder 0-Wert e
 | Fundstelle | Aussage | Status | Freigabe |
 |---|---|---|---|
 | Shopify-Menüs `footer`, `customer-service`, `legal` (Handles aus `sections/footer-group.json:8-10`) | Impressum, Datenschutz, AGB, Widerruf kommen ausschließlich aus diesen Menüs. **Im Admin anlegen und prüfen.** Zusätzlich verlinkt der Footer Richtlinien aus Einstellungen > Richtlinien, die in keinem Menü stehen (Schalter im Footer-Abschnitt, Standard an). | offen | |
-| `sections/footer.liquid:146` | Fußnote „* Alle Preise inkl. MwSt., zzgl. Versandkosten“. Gilt nicht für Differenzbesteuerung (Gebrauchte, § 25a UStG, `snippets/bike-card.liquid:69`). Der Stern der Ankündigungsleiste wird nirgends einzeln erklärt. Wortlaut „Versand“ und „Versandkosten“ ist uneinheitlich (`snippets/pdp-sticky-buy.liquid:33`, `sections/cart.liquid:32`, `sections/cart-drawer.liquid:51`: „zzgl. Versand (kostenlos)“ widerspricht sich). | offen | |
+| `sections/footer.liquid:146` | Fußnote „* Alle Preise inkl. MwSt., zzgl. Versandkosten“. Gilt nicht für Differenzbesteuerung (Gebrauchte, § 25a UStG, `snippets/bike-card.liquid:69`). Der Stern der Ankündigungsleiste ist seit dem 10.11. weg. Die Warenkörbe sagen seit dem 10.11. „zzgl. 5,99 € Versand“, „Standardversand kostenlos“ oder „Abholung im Power Shop kostenlos“ (`snippets/cart-shipping-line.liquid`) statt des widersprüchlichen „zzgl. Versand (kostenlos)“. | offen | |
 | `sections/footer-group.json:18` | Text der Händlerkarte „Harley-Davidson Neufahrzeuge, Original-Teile, MotorClothes und Werkstatt-Service.“ | offen | |
 | `config/settings_schema.json:15-21, 40-42` | Firmenname, Adresse, Telefon, WhatsApp, E-Mail, Ansprechperson: bewusst ohne Beispielwerte, bleiben unsichtbar, solange leer. Folge (Endkontrolle): Ohne Telefon, WhatsApp und E-Mail zeigen die Bike-Karten nur „Details“ (kein „Anfragen“ auf einen toten Anker), die Motorrad-Seite hat keine Kontakt-Box und keine Handlung. Das ist der Verkaufsweg der Motorräder: Daten vor dem Livegang eintragen. Adresse eingetragen (config/settings_data.json): Burghölzle 15, 79576 Weil am Rhein, aus den Shopify-Angaben; erscheint auf der Service-Seite und bei „Standort & Übergabe“. | offen | |
 | `assets/theme.js` (`showCookieSettings`), `sections/footer-group.json:10` | Link „Cookie-Einstellungen“ (jetzt ein Knopf): öffnet zuerst `window.privacyBanner.showPreferences()` (so auf dem Live-Shop gefunden), dann die Customer Privacy API, dann lädt er diese nach; erst wenn nichts davon da ist, erscheint ein Hinweis. Funktioniert nur mit einem aktiven Cookie-Banner von Shopify mit gleichwertigem „Ablehnen“. Banner im Admin aktivieren und im Preview-Theme testen (im Harness nur mit Stubs prüfbar). | offen | |
@@ -103,7 +104,7 @@ Diese Punkte lassen sich im Theme nicht lösen. Sie wurden live beziehungsweise 
 | Aufgabe | Befund | Status |
 |---|---|---|
 | Seite „Service“ anlegen (Handle `service`, Vorlage `page.service`) | `/pages/service` liefert live 404. Die Startseite verlinkt sie 16-mal (Ankündigungsleiste „Probefahrt anfragen“, zweiter Hero-Button, vier Service-Kacheln, Megamenü-Buttons, Event-Links), die Kategorie Motorräder verlinkt `/pages/service#probefahrt`. Der Showroom-Leerzustand hängt ebenfalls an ihr. Vor Werbung anlegen. | offen |
-| Impressum, AGB, Widerruf, Versand, Rückgabe anlegen | `/policies/privacy-policy` existiert; `legal-notice`, `terms-of-service`, `refund-policy`, `shipping-policy` liefern live 404. Für einen Shop in Deutschland vor dem Verkauf Pflicht. | offen |
+| Impressum, AGB, Widerruf, Versand, Rückgabe anlegen | `/policies/privacy-policy` existiert; `legal-notice`, `terms-of-service`, `refund-policy`, `shipping-policy` liefern live 404. Für einen Shop in Deutschland vor dem Verkauf Pflicht. Text für die Versandrichtlinie liegt in `docs/versand.md` (10.11.). | offen |
 | Double-Opt-in für die Marketing-Einwilligung aktivieren und mit einer Testadresse prüfen | Siehe Abschnitt 2: Das Theme verspricht eine Bestätigungs-Mail. | offen |
 | Cookie-Banner aktivieren, „Ablehnen“ gleichwertig, im Preview-Theme „Cookie-Einstellungen“ im Footer testen | Live ist das Banner aktiv; der Footer-Link nutzt jetzt dessen Schnittstelle (Abschnitt 3). Im Preview bestätigen. | offen |
 | Händlerdaten (Telefon, WhatsApp, E-Mail) in den Theme-Einstellungen eintragen | Ohne sie hat die Motorrad-Seite keine Handlung (Abschnitt 3). Auf der Service-Seite fehlen dann die Anfrage-Zeilen; Finanzierung verweist auf „Standort & Kontakt“. Vorschlag aus der alten Website: Frage 39 in `docs/haendler-fragen.md`. | offen |
