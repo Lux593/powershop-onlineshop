@@ -182,7 +182,7 @@ html:not(:has(.announce)) { --announce-h: 0px; }
 .mega__tiles { display: grid; grid-template-columns: repeat(var(--tiles, 3), minmax(0, 1fr)); gap: 12px; }
 .mega-tile {
   position: relative; isolation: isolate; overflow: hidden;
-  display: flex; align-items: flex-end; gap: 16px; height: clamp(150px, 19vh, 180px); padding: 20px 20px 22px; /* niedriger seit 10.11.2026, vorher 200–240 px */
+  display: flex; align-items: flex-end; gap: 16px; height: clamp(124px, 16vh, 150px); padding: 20px 20px 22px; /* niedriger seit 10.11.2026, vorher 200–240 px, dann 150–180 px */
   background: var(--c-anthracite); color: var(--c-white); text-align: left;
 }
 /* Fotos gedämpft, damit die Schrift trägt; beim Überfahren heller (seit 10.11.2026 gibt es keine „offene“ Kachel mehr, die
@@ -268,7 +268,7 @@ html:not(:has(.announce)) { --announce-h: 0px; }
 .mega__contact a:hover { color: var(--c-orange); }
 .mega__contact .icon { color: var(--c-muted-dark); }
 @media (max-width: 1279px) {
-  .mega-tile { height: clamp(136px, 17vh, 156px); padding: 16px 16px 18px; }
+  .mega-tile { height: clamp(116px, 14vh, 132px); padding: 16px 16px 18px; }
   .mega__links { padding-inline: 16px; }
   .mega__group-all { margin-left: 16px; }
   .mega-tile__title { font-size: 22px; }
