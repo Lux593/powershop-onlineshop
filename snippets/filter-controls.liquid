@@ -63,9 +63,33 @@
       if filter.param_name == 'filter.v.m.lieferzeit.status'
         assign filter_values = filter.values | sort: 'value' | reverse
       endif
+      # Reihenfolge als Positionen in filter_values. Größen (Option Grösse, Größe, Size, Weite): XS, S, M, L, XL, 2XL statt
+      # alphabetisch wie von Shopify (snippets/size-order.liquid, seit 10.11.2026); alle übrigen Filter wie geliefert
+      assign option_name = filter.param_name | remove_first: 'filter.v.option.'
+      assign is_size = false
+      if filter.param_name contains 'filter.v.option.'
+        case option_name
+          when 'grösse', 'größe', 'groesse', 'size', 'weite'
+            assign is_size = true
+        endcase
+      endif
+      if is_size
+        capture order
+          render 'size-order', values: filter_values
+        endcapture
+      else
+        capture order
+          for v in filter_values
+            echo forloop.index0 | append: ','
+          endfor
+        endcapture
+      endif
+      assign order = order | split: ','
     -%}
     <div class="fgroup">
-      {%- for value in filter_values -%}
+      {%- for position in order -%}
+        {%- assign index = position | plus: 0 -%}
+        {%- assign value = filter_values[index] -%}
         <label class="check">
           <input
             type="checkbox"
