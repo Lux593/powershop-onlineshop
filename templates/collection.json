@@ -3,7 +3,7 @@
     "main": {
       "type": "collection",
       "settings": {
-        "per_page": 12,
+        "per_page": 20,
         "bikes_layout": false
       }
     }

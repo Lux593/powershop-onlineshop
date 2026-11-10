@@ -144,7 +144,7 @@ Icons: Suche (auch Teilenummer) · Konto · Warenkorb (eine Merkliste hat das Th
 **Weitere Elemente der Kategorieseite**
 - Aktive Filter als Chips mit „Alle zurücksetzen“ und Trefferzahl
 - Sortierung und Spalten-Umschalter (2/3/4)
-- Pagination mit 12 Artikeln pro Seite
+- Pagination mit 20 Artikeln pro Seite (seit 10.11.2026, vorher 12: bei 5 Spalten blieb die letzte Reihe halb leer); Motorräder 12
 
 ---
 
