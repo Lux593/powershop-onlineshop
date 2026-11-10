@@ -29,7 +29,6 @@
       active = i;
       thumbs.forEach(function (b, k) { b.setAttribute('aria-current', k === i ? 'true' : 'false'); });
       centerThumb();
-      updateArrows();
     }
     // Vorschaubild des sichtbaren Slides mittig in die Zeile (instant: ohne Gleiten, nach einer Größenänderung).
     // Nur die Vorschau-Zeile scrollen (scrollIntoView spränge auch vertikal). Lage über die Rechtecke: offsetLeft bezöge sich auf den
@@ -41,24 +40,36 @@
       thumbRow.scrollTo({ left: inRow - (thumbRow.clientWidth - b.offsetWidth) / 2, behavior: instant ? 'auto' : behavior() });
     }
 
-    /* Pfeile der Vorschau-Zeile: ein sichtbares Bild zurück oder weiter (versteckte Bilder anderer Varianten zählen nicht);
-       am ersten bzw. letzten Bild gesperrt (aria-disabled wie bei den Schienen in theme.js, so bleibt der Fokus auf dem Pfeil).
-       Sichtbar sind sie nur, wenn die Vorschaubilder nicht alle in die Zeile passen. Gemessen wird am Platz ohne Pfeile
-       (Breite der Zeile plus ihr negativer Rand für den Fokusring), sonst blieben sie nach dem Vergrößern des Fensters stehen. */
-    function neighbour(dir) {
-      for (var i = active + dir; i >= 0 && i < slides.length; i += dir) if (!slides[i].hidden) return i;
-      return -1;
+    /* Pfeile der Vorschau-Zeile: verschieben nur die Zeile, das große Bild bleibt (Wunsch des Nutzers, 10.11.2026). Ein Klick
+       rückt um die ganz sichtbaren Vorschaubilder weiter, das letzte bleibt zur Orientierung stehen; das Ziel liegt auf dem
+       Anfang eines Vorschaubilds. Gesperrt am Anfang bzw. Ende der Zeile (aria-disabled wie bei den Schienen in theme.js, so
+       bleibt der Fokus auf dem Pfeil). Sichtbar sind sie nur, wenn die Vorschaubilder nicht alle in die Zeile passen. Gemessen
+       wird am Platz ohne Pfeile (Breite der Zeile plus ihr negativer Rand für den Fokusring), sonst blieben sie nach dem
+       Vergrößern des Fensters stehen. */
+    function scrollThumbs(dir) {
+      var first = thumbs.filter(function (b) { return !b.hidden; })[0];
+      if (!first || !thumbRow) return;
+      var step = first.offsetWidth + (parseFloat(getComputedStyle(thumbRow).columnGap) || 0);
+      var page = Math.max(1, Math.floor(thumbRow.clientWidth / step) - 1);
+      thumbRow.scrollTo({ left: Math.round((thumbRow.scrollLeft + dir * page * step) / step) * step, behavior: behavior() });
+    }
+    function lockArrows() {
+      if (!thumbRow) return;
+      var max = thumbRow.scrollWidth - thumbRow.clientWidth;
+      arrows.forEach(function (a) {
+        var end = a.dataset.galleryStep === '-1' ? thumbRow.scrollLeft <= 4 : thumbRow.scrollLeft >= max - 4;
+        if (end) a.setAttribute('aria-disabled', 'true');
+        else a.removeAttribute('aria-disabled');
+      });
     }
     function updateArrows() {
       if (!thumbNav || !thumbRow) return;
       var cs = getComputedStyle(thumbRow);
       var room = thumbNav.clientWidth - parseFloat(cs.marginLeft) - parseFloat(cs.marginRight);
       thumbNav.classList.toggle('is-scrollable', !thumbNav.hidden && thumbRow.scrollWidth > room + 1);
-      arrows.forEach(function (a) {
-        if (neighbour(parseInt(a.dataset.galleryStep, 10)) < 0) a.setAttribute('aria-disabled', 'true');
-        else a.removeAttribute('aria-disabled');
-      });
+      lockArrows();
     }
+    if (thumbRow) thumbRow.addEventListener('scroll', lockArrows, { passive: true });
     // instant: ohne Gleiten (nach einem Gruppenwechsel liefe es sonst über Bilder der neuen Gruppe, die noch laden)
     function showSlide(i, instant) {
       if (!track || !slides[i]) return;
@@ -209,8 +220,7 @@
 
       var arrow = event.target.closest('[data-gallery-step]');
       if (arrow) {
-        var to = neighbour(parseInt(arrow.dataset.galleryStep, 10));
-        if (to > -1) showSlide(to);
+        if (arrow.getAttribute('aria-disabled') !== 'true') scrollThumbs(parseInt(arrow.dataset.galleryStep, 10));
         return;
       }
 

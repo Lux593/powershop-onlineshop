@@ -1,7 +1,7 @@
 {% doc %}
   Bildergalerie: Slides mit Scroll-Snap (mobil wischen, am Desktop über die Vorschaubilder), Vergrößerung in einer
   Lightbox mit Zoom (.gallery). Die Steuerung übernimmt assets/product.js.
-  Pfeile links und rechts der Vorschau-Zeile (seit 10.11.2026): blättern ein Bild zurück oder weiter, die Zeile läuft mit.
+  Pfeile links und rechts der Vorschau-Zeile (seit 10.11.2026): verschieben nur die Zeile, das große Bild bleibt.
   Sie erscheinen nur mit Maus oder Trackpad und nur, wenn nicht alle Vorschaubilder in die Zeile passen (shop.css, product.js).
   Bilder je Variante: Ein Variantenbild beginnt eine Gruppe, die bis zum nächsten Variantenbild reicht; Bilder vor dem
   ersten gehören allen. Gezeigt wird nur die Gruppe der gewählten Variante (product.js tauscht sie bei jeder Auswahl).
@@ -86,7 +86,7 @@
   {%- if product.images.size > 1 -%}
     {%- assign thumb_index = 0 -%}
     <div class="gallery__nav" data-thumbs-nav{% if shown_count < 2 %} hidden{% endif %}>
-      <button class="gallery__arrow" type="button" data-gallery-step="-1" aria-label="Vorheriges Bild">{% render 'icon', name: 'chevron-left' %}</button>
+      <button class="gallery__arrow" type="button" data-gallery-step="-1" aria-label="Vorschaubilder zurück">{% render 'icon', name: 'chevron-left' %}</button>
       <div class="gallery__thumbs" role="group" aria-label="Weitere Bilder">
         {%- for image in product.images -%}
           {%- liquid
@@ -110,7 +110,7 @@
           </button>
         {%- endfor -%}
       </div>
-      <button class="gallery__arrow" type="button" data-gallery-step="1" aria-label="Nächstes Bild">{% render 'icon', name: 'chevron-right' %}</button>
+      <button class="gallery__arrow" type="button" data-gallery-step="1" aria-label="Weitere Vorschaubilder">{% render 'icon', name: 'chevron-right' %}</button>
     </div>
   {%- endif -%}
 </div>
