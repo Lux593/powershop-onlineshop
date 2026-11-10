@@ -5,8 +5,8 @@ Stand 10.11.2026. Das Hauptmenü `main-menu` (Shopify-Admin › Inhalte › Men�
 | Ebene | Beispiel | Im Megamenü | Im Handy-Menü |
 |---|---|---|---|
 | 1 Hauptpunkt | Herren | Punkt in der Leiste, Fußzeile „Alle Herren“ | Aufklapper, oben „Alle Herren“ |
-| 2 Gruppe | Motorradbekleidung | Foto-Kachel, darunter „Alle Motorradbekleidung“ | Bildstreifen, darunter „Alle Motorradbekleidung“ |
-| 3 Link | Helme | Link unter der Kachel | Link im Bildstreifen |
+| 2 Gruppe | Motorradbekleidung | Foto-Kachel als Link, darunter „Alle Motorradbekleidung“ und alle Links, ohne Aufklappen | Bildstreifen zum Aufklappen, darin „Alle Motorradbekleidung“ |
+| 3 Link | Helme | Link unter der Kachel (alle Gruppen zugleich sichtbar, seit 10.11.2026) | Link im aufgeklappten Bildstreifen |
 
 Der Link „Alle …“ einer Gruppe führt auf das Ziel ihres Ebene-2-Punkts. Bei Kollektionen heißt er „Alle …“, bei Seiten
 „… im Überblick“ (z. B. „Werkstatt im Überblick“). Ohne Ziel (leer oder `#`) entfällt er.

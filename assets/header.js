@@ -19,9 +19,6 @@
     /* ---------------- Megamenü ---------------- */
     function setOpen(li, open) {
       if (open) items.forEach(function (other) { if (other !== li) setOpen(other, false); });
-      // Jedes Öffnen beginnt mit zugeklappten Kacheln. Das Menü rendert dann noch nicht (header.css), es klappt also nichts sichtbar zu.
-      var groups = li.querySelector('[data-mega-groups]');
-      if (open && groups && !li.classList.contains('is-open')) showGroup(groups, null);
       li.classList.toggle('is-open', open);
       li.querySelector('.mainnav__toggle').setAttribute('aria-expanded', open);
       update();
@@ -60,24 +57,8 @@
       if (!e.target.closest('.mainnav')) items.forEach(function (li) { setOpen(li, false); });
     }, sig);
 
-    // Kacheln im Megamenü (snippets/mega-menu.liquid): alle Gruppen sind zu, ein Klick klappt die Links der Kachel unter der Reihe
-    // auf und die offene zu, ein Klick auf die offene schließt sie. Die Gruppen liegen übereinander, is-active blendet über, is-closed
-    // klappt den Bereich ein. showGroup(mega, null) schließt alle.
-    function showGroup(mega, tile) {
-      mega.querySelectorAll('.mega-tile[aria-controls]').forEach(function (other) {
-        var on = other === tile;
-        other.setAttribute('aria-expanded', on);
-        document.getElementById(other.getAttribute('aria-controls')).classList.toggle('is-active', on);
-      });
-      mega.querySelector('.mega__drawer').classList.toggle('is-closed', !tile);
-    }
-    header.querySelectorAll('[data-mega-groups]').forEach(function (mega) {
-      mega.querySelectorAll('.mega-tile[aria-controls]').forEach(function (tile) {
-        tile.addEventListener('click', function () {
-          showGroup(mega, tile.getAttribute('aria-expanded') === 'true' ? null : tile);
-        });
-      });
-    });
+    // Kacheln im Megamenü (snippets/mega-menu.liquid) sind seit 10.11.2026 Links, alle Gruppen stehen offen darunter: kein
+    // Aufklappen mehr, nur das Menü selbst öffnet und schließt.
 
     // Das geschlossene Menü rendert nicht (header.css): seine lazy Bilder laden nicht von selbst. Nach Load plus Idle holen, ohne
     // Datensparen; ein Hover davor lädt sie ohnehin sofort. Ohne Megamenü (Handy) dieselben Fotos für die Bildstreifen im Handy-Menü:
