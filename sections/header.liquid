@@ -103,8 +103,10 @@
         {%- comment -%}
           Gliederung wie im Megamenü (snippets/mega-menu.liquid): Ebene 2 mit Unterpunkten = Gruppe, zugeklappt wie die
           Hauptpunkte, darin Ebene 3 in derselben Reihenfolge (snippets/link-order.liquid); Ebene 2 ohne Unterpunkte =
-          Gruppentitel als Link. „Alle …“ steht sichtbar unter den Gruppen (der Hauptpunkt selbst klappt hier nur auf), bei
-          einer Seite wie Service heißt der Link „Service im Überblick“. Ohne Gruppen bilden alle Ebene-2-Punkte eine Liste.
+          Gruppentitel als Link. „Alle …“ steht sichtbar über den Gruppen (der Hauptpunkt selbst klappt hier nur auf), bei
+          einer Seite wie Service heißt der Link „Service im Überblick“ (snippets/overview-label.liquid). Jede Gruppe beginnt
+          genauso mit ihrem eigenen Übersichts-Link auf das Ziel des Ebene-2-Punkts, z. B. „Alle Motorradbekleidung“ oder
+          „Werkstatt im Überblick“ (seit 10.11.2026). Ohne Gruppen bilden alle Ebene-2-Punkte eine Liste.
           Mit „Handy-Menü: Kacheln mit Bild“ ist jeder Ebene-2-Punkt ein Bildstreifen mit dem Foto seiner Megamenü-Kachel:
           Gruppen klappen ihre Links darunter auf, Punkte ohne Unterpunkte sind Links mit Pfeil (auch ohne Gruppen, wie das
           Raster im Megamenü).
@@ -117,17 +119,15 @@
               break
             endif
           endfor
-          if link.type == 'collection_link' or link.type == 'catalog_link' or link.url contains '/collections'
-            assign overview_label = 'Alle ' | append: link.title
-          else
-            assign overview_label = link.title | append: ' im Überblick'
-          endif
         -%}
+        {%- capture overview_label -%}{%- render 'overview-label', link: link -%}{%- endcapture -%}
         <details class="acc">
           <summary>{{ link.title | escape }}{% render 'icon', name: 'plus' %}</summary>
           <div class="acc__body">
             {%- comment -%} Übersicht („Alle Herren“) zuerst und hervorgehoben: so findet man sie sofort (6.11.2026) {%- endcomment -%}
-            <a class="mobile-menu__all" href="{{ link.url }}" style="--i: 0">{{ overview_label | escape }}{% render 'icon', name: 'arrow-right' %}</a>
+            {%- if overview_label != blank -%}
+              <a class="mobile-menu__all" href="{{ link.url }}" style="--i: 0">{{ overview_label | escape }}{% render 'icon', name: 'arrow-right' %}</a>
+            {%- endif -%}
             {%- for group in link.links -%}
               {%- liquid
                 assign tile_block = nil
@@ -160,6 +160,7 @@
               {%- else -%}
                 {%- capture order -%}{% render 'link-order', group: group, keep: section.settings.keep_order %}{%- endcapture -%}
                 {%- assign order = order | split: ',' -%}
+                {%- capture group_all -%}{%- render 'overview-label', link: group -%}{%- endcapture -%}
                 <details class="mobile-menu__sub" style="--i: {{ forloop.index0 }}">
                   {%- if tiles -%}
                     <summary class="mobile-tile">
@@ -171,10 +172,13 @@
                     <summary class="mobile-menu__group">{{ group.title | escape }}{% render 'icon', name: 'plus' %}</summary>
                   {%- endif -%}
                   <div class="mobile-menu__links">
+                    {%- if group_all != blank -%}
+                      <a class="mobile-menu__sub-all" href="{{ group.url }}" style="--i: 0">{{ group_all | escape }}{% render 'icon', name: 'arrow-right' %}</a>
+                    {%- endif -%}
                     {%- for position in order -%}
                       {%- assign index = position | plus: 0 -%}
                       {%- assign child = group.links[index] -%}
-                      <a href="{{ child.url }}" style="--i: {{ forloop.index0 }}">{{ child.title | escape }}</a>
+                      <a href="{{ child.url }}" style="--i: {{ forloop.index }}">{{ child.title | escape }}</a>
                     {%- endfor -%}
                   </div>
                 </details>
@@ -214,7 +218,7 @@
       "id": "menu",
       "label": "Hauptmenü",
       "default": "main-menu",
-      "info": "Ebene 1 = Hauptpunkt, Ebene 2 = Kachel im Megamenü, Ebene 3 = Links, die sich unter der Kachel aufklappen. Die Fotos der Kacheln kommen aus den Blöcken „Megamenü: Kachelbild“."
+      "info": "Ebene 1 = Hauptpunkt, Ebene 2 = Kachel im Megamenü, Ebene 3 = Links, die sich unter der Kachel aufklappen. Der Link der Ebene 2 ist das Ziel von „Alle …“ über diesen Links (z. B. Kollektion Herren Motorradbekleidung). Die Fotos der Kacheln kommen aus den Blöcken „Megamenü: Kachelbild“."
     },
     {
       "type": "text",

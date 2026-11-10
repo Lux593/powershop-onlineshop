@@ -12,8 +12,9 @@
   - Die Links stehen direkt unter ihrer Kachel: ab drei Kacheln einspaltig, bei zwei Kacheln bis zu zwei, bei einer bis zu vier
     Spalten, mit mindestens drei Links je Spalte.
     Alle Gruppen liegen in derselben Zeile, die geschlossenen unsichtbar: das Menü bleibt beim Wechsel gleich hoch
-  - Links einer Gruppe stehen alphabetisch, außer die Gruppe steht in keep (snippets/link-order.liquid)
-  - Fußzeile: „Alle …“ bei Kollektionen, sonst „… im Überblick“ (gleich lautend wie im Handy-Menü, sections/header.liquid),
+  - Links einer Gruppe stehen alphabetisch, außer die Gruppe steht in keep (snippets/link-order.liquid). Darüber führt
+    „Alle …“ bzw. „… im Überblick“ zum Ziel des Ebene-2-Punkts, z. B. „Alle Motorradbekleidung“ (seit 10.11.2026, wie im Handy-Menü)
+  - Fußzeile: „Alle …“ bei Kollektionen, sonst „… im Überblick“ (snippets/overview-label.liquid, gleich lautend wie im Handy-Menü),
     rechts Aufruf-Zeile oder Kontakt (bei Gruppen) aus den Header-Blöcken, ganz rechts die Symbole der sozialen Netze (snippets/social-links)
   Bilder der Kacheln kommen aus den Blöcken „Megamenü: Kachelbild“ (Hauptpunkt + Gruppe); ohne Bild bleibt die Kachel anthrazit.
 
@@ -24,11 +25,6 @@
 
 {%- liquid
   assign key = link.handle
-  if link.type == 'collection_link' or link.type == 'catalog_link' or link.url contains '/collections'
-    assign overview_label = 'Alle ' | append: link.title
-  else
-    assign overview_label = link.title | append: ' im Überblick'
-  endif
 
   assign has_groups = false
   for group in link.links
@@ -84,6 +80,8 @@
   endcase
   assign tile_sizes = 1272 | divided_by: tile_count | append: 'px'
 -%}
+
+{%- capture overview_label -%}{%- render 'overview-label', link: link -%}{%- endcapture -%}
 
 {%- capture contact_lines -%}
   {%- if contact_block -%}
@@ -172,6 +170,7 @@
             {%- assign order = order | split: ',' -%}
             {%- assign cols = group.links.size | plus: 2 | divided_by: 3 | at_most: link_cols -%}
             {%- assign rows = group.links.size | plus: cols | minus: 1 | divided_by: cols -%}
+            {%- capture group_all -%}{%- render 'overview-label', link: group -%}{%- endcapture -%}
             <div
               class="mega__group"
               id="mega-{{ key }}-group-{{ forloop.index }}"
@@ -179,11 +178,14 @@
               aria-labelledby="mega-{{ key }}-tile-{{ forloop.index }}"
               style="--col: {{ forloop.index }}"
             >
+              {%- if group_all != blank -%}
+                <a class="mega__group-all" href="{{ group.url }}">{{ group_all | escape }}{% render 'icon', name: 'arrow-right' %}</a>
+              {%- endif -%}
               <ul class="mega__links" style="--cols: {{ cols }}; --rows: {{ rows }}">
                 {%- for position in order -%}
                   {%- assign index = position | plus: 0 -%}
                   {%- assign child = group.links[index] -%}
-                  <li style="--i: {{ forloop.index0 }}"><a href="{{ child.url }}">{{ child.title | escape }}</a></li>
+                  <li style="--i: {{ forloop.index }}"><a href="{{ child.url }}">{{ child.title | escape }}</a></li>
                 {%- endfor -%}
               </ul>
             </div>
@@ -194,7 +196,9 @@
   {%- endif -%}
 
   <div class="mega__foot">
-    <a class="mega__all" href="{{ link.url }}">{{ overview_label | escape }}{% render 'icon', name: 'arrow-right' %}</a>
+    {%- if overview_label != blank -%}
+      <a class="mega__all" href="{{ link.url }}">{{ overview_label | escape }}{% render 'icon', name: 'arrow-right' %}</a>
+    {%- endif -%}
 
     {%- if contact_block and has_groups -%}
       <div class="mega__contact" {{ contact_block.shopify_attributes }}>

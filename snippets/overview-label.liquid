@@ -1,0 +1,23 @@
+{% doc %}
+  Text des Übersichts-Links eines Menüpunkts: „Alle …“ bei Kollektionen, sonst „… im Überblick“ (Seiten wie Service, Werkstatt).
+  Gemeinsam für Hauptpunkte (Fußzeile im Megamenü, oben im Handy-Menü) und Gruppen der Ebene 2 („Alle Motorradbekleidung“ über den
+  Links der Gruppe, seit 10.11.2026). Ohne Ziel (leer oder „#“) gibt das Snippet nichts aus, der Link entfällt dann.
+  Ausgabe unescaped: beim Einsetzen | escape anhängen.
+
+  @param {object} link - Menüpunkt (Ebene 1 oder 2)
+
+  @example
+  {%- capture label -%}{% render 'overview-label', link: group %}{%- endcapture -%}
+  {%- if label != blank -%}<a href="{{ group.url }}">{{ label | escape }}</a>{%- endif -%}
+{% enddoc %}
+
+{%- liquid
+  assign target = link.url | strip
+  unless target == blank or target == '#'
+    if link.type == 'collection_link' or link.type == 'catalog_link' or target contains '/collections'
+      echo 'Alle ' | append: link.title
+    else
+      echo link.title | append: ' im Überblick'
+    endif
+  endunless
+-%}

@@ -233,6 +233,16 @@ html:not(:has(.announce)) { --announce-h: 0px; }
 .mega__group.is-active li { opacity: 1; transform: none; transition-delay: calc(var(--i, 0) * 18ms + 60ms); }
 .mega__links a { display: flex; align-items: center; min-height: 36px; font-size: 15px; color: var(--c-on-dark-strong); }
 .mega__links a:hover { color: var(--c-orange); }
+/* „Alle Motorradbekleidung“ usw. über den Links der Gruppe (Ziel des Ebene-2-Punkts, seit 10.11.2026): orange in Barlow wie
+   „Alle Herren“, eine Stufe kleiner als Text-Link statt Knopf; blendet mit den Links ein (als erster in der Staffel) */
+.mega__group-all {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 40px; margin-left: 20px;
+  font-family: var(--f-head); font-size: 15px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--c-orange);
+  opacity: 0; transform: translateY(6px); transition: opacity var(--t-fast) var(--ease), transform var(--t-med) var(--ease-out);
+}
+.mega__group.is-active .mega__group-all { opacity: 1; transform: none; transition-delay: 60ms; }
+.mega__group-all .icon { width: 16px; height: 16px; color: currentColor; transition: transform var(--t-fast) var(--ease); }
+.mega__group-all:hover .icon { transform: translateX(4px); }
 
 /* Fußzeile: links der Weg zum Hauptpunkt, rechts Aufruf-Zeile (Motorräder) oder Kontakt (Service) */
 .mega__foot { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 32px; margin-top: 20px; padding-top: 12px; border-top: 1px solid var(--c-steel); }
@@ -260,6 +270,7 @@ html:not(:has(.announce)) { --announce-h: 0px; }
 @media (max-width: 1279px) {
   .mega-tile { height: clamp(180px, 24vh, 208px); padding: 16px 16px 18px; }
   .mega__links { padding-inline: 16px; }
+  .mega__group-all { margin-left: 16px; }
   .mega-tile__title { font-size: 22px; }
   .mega__tiles--grid .mega-tile__title { font-size: 20px; }
 }
@@ -289,6 +300,13 @@ html:not(:has(.announce)) { --announce-h: 0px; }
 .mobile-menu__sub > summary .icon { width: 18px; height: 18px; flex: none; transition: transform var(--t-fast); }
 .mobile-menu__sub[open] > summary .icon { transform: rotate(45deg); }
 .mobile-menu__links { padding: 0 0 8px 14px; }
+/* Übersicht der Gruppe als erster Eintrag („Alle Motorradbekleidung“, seit 10.11.2026): orange wie „Alle Herren“, eine Stufe
+   kleiner und ohne Linie, Pfeil rechts */
+.mobile-menu .acc__body .mobile-menu__sub-all {
+  justify-content: space-between; gap: 16px;
+  font-family: var(--f-head); font-size: 15px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--c-orange);
+}
+.mobile-menu__sub-all .icon { flex: none; width: 16px; height: 16px; }
 /* Ebene 2 als Bildstreifen (Einstellung „Handy-Menü: Kacheln mit Bild“): das Foto der Megamenü-Kachel (.mega-tile__img) über die
    volle Breite, Titel unten links auf dem Verlauf. Geschlossen gedämpft, die offene Gruppe in voller Farbe mit orangem Strich wie
    im Megamenü; ihre Links stehen eingerückt darunter. Ohne Foto bleibt der Streifen anthrazit. */

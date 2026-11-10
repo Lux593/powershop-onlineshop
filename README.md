@@ -13,6 +13,7 @@ geschlossen: eigene Assets, Schriften und Icons, kein Build-Step.
 - **Hero-Clip (Herkunft, offene Rechtsfragen):** [`docs/hero-clip.md`](docs/hero-clip.md)
 - **Freigabeliste (Zahlen, Zusagen, Texte, Rechtliches, Bildrechte des Händlers):** [`docs/freigaben.md`](docs/freigaben.md)
 - **Versand (Tarife, Sperrgut, Abholung, Versandrichtlinie):** [`docs/versand.md`](docs/versand.md)
+- **Navigation (Hauptmenü, Gruppen-Kollektionen für „Alle …“):** [`docs/navigation.md`](docs/navigation.md)
 
 ## Shopify-Anbindung
 
@@ -53,7 +54,7 @@ sections/   Startseite: hero · service-tiles · product-tabs · statement · ca
             Rahmen: header · announcement-bar · footer, dazu header-group.json und footer-group.json
 snippets/   Karten (product-card, bike-card, result-card, event-card, bento-tile), Produktseite (pdp-gallery, pdp-buy, pdp-options, pdp-sticky-buy,
             pdp-usp, pdp-shipping, pdp-gpsr, size-guide, swatch, rating, price), Shop-Bausteine (results-toolbar, filter-controls,
-            active-filters, pagination, cart-line, cart-shipping-line, cart-pickup-note, shipping-class, contact-box, search-dialog, mega-menu, link-order, accordion), Kleinteile (icon, icons-sprite,
+            active-filters, pagination, cart-line, cart-shipping-line, cart-pickup-note, shipping-class, contact-box, search-dialog, mega-menu, link-order, overview-label, accordion), Kleinteile (icon, icons-sprite,
             media, is-placeholder, number-de, opening-hours, payments, bike-badge), Kopfbereich (meta-tags, fonts)
 assets/     CSS, JS, Bilder, Videos, Schriften (flach, Shopify kennt keine Unterordner in assets/), Details unten
 config/     settings_schema.json · settings_data.json
