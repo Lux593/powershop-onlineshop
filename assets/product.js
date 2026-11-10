@@ -19,6 +19,8 @@
     var slides = $$('[data-slide]');
     var thumbs = $$('[data-thumb]');
     var thumbRow = $('.gallery__thumbs');
+    var thumbNav = $('[data-thumbs-nav]'); // Vorschau-Zeile samt Pfeilen links und rechts
+    var arrows = $$('[data-gallery-step]');
     var active = 0;
     var holdUntil = 0; // beim Sprung melden die Zwischen-Slides nichts
 
@@ -26,13 +28,36 @@
     function mark(i) {
       active = i;
       thumbs.forEach(function (b, k) { b.setAttribute('aria-current', k === i ? 'true' : 'false'); });
-      var b = thumbs[i];
-      // nur die Vorschau-Zeile scrollen (scrollIntoView spränge auch vertikal). Lage über die Rechtecke: offsetLeft bezöge sich auf den
-      // offsetParent (hier body) und läge um den Seitenabstand der Zeile daneben
-      if (b && thumbRow) {
-        var inRow = b.getBoundingClientRect().left - thumbRow.getBoundingClientRect().left + thumbRow.scrollLeft;
-        thumbRow.scrollTo({ left: inRow - (thumbRow.clientWidth - b.offsetWidth) / 2, behavior: behavior() });
-      }
+      centerThumb();
+      updateArrows();
+    }
+    // Vorschaubild des sichtbaren Slides mittig in die Zeile (instant: ohne Gleiten, nach einer Größenänderung).
+    // Nur die Vorschau-Zeile scrollen (scrollIntoView spränge auch vertikal). Lage über die Rechtecke: offsetLeft bezöge sich auf den
+    // offsetParent (hier body) und läge um den Seitenabstand der Zeile daneben
+    function centerThumb(instant) {
+      var b = thumbs[active];
+      if (!b || b.hidden || !thumbRow) return;
+      var inRow = b.getBoundingClientRect().left - thumbRow.getBoundingClientRect().left + thumbRow.scrollLeft;
+      thumbRow.scrollTo({ left: inRow - (thumbRow.clientWidth - b.offsetWidth) / 2, behavior: instant ? 'auto' : behavior() });
+    }
+
+    /* Pfeile der Vorschau-Zeile: ein sichtbares Bild zurück oder weiter (versteckte Bilder anderer Varianten zählen nicht);
+       am ersten bzw. letzten Bild gesperrt (aria-disabled wie bei den Schienen in theme.js, so bleibt der Fokus auf dem Pfeil).
+       Sichtbar sind sie nur, wenn die Vorschaubilder nicht alle in die Zeile passen. Gemessen wird am Platz ohne Pfeile
+       (Breite der Zeile plus ihr negativer Rand für den Fokusring), sonst blieben sie nach dem Vergrößern des Fensters stehen. */
+    function neighbour(dir) {
+      for (var i = active + dir; i >= 0 && i < slides.length; i += dir) if (!slides[i].hidden) return i;
+      return -1;
+    }
+    function updateArrows() {
+      if (!thumbNav || !thumbRow) return;
+      var cs = getComputedStyle(thumbRow);
+      var room = thumbNav.clientWidth - parseFloat(cs.marginLeft) - parseFloat(cs.marginRight);
+      thumbNav.classList.toggle('is-scrollable', !thumbNav.hidden && thumbRow.scrollWidth > room + 1);
+      arrows.forEach(function (a) {
+        if (neighbour(parseInt(a.dataset.galleryStep, 10)) < 0) a.setAttribute('aria-disabled', 'true');
+        else a.removeAttribute('aria-disabled');
+      });
     }
     // instant: ohne Gleiten (nach einem Gruppenwechsel liefe es sonst über Bilder der neuen Gruppe, die noch laden)
     function showSlide(i, instant) {
@@ -100,8 +125,9 @@
       });
       var n = 0;
       thumbs.forEach(function (b) { if (!b.hidden) b.setAttribute('aria-label', 'Bild ' + (++n) + ' von ' + shown); });
-      if (thumbRow) thumbRow.hidden = shown < 2;
+      if (thumbNav) thumbNav.hidden = shown < 2;
       shownGroup = group;
+      updateArrows();
     }
     // Die neue Gruppe erscheint erst, wenn ihr erstes Bild geladen ist; bis dahin bleibt das alte Bild leicht abgeblendet stehen
     // (.gallery.is-switching), höchstens 5 s (sehr langsame Verbindung).
@@ -128,6 +154,8 @@
       });
       Promise.race([ready.catch(function () {}), new Promise(function (r) { setTimeout(r, 5000); })]).then(done);
     }
+    if (thumbNav && 'ResizeObserver' in window) new ResizeObserver(function () { updateArrows(); centerThumb(true); }).observe(thumbNav);
+    updateArrows();
     if (track && slides.length > 1 && 'IntersectionObserver' in window) {
       var seen = new IntersectionObserver(function (entries) {
         if (Date.now() < holdUntil) return;
@@ -178,6 +206,13 @@
     root.addEventListener('click', function (event) {
       var thumb = event.target.closest('[data-thumb]');
       if (thumb) { showSlide(thumbs.indexOf(thumb)); return; }
+
+      var arrow = event.target.closest('[data-gallery-step]');
+      if (arrow) {
+        var to = neighbour(parseInt(arrow.dataset.galleryStep, 10));
+        if (to > -1) showSlide(to);
+        return;
+      }
 
       if (event.target.closest('[data-zoom]')) {
         var slide = slides[active];

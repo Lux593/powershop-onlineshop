@@ -1,6 +1,8 @@
 {% doc %}
   Bildergalerie: Slides mit Scroll-Snap (mobil wischen, am Desktop über die Vorschaubilder), Vergrößerung in einer
   Lightbox mit Zoom (.gallery). Die Steuerung übernimmt assets/product.js.
+  Pfeile links und rechts der Vorschau-Zeile (seit 10.11.2026): blättern ein Bild zurück oder weiter, die Zeile läuft mit.
+  Sie erscheinen nur mit Maus oder Trackpad und nur, wenn nicht alle Vorschaubilder in die Zeile passen (shop.css, product.js).
   Bilder je Variante: Ein Variantenbild beginnt eine Gruppe, die bis zum nächsten Variantenbild reicht; Bilder vor dem
   ersten gehören allen. Gezeigt wird nur die Gruppe der gewählten Variante (product.js tauscht sie bei jeder Auswahl).
 
@@ -83,28 +85,32 @@
 
   {%- if product.images.size > 1 -%}
     {%- assign thumb_index = 0 -%}
-    <div class="gallery__thumbs" role="group" aria-label="Weitere Bilder"{% if shown_count < 2 %} hidden{% endif %}>
-      {%- for image in product.images -%}
-        {%- liquid
-          assign key = ',' | append: image.id | append: ','
-          assign is_hidden = false
-          if hidden_ids contains key
-            assign is_hidden = true
-          else
-            assign thumb_index = thumb_index | plus: 1
-          endif
-        -%}
-        <button
-          type="button"
-          data-thumb
-          data-media-id="{{ image.id }}"
-          aria-current="{% if image.id == first_image.id %}true{% else %}false{% endif %}"
-          aria-label="Bild {{ thumb_index }} von {{ shown_count }}"
-          {% if is_hidden %}hidden{% endif %}
-        >
-          <img src="{{ image | image_url: width: 240 }}" alt="" width="160" height="200" loading="lazy">
-        </button>
-      {%- endfor -%}
+    <div class="gallery__nav" data-thumbs-nav{% if shown_count < 2 %} hidden{% endif %}>
+      <button class="gallery__arrow" type="button" data-gallery-step="-1" aria-label="Vorheriges Bild">{% render 'icon', name: 'chevron-left' %}</button>
+      <div class="gallery__thumbs" role="group" aria-label="Weitere Bilder">
+        {%- for image in product.images -%}
+          {%- liquid
+            assign key = ',' | append: image.id | append: ','
+            assign is_hidden = false
+            if hidden_ids contains key
+              assign is_hidden = true
+            else
+              assign thumb_index = thumb_index | plus: 1
+            endif
+          -%}
+          <button
+            type="button"
+            data-thumb
+            data-media-id="{{ image.id }}"
+            aria-current="{% if image.id == first_image.id %}true{% else %}false{% endif %}"
+            aria-label="Bild {{ thumb_index }} von {{ shown_count }}"
+            {% if is_hidden %}hidden{% endif %}
+          >
+            <img src="{{ image | image_url: width: 240 }}" alt="" width="160" height="200" loading="lazy">
+          </button>
+        {%- endfor -%}
+      </div>
+      <button class="gallery__arrow" type="button" data-gallery-step="1" aria-label="Nächstes Bild">{% render 'icon', name: 'chevron-right' %}</button>
     </div>
   {%- endif -%}
 </div>

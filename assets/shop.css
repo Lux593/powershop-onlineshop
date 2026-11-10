@@ -254,6 +254,14 @@
 .gallery--wide .gallery__thumbs button { aspect-ratio: 16 / 10; background: var(--c-white); }
 .gallery__thumbs button[aria-current="true"] { border-color: var(--c-black); }
 .gallery__thumbs img { width: 100%; height: 100%; object-fit: cover; }
+/* Pfeile links und rechts der Vorschau-Zeile (seit 10.11.2026; Aussehen wie die Schienen-Pfeile, components.css): nur mit Maus
+   oder Trackpad, die Zeile lässt sich dort nicht wischen. Nur wenn nicht alle Vorschaubilder passen (product.js setzt .is-scrollable). */
+.gallery__nav { display: grid; grid-template-columns: minmax(0, 1fr); align-items: center; gap: 16px; }
+.gallery__arrow { display: none; }
+@media (hover: hover) and (pointer: fine) {
+  .gallery__nav.is-scrollable { grid-template-columns: auto minmax(0, 1fr) auto; }
+  .gallery__nav.is-scrollable .gallery__arrow { display: grid; }
+}
 .lightbox { width: min(1200px, calc(100% - 32px)); background: var(--c-black); }
 .lightbox img { width: 100%; height: auto; max-height: 80vh; object-fit: contain; }
 .lightbox .modal__head { border-color: var(--c-steel); color: var(--c-white); }
