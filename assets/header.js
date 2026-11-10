@@ -17,7 +17,21 @@
     var timers = new WeakMap();
 
     /* ---------------- Megamenü ---------------- */
+    function openOther(li) {
+      return Array.prototype.some.call(items, function (other) { return other !== li && other.classList.contains('is-open'); });
+    }
+    // Wechsel von einem offenen Menü zum nächsten (Herren → Damen): ohne Ein- und Ausblenden (is-switching, header.css). Sonst
+    // überblendeten zwei halb durchsichtige Panels, das ganze Menü flackerte. So bleibt es stehen und nur der Inhalt tauscht.
+    // Die Klasse fällt zwei Frames später weg, wenn der neue Zustand gemalt ist; Öffnen und Schließen blenden dann wieder.
+    var switchFrame = 0;
     function setOpen(li, open) {
+      if (open && !li.classList.contains('is-open') && openOther(li)) {
+        header.classList.add('is-switching');
+        cancelAnimationFrame(switchFrame);
+        switchFrame = requestAnimationFrame(function () {
+          switchFrame = requestAnimationFrame(function () { header.classList.remove('is-switching'); });
+        });
+      }
       if (open) items.forEach(function (other) { if (other !== li) setOpen(other, false); });
       li.classList.toggle('is-open', open);
       li.querySelector('.mainnav__toggle').setAttribute('aria-expanded', open);
@@ -27,7 +41,10 @@
     items.forEach(function (li) {
       li.addEventListener('mouseenter', function () {
         if (lastPointer !== 'mouse') return;
-        clearTimeout(timers.get(li));
+        // Ist schon ein Menü offen, sofort umschalten und dessen Schließ-Timer verwerfen: sonst schlösse es nach 160 ms, bevor
+        // dieses nach 90 ms aufgeht, und das Menü klappte kurz zu und wieder auf
+        items.forEach(function (other) { clearTimeout(timers.get(other)); });
+        if (openOther(li)) { setOpen(li, true); return; }
         timers.set(li, setTimeout(function () { setOpen(li, true); }, 90));
       });
       li.addEventListener('mouseleave', function () {
