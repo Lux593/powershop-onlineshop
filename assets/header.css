@@ -167,9 +167,13 @@ html:not(:has(.announce)) { --announce-h: 0px; }
   .mega { transition: opacity var(--t-fast), transform var(--t-fast), visibility 0s linear var(--t-fast), content-visibility 0s linear var(--t-fast) allow-discrete; }
 }
 .mainnav__item.is-open .mega { visibility: visible; opacity: 1; transform: none; content-visibility: visible; transition-delay: 0s; }
-/* Wechsel von einem offenen Menü zum nächsten (header.js setzt is-switching für zwei Frames): alles sofort, ohne Überblenden.
-   Sonst blendeten zwei Panels zugleich halb durchsichtig über, das Menü flackerte (seit 10.11.2026). */
-.site-header.is-switching .mega, .site-header.is-switching .mega * { transition: none !important; }
+/* Wechsel von einem offenen Menü zum nächsten (seit 10.11.2026): Das Panel steht sofort (header.js setzt is-switching für zwei
+   Frames), sonst blendeten zwei Panels zugleich halb durchsichtig über und das Menü flackerte. Der neue Inhalt gleitet dann
+   herein wie das Panel beim Öffnen (von 6 px oberhalb, aufblendend), die Links blenden gestaffelt nach wie beim Öffnen.
+   is-swap trägt der neu geöffnete Punkt, bis er schließt; ein frisches Öffnen ohne Wechsel blendet wie bisher das Panel. */
+.site-header.is-switching .mega { transition: none !important; }
+@keyframes mega-swap-in { from { opacity: 0; transform: translateY(-6px); } }
+.mainnav__item.is-open.is-swap .mega__inner { animation: mega-swap-in var(--t-med) var(--ease-out) both; }
 /* Inhalt (snippets/mega-menu.liquid): oben --tiles Kacheln in einer Reihe, darunter die Links aller Kacheln, unten die Fußzeile.
    Mindestens so hoch wie der Kategorie-Kopf mit Film (.page-banner--film in shop.css: 2 × 32 px Rand plus Filmfenster 4:3 in der
    Breite clamp(300px, 34vw, 448px)): auch mit zugeklappten Links läuft der Film nie unter dem Menü weiter. Den freien Platz nimmt

@@ -20,12 +20,15 @@
     function openOther(li) {
       return Array.prototype.some.call(items, function (other) { return other !== li && other.classList.contains('is-open'); });
     }
-    // Wechsel von einem offenen Menü zum nächsten (Herren → Damen): ohne Ein- und Ausblenden (is-switching, header.css). Sonst
-    // überblendeten zwei halb durchsichtige Panels, das ganze Menü flackerte. So bleibt es stehen und nur der Inhalt tauscht.
-    // Die Klasse fällt zwei Frames später weg, wenn der neue Zustand gemalt ist; Öffnen und Schließen blenden dann wieder.
+    // Wechsel von einem offenen Menü zum nächsten (Herren → Damen): das Panel ohne Ein- und Ausblenden (is-switching, header.css).
+    // Sonst überblendeten zwei halb durchsichtige Panels, das ganze Menü flackerte. So bleibt es stehen, und der neue Inhalt
+    // gleitet herein (is-swap am neuen Punkt, bis er schließt). is-switching fällt zwei Frames später weg, wenn der neue Zustand
+    // gemalt ist; Öffnen und Schließen blenden dann wieder.
     var switchFrame = 0;
     function setOpen(li, open) {
+      if (!open) li.classList.remove('is-swap');
       if (open && !li.classList.contains('is-open') && openOther(li)) {
+        li.classList.add('is-swap');
         header.classList.add('is-switching');
         cancelAnimationFrame(switchFrame);
         switchFrame = requestAnimationFrame(function () {
