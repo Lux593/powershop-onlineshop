@@ -50,9 +50,12 @@
    deshalb am Träger. Das Gebäude steht rechts über der Unterkante der Bühne (um die Drift angehoben), über den Kacheln. */
 .statement__drawing {
   position: absolute; z-index: -1; right: 5%; bottom: calc(var(--draw-h) * 0.08); width: var(--draw-w);
-  opacity: 0.1; pointer-events: none;
+  pointer-events: none;
 }
-.statement__drawing img { display: block; width: 100%; height: auto; }
+.statement__drawing img { position: relative; display: block; width: 100%; height: auto; opacity: 0.1; }
+/* Schriftzug „Harley-Davidson“: blasse Füllung in H-D-Orange als eigene Ebene unter den Linien (im Markup davor), deren Umriss
+   ihn wie der Rest der Zeichnung rahmt. Eigene Ebene, weil Orange mit den 10 % der Linien nur beige wäre. */
+.statement__drawing .statement__drawing-schrift { position: absolute; left: 0; top: 0; opacity: 0.3; }
 @media (min-width: 700px) { .statement__drawing { right: 4%; } }
 /* Scrub: die Zeichnung entsteht von links nach rechts im Takt der Wörter. home.js setzt --draw (0 bis 1) aus
    demselben ScrollTrigger. Die Maske ist 2,5-mal so breit wie die Zeichnung, ihre weiche Kante wandert hindurch. */

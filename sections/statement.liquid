@@ -17,6 +17,8 @@
     <div class="statement__stage">
       {%- if section.settings.show_drawing and section.settings.text != blank -%}
         <div class="statement__drawing" aria-hidden="true">
+          {%- comment -%} Orange Füllung des Schriftzugs zuerst: Die Linien der Zeichnung liegen darüber und rahmen sie {%- endcomment -%}
+          <img class="statement__drawing-schrift" src="{{ 'gebaeude-schriftzug.svg' | asset_url }}" width="744" height="465" alt="" loading="lazy" decoding="async" data-parallax="0.16">
           <img src="{{ 'gebaeude-zeichnung.svg' | asset_url }}" width="744" height="465" alt="" loading="lazy" decoding="async" data-parallax="0.16">
         </div>
       {%- endif -%}
