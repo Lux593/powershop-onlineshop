@@ -34,7 +34,7 @@
         {%- for product in products -%}
           <a href="{{ product.url }}">
             {%- if product.featured_image -%}
-              {{ product.featured_image | image_url: width: 96 | image_tag: width: 48, height: 60, alt: '', loading: 'lazy' }}
+              {{ product.featured_image | image_url: width: 192, height: 240, crop: 'center' | image_tag: width: 48, height: 60, alt: '', loading: 'lazy' }}
             {%- else -%}
               <span style="width:48px;height:60px;flex:none;background:var(--c-stone)"></span>
             {%- endif -%}
