@@ -499,10 +499,13 @@
 .mega__inner > :nth-child(n+6) { --i: 5; }
 
 /* ---------- Karten ---------- */
-/* Bild blendet beim Laden ein: das inline onload der Karten-Snippets setzt .is-loaded. Nur für lazy Bilder: die ersten
-   Karten einer Kollektion laden eager (Erstblick, mögliches LCP-Element) und starten nie versteckt. Das Zweitbild (Hover) bleibt außen vor. */
-.has-motion .pcard__img[loading="lazy"]:not(.pcard__img--alt):not(.is-loaded),
-.has-motion .bcard__media img[loading="lazy"]:not(.is-loaded) { opacity: 0; }
+/* Bild blendet beim Laden ein: das inline onload der Karten-Snippets setzt .is-loaded. Nur Bilder, die Liquid lazy ausgibt, tragen
+   .fade-on-load: die ersten Karten einer Kollektion laden eager (Erstblick, mögliches LCP-Element) und starten nie versteckt. Das
+   Zweitbild (Hover) bekommt die Klasse nie. Die Regel hängt an der Klasse statt an loading="lazy", weil die Vorlader (theme.js)
+   Bilder vorab auf eager stellen: Ein noch ladendes Bild blendet so weiter ein. Ist ein vorgeladenes Bild beim Erscheinen schon
+   fertig, steht es ohne sichtbares Einblenden da (vom Nutzer am 11.11.2026 so entschieden). */
+.has-motion .pcard__img.fade-on-load:not(.is-loaded),
+.has-motion .bcard__media img.fade-on-load:not(.is-loaded) { opacity: 0; }
 .pcard__img { transition: opacity 600ms var(--ease-out), transform 900ms var(--ease-out); }
 .bcard__media img { transition: opacity 600ms var(--ease-out), transform 900ms var(--ease-out); }
 /* Längerer Zoom nur mit Maus. Ohne Bewegung entfällt auch der Zoom der Fahrzeugkarte aus components.css */

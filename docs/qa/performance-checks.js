@@ -441,4 +441,25 @@
 
   // ---------------- Prüfungen ----------------
   // Je Task ein Abschnitt: PK.add('bereich.was', function () { … return fehlertexte; }, wann?)
+
+  // ---- Task 1: Einblenden am eigenen Merkmal (fade-on-load statt loading="lazy") ----
+  PK.add('fade.rule', () => {
+    const box = document.body.appendChild(document.createElement('div')), f = [];
+    box.innerHTML = '<div class="pcard"><img class="pcard__img fade-on-load" loading="eager"><img class="pcard__img" loading="lazy"></div>' +
+      '<div class="bcard"><div class="bcard__media"><img class="fade-on-load" loading="eager"></div></div>';
+    const [a, b, c] = box.querySelectorAll('img'), op = (i) => getComputedStyle(i).opacity;
+    box.querySelectorAll('img').forEach((i) => { i.style.transition = 'none'; });
+    if (op(a) !== '0' || op(c) !== '0') f.push('fade-on-load ohne is-loaded ist nicht versteckt (auch bei eager)');
+    if (op(b) !== '1') f.push('Regel hängt noch an loading="lazy"');
+    a.classList.add('is-loaded');
+    if (op(a) !== '1') f.push('is-loaded zeigt das Bild nicht');
+    box.remove();
+    return f;
+  }, needMotion);
+  PK.add('fade.marker', () => [...document.querySelectorAll('.pcard__img, .bcard__media img')].flatMap((i) => {
+    const has = i.classList.contains('fade-on-load');
+    if (i.classList.contains('pcard__img--alt')) return has ? ['Zweitbild mit fade-on-load'] : [];
+    const lazy = i.getAttribute('loading') === 'lazy' || !!pre(i); // so von Liquid ausgegeben
+    return lazy === has ? [] : [(has ? 'eager mit' : 'lazy ohne') + ' fade-on-load: ' + i.src.slice(-50)];
+  }));
 })();

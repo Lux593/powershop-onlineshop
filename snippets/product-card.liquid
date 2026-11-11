@@ -13,6 +13,11 @@
 
 {%- liquid
   assign img_loading = loading | default: 'lazy'
+  # Nur lazy ausgegebene Hauptbilder blenden beim Laden ein (shop.css, .fade-on-load). Ein Vorlader stellt sie später auf eager, das Merkmal bleibt.
+  assign img_class = 'pcard__img'
+  if img_loading == 'lazy'
+    assign img_class = 'pcard__img fade-on-load'
+  endif
   assign img_sizes = sizes | default: '(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw'
 
   assign is_part = false
@@ -56,7 +61,7 @@
         {{
           product.featured_image
           | image_url: width: 900
-          | image_tag: class: 'pcard__img', alt: '', loading: img_loading, sizes: img_sizes, widths: '300, 450, 600, 900', onload: "this.classList.add('is-loaded')"
+          | image_tag: class: img_class, alt: '', loading: img_loading, sizes: img_sizes, widths: '300, 450, 600, 900', onload: "this.classList.add('is-loaded')"
         }}
         {%- assign second_image = product.images[1] -%}
         {%- if second_image -%}
