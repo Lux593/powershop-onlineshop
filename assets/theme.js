@@ -234,9 +234,15 @@
     var prev = document.querySelector('[data-rail-prev="' + id + '"]');
     var next = document.querySelector('[data-rail-next="' + id + '"]');
     if (!prev || !next) return;
+    // Schrittweite = erste sichtbare Karte plus Abstand. Ausgeblendete Karten (im Showroom die Bikes des anderen Zustands bzw.
+    // einer anderen Kategorie, display: none) haben Breite 0; stand eine davon vorn, rückte der Pfeil nur um den Abstand und
+    // Scroll-Snap zog die Schiene zurück (seit 11.11.2026 behoben).
     function step() {
-      var first = rail.firstElementChild;
-      return first ? first.getBoundingClientRect().width + parseFloat(getComputedStyle(rail).columnGap || 0) : rail.clientWidth;
+      for (var card = rail.firstElementChild; card; card = card.nextElementSibling) {
+        var w = card.getBoundingClientRect().width;
+        if (w > 0) return w + parseFloat(getComputedStyle(rail).columnGap || 0);
+      }
+      return rail.clientWidth;
     }
     // aria-disabled statt disabled: Ein per Tastatur bedienter Pfeil, der am Ende gesperrt wird, verlöre sonst den Fokus (der Browser
     // setzt ihn auf body). Gesperrt ist er für Screenreader und optisch (components.css), der Klick tut dann nichts.
