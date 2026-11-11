@@ -721,4 +721,20 @@
     if (!urls.length) return ['kein Abruf ausgelöst, die Prüfung greift nicht'];
     return urls.filter((u) => new URL(u, location.href).origin !== location.origin).map((u) => 'fremde Adresse: ' + u);
   }, () => document.querySelector('[data-cart-page]') ? '' : 'keine Warenkorb-Seite');
+
+  // ---- Task 6: Zweitbild der Produktkarte nur mit Hover ab 1024 px ----
+  const hoverWide = () => matchMedia('(hover: hover) and (min-width: 1024px)').matches;
+  const hasAlt = () => document.querySelector('.pcard__img--alt') ? '' : 'keine Karte mit Zweitbild';
+  PK.add('alt.touch', () => [...document.querySelectorAll('.pcard__img--alt')]
+    .filter((i) => getComputedStyle(i).display !== 'none' || i.currentSrc).map((i) => 'Zweitbild da oder geladen: ' + i.src.slice(-50)),
+    () => hoverWide() ? 'nur ohne Hover oder unter 1024 px' : hasAlt());
+  PK.add('alt.desktop', async () => {
+    const alt = document.querySelector('.pcard__img--alt'), f = [];
+    alt.style.transition = 'none'; alt.closest('.pcard').querySelector('a').focus(); await frames(2);
+    if (getComputedStyle(alt).display === 'none') f.push('Zweitbild am Desktop ausgeblendet');
+    // :focus-within greift nur, wenn das Fenster den Fokus hat
+    if (document.hasFocus() && getComputedStyle(alt).opacity !== '1') f.push('Fokus zeigt das Zweitbild nicht');
+    document.activeElement.blur(); alt.style.transition = '';
+    return f;
+  }, () => hoverWide() ? hasAlt() : 'nur mit Hover ab 1024 px');
 })();

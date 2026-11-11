@@ -197,7 +197,9 @@
 .pcard__media { position: relative; aspect-ratio: 4 / 5; background: var(--c-stone); overflow: hidden; }
 .pcard__media > a { position: absolute; inset: 0; }
 .pcard__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity var(--t-med), transform 600ms var(--ease); }
-.pcard__img--alt { opacity: 0; }
+/* Zweitbild: zu sehen ist es nur mit Hover ab 1024 px (Hover und Fokus unten). Sonst bleibt es ohne Box, denn ein Lazy-Bild ohne
+   Box lädt nicht: Handy und Tablet holen so keine Bilder, die nie erscheinen. */
+.pcard__img--alt { opacity: 0; display: none; }
 .pcard__badges { position: absolute; top: 12px; left: 12px; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; pointer-events: none; }
 .pcard__quick {
   position: absolute; left: 0; right: 0; bottom: 0; padding: 12px;
@@ -215,6 +217,7 @@
 .pcard.is-quick-open .pcard__plus .icon { transform: rotate(45deg); }
 @media (hover: hover) and (min-width: 1024px) {
   .pcard__plus { display: none; }
+  .pcard__img--alt { display: block; }
   .pcard:hover .pcard__img--alt, .pcard:focus-within .pcard__img--alt { opacity: 1; }
   .pcard:hover .pcard__quick, .pcard:focus-within .pcard__quick { transform: none; }
 }
