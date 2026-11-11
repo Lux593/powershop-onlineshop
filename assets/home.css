@@ -9,10 +9,10 @@
 /* Heller Grund wie die Seite: Überschrift mit Bar & Shield, Aussage mit Gebäudezeichnung (.statement__stage), darunter
    die Service-Kacheln. Die Bühne isoliert die Zeichnung (liegt über dem Seitengrund, unter dem Text). Sie ist mindestens
    so hoch wie die Zeichnung plus 48 px; mit der Parallax-Drift (±8 %) ragt das Dach zeitweise darüber und läuft dann
-   in den oberen Abstand der Section, die nur seitlich überstehende Teile (mobil 110vw) abschneidet. */
+   in den oberen Abstand der Section, die nur seitlich überstehende Teile abschneidet. Mobil 90vw breit und mittig, ganz sichtbar. */
 .statement { padding-block: var(--section-y); overflow: clip; }
 .statement__stage {
-  --draw-w: 110vw; --draw-h: calc(var(--draw-w) * 0.625); /* Zeichnung 744 × 465 */
+  --draw-w: 90vw; --draw-h: calc(var(--draw-w) * 0.625); /* Zeichnung 744 × 465 */
   position: relative; isolation: isolate; padding-bottom: var(--s-8); min-height: calc(var(--draw-h) + var(--s-6));
 }
 @media (min-width: 700px) { .statement__stage { --draw-w: clamp(360px, 54vw, 900px); } }
@@ -49,7 +49,7 @@
 /* Gebäudezeichnung hinter der Aussage: dunkle Linien direkt in der SVG (kein Filter), sehr leise. Die Parallax-Drift (data-parallax) belegt transform am Bild, Lage und Maske sitzen
    deshalb am Träger. Das Gebäude steht rechts über der Unterkante der Bühne (um die Drift angehoben), über den Kacheln. */
 .statement__drawing {
-  position: absolute; z-index: -1; right: -10%; bottom: calc(var(--draw-h) * 0.08); width: var(--draw-w);
+  position: absolute; z-index: -1; right: 5%; bottom: calc(var(--draw-h) * 0.08); width: var(--draw-w);
   opacity: 0.1; pointer-events: none;
 }
 .statement__drawing img { display: block; width: 100%; height: auto; }
