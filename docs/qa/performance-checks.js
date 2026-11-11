@@ -737,4 +737,39 @@
     document.activeElement.blur(); alt.style.transition = '';
     return f;
   }, () => hoverWide() ? hasAlt() : 'nur mit Hover ab 1024 px');
+
+  // ---- Task 7: Seiten vorab holen (Speculation Rules) ----
+  const rules = () => { const s = document.getElementById('ps-speculation'); return s && JSON.parse(s.textContent); };
+  const specOk = () => HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules') ? '' : 'Browser ohne Speculation Rules';
+  PK.add('spec.rule', () => {
+    const r = rules(), f = [];
+    if (!r || !r.prefetch) return ['keine Regel im Dokument'];
+    if (r.prerender) f.push('prerender in der Regel');
+    if (r.prefetch[0].eagerness !== (mouse() ? 'moderate' : 'conservative')) f.push('eagerness ' + r.prefetch[0].eagerness);
+    return f;
+  }, specOk);
+  // Prüft auch die Muster selbst: Ein ungültiges Muster wirft in new URLPattern und erscheint als Fehler (Chrome verwürfe sonst
+  // still die ganze Regel).
+  PK.add('spec.where', () => {
+    const w = rules().prefetch[0].where, f = [];
+    const hit = (x, a) => x.and ? x.and.every((y) => hit(y, a)) : x.or ? x.or.some((y) => hit(y, a)) : x.not ? !hit(x.not, a)
+      : x.href_matches ? [].concat(x.href_matches).some((p) => new URLPattern(p, location.origin).test(a.href))
+      : [].concat(x.selector_matches).some((sel) => a.matches(sel));
+    const link = (href, attr = '') => Object.assign(document.createElement('div'), { innerHTML: `<a href="${href}" ${attr}>x</a>` }).firstChild;
+    ['/cart', '/cart/add', '/de/cart', '/checkout', '/checkouts/c/123', '/account', '/account/login', '/customer_authentication/login',
+     '/discount/WINTER', '/password', '/challenge', '/apps/x', '/a/x', '/tools/x', '/community/x', '/services/login_with_shop',
+     '/12345/orders/abc', 'https://example.com/products/x'].forEach((h) => { if (hit(w, link(h))) f.push('würde vorab holen: ' + h); });
+    ['/', '/products/helm', '/de/products/helm', '/collections/herren', '/collections/herren?page=2', '/pages/ueber-uns', '/search?q=helm']
+      .forEach((h) => { if (!hit(w, link(h))) f.push('holt nicht vorab: ' + h); });
+    ['target="_blank"', 'download', 'rel="nofollow"', 'data-no-prefetch', 'data-filter-link']
+      .forEach((a) => { if (hit(w, link('/products/helm', a))) f.push('würde vorab holen mit ' + a); });
+    return f;
+  }, () => specOk() || (window.URLPattern && rules() ? '' : 'keine Regel oder kein URLPattern'));
+  PK.add('spec.cart', async () => {
+    const a = document.getElementById('ps-speculation');
+    document.dispatchEvent(new CustomEvent('ps:cart', { detail: { count: 0, previous: 0 } }));
+    await frames(1);
+    const b = document.getElementById('ps-speculation');
+    return b && b !== a && !a.isConnected && b.textContent === a.textContent ? [] : ['Regel nach ps:cart nicht neu eingesetzt'];
+  }, () => specOk() || (rules() ? '' : 'keine Regel'));
 })();

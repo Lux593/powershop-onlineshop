@@ -136,6 +136,54 @@
       {%- endif -%}
     {%- endunless -%}
 
+    {%- comment -%}
+      Seiten vorab holen: Speculation Rules, nur Chrome und Edge (Safari und Firefox ignorieren die Regel). Nur prefetch, kein
+      prerender: Sonst liefen Intro, Hero-Film und Animationen unsichtbar vorab, und die Statistik zählte zu früh. Mit Maus
+      moderate (nach ca. 200 ms Zeigen), am Touch-Gerät conservative (beim Fingerauflegen): Seit Chrome 138 löst moderate auf Android
+      schon aus, wenn ein Link ins Bild kommt, beim Scrollen durch eine Kollektion liefen sonst laufend Abrufe. JSON kennt keine
+      Media Query, daher setzt ein Skript die Regel. Nie vorab, nach dem Prinzip „nur Seiten ohne Nebenwirkung“: Warenkorb, Kasse,
+      Konto und Anmelden, Rabatt-Links, Passwort- und Challenge-Seite, App-Proxys (auch mit Sprachpräfix), dazu Filterlinks (laufen
+      per fetch), neue Tabs, Downloads, nofollow und alles mit data-no-prefetch. Nicht im Theme-Editor, nicht bei Datensparen, 2G
+      oder 3G.
+      Der Warenkorb darf nie veraltet erscheinen: Eine vor dem Hinzufügen geholte Seite zeigte den alten Stand. Chrome verwirft sie
+      heute schon selbst, weil Shopify bei jedem Hinzufügen die Warenkorb-Cookies neu setzt (gleicher Wert, neues Ablaufdatum;
+      gemessen am 11.11.2026, auch beim zweiten Artikel). Darauf verlassen wir uns nicht: Nach jeder Änderung (ps:cart) kommt die
+      Regel als neues Element, Chrome bricht die Spekulationen einer entfernten Regel ab. Ein Klon ginge nicht: Er erbt das Merkmal
+      „already started“ und würde nie ausgewertet. Sicherheitsnetz für jeden Browser ist der Abgleich in cart.js (data-sig).
+    {%- endcomment -%}
+    {%- unless request.design_mode -%}
+      <script>
+        (function () {
+          var c = navigator.connection;
+          if (!(window.HTMLScriptElement && HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules'))) return;
+          if (c && (c.saveData || /(^|-)[23]g$/.test(c.effectiveType || ''))) return;
+          var lang = '/:lang([a-z]{2}|[a-z]{2}-[a-z]{2})?';
+          var off = ['/cart*', '/checkout*', '/checkouts/*', '/account*', '/customer_authentication/*', '/discount/*', '/password*',
+            '/challenge*', '/apps/*', '/a/*', '/tools/*', '/community/*', '/services/*', '/*/orders/*'];
+          var rules = { prefetch: [{
+            source: 'document',
+            eagerness: matchMedia('(hover: hover) and (pointer: fine)').matches ? 'moderate' : 'conservative',
+            where: { and: [
+              { href_matches: '/*' },
+              { not: { href_matches: off.map(function (p) { return lang + p; }) } },
+              { not: { selector_matches: '[data-filter-link], [target="_blank"], [download], [rel~="nofollow"], [data-no-prefetch], [data-no-prefetch] a' } }
+            ] }
+          }] };
+          function put() {
+            var old = document.getElementById('ps-speculation');
+            if (old) old.remove();
+            var s = document.createElement('script');
+            s.type = 'speculationrules';
+            s.id = 'ps-speculation';
+            s.textContent = JSON.stringify(rules);
+            document.head.appendChild(s);
+          }
+          put();
+          document.addEventListener('ps:cart', put);
+        })();
+      </script>
+    {%- endunless -%}
+
     {{ content_for_header }}
   </head>
 
