@@ -167,8 +167,9 @@
 /* ---------- Formulare ---------- */
 .field { display: grid; gap: 6px; }
 .field label, .label { font-size: var(--fs-small); font-weight: 600; }
+/* font-size 16px: iOS Safari zoomt beim Fokus in Felder mit weniger als 16 px hinein (z. B. Preisfelder im Filter-Dialog, geerbte 15 px) */
 .input, .select {
-  width: 100%; min-height: 48px; padding: 0 14px;
+  width: 100%; min-height: 48px; padding: 0 14px; font-size: 16px;
   border: 1px solid var(--c-border-input); border-radius: var(--radius); background: var(--c-white);
 }
 .input:focus, .select:focus { border-color: var(--c-black); }
