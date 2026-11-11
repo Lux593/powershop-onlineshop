@@ -25,7 +25,7 @@
     var rotate = wanted && chips.length > 1; // endet mit dem ersten Tab-Klick
     var paused = !wanted || !!slow;          // ohne Bewegung startet die Seite pausiert
     var seen = true, awake = false, cur = 0, auto = false;
-    var swipeDir = 0, leaveTimers = []; // swipeDir: 1 = Wisch nach links (nächstes Modell), -1 = nach rechts; nur für den einen Wechsel
+    var swipeDir = 0; // 1 = Wisch nach links (nächstes Modell), -1 = nach rechts; gilt nur für den einen Wechsel
     var began = !paused; // Fortschrittslinie läuft erst, wenn die Seite wirklich spielt: sonst steht sie bei 0 und der aktive Tab hat keinen Marker
     var hover = false, focus = false; // Maus über dem Text oder Tastaturfokus darin: Bildwechsel hält an, der Film läuft weiter
 
@@ -128,29 +128,17 @@
     if (tabs) {
       tabs.addEventListener('ps:tab', function (e) {
         var i = parseInt(e.detail.dataset.index, 10) || 0;
-        var dir = swipeDir, glide = !!dir && motion; // Wisch: das Bild fährt mit dem Text seitlich, sonst blendet es über
-        var back = dir ? dir < 0 : i < cur;          // Wisch: die Richtung folgt dem Finger, auch beim Sprung vom letzten zum ersten Modell
+        // Richtung des Texts: bei Wisch folgt sie dem Finger (auch beim Sprung vom letzten zum ersten Modell), sonst der Lage der Tabs
+        var back = swipeDir ? swipeDir < 0 : i < cur;
         swipeDir = 0;
         if (!auto) end();
         slides.forEach(function (s, k) {
           var on = k === i, img = s.querySelector('img');
           if (!on && s.classList.contains('is-active')) {
             s.classList.add('is-leaving'); // bleibt unter dem neuen, bis dieser eingeblendet ist
-            s.classList.remove('is-slide-in');
-            s.classList.toggle('is-slide-out', glide);
-            s.classList.toggle('is-slide-back', glide && back);
-            clearTimeout(leaveTimers[k]);
-            leaveTimers[k] = setTimeout(function () { s.classList.remove('is-leaving', 'is-slide-out', 'is-slide-back'); }, 800);
+            setTimeout(function () { s.classList.remove('is-leaving'); }, 800);
           }
-          if (on) {
-            clearTimeout(leaveTimers[k]);
-            s.classList.remove('is-leaving', 'is-slide-in', 'is-slide-out', 'is-slide-back');
-            if (glide && !s.classList.contains('is-active')) {
-              void s.offsetWidth; // die Fahrt beginnt sauber von vorn
-              s.classList.add('is-slide-in');
-              s.classList.toggle('is-slide-back', back);
-            }
-          }
+          if (on) s.classList.remove('is-leaving');
           s.classList.toggle('is-active', on);
           s.setAttribute('aria-hidden', !on);
           if (on && img) img.loading = 'eager'; // Sicherheitsnetz: lazy hält gestapelte Bilder nicht zurück
@@ -164,11 +152,12 @@
       });
     }
     /* ---------------- Wischen (Touch) ----------------
-       Nach links wischen: das nächste Modell fährt von rechts herein, nach rechts: das vorige von links; vom letzten geht es
-       zum ersten und zurück. Ein Wisch zählt wie ein Tab-Klick (beendet den Bildwechsel). touch-action: pan-y am Hero (hero.css)
-       lässt Hoch und Runter beim Browser, nur seitliche Züge kommen hier an. Nicht gewertet: Züge, die auf den Tabs oder der
-       Pause-Taste beginnen, sowie kurze (unter 48 px), schräge oder langsame (über 800 ms) Züge. Während der Fahrt (650 ms) ist
-       ein weiterer Wisch gesperrt, sonst stapeln sich die Bilder. Die Tabs und die Pfeiltasten bleiben der Weg ohne Touch. */
+       Ein Wisch ist ein Tab-Klick: gleicher Wechsel wie über die Tabs (Text schiebt sich seitlich weg, das neue Bild blendet über,
+       der Film des neuen Modells startet) und er beendet den Bildwechsel. Nur die Richtung des Texts folgt dem Finger: nach links
+       wischen = nächstes Modell, der neue Text kommt von rechts; nach rechts = voriges, der Text kommt von links; vom letzten
+       geht es zum ersten und zurück. touch-action: pan-y am Hero (hero.css) lässt Hoch und Runter beim Browser, nur seitliche Züge
+       kommen hier an. Nicht gewertet: Züge, die auf den Tabs oder der Pause-Taste beginnen, sowie kurze (unter 48 px), schräge
+       oder langsame (über 800 ms) Züge. Nach einem Wisch sind weitere 650 ms gesperrt, bis der Wechsel durch ist. */
     if (chips.length > 1) {
       var sx = 0, sy = 0, st = 0, sid = -1, sat = 0;
       hero.addEventListener('pointerdown', function (e) {

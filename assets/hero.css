@@ -61,18 +61,8 @@
 .hero__slide { position: absolute; inset: 0; opacity: 0; }
 .hero__slide.is-active { z-index: 2; opacity: 1; transition: opacity 800ms var(--ease); }
 .hero__slide.is-leaving { z-index: 1; opacity: 1; }
-/* Wischen am Handy (hero.js): Das Bild fährt wie der Text seitlich (gleiche Dauer und Kurve): das neue von rechts herein, das alte
-   nach links hinaus, bei .is-slide-back umgekehrt. Tab-Klick und Bildwechsel überblenden weiter. touch-action lässt Hoch und Runter
-   (Scrollen) und Zwei-Finger-Zoom beim Browser, seitliche Züge gehören dem Skript. */
+/* Wischen am Handy (hero.js): lässt Hoch und Runter (Scrollen) und Zwei-Finger-Zoom beim Browser, seitliche Züge gehören dem Skript. */
 .hero { touch-action: pan-y pinch-zoom; }
-.has-motion .hero__slide.is-slide-in { transition: none; animation: hero-slide-in 600ms var(--ease) backwards; }
-.has-motion .hero__slide.is-slide-out { animation: hero-slide-out 600ms var(--ease) forwards; }
-.has-motion .hero__slide.is-slide-back.is-slide-in { animation-name: hero-slide-in-back; }
-.has-motion .hero__slide.is-slide-back.is-slide-out { animation-name: hero-slide-out-back; }
-@keyframes hero-slide-in { from { translate: 100% 0; } }
-@keyframes hero-slide-out { to { translate: -100% 0; } }
-@keyframes hero-slide-in-back { from { translate: -100% 0; } }
-@keyframes hero-slide-out-back { to { translate: 100% 0; } }
 /* Slides ohne Sichtbarkeit rendern nicht: ihre lazy Bilder lägen sonst gestapelt im Bild, würden sofort laden und gegen das Poster (LCP) konkurrieren. hero.js holt sie nach Load plus Idle. */
 .hero__slide:not(.is-active):not(.is-leaving) { content-visibility: hidden; }
 .hero__img, .hero__video {
