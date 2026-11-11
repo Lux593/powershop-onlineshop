@@ -40,6 +40,61 @@
     return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   };
 
+  /* ---------------- Vorladen ----------------
+     Gemeinsame Hilfen der Vorlader (Schienen, Showroom, Reiter, Drawer, Reveals). Vorgeladen wird, indem ein Bild von lazy auf eager
+     wechselt: Der Browser holt es sofort, Größe (srcset, sizes) und Einblenden (shop.css, .fade-on-load) bleiben, wie sie sind. */
+  // Langsames Netz oder Datensparen (wie header.js): dann lädt kein Vorlader etwas vorab. Safari kennt navigator.connection nicht,
+  // dort gilt das Netz nie als langsam. Liest bei jedem Aufruf neu.
+  PS.slowNet = function () {
+    var c = navigator.connection;
+    return !!c && (!!c.saveData || /(^|-)[23]g$/.test(c.effectiveType || ''));
+  };
+  // fn nach dem load-Ereignis im Leerlauf (ohne requestIdleCallback nach 300 ms). Ist load schon vorbei, zählt nur der Leerlauf.
+  PS.afterLoad = function (fn) {
+    function idle() {
+      if (window.requestIdleCallback) window.requestIdleCallback(fn, { timeout: 2000 });
+      else setTimeout(fn, 300);
+    }
+    if (document.readyState === 'complete') idle();
+    else window.addEventListener('load', idle, { once: true });
+  };
+  // Stellt ein lazy Bild auf eager und gibt true. data-pre = Grund und Zeitpunkt (Prüfung, Fehlersuche). Sonst false, ohne Änderung.
+  // why: rail, state, chip, tab, drawer oder reveal
+  PS.eager = function (img, why) {
+    if (!img || img.loading !== 'lazy') return false;
+    img.loading = 'eager';
+    img.dataset.pre = why + ' ' + Math.round(performance.now());
+    return true;
+  };
+  // Lädt die lazy Bilder der Karten vor, das Hover-Zweitbild der Produktkarte nie. Gibt die Zahl der umgestellten Bilder, bei
+  // langsamem Netz 0 (dann bleibt alles lazy).
+  PS.eagerCards = function (cards, why) {
+    if (PS.slowNet()) return 0;
+    var n = 0;
+    [].forEach.call(cards, function (card) {
+      card.querySelectorAll('img[loading="lazy"]').forEach(function (img) {
+        if (!img.classList.contains('pcard__img--alt') && PS.eager(img, why)) n++;
+      });
+    });
+    return n;
+  };
+  // Erfüllt, sobald jedes Bild fertig ist (complete, load oder error), spätestens nach ms
+  PS.whenLoaded = function (imgs, ms) {
+    return new Promise(function (resolve) {
+      var left = 0, done = false;
+      function finish() { if (!done) { done = true; resolve(); } }
+      function one() { if (--left <= 0) finish(); }
+      [].forEach.call(imgs, function (img) {
+        if (img.complete) return;
+        left++;
+        img.addEventListener('load', one, { once: true });
+        img.addEventListener('error', one, { once: true });
+      });
+      if (!left) finish();
+      else setTimeout(finish, ms);
+    });
+  };
+
   // Bewegung: No-op-Stub, motion.js ersetzt ihn (Vertrag dort). Fehlt es, bleiben Aufrufe harmlos.
   function noop() {}
   PS.motion = PS.motion || { enabled: false, scroll: false, add: noop, track: noop, refresh: noop };
@@ -228,22 +283,22 @@
   });
 
   /* ---------------- Schienen (horizontale Karussells) ---------------- */
+  // Schrittweite = erste sichtbare Karte plus Abstand. Ausgeblendete Karten (im Showroom die Bikes des anderen Zustands bzw.
+  // einer anderen Kategorie, display: none) haben Breite 0; stand eine davon vorn, rückte der Pfeil nur um den Abstand und
+  // Scroll-Snap zog die Schiene zurück (seit 11.11.2026 behoben). Auch der Vorlauf der Schienen (unten) rechnet damit.
+  function railStep(rail) {
+    for (var card = rail.firstElementChild; card; card = card.nextElementSibling) {
+      var w = card.getBoundingClientRect().width;
+      if (w > 0) return w + parseFloat(getComputedStyle(rail).columnGap || 0);
+    }
+    return rail.clientWidth;
+  }
   PS.on('.rail', function (rail) {
     var id = rail.id;
     if (!id) return;
     var prev = document.querySelector('[data-rail-prev="' + id + '"]');
     var next = document.querySelector('[data-rail-next="' + id + '"]');
     if (!prev || !next) return;
-    // Schrittweite = erste sichtbare Karte plus Abstand. Ausgeblendete Karten (im Showroom die Bikes des anderen Zustands bzw.
-    // einer anderen Kategorie, display: none) haben Breite 0; stand eine davon vorn, rückte der Pfeil nur um den Abstand und
-    // Scroll-Snap zog die Schiene zurück (seit 11.11.2026 behoben).
-    function step() {
-      for (var card = rail.firstElementChild; card; card = card.nextElementSibling) {
-        var w = card.getBoundingClientRect().width;
-        if (w > 0) return w + parseFloat(getComputedStyle(rail).columnGap || 0);
-      }
-      return rail.clientWidth;
-    }
     // aria-disabled statt disabled: Ein per Tastatur bedienter Pfeil, der am Ende gesperrt wird, verlöre sonst den Fokus (der Browser
     // setzt ihn auf body). Gesperrt ist er für Screenreader und optisch (components.css), der Klick tut dann nichts.
     function lock(button, on) { if (on) button.setAttribute('aria-disabled', 'true'); else button.removeAttribute('aria-disabled'); }
@@ -251,10 +306,45 @@
       lock(prev, rail.scrollLeft <= 4);
       lock(next, rail.scrollLeft + rail.clientWidth >= rail.scrollWidth - 4);
     }
-    prev.addEventListener('click', function () { if (prev.getAttribute('aria-disabled') !== 'true') rail.scrollBy({ left: -step(), behavior: PS.prefersReducedMotion() ? 'auto' : 'smooth' }); });
-    next.addEventListener('click', function () { if (next.getAttribute('aria-disabled') !== 'true') rail.scrollBy({ left: step(), behavior: PS.prefersReducedMotion() ? 'auto' : 'smooth' }); });
+    prev.addEventListener('click', function () { if (prev.getAttribute('aria-disabled') !== 'true') rail.scrollBy({ left: -railStep(rail), behavior: PS.prefersReducedMotion() ? 'auto' : 'smooth' }); });
+    next.addEventListener('click', function () { if (next.getAttribute('aria-disabled') !== 'true') rail.scrollBy({ left: railStep(rail), behavior: PS.prefersReducedMotion() ? 'auto' : 'smooth' }); });
     rail.addEventListener('scroll', update, { passive: true });
     window.addEventListener('resize', update);
     update();
+  });
+
+  /* ---------------- Schienen vorladen ----------------
+     In einer horizontalen Schiene holt der Browser ein lazy Bild erst, wenn die Karte sichtbar wird (kein Vorlauf zur Seite). Beim
+     schnellen Wischen sähe man Platzhalter. Darum zwei Schritte, beide erst nach load im Leerlauf und nie bei PS.slowNet():
+     1. Annähern: Ein Observer aufs Fenster mit einer Fensterhöhe Vorlauf oben und unten. Beim ersten Treffer startet Schritt 2,
+        und die Schiene meldet ps:rail-near. Schritt 2 wartet darauf, weil ein Observer mit der Schiene als root ihre Lage auf der
+        Seite nicht kennt: Er sähe die ersten Karten sofort und lüde sie schon beim Seitenaufruf, auch weit unten.
+     2. Wischen und Pfeile: Ein Observer mit der Schiene als root und einem Rand links und rechts lädt jede Karte, die in den Rand
+        kommt. Der Rand umfasst mindestens 3 Karten, weil das Handy nur gut eine Karte zeigt. Er wird einmal berechnet und beim
+        Drehen des Handys nicht neu: Er bleibt groß genug. Versteckte Karten (display: none, hidden) haben keine Box und treffen
+        erst, wenn sie sichtbar werden. */
+  PS.on('.rail, .product-grid--rail', function (rail) {
+    if (!('IntersectionObserver' in window)) return;
+    function ahead() {
+      var m = Math.round(Math.max(rail.clientWidth, 3 * railStep(rail))) || 0;
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (!en.isIntersecting) return;
+          io.unobserve(en.target);
+          PS.eagerCards([en.target], 'rail');
+        });
+      }, { root: rail, rootMargin: '0px ' + m + 'px 0px ' + m + 'px' });
+      [].forEach.call(rail.children, function (card) { io.observe(card); });
+    }
+    PS.afterLoad(function () {
+      if (PS.slowNet()) return;
+      var near = new IntersectionObserver(function (entries) {
+        if (!entries.some(function (en) { return en.isIntersecting; })) return;
+        near.disconnect();
+        ahead();
+        rail.dispatchEvent(new CustomEvent('ps:rail-near', { bubbles: true }));
+      }, { rootMargin: '100% 0px 100% 0px' });
+      near.observe(rail);
+    });
   });
 })();

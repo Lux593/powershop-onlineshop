@@ -462,4 +462,80 @@
     const lazy = i.getAttribute('loading') === 'lazy' || !!pre(i); // so von Liquid ausgegeben
     return lazy === has ? [] : [(has ? 'eager mit' : 'lazy ohne') + ' fade-on-load: ' + i.src.slice(-50)];
   }));
+
+  // ---- Task 2: Vorlade-Hilfen und Schienen ----
+  // Ablauf: neuer Tab, erst PK.run('rail.far') (frisch geladen), dann PK.run('rail') und PK.run('pre').
+  // rail.swipe zählt nur in einem eigenen neuen Tab (Memory-Cache): PK.run('rail.swipe').
+  PK.add('rail.api', () => ['slowNet', 'afterLoad', 'eager', 'eagerCards', 'whenLoaded']
+    .filter((k) => typeof PS[k] !== 'function').map((k) => 'PS.' + k + ' fehlt'));
+  PK.add('rail.slownet', () => {
+    const f = [];
+    try {
+      [[{ saveData: true }, true], [{ effectiveType: '3g' }, true], [{ effectiveType: 'slow-2g' }, true],
+       [{ effectiveType: '4g' }, false], [undefined, false]].forEach(([c, want]) => {
+        Object.defineProperty(navigator, 'connection', { configurable: true, value: c });
+        if (PS.slowNet() !== want) f.push(JSON.stringify(c) + ' ergibt ' + !want);
+      });
+    } finally { delete navigator.connection; }
+    return f;
+  });
+  PK.add('rail.far', async () => {
+    await wait(1500);
+    return [...document.querySelectorAll('.rail, .product-grid--rail')]
+      .filter((r) => r.getBoundingClientRect().top > 2.5 * innerHeight && r.querySelector('img[data-pre]'))
+      .map((r) => 'zu früh vorgeladen: ' + (r.id || r.className));
+  }, fresh);
+  PK.add('rail.ahead', async () => {
+    const f = [];
+    for (const rail of [...document.querySelectorAll('.rail')].filter((r) => r.getClientRects().length)) {
+      await near(rail);
+      const right = rail.getBoundingClientRect().right;
+      const cards = [...rail.children].filter((c) => c.getClientRects().length && imgs(c).length);
+      const vis = cards.filter((c) => c.getBoundingClientRect().left < right).length;
+      const eager = cards.filter((c) => imgs(c).every((i) => i.loading === 'eager')).length;
+      const want = Math.min(cards.length, vis + 3);
+      if (eager < want) f.push(`#${rail.id}: ${eager} Karten vorgeladen, erwartet mindestens ${want}`);
+      if (cards.length > vis + 8 && eager === cards.length) f.push(`#${rail.id}: alle ${eager} Karten auf einmal`);
+    }
+    return f;
+  });
+  PK.add('rail.neuheiten', async () => {
+    const grid = document.querySelector('[role="tabpanel"]:not([hidden]) .product-grid--rail');
+    await near(grid);
+    const cards = [...grid.children], eager = cards.filter((c) => imgs(c).every((i) => i.loading === 'eager')).length;
+    return eager >= Math.min(cards.length, 4) ? [] : [`Neuheiten: ${eager} Karten vorgeladen`];
+  }, () => innerWidth >= 1024 ? 'nur unter 1024 px' : document.querySelector('.product-grid--rail') ? '' : 'keine Neuheiten');
+  PK.add('pre.hidden', () => [...document.querySelectorAll('img[data-pre]')]
+    .filter((i) => !i.getClientRects().length && !['state', 'tab', 'chip', 'drawer'].includes(pre(i).why))
+    .map((i) => `verstecktes Bild vorgeladen (${pre(i).why}): ${i.src.slice(-50)}`));
+  PK.add('rail.afterload', () => {
+    const end = performance.getEntriesByType('navigation')[0].loadEventEnd;
+    return [...document.querySelectorAll('img[data-pre]')].filter((i) => pre(i).at < end).map((i) => 'vor load: ' + i.src.slice(-50));
+  });
+  // Kopie der Showroom-Schiene: einmal mit saveData, einmal ohne als Gegenprobe. Die Kopie bekommt keine Bildquellen: Ein
+  // geklontes Bild lädt sofort (noch nicht im Dokument, lazy greift nicht) und legte alle Bikes in den Speicher-Cache.
+  PK.add('rail.slow', async () => {
+    const probe = async (save) => {
+      const rail = room().rail, clone = rail.cloneNode(true);
+      clone.id = rail.id + '-pk';
+      clone.querySelectorAll('img').forEach((i) => {
+        i.removeAttribute('srcset'); i.removeAttribute('src'); i.setAttribute('loading', 'lazy'); i.removeAttribute('data-pre');
+      });
+      if (save) Object.defineProperty(navigator, 'connection', { configurable: true, value: { saveData: true } });
+      try {
+        rail.after(clone); PS.scan(clone); await near(clone); await wait(1500);
+        return !!clone.querySelector('img[data-pre]');
+      } finally { clone.remove(); delete navigator.connection; }
+    };
+    const f = [];
+    if (await probe(true)) f.push('bei saveData vorgeladen');
+    if (!await probe(false)) f.push('Gegenprobe: die Kopie lädt auch ohne saveData nicht vor, die Prüfung greift nicht');
+    return f;
+  }, () => room() ? '' : 'kein Showroom');
+  PK.add('rail.swipe', async () => { // nur frisch geladen (Memory-Cache), also in einem eigenen neuen Tab
+    const { rail } = room();
+    await near(rail);
+    const r = await PK.m.swipe(rail, mouse() ? 4000 : 3000);
+    return r.ready >= 0.9 * r.seen ? [] : [`nur ${r.ready} von ${r.seen} Karten fertig: ${r.late.slice(0, 3).join(', ')}`];
+  }, () => !room() ? 'kein Showroom' : fresh());
 })();
