@@ -658,4 +658,28 @@
     if (entries(/sections=cart-drawer/).some((e) => e.startTime > t)) f.push('Abruf trotz gleichem Stand');
     return f;
   });
+
+  // ---- Task 5: Vorlader für Reveals ----
+  // Ablauf: neuer Tab, PK.run('reveal') (reveal.ahead nur frisch geladen, reveal.ready scrollt die ganze Seite), dann
+  // PK.run('pre'). NO_PRELOAD ist dieselbe Liste wie in assets/motion.js.
+  const NO_PRELOAD = '.rail, .product-grid--rail, [data-hero], [data-story], [data-about-team], [data-build-book], [data-header], [data-pdp], [data-no-preload]';
+  const revealImgs = () => [...document.querySelectorAll('[data-reveal] img, [data-stagger] img')].filter((i) =>
+    !i.classList.contains('pcard__img--alt') && !i.closest(NO_PRELOAD) && i.getClientRects().length && (i.getAttribute('loading') === 'lazy' || pre(i)));
+  PK.add('reveal.ahead', async () => {
+    await wait(1500);
+    const f = [], h = innerHeight;
+    revealImgs().forEach((i) => {
+      const top = i.getBoundingClientRect().top;
+      if (top > h && top < 2.4 * h && i.loading !== 'eager') f.push('nicht vorgeladen: ' + i.src.slice(-50));
+      if (top > 2.6 * h && pre(i)) f.push('zu früh vorgeladen: ' + i.src.slice(-50));
+    });
+    return f;
+  }, () => needMotion() || fresh());
+  PK.add('reveal.excl', () => [...document.querySelectorAll('img[data-pre]')]
+    .filter((i) => pre(i).why === 'reveal' && (i.closest(NO_PRELOAD) || i.classList.contains('pcard__img--alt')))
+    .map((i) => 'Ausnahme vorgeladen: ' + i.src.slice(-50)));
+  PK.add('reveal.ready', async () => { // neuer Tab (Memory-Cache)
+    const r = await PK.m.reveals(2500);
+    return !r.revealed || r.ready >= 0.9 * r.revealed ? [] : [`${r.ready} von ${r.revealed} Reveals mit fertigem Bild: ${r.late.slice(0, 3).join(', ')}`];
+  }, needMotion);
 })();

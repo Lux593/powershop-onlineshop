@@ -94,6 +94,8 @@
     io.disconnect();
     mo.disconnect();
     wait.clear();
+    if (pio) { pio.disconnect(); pio = null; }
+    pending = null;
   }
   var rm = window.matchMedia('(prefers-reduced-motion: reduce)');
   function onRm(e) { if (e.matches) teardown(); }
@@ -193,7 +195,42 @@
     if (b) { el._box = b; b._for = el; io.observe(b); }
     io.observe(el);
     wait.add(el);
+    preload(el);
   }
+
+  /* ---------------- Vorladen unter Reveals ----------------
+     Ein Bild unter einem Reveal soll fertig und dekodiert sein, wenn das Reveal einblendet. Chrome holt lazy Bilder ca.
+     1250 px vorher, Safari erst kurz vor dem Fenster: Dort blendete ein Reveal oft ein leeres Feld ein. Darum stellt ein
+     Beobachter Bilder 1,5 Fensterhöhen vor dem Fenster auf eager und dekodiert sie. Er startet erst nach load (PS.afterLoad),
+     ohne Bewegung oder bei langsamem Netz gar nicht.
+     Beobachtet werden die Bilder selbst, nicht die Reveal-Elemente: Ein langer Stagger-Container (z. B. events-page__list)
+     lädt so nur, was wirklich nah ist, und Bilder ohne Box (versteckt) treffen nie.
+     Ausgenommen (NO_PRELOAD): die Schienen (eigener Vorlader in theme.js) und Bereiche, die ihre Bilder selbst in bewusster
+     Reihenfolge laden (hero.js, about-story.js, about-team.js, build-book.js, header.js, product.js). data-no-preload nimmt
+     weitere aus. Das Prüfgerüst (docs/qa/performance-checks.js) nutzt dieselbe Liste. Auslöser, Rand, Dauer, Staffel und
+     Clip der Reveals bleiben, wie sie sind. */
+  var NO_PRELOAD = '.rail, .product-grid--rail, [data-hero], [data-story], [data-about-team], [data-build-book], [data-header], [data-pdp], [data-no-preload]';
+  var pio = null, pending = [];
+  function preload(el) {
+    [].forEach.call(el.querySelectorAll('img[loading="lazy"]'), function (img) {
+      if (img.classList.contains('pcard__img--alt') || img.closest(NO_PRELOAD)) return;
+      if (pio) pio.observe(img); else if (pending) pending.push(img);
+    });
+  }
+  PS.afterLoad(function () {
+    var list = pending;
+    pending = null;
+    if (!list || !M.enabled || PS.slowNet()) return;
+    pio = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        var img = en.target;
+        pio.unobserve(img);
+        if (PS.eager(img, 'reveal') && img.decode) img.decode().catch(noop);
+      });
+    }, { rootMargin: '0px 0px 150% 0px' });
+    list.forEach(function (img) { pio.observe(img); });
+  });
   // Der 8-%-Rand schluckt den untersten Streifen, wenn nicht weiter gescrollt werden kann: dort alles zeigen
   function tail() {
     if (innerHeight + scrollY < doc.documentElement.scrollHeight - 4) return;
