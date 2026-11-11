@@ -41,7 +41,10 @@
   endfor
 -%}
 
-<dialog class="drawer drawer--cart" id="cart-drawer" aria-labelledby="cart-title" data-cart-drawer data-lenis-prevent>
+{%- comment -%} Stückzahl und Fingerabdruck des Warenkorbs: cart.js liest beides aus jeder Section-Antwort (kein zweiter Abruf
+  von /cart.js) und gleicht vorab geholte oder aus dem bfcache kommende Seiten über data-sig ab (sessionStorage). {%- endcomment -%}
+{%- capture cart_sig -%}{{ cart.item_count }}|{{ cart.total_price }}{%- for item in cart.items -%}|{{ item.key }}:{{ item.quantity }}{%- endfor -%}{%- endcapture -%}
+<dialog class="drawer drawer--cart" id="cart-drawer" aria-labelledby="cart-title" data-cart-drawer data-lenis-prevent data-count="{{ cart.item_count }}" data-sig="{{ cart_sig | md5 }}">
   <div class="drawer__head">
     <h2 class="h4 drawer__title" id="cart-title"><img class="drawer__hd" src="{{ 'hd-bar-shield.png' | asset_url }}" alt="" width="49" height="40">Warenkorb ({{ cart.item_count }})</h2>
     <button class="icon-btn" type="button" data-close aria-label="Warenkorb schließen">{% render 'icon', name: 'x' %}</button>

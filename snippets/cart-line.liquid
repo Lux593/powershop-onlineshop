@@ -26,7 +26,9 @@
 
 <div class="line-item">
   {%- if item.image -%}
-    {{ item.image | image_url: width: 176 | image_tag: width: 88, height: 110, alt: '', loading: 'lazy' }}
+    {%- comment -%} Nur diese eine Breite (widths): Die URL gleicht dem Vorschaubild, das cart.js beim Klick vorab holt
+      (data-add-thumb, "thumb" im Produkt-JSON). Der Drawer nimmt es dann aus dem Speicher. {%- endcomment -%}
+    {{ item.image | image_url: width: 176 | image_tag: width: 88, height: 110, alt: '', loading: 'lazy', widths: '176' }}
   {%- else -%}
     <div></div>
   {%- endif -%}

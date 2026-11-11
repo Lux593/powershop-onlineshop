@@ -584,4 +584,78 @@
     if (hidden.some((p) => first(p, 3)[2] && imgs(first(p, 3)[2]).some((i) => i.loading === 'eager'))) f.push('mehr als 2 Karten je Reiter');
     return f;
   }, () => mouse() ? 'nur am Touch-Gerät' : neu() ? '' : 'keine Neuheiten-Reiter');
+
+  // ---- Task 4: Warenkorb: eine Runde weniger, Vorschaubild vorab, Abgleich ----
+  // Ablauf: PK.run('cart') auf der Kollektion bzw. einer Bekleidungs-Produktseite. cart.lines braucht einen Artikel im
+  // Warenkorb und ein Neuladen danach.
+  const quick = () => document.querySelector('[data-add-variant]:not([disabled])');
+  const addFails = (r) => [
+    r.cartJs && `${r.cartJs}× /cart.js nach dem Hinzufügen`, r.adds !== 1 && `${r.adds}× /cart/add.js`,
+    r.events !== 1 && `${r.events}× ps:cart`, !r.thumbPreloaded && 'Vorschaubild nicht beim Klick geholt (andere URL?)',
+    !r.thumbReady && 'Vorschaubild beim Öffnen nicht fertig', r.count !== r.serverCount && `Zähler ${r.count}, Warenkorb ${r.serverCount}`
+  ].filter(Boolean);
+  PK.add('cart.attrs', () => {
+    const d = document.getElementById('cart-drawer'), f = [];
+    const n = (d.querySelector('#cart-title').textContent.match(/\((\d+)\)/) || [])[1];
+    if (d.dataset.count !== n) f.push(`data-count ${d.dataset.count} statt ${n}`);
+    if (!/^[0-9a-f]{32}$/.test(d.dataset.sig || '')) f.push('data-sig fehlt');
+    if (quick() && !quick().dataset.addThumb) f.push('Quick-Add ohne data-add-thumb');
+    return f;
+  });
+  PK.add('cart.add', async () => addFails(await PK.m.add(quick())), () => quick() ? '' : 'kein Quick-Add auf der Seite');
+  // Ohne vorgewählte Variante („bitte wählen“) wählt die Prüfung wie eine Kundin je Option den ersten freien Wert
+  // (product.js setzt dann [data-variant-id]).
+  async function pickVariant(form) {
+    const id = form.elements.namedItem('id');
+    if (!id || id.value) return;
+    document.querySelectorAll('[data-pdp] [data-option-row]').forEach((row) => {
+      if (row.querySelector('[data-option-value][aria-pressed="true"]')) return;
+      const btn = row.querySelector('[data-option-value]:not(.is-soldout):not([disabled])');
+      if (btn) btn.click();
+    });
+    await until(() => !!id.value, 4000);
+  }
+  PK.add('cart.form', async () => {
+    const form = document.querySelector('form[data-product-form]');
+    await pickVariant(form);
+    return addFails(await PK.m.add(form));
+  },
+    () => document.querySelector('form[data-product-form] [type="submit"]:not([disabled])') ? '' : 'kein kaufbares Produktformular');
+  PK.add('cart.fallback', async () => { // Antwort ohne Drawer-Section
+    const orig = window.fetch;
+    window.fetch = (u, o) => orig(u, o).then((res) => !String(u).includes('/cart/add') ? res : res.clone().json().then((j) => {
+      delete j.sections;
+      return new Response(JSON.stringify(j), { status: res.status, headers: { 'Content-Type': 'application/json' } });
+    }));
+    try {
+      const r = await PK.m.add(quick());
+      return [r.cartJs !== 1 && 'kein Rückfall auf /cart.js', r.events !== 1 && `${r.events}× ps:cart`,
+        r.count !== r.serverCount && 'Zähler falsch'].filter(Boolean);
+    } finally { window.fetch = orig; }
+  }, () => quick() ? '' : 'kein Quick-Add auf der Seite');
+  PK.add('cart.change', async () => {
+    const id = +quick().dataset.addVariant, f = [], sel = `#cart-drawer [data-cart-qty][data-key^="${id}:"]`;
+    const qty = () => +(document.querySelector(sel) || { value: 0 }).value, key = () => document.querySelector(sel).dataset.key;
+    await PS.cart.add([{ id, quantity: 1 }]);
+    const q = qty();
+    await PS.cart.change(key(), q + 1);
+    if (qty() !== q + 1) f.push('Menge ändern wirkt nicht');
+    await PS.cart.change(key(), q - 1); // Stand vor der Prüfung, bei 0 entfernt
+    if (qty() !== q - 1) f.push('Zurücksetzen oder Entfernen wirkt nicht');
+    if (document.querySelector('[data-cart-count]').dataset.count !== document.getElementById('cart-drawer').dataset.count) f.push('Zähler und data-count uneinig');
+    return f;
+  }, () => quick() ? '' : 'kein Quick-Add auf der Seite');
+  PK.add('cart.lines', () => [...document.querySelectorAll('#cart-drawer .line-item img')].some((i) => i.loading !== 'eager') ? ['Drawer-Bilder nach load noch lazy'] : [],
+    () => document.querySelector('#cart-drawer .line-item img') ? '' : 'Warenkorb leer: einen Artikel hinzufügen, neu laden');
+  PK.add('cart.sync', async () => {
+    const d = document.getElementById('cart-drawer'), f = [];
+    const show = () => window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true }));
+    let t = performance.now();
+    sessionStorage.setItem('ps:cart-sig', 'veraltet'); show();
+    if (!await until(() => sessionStorage.getItem('ps:cart-sig') === d.dataset.sig, 4000)) f.push('kein Abgleich nach pageshow');
+    if (!entries(/sections=cart-drawer/).some((e) => e.startTime > t)) f.push('Drawer nicht neu geholt');
+    t = performance.now(); show(); await wait(1500);
+    if (entries(/sections=cart-drawer/).some((e) => e.startTime > t)) f.push('Abruf trotz gleichem Stand');
+    return f;
+  });
 })();

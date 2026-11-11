@@ -105,10 +105,11 @@
               {%- endif -%}
               {%- if show_variant -%}
                 {%- assign variant_size = variant.options[size_idx] -%}
+                {%- assign add_thumb = variant.featured_image | default: product.featured_image -%}
                 <button
                   class="size-chip{% unless variant.available %} is-soldout{% endunless %}"
                   type="button"
-                  data-add-variant="{{ variant.id }}"
+                  data-add-variant="{{ variant.id }}"{% if add_thumb %} data-add-thumb="{{ add_thumb | image_url: width: 176 }}"{% endif %}
                   {% unless variant.available %}disabled aria-label="Größe {{ variant_size | escape }}: {{ card_title }} ausverkauft"{% else %}aria-label="Größe {{ variant_size | escape }}: {{ card_title }} in den Warenkorb"{% endunless %}
                 >{{ variant_size | escape }}</button>
               {%- endif -%}
@@ -116,7 +117,8 @@
           </div>
         {%- elsif product.variants.size == 1 -%}
           {%- comment -%} Kurzform für schmale Karten (Handy): Der Button steht dort neben dem runden Schließen-Button (shop.css, Quick-Add) {%- endcomment -%}
-          <button class="btn btn--secondary btn--block btn--sm pcard__add" type="button" data-add-variant="{{ product.selected_or_first_available_variant.id }}">
+          {%- assign add_thumb = product.selected_or_first_available_variant.featured_image | default: product.featured_image -%}
+          <button class="btn btn--secondary btn--block btn--sm pcard__add" type="button" data-add-variant="{{ product.selected_or_first_available_variant.id }}"{% if add_thumb %} data-add-thumb="{{ add_thumb | image_url: width: 176 }}"{% endif %}>
             {% render 'icon', name: 'shopping-bag' %}<span class="pcard__add-long">In den Warenkorb</span><span class="pcard__add-short">In den Korb</span><span class="sr-only">: {{ card_title }}</span></button>
         {%- else -%}
           <a class="btn btn--secondary btn--block btn--sm pcard__add" href="{{ product.url }}"><span class="pcard__add-long">Optionen wählen</span><span class="pcard__add-short">Optionen</span><span class="sr-only">: {{ card_title }}</span></a>

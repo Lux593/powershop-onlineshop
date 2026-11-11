@@ -63,29 +63,37 @@
   }
   if (document.body) liveRegion(); else document.addEventListener('DOMContentLoaded', liveRegion, { once: true });
 
+  // Tauscht den Drawer gegen die frisch gerenderte Section und setzt die Zähler. itemCount ist die Stückzahl aus der Antwort der
+  // Cart-API. Fehlt sie, gilt data-count des frischen Drawers (sections/cart-drawer.liquid). Ist danach keine Stückzahl bekannt
+  // (Antwort ohne Drawer-Section), bleibt alles, wie es ist: false, kein ps:cart. Der Aufrufer holt dann /cart.js.
+  var SIG = 'ps:cart-sig';
   function applySections(sections, itemCount) {
     var html = sections && sections[SECTION];
+    var fresh = html ? new DOMParser().parseFromString(html, 'text/html').querySelector('dialog') : null;
+    if (typeof itemCount !== 'number') itemCount = fresh ? +fresh.dataset.count : NaN;
+    if (!isFinite(itemCount)) return false;
     var counter = document.querySelector('[data-cart-count]');
     var previous = counter ? +counter.dataset.count || 0 : 0;
     var d = drawer(), b = bar(), before = b ? +b.getAttribute('aria-valuenow') || 0 : 0;
-    if (html) {
-      var fresh = new DOMParser().parseFromString(html, 'text/html').querySelector('dialog');
-      if (fresh && d) {
-        d.innerHTML = fresh.innerHTML;
-        d.classList.remove('is-entering'); // Zeilen-Stagger nur beim Öffnen, nicht bei jeder Mengenänderung
-        if (d.open) { fillBar(before); restore(d); } else barFrom = before;
-      }
+    if (fresh && d) {
+      d.innerHTML = fresh.innerHTML;
+      // innerHTML tauscht nur den Inhalt: Stückzahl und Fingerabdruck des Dialogs selbst nachziehen
+      ['count', 'sig'].forEach(function (k) { if (fresh.dataset[k] != null) d.dataset[k] = fresh.dataset[k]; });
+      if (fresh.dataset.sig) { try { sessionStorage.setItem(SIG, fresh.dataset.sig); } catch (e) { /* Speicher gesperrt */ } }
+      // Der Drawer öffnet meist gleich danach: Zeilenbilder nicht erst beim Öffnen laden (lazy im geschlossenen Dialog)
+      if (!PS.slowNet()) d.querySelectorAll('.line-item img').forEach(function (img) { PS.eager(img, 'drawer'); });
+      d.classList.remove('is-entering'); // Zeilen-Stagger nur beim Öffnen, nicht bei jeder Mengenänderung
+      if (d.open) { fillBar(before); restore(d); } else barFrom = before;
     }
-    if (typeof itemCount === 'number') {
-      document.querySelectorAll('[data-cart-count]').forEach(function (el) {
-        el.textContent = itemCount || '';
-        el.dataset.count = itemCount;
-      });
-      document.querySelectorAll('[data-cart-trigger]').forEach(function (el) {
-        el.setAttribute('aria-label', 'Warenkorb, ' + itemCount + ' Artikel');
-      });
-    }
-    document.dispatchEvent(new CustomEvent('ps:cart', { detail: { count: typeof itemCount === 'number' ? itemCount : previous, previous: previous } }));
+    document.querySelectorAll('[data-cart-count]').forEach(function (el) {
+      el.textContent = itemCount || '';
+      el.dataset.count = itemCount;
+    });
+    document.querySelectorAll('[data-cart-trigger]').forEach(function (el) {
+      el.setAttribute('aria-label', 'Warenkorb, ' + itemCount + ' Artikel');
+    });
+    document.dispatchEvent(new CustomEvent('ps:cart', { detail: { count: itemCount, previous: previous } }));
+    return true;
   }
 
   // Öffnen: Zeilen laufen gestaffelt ein (CSS .is-entering), der Balken fährt zum Stand
@@ -156,11 +164,28 @@
     }
     return request(PS.routes.cartAdd + '.js', { method: 'POST', headers: headers, body: body })
       .then(function (data) {
+        // Die Antwort bringt den frisch gerenderten Drawer samt Stückzahl (data-count) mit. /cart.js braucht es nur noch, wenn
+        // die Section fehlt.
+        if (applySections(data.sections)) return data;
         return fetch('/cart.js').then(function (r) { return r.json(); }).then(function (cart) {
           applySections(data.sections, cart.item_count);
           return cart;
         });
       });
+  }
+
+  // Vorschaubild vorab: Beim Klick auf „In den Warenkorb“ holt der Browser das Zeilenbild schon, während /cart/add.js läuft.
+  // Der Drawer lädt dieselbe URL (cart-line.liquid: 176 px, nur diese Breite) und nimmt das Bild dann aus dem Speicher.
+  // Die Liste hält jedes Bild, bis es geladen ist, sonst dürfte der Browser es vorher verwerfen.
+  var warming = [];
+  function warm(url) {
+    if (!url) return;
+    var img = new Image();
+    function done() { var i = warming.indexOf(img); if (i > -1) warming.splice(i, 1); }
+    img.addEventListener('load', done);
+    img.addEventListener('error', done);
+    warming.push(img);
+    img.src = url;
   }
 
   function changeNow(target, quantity) {
@@ -234,6 +259,12 @@
       });
     }
     mark(true, false);
+    try { // Vorschaubild der gewählten Variante aus dem Produkt-JSON (pdp-options.liquid, "thumb")
+      var id = +form.elements.namedItem('id').value;
+      var json = form.closest('[data-pdp]').querySelector('[data-product-json]');
+      var variant = JSON.parse(json.textContent).variants.filter(function (v) { return v.id === id; })[0];
+      if (variant) warm(variant.thumb);
+    } catch (err) { /* ohne Produkt-JSON gibt es nichts vorab */ }
     PS.cart.add(new FormData(form))
       .then(function () {
         mark(false, true);
@@ -247,6 +278,7 @@
     if (!add) return;
     e.preventDefault();
     add.disabled = true;
+    warm(add.dataset.addThumb);
     PS.cart.add([{ id: +add.dataset.addVariant, quantity: 1 }])
       .then(function () {
         // Fokusrückgabe: „+“ (Touch, schmal), am Desktop (kein „+“) die Größe
@@ -257,4 +289,31 @@
       .catch(fail)
       .then(function () { add.disabled = false; });
   });
+
+  // Zeilenbilder nach dem Laden der Seite vorab: lazy lädt im geschlossenen Dialog sonst erst beim Öffnen.
+  PS.afterLoad(function () {
+    if (PS.slowNet()) return;
+    document.querySelectorAll('#cart-drawer img[loading="lazy"]').forEach(function (img) { PS.eager(img, 'drawer'); });
+  });
+
+  /* Abgleich: Der Drawer kommt mit der Seite. Eine vorab geholte Seite (Speculation Rules) oder eine aus dem bfcache zeigt den
+     Warenkorb von damals, und das Warenkorb-Cookie ändert sich ab dem zweiten Artikel nicht mehr, ein Cookie-Vergleich hilft
+     also nicht. Darum merkt sich der Tab den Fingerabdruck des zuletzt gesehenen Warenkorbs (data-sig, sessionStorage). Weicht
+     der Drawer der Seite davon ab, holt sie ihn neu. Wie jede Änderung meldet das ps:cart; steigt der Zähler dabei, wippt das
+     Symbol. Das ist gewollt, der Zähler ändert sich ja sichtbar. */
+  function refresh() {
+    return fetch(window.location.pathname + '?sections=' + SECTION)
+      .then(function (r) { return r.json(); })
+      .then(function (json) { applySections(json); })
+      .catch(function () {});
+  }
+  function sync() {
+    var d = drawer(), sig = d && d.dataset.sig, seen = null;
+    if (!sig) return;
+    try { seen = sessionStorage.getItem(SIG); } catch (e) { return; }
+    if (seen && seen !== sig) enqueue(refresh);
+    else { try { sessionStorage.setItem(SIG, sig); } catch (e) { /* Speicher gesperrt */ } }
+  }
+  sync();
+  window.addEventListener('pageshow', function (e) { if (e.persisted) sync(); });
 })();
