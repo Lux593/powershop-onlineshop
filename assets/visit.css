@@ -231,3 +231,11 @@
 .visit--dark .visit__note { color: var(--c-muted-dark); }
 .visit--dark .visit__hours { border-top-color: var(--c-border-dark); }
 .visit--dark .visit__foot { color: var(--c-on-dark); }
+/* Desktop (seit 11.11., Wunsch des Nutzers): „Route planen“ und alles darunter (Öffnungszeiten, „Zu weit für einen Besuch?“) an
+   der Textkante des Briefkopfs statt am Rand unter dem Logo. Die Logo-Spalte ist ein Subgrid von .visit__info, so folgt die Kante
+   der tatsächlichen Breite des Schilds. Am Handy bleibt der Knopf über die ganze Breite. */
+@media (min-width: 1024px) {
+  .visit__info:has(> .visit__id--logo) { grid-template-columns: auto minmax(0, 1fr); column-gap: 14px; }
+  .visit__info:has(> .visit__id--logo) > .visit__id { grid-column: 1 / -1; grid-template-columns: subgrid; }
+  .visit__info:has(> .visit__id--logo) > :not(.visit__id) { grid-column: 2; }
+}
