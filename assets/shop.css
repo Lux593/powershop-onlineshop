@@ -120,6 +120,7 @@
 .fdrop__btn .dot { position: relative; /* hält den Screenreader-Zusatz („ausgewählt“) in der Zahl */ min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--c-black); color: var(--c-white); font-size: var(--fs-caption); display: grid; place-items: center; }
 .fdrop__panel {
   position: absolute; left: 0; top: calc(100% + 6px); z-index: 50; min-width: 240px; max-height: 360px; overflow: auto;
+  overscroll-behavior: contain; /* am Listenende scrollt nicht die Seite weiter (kurze Listen fängt collection.js ab) */
   padding: 16px; background: var(--c-white); border: 1px solid var(--c-line); box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
 }
 .fgroup { display: grid; gap: 2px; }
@@ -599,6 +600,14 @@ html:not(.has-motion) .bcard:hover .bcard__media img { transform: none; }
 ::view-transition-group(results) { animation-duration: 420ms; animation-timing-function: var(--ease-out); }
 ::view-transition-old(results) { animation: ps-vt-out 160ms linear both; }
 ::view-transition-new(results) { animation: ps-vt-in 420ms var(--ease-out) both; }
+/* Das offene Filter-Menü bekommt für den Wechsel eine eigene Ebene: Sonst steckt es im Root-Abbild, und die Ergebnisse
+   (eigene Gruppe, liegt über dem Root) schoben sich während der Überblendung davor und sprangen danach wieder dahinter.
+   Die Gruppen stehen in Malreihenfolge, das Menü (z-index 50) also über den Ergebnissen. Es zeigt gleich den neuen
+   Stand, ohne Bewegung. */
+:root.is-vt-results .fdrop__panel:not([hidden]) { view-transition-name: filter-panel; }
+::view-transition-group(filter-panel) { animation: none; }
+::view-transition-old(filter-panel) { animation: none; opacity: 0; }
+::view-transition-new(filter-panel) { animation: none; mix-blend-mode: normal; }
 
 /* ---------- Produktseite: Galerie als Slides (Scroll-Snap, mobil wischen) ---------- */
 .gallery__track { position: relative; display: flex; height: 100%; overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none; }

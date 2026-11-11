@@ -423,6 +423,17 @@
       });
     });
 
+    // Mausrad im offenen Filter-Menü: an Anfang und Ende der Liste (und bei Listen, die gar nicht scrollen) nicht an die
+    // Seite dahinter weiterreichen. overscroll-behavior in shop.css greift nur, solange die Liste selbst scrollen kann.
+    // Die Menüs bleiben beim Austausch bestehen (nur ihr Inhalt wechselt), ein Listener je Menü genügt.
+    $$('.fdrop__panel').forEach(function (panel) {
+      panel.addEventListener('wheel', function (event) {
+        if (event.ctrlKey || !event.deltaY) return; // Zoomen und seitliches Wischen bleiben frei
+        var end = panel.scrollHeight - panel.clientHeight;
+        if ((event.deltaY < 0 && panel.scrollTop <= 0) || (event.deltaY > 0 && panel.scrollTop >= end - 1)) event.preventDefault();
+      }, { passive: false });
+    });
+
     root.addEventListener('keydown', function (event) {
       if (event.key !== 'Escape') return;
       var open = $('.fdrop__btn[aria-expanded="true"]');
