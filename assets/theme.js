@@ -282,6 +282,41 @@
     PS.selectTab(next);
   });
 
+  /* ---------------- Reiter vorladen ----------------
+     Versteckte Panels haben keine Box, der Schienen-Vorlader (unten) sieht ihre Karten nicht. Mit Maus lädt das Zeigen auf
+     einen Reiter oder sein Fokus die Karten seines Panels vor: Das Zeigen kommt meist einige hundert ms vor dem Klick. Ohne
+     Maus gibt es kein Zeigen, und Safari fokussiert beim Tippen nicht (header.js): Kommt die Liste nah, laden im Leerlauf die
+     ersten 2 Karten jedes versteckten Panels vor, das hält die Menge klein. Reiterlisten ohne Karten (Hero, Größentabelle)
+     bleiben unberührt. */
+  PS.on('[role="tablist"]', function (list) {
+    var tabs = Array.prototype.slice.call(list.querySelectorAll('[role="tab"]'));
+    function panelOf(tab) { return document.getElementById(tab.getAttribute('aria-controls')); }
+    function cards(tab) {
+      var panel = panelOf(tab);
+      return panel ? Array.prototype.slice.call(panel.querySelectorAll('.pcard, .bcard')) : [];
+    }
+    if (!tabs.some(function (tab) { return cards(tab).length; })) return;
+    tabs.forEach(function (tab) {
+      function pre() { PS.eagerCards(cards(tab), 'tab'); }
+      tab.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') pre(); });
+      tab.addEventListener('focus', pre);
+    });
+    if (window.matchMedia('(hover: hover) and (pointer: fine)').matches || !('IntersectionObserver' in window)) return;
+    PS.afterLoad(function () {
+      var io = new IntersectionObserver(function (entries) {
+        if (!entries.some(function (en) { return en.isIntersecting; })) return;
+        io.disconnect();
+        PS.afterLoad(function () {
+          tabs.forEach(function (tab) {
+            var panel = panelOf(tab);
+            if (panel && panel.hidden) PS.eagerCards(cards(tab).slice(0, 2), 'tab');
+          });
+        });
+      }, { rootMargin: '100% 0px 100% 0px' });
+      io.observe(list);
+    });
+  });
+
   /* ---------------- Schienen (horizontale Karussells) ---------------- */
   // Schrittweite = erste sichtbare Karte plus Abstand. Ausgeblendete Karten (im Showroom die Bikes des anderen Zustands bzw.
   // einer anderen Kategorie, display: none) haben Breite 0; stand eine davon vorn, rückte der Pfeil nur um den Abstand und

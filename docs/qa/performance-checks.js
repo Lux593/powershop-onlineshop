@@ -505,8 +505,11 @@
     const cards = [...grid.children], eager = cards.filter((c) => imgs(c).every((i) => i.loading === 'eager')).length;
     return eager >= Math.min(cards.length, 4) ? [] : [`Neuheiten: ${eager} Karten vorgeladen`];
   }, () => innerWidth >= 1024 ? 'nur unter 1024 px' : document.querySelector('.product-grid--rail') ? '' : 'keine Neuheiten');
+  // Ausgenommen: Karten, die toggle.state selbst kurz sichtbar gemacht hat (window.pkShown). Die Schiene lädt sie dann zu Recht
+  // vor, nach dem Zurückschalten sind sie wieder versteckt.
   PK.add('pre.hidden', () => [...document.querySelectorAll('img[data-pre]')]
-    .filter((i) => !i.getClientRects().length && !['state', 'tab', 'chip', 'drawer'].includes(pre(i).why))
+    .filter((i) => !i.getClientRects().length && !['state', 'tab', 'chip', 'drawer'].includes(pre(i).why) &&
+      !(pre(i).why === 'rail' && window.pkShown && window.pkShown.has(i.closest('.bcard'))))
     .map((i) => `verstecktes Bild vorgeladen (${pre(i).why}): ${i.src.slice(-50)}`));
   PK.add('rail.afterload', () => {
     const end = performance.getEntriesByType('navigation')[0].loadEventEnd;
@@ -538,4 +541,47 @@
     const r = await PK.m.swipe(rail, mouse() ? 4000 : 3000);
     return r.ready >= 0.9 * r.seen ? [] : [`nur ${r.ready} von ${r.seen} Karten fertig: ${r.late.slice(0, 3).join(', ')}`];
   }, () => !room() ? 'kein Showroom' : fresh());
+
+  // ---- Task 3: Umschalter: Showroom und Neuheiten-Reiter ----
+  // Ablauf: neuer Tab auf /?view=pk-test (dort hat die Startseite Neuheiten, siehe Ruling Task 0), PK.run('toggle') und
+  // PK.run('pre'). toggle.chip zählt nur, solange die Chip-Karten noch lazy sind (frisch geladen).
+  PK.add('toggle.state', async () => {
+    const { s, rail, cards } = room(), f = [], other = cards.filter((c) => !inState(c));
+    await near(rail);
+    if (!await until(() => other.slice(0, 3).every((c) => imgs(c).every((i) => i.loading === 'eager')), 8000)) f.push('erste 3 Karten des anderen Zustands nicht vorgeladen');
+    if (other[3] && imgs(other[3]).some((i) => i.loading === 'eager')) f.push('mehr als 3 Karten des anderen Zustands vorgeladen');
+    await until(() => other.slice(0, 3).every((c) => imgs(c).every(ready)), 6000);
+    await into(rail);
+    window.pkShown = window.pkShown || new WeakSet(); // für pre.hidden: diese Karten macht die Prüfung selbst sichtbar
+    other.forEach((c) => window.pkShown.add(c));
+    s.querySelector('[data-showroom-mode][aria-pressed="false"]').click(); await frames(2);
+    if (!other.filter((c) => c.getClientRects().length).slice(0, 2).every((c) => imgs(c).every(ready))) f.push('nach dem Umschalten nicht fertig');
+    s.querySelector('[data-showroom-mode][aria-pressed="false"]').click(); await frames(2);
+    return f;
+  }, () => room() && room().cards.some((c) => !inState(c)) ? '' : 'kein Showroom mit zwei Zuständen');
+  PK.add('toggle.chip', async () => {
+    const { s, cards } = room(), has = (c, id) => (' ' + (c.dataset.categories || '') + ' ').includes(' ' + id + ' ');
+    const want = (ch) => cards.filter((c) => inState(c) && has(c, ch.dataset.showroomCat)).slice(0, 3);
+    const chip = [...s.querySelectorAll('[data-showroom-cat]')].find((ch) => ch.dataset.showroomCat && !ch.hidden &&
+      want(ch).some((c) => imgs(c).some((i) => i.loading === 'lazy')));
+    if (!chip) return []; // alle Chip-Karten schon geladen (z. B. nach rail.swipe): frisch laden, dann zählt die Prüfung
+    chip.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, pointerType: 'touch' }));
+    await frames(1);
+    return want(chip).every((c) => imgs(c).every((i) => i.loading === 'eager')) ? [] : ['Fingerauflegen auf einen Chip lädt nicht vor'];
+  }, () => room() ? '' : 'kein Showroom');
+  PK.add('toggle.tabs-mouse', async () => {
+    const { tabs, panel } = neu(), tab = tabs.find((t) => t.getAttribute('aria-selected') === 'false');
+    tab.dispatchEvent(new PointerEvent('pointerenter', { pointerType: 'mouse' }));
+    await frames(1);
+    const cards = [...panel(tab).querySelectorAll('.pcard')];
+    return cards.length && cards.every((c) => imgs(c).every((i) => i.loading === 'eager')) ? [] : ['Zeigen auf einen Reiter lädt seine Karten nicht vor'];
+  }, () => !mouse() ? 'nur mit Maus' : neu() ? '' : 'keine Neuheiten-Reiter');
+  PK.add('toggle.tabs-touch', async () => {
+    const { list, tabs, panel } = neu(), hidden = tabs.map(panel).filter((p) => p.hidden), f = [];
+    const first = (p, n) => [...p.querySelectorAll('.pcard')].slice(0, n);
+    await near(list);
+    if (!await until(() => hidden.every((p) => first(p, 2).every((c) => imgs(c).every((i) => i.loading === 'eager'))), 6000)) f.push('erste 2 Karten der anderen Reiter nicht vorgeladen');
+    if (hidden.some((p) => first(p, 3)[2] && imgs(first(p, 3)[2]).some((i) => i.loading === 'eager'))) f.push('mehr als 2 Karten je Reiter');
+    return f;
+  }, () => mouse() ? 'nur am Touch-Gerät' : neu() ? '' : 'keine Neuheiten-Reiter');
 })();

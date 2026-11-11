@@ -53,6 +53,37 @@
         update();
       });
     });
+
+    /* Vorladen hinter dem Umschalter. Die Karten des anderen Zustands und der anderen Baureihen sind versteckt (keine Box),
+       der Schienen-Vorlader (theme.js) sieht sie nicht. Safari kennt kein Zeigen und fokussiert Knöpfe beim Tippen nicht
+       (assets/header.js:65), ein Vorladen erst beim Tippen käme zu spät. Darum:
+       - Ist die Schiene nah (ps:rail-near) und sind ihre ersten 3 sichtbaren Karten fertig (höchstens 4 s), lädt im Leerlauf
+         die erste Reihe des anderen Zustands vor: 3 Karten in der gewählten Baureihe.
+       - Ein Chip lädt beim Zeigen (nur Maus), beim Auflegen des Fingers und beim Fokus die ersten 3 Karten seiner Baureihe im
+         aktuellen Zustand vor. */
+    function firstThree(test) { return cards.filter(test).slice(0, 3); }
+    if (rail && PS.eagerCards) {
+      rail.addEventListener('ps:rail-near', function () {
+        var imgs = [];
+        cards.filter(function (card) { return card.getClientRects().length; }).slice(0, 3).forEach(function (card) {
+          imgs.push.apply(imgs, card.querySelectorAll('img'));
+        });
+        PS.whenLoaded(imgs, 4000).then(function () {
+          PS.afterLoad(function () {
+            PS.eagerCards(firstThree(function (card) { return !inState(card) && inCategory(card, category); }), 'state');
+          });
+        });
+      }, { once: true });
+      chips.forEach(function (chip) {
+        function pre() {
+          var id = chip.dataset.showroomCat;
+          PS.eagerCards(firstThree(function (card) { return inState(card) && inCategory(card, id); }), 'chip');
+        }
+        chip.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') pre(); });
+        chip.addEventListener('pointerdown', pre);
+        chip.addEventListener('focus', pre);
+      });
+    }
     if (chips.length) update();
   });
 
