@@ -8,6 +8,11 @@
 
   function drawer() { return document.getElementById('cart-drawer'); }
 
+  // Pfad der Seite für eigene Abrufe (Section-Rendering). Beginnt er mit „//“ (https://shop//fremd.example/x zeigt die 404-Seite),
+  // läse fetch ihn als fremde Adresse //fremd.example/x, deren Antwort per innerHTML im Warenkorb landete. Führende Schrägstriche
+  // darum auf einen kürzen: der Abruf bleibt im eigenen Shop (//cart und /cart sind dort dieselbe Seite).
+  function pagePath() { return window.location.pathname.replace(/^\/+/, '/'); }
+
   // Versandbalken: Der Drawer wird bei jedem Austausch neu gerendert (keine Transition ohne Startwert): alten Stand merken,
   // danach vom alten zum neuen Wert fahren. War der Drawer dabei zu, läuft es beim Öffnen (barFrom).
   var barFrom = null;
@@ -215,7 +220,7 @@
     var page = document.querySelector('[data-cart-page]');
     if (!page) return;
     var seq = ++pageSeq; // überholt eine neuere Anfrage diese, bleibt der neuere Stand stehen
-    fetch(window.location.pathname + '?section_id=' + encodeURIComponent(page.dataset.sectionId))
+    fetch(pagePath() + '?section_id=' + encodeURIComponent(page.dataset.sectionId))
       .then(function (res) { return res.text(); })
       .then(function (html) {
         if (seq !== pageSeq) return;
@@ -302,7 +307,7 @@
      der Drawer der Seite davon ab, holt sie ihn neu. Wie jede Änderung meldet das ps:cart; steigt der Zähler dabei, wippt das
      Symbol. Das ist gewollt, der Zähler ändert sich ja sichtbar. */
   function refresh() {
-    return fetch(window.location.pathname + '?sections=' + SECTION)
+    return fetch(pagePath() + '?sections=' + SECTION)
       .then(function (r) { return r.json(); })
       .then(function (json) { applySections(json); })
       .catch(function () {});

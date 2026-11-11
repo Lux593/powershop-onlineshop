@@ -682,4 +682,43 @@
     const r = await PK.m.reveals(2500);
     return !r.revealed || r.ready >= 0.9 * r.revealed ? [] : [`${r.ready} von ${r.revealed} Reveals mit fertigem Bild: ${r.late.slice(0, 3).join(', ')}`];
   }, needMotion);
+
+  // ---- Sicherheits-Nachtrag zu Task 4: Abgleich nur vom eigenen Shop ----
+  // Beginnt der Pfad mit „//“ (https://shop//fremd.example/ zeigt die 404-Seite samt cart.js), wäre location.pathname + '?…'
+  // für fetch eine fremde Adresse, deren Antwort applySections per innerHTML einsetzte. Die Prüfung stellt so einen Pfad her,
+  // fängt fetch ab (nichts geht hinaus) und löst den Abgleich aus.
+  PK.add('cart.path', async () => {
+    const orig = window.fetch, href = location.href, d = document.getElementById('cart-drawer'), urls = [];
+    window.fetch = (u) => { urls.push(String(u)); return Promise.reject(new TypeError('pk: abgefangen')); };
+    try {
+      history.replaceState(history.state, '', location.origin + '//pk-fremd.invalid/x');
+      sessionStorage.setItem('ps:cart-sig', 'veraltet');
+      window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true }));
+      await until(() => urls.length > 0, 3000);
+    } finally {
+      window.fetch = orig;
+      history.replaceState(history.state, '', href);
+      if (d && d.dataset.sig) sessionStorage.setItem('ps:cart-sig', d.dataset.sig);
+    }
+    if (!urls.length) return ['kein Abruf ausgelöst, die Prüfung greift nicht'];
+    return urls.filter((u) => new URL(u, location.href).origin !== location.origin).map((u) => 'fremde Adresse: ' + u);
+  }, () => document.getElementById('cart-drawer') && document.getElementById('cart-drawer').dataset.sig ? '' : 'Drawer ohne data-sig');
+
+  // Dasselbe Muster auf der Warenkorb-Seite: https://shop//cart liefert sie (200), ihr Abruf nach einer Änderung ginge dann an den
+  // Host „cart“. Fremd steuerbar ist der Host dort nicht (der Pfad muss zur Warenkorb-Seite führen), der Abruf scheitert aber, und
+  // die Seite bliebe nach einer Mengenänderung auf dem alten Stand. Die leere Antwort lässt die Seite unberührt.
+  PK.add('cart.page-path', async () => {
+    const orig = window.fetch, href = location.href, urls = [];
+    window.fetch = (u) => { urls.push(String(u)); return Promise.resolve(new Response('', { status: 200 })); };
+    try {
+      history.replaceState(history.state, '', location.origin + '//cart' + location.search);
+      document.dispatchEvent(new CustomEvent('ps:cart', { detail: { count: 0, previous: 0 } }));
+      await until(() => urls.length > 0, 3000);
+    } finally {
+      window.fetch = orig;
+      history.replaceState(history.state, '', href);
+    }
+    if (!urls.length) return ['kein Abruf ausgelöst, die Prüfung greift nicht'];
+    return urls.filter((u) => new URL(u, location.href).origin !== location.origin).map((u) => 'fremde Adresse: ' + u);
+  }, () => document.querySelector('[data-cart-page]') ? '' : 'keine Warenkorb-Seite');
 })();
