@@ -3,7 +3,7 @@
    Die Filter selbst kommen von Shopify (Storefront Filtering). Dieses Modul
    holt die Section nach jeder Änderung neu (Section Rendering API) und tauscht
    Ergebnisse und Filterfelder aus. Ohne JavaScript funktionieren Links und
-   Formulare als normale Seitenaufrufe. Der Austausch läuft in einer View Transition (nur [data-results]),
+   Formulare als normale Seitenaufrufe. Nach dem Austausch blenden die neuen Ergebnisse ein ([data-results].is-entering),
    solange Bewegung aktiv ist; neu eingefügtes HTML startet die Motion-Schicht selbst.
    ========================================================================== */
 (function () {
@@ -21,7 +21,6 @@
     var timer = null;
     var busyTimer = null;
     var seq = 0;   // Zähler der Ladevorgänge: nur der jüngste darf austauschen
-    var vt = null; // laufende View Transition
     var last = window.location.pathname + window.location.search; // jüngste angeforderte Adresse (nicht erst die angewendete)
 
     function $(sel, ctx) { return (ctx || root).querySelector(sel); }
@@ -118,23 +117,18 @@
       }
     }
 
-    /* ---------- Austausch, wenn möglich als View Transition ---------- */
+    /* ---------- Austausch, danach blenden die neuen Ergebnisse ein ----------
+       Bewusst keine View Transition: Solange eine läuft, nimmt Chrome auf der ganzen Seite keine Klicks an (jeder Treffer
+       landet auf <html>, auch mit pointer-events: none auf den Pseudo-Elementen). Ein zweiter schneller Filterklick ging so
+       ins Leere und schloss als „Klick außerhalb“ das Menü. Die CSS-Animation (.is-entering) lässt die Seite bedienbar. */
     function swap(update, animate) {
       var results = $('[data-results]');
-      var html = document.documentElement;
-      // Kein Übergang, solange ein Fenster offen ist (Filter- oder Sortier-Sheet, Warenkorb): Die Momentaufnahmen der
-      // View Transition liegen über der obersten Ebene, Ergebnisse und Header schoben sich sonst über das offene Sheet
-      var dialogOpen = !!document.querySelector('dialog[open]');
-      if (!animate || dialogOpen || !results || !document.startViewTransition || !PS.motion.enabled) { update(false); return; }
-      results.classList.add('is-vt');
-      html.classList.add('is-vt-results');
-      var transition = vt = document.startViewTransition(function () { update(true); });
-      // Nur die jüngste Überblendung räumt auf: eine übersprungene darf die Klassen der nächsten nicht vorzeitig entfernen
-      var done = function () { if (vt !== transition) return; vt = null; results.classList.remove('is-vt'); html.classList.remove('is-vt-results'); };
-      // übersprungene Übergänge melden sonst „Uncaught (in promise)“
-      transition.ready.catch(function () {});
-      transition.updateCallbackDone.catch(function () {});
-      transition.finished.then(done, done);
+      var animated = !!(animate && results && PS.motion.enabled);
+      update(animated);
+      if (!animated) return;
+      results.classList.remove('is-entering');
+      void results.offsetWidth; // bei schnellem Wechsel startet die Einblendung neu
+      results.classList.add('is-entering');
     }
 
     /* ---------- Section nachladen und austauschen ---------- */
@@ -168,12 +162,12 @@
           var next = doc.querySelector('[data-collection]');
           if (!next) throw new Error('Section nicht gefunden');
 
-          busy(false); // vor dem Austausch: der alte Stand geht nicht abgedunkelt in die Überblendung
-          // Beim Blättern (Scrollen) keine Überblendung, die Karten laufen über ihre Reveals ein
-          swap(function (viaTransition) {
-            if (mine !== seq) return; // die Überblendung startet verzögert: inzwischen kann ein jüngerer Ladevorgang laufen
+          busy(false);
+          // Beim Blättern (Scrollen) keine Einblendung, die Karten laufen über ihre Reveals ein
+          swap(function (animated) {
+            if (mine !== seq) return; // ein jüngerer Ladevorgang hat übernommen
             try {
-              apply(next, doc, viaTransition);
+              apply(next, doc, animated);
               // Adresse erst mit dem neuen Stand
               if (options.push !== false) window.history.pushState({}, '', target.pathname + target.search);
               var again = focusId && document.getElementById(focusId);
@@ -188,7 +182,7 @@
                 if (bar) bar.scrollIntoView({ behavior: PS.prefersReducedMotion() ? 'auto' : 'smooth', block: 'start' });
               }
             } catch (e) {
-              window.location.href = target.pathname + target.search; // in der Überblendung gibt es kein äußeres catch
+              window.location.href = target.pathname + target.search;
             }
           }, !options.scroll);
         })
@@ -200,13 +194,13 @@
         });
     }
 
-    function apply(next, doc, viaTransition) {
+    function apply(next, doc, animated) {
       // Ergebnisse
       var results = $('[data-results]');
       var nextResults = $('[data-results]', next);
       if (results && nextResults) {
-        // Die Überblendung bewegt: kein zusätzlicher Reveal-Stagger
-        if (viaTransition) $$('[data-reveal]', nextResults).forEach(function (el) { el.removeAttribute('data-reveal'); });
+        // Die Einblendung bewegt schon: kein zusätzlicher Reveal-Stagger
+        if (animated) $$('[data-reveal]', nextResults).forEach(function (el) { el.removeAttribute('data-reveal'); });
         // Die Trefferzahl sagt die Live-Region [data-live] außerhalb an: eine mit ersetzte Region würde nicht verlässlich gelesen
         var count = $('.active-filters__count', nextResults);
         var live = $('[data-live]');
@@ -432,6 +426,11 @@
         var end = panel.scrollHeight - panel.clientHeight;
         if ((event.deltaY < 0 && panel.scrollTop <= 0) || (event.deltaY > 0 && panel.scrollTop >= end - 1)) event.preventDefault();
       }, { passive: false });
+    });
+
+    // Einblendung fertig: Klasse wieder weg (Animationen der Karten darin steigen hier mit auf, daher der Abgleich)
+    root.addEventListener('animationend', function (event) {
+      if (event.target.matches('[data-results].is-entering')) event.target.classList.remove('is-entering');
     });
 
     root.addEventListener('keydown', function (event) {

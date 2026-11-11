@@ -486,7 +486,7 @@
    Start- und Bewegungszustände gelten nur unter html.has-motion (Notaus, reduzierte Bewegung, Theme-Editor,
    ohne JS: alles sichtbar und statisch). Animiert werden nur transform/translate, opacity und clip-path.
    Attribute und Zustände der Motion-Schicht und die Verträge dieses Blocks (ps:cart in cart.js, PS.quick in sections.js,
-   is-vt/is-vt-results in collection.js, data-sticky-buy in product.js): docs/motion-api.md.
+   is-entering in collection.js, data-sticky-buy in product.js): docs/motion-api.md.
    ========================================================================== */
 
 /* ---------- Megamenü: Spalten laufen gestaffelt ein (40-ms-Schritte) ---------- */
@@ -588,26 +588,13 @@ html:not(.has-motion) .bcard:hover .bcard__media img { transform: none; }
    (scroll-padding-top der Seite zählt ihn nur, solange er sichtbar ist), sonst läge die Leiste beim Ankommen darunter. */
 [data-filterbar] { scroll-margin-top: calc(var(--header-h) * (1 - var(--header-shown, 1))); }
 
-/* ---------- Kollektion: Filter-/Sortierwechsel als View Transition ----------
-   collection.js benennt [data-results] nur für die Dauer des Wechsels und setzt html.is-vt-results.
-   Header und Filterleiste liegen im Root: dessen Standard-Überblendung würde sie mitblenden, daher aus
-   (mix-blend-mode normal, sonst addieren sich die zwei Abbilder zu einem helleren Bild). */
-[data-results].is-vt { view-transition-name: results; }
-:root.is-vt-results::view-transition-old(root),
-:root.is-vt-results::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
-@keyframes ps-vt-out { to { opacity: 0; } }
+/* ---------- Kollektion: Filter-/Sortierwechsel ----------
+   Nach dem Austausch blenden die neuen Ergebnisse ein und rücken 12 px hoch (collection.js setzt .is-entering).
+   Bewusst keine View Transition: Während einer Überblendung nimmt Chrome keine Klicks an, schnelles Filtern ging ins
+   Leere. Ohne Abbilder liegt auch das offene Filter-Menü (z-index 50) während des Wechsels normal über den Ergebnissen.
+   ps-vt-in nutzt auch build-book.css. */
 @keyframes ps-vt-in { from { opacity: 0; transform: translateY(12px); } }
-::view-transition-group(results) { animation-duration: 420ms; animation-timing-function: var(--ease-out); }
-::view-transition-old(results) { animation: ps-vt-out 160ms linear both; }
-::view-transition-new(results) { animation: ps-vt-in 420ms var(--ease-out) both; }
-/* Das offene Filter-Menü bekommt für den Wechsel eine eigene Ebene: Sonst steckt es im Root-Abbild, und die Ergebnisse
-   (eigene Gruppe, liegt über dem Root) schoben sich während der Überblendung davor und sprangen danach wieder dahinter.
-   Die Gruppen stehen in Malreihenfolge, das Menü (z-index 50) also über den Ergebnissen. Es zeigt gleich den neuen
-   Stand, ohne Bewegung. */
-:root.is-vt-results .fdrop__panel:not([hidden]) { view-transition-name: filter-panel; }
-::view-transition-group(filter-panel) { animation: none; }
-::view-transition-old(filter-panel) { animation: none; opacity: 0; }
-::view-transition-new(filter-panel) { animation: none; mix-blend-mode: normal; }
+.has-motion [data-results].is-entering { animation: ps-vt-in 420ms var(--ease-out) both; }
 
 /* ---------- Produktseite: Galerie als Slides (Scroll-Snap, mobil wischen) ---------- */
 .gallery__track { position: relative; display: flex; height: 100%; overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none; }

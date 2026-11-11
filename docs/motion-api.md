@@ -143,11 +143,12 @@ Kollektion und Suche (assets/collection.js, Regeln in shop.css)
                            <video> (Film-Kollektionen) bliebe sonst je Austausch im Speicher (+1200 Knoten).
   [data-results]           Ergebnisbereich. Beim Nachladen (Filter, Sortierung, Seitenwechsel) setzt collection.js sofort
                            aria-busy="true" und nach 160 ms .is-loading (sichtbarer Ladehinweis).
-  is-vt, is-vt-results     Mit PS.motion.enabled und document.startViewTransition tauscht collection.js die Ergebnisse als
-                           View Transition aus. Nur dafür trägt [data-results] .is-vt (view-transition-name: results) und
-                           html .is-vt-results (Root-Überblendung aus: Header und Filterleiste bleiben stehen). Beide Klassen
-                           entfernt nur die jüngste Überblendung. Ohne View Transition (Browser, Reduced-Motion, Setting aus)
-                           wird ohne Überblendung getauscht. Reveals im neuen HTML startet motion.js selbst (MutationObserver).
+  is-entering              Mit PS.motion.enabled setzt collection.js nach dem Austausch .is-entering an [data-results]: Die neuen
+                           Ergebnisse blenden ein und rücken 12 px hoch (ps-vt-in, 420 ms), animationend nimmt die Klasse wieder
+                           weg. Bewusst keine View Transition: Solange eine läuft, nimmt Chrome auf der ganzen Seite keine Klicks
+                           an (Treffer landen auf <html>, pointer-events: none hilft nicht), schnelles Filtern ging ins Leere.
+                           Beim Blättern und ohne Bewegung wird ohne Einblendung getauscht. Reveals im neuen HTML startet
+                           motion.js selbst (MutationObserver).
   Film-Kopf mobil         Bis 767 px, nur unter html.has-motion: Der Text bleibt per sticky unter dem Header stehen, der Film rutscht
                            ganz dahinter und nimmt ihn erst mit, wenn seine Unterkante 24 px unter dem Text angekommen ist. Reines CSS (shop.css), der Schleier hängt als
                            ::before am Text und wandert mit ihm. Einziges Skript: collection.js setzt .is-behind am Pause-Knopf, solange der
