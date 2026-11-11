@@ -307,8 +307,9 @@ Vorladen (assets/theme.js, motion.js, sections.js, cart.js, layout/theme.liquid;
                              Passwort- und Challenge-Seite, App-Proxys und Shopify-Dienste (alles auch mit Sprachpräfix),
                              Filterlinks ([data-filter-link]), neue Tabs, Downloads, nofollow. Fehlt im Theme-Editor, bei
                              Datensparen, 2G und 3G.
-                             Nach jedem ps:cart kommt die Regel als neues Element (kein Klon): Chrome verwirft dann die vorab
-                             geholten Seiten mit dem alten Warenkorb.
+                             Nach jedem ps:cart fliegt die Regel sofort raus, Chrome verwirft ihre vorab geholten Seiten mit dem
+                             alten Warenkorb; die neue Regel kommt erst im nächsten Task als neues Element (kein Klon). Im selben
+                             Task eingesetzt, sähe Chrome dieselben Kandidaten und behielte die alten Seiten (gemessen).
   data-no-prefetch           Am Link oder an einem Container: Diese Links holt die Regel nie vorab.
 ```
 

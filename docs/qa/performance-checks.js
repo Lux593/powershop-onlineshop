@@ -765,11 +765,20 @@
       .forEach((a) => { if (hit(w, link('/products/helm', a))) f.push('würde vorab holen mit ' + a); });
     return f;
   }, () => specOk() || (window.URLPattern && rules() ? '' : 'keine Regel oder kein URLPattern'));
+  // Chrome verwirft fertige Prefetches nur, wenn es die Regel ohne Kandidaten sieht: Kommt sie im selben Task wieder, sieht es
+  // dieselben Kandidaten und behält sie (Probe performance-qa/cdp/spec-probe-a.js, 11.11.2026: PrefetchResponseUsed). Darum muss
+  // die alte Regel direkt nach ps:cart fort sein und die neue erst später kommen, auch bei zwei ps:cart kurz nacheinander nur einmal.
   PK.add('spec.cart', async () => {
+    const f = [];
     const a = document.getElementById('ps-speculation');
-    document.dispatchEvent(new CustomEvent('ps:cart', { detail: { count: 0, previous: 0 } }));
-    await frames(1);
-    const b = document.getElementById('ps-speculation');
-    return b && b !== a && !a.isConnected && b.textContent === a.textContent ? [] : ['Regel nach ps:cart nicht neu eingesetzt'];
+    const cart = () => document.dispatchEvent(new CustomEvent('ps:cart', { detail: { count: 0, previous: 0 } }));
+    cart();
+    if (a.isConnected || document.getElementById('ps-speculation')) f.push('Regel im selben Task wieder da (fertige Prefetches bleiben)');
+    cart();
+    await wait(150);
+    const all = document.querySelectorAll('#ps-speculation'), b = all[0];
+    if (all.length !== 1) f.push(all.length + ' Regeln nach zwei ps:cart');
+    if (!b || b === a || b.textContent !== a.textContent) f.push('Regel nach ps:cart nicht neu eingesetzt');
+    return f;
   }, () => specOk() || (rules() ? '' : 'keine Regel'));
 })();

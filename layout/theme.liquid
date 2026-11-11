@@ -147,9 +147,11 @@
       oder 3G.
       Der Warenkorb darf nie veraltet erscheinen: Eine vor dem Hinzufügen geholte Seite zeigte den alten Stand. Chrome verwirft sie
       heute schon selbst, weil Shopify bei jedem Hinzufügen die Warenkorb-Cookies neu setzt (gleicher Wert, neues Ablaufdatum;
-      gemessen am 11.11.2026, auch beim zweiten Artikel). Darauf verlassen wir uns nicht: Nach jeder Änderung (ps:cart) kommt die
-      Regel als neues Element, Chrome bricht die Spekulationen einer entfernten Regel ab. Ein Klon ginge nicht: Er erbt das Merkmal
-      „already started“ und würde nie ausgewertet. Sicherheitsnetz für jeden Browser ist der Abgleich in cart.js (data-sig).
+      gemessen am 11.11.2026, auch beim zweiten Artikel). Darauf verlassen wir uns nicht: Nach jeder Änderung (ps:cart) fliegt die
+      Regel sofort raus, Chrome verwirft dann ihre fertigen Prefetches. Die neue Regel kommt erst im nächsten Task: Im selben Task
+      sähe Chrome dieselben Kandidaten und behielte die alten Seiten (beides gemessen am 11.11.2026). Sie kommt als neues Element,
+      ein Klon ginge nicht: Er erbt das Merkmal „already started“ und würde nie ausgewertet. Sicherheitsnetz für jeden Browser ist
+      der Abgleich in cart.js (data-sig).
     {%- endcomment -%}
     {%- unless request.design_mode -%}
       <script>
@@ -170,16 +172,20 @@
             ] }
           }] };
           function put() {
-            var old = document.getElementById('ps-speculation');
-            if (old) old.remove();
             var s = document.createElement('script');
             s.type = 'speculationrules';
             s.id = 'ps-speculation';
             s.textContent = JSON.stringify(rules);
             document.head.appendChild(s);
           }
+          var later = 0;
           put();
-          document.addEventListener('ps:cart', put);
+          document.addEventListener('ps:cart', function () {
+            var old = document.getElementById('ps-speculation');
+            if (old) old.remove();
+            clearTimeout(later);
+            later = setTimeout(put, 0);
+          });
         })();
       </script>
     {%- endunless -%}
