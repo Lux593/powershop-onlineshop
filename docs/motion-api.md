@@ -247,6 +247,69 @@ Hero (sections/hero.liquid, assets/hero.js; nur Startseite, PS.on('[data-hero]')
   Weiter-Pfeil             .hero__scroll: mit JavaScript zeigt href auf die ID des ersten sichtbaren Elements nach dem Hero,
                            ohne JavaScript auf das Setting „scroll_target“ (Standard nach-hero, in index.json die Anker-ID
                            des Willkommensblocks, sections/statement.liquid).
+
+Vorladen (assets/theme.js, motion.js, sections.js, cart.js, layout/theme.liquid; Prüfungen: docs/qa/performance-checks.js)
+  Grundsatz                  Vorgeladen wird, indem ein lazy Bild auf eager wechselt (PS.eager): Der Browser holt es sofort,
+                             srcset, sizes und das Einblenden bleiben. Was von selbst vorlädt, startet erst nach load im Leerlauf
+                             (PS.afterLoad); Zeigen, Fokus und Fingerauflegen laden sofort. Bei PS.slowNet() lädt nichts vorab.
+                             Das Hover-Zweitbild (.pcard__img--alt) lädt nie ein Vorlader. Es hat nur mit Hover ab 1024 px eine
+                             Box (components.css), sonst lädt es gar nicht.
+  PS.slowNet()               true bei Datensparen oder 2G/3G (navigator.connection, bei jedem Aufruf neu gelesen). Safari kennt
+                             navigator.connection nicht, dort ist es immer false.
+  PS.afterLoad(fn)           fn nach dem load-Ereignis im Leerlauf (requestIdleCallback mit timeout 2 s, ohne es nach 300 ms).
+                             Ist load schon vorbei, zählt nur der Leerlauf.
+  PS.eager(img, why)         Stellt ein lazy Bild auf eager, setzt data-pre und gibt true. Sonst (null, schon eager) false
+                             ohne Änderung.
+  PS.eagerCards(cards, why)  PS.eager für alle lazy Bilder der Karten außer dem Zweitbild. Gibt die Zahl der umgestellten Bilder,
+                             bei PS.slowNet() 0 ohne Änderung.
+  PS.whenLoaded(imgs, ms)    Promise, erfüllt, sobald jedes Bild fertig ist (complete, load oder error), spätestens nach ms.
+                             Wird nie abgelehnt.
+  data-pre="why ms"          Grund und Zeitpunkt (performance.now) am vorgeladenen Bild, nur für Prüfung und Fehlersuche. why:
+                             rail     Schienen (theme.js): Kommt die Schiene auf eine Fensterhöhe nah, lädt ein Observer mit der
+                                      Schiene als root jede Karte, die in den Rand kommt (links und rechts mindestens 3 Karten).
+                             tab      Reiter mit Karten (theme.js): Zeigen mit der Maus oder Fokus lädt das Panel des Reiters. Ohne
+                                      Maus zusätzlich, sobald die Liste eine Fensterhöhe nah ist: die ersten 2 Karten jedes
+                                      versteckten Panels.
+                             state    Showroom (sections.js): nach ps:rail-near, sobald die ersten 3 sichtbaren Karten fertig sind
+                                      (höchstens 4 s), 3 Karten des anderen Zustands in der gewählten Baureihe.
+                             chip     Showroom-Chip (sections.js): Zeigen (Maus), Fingerauflegen oder Fokus lädt die ersten
+                                      3 Karten seiner Baureihe im aktuellen Zustand.
+                             drawer   Zeilenbilder des Warenkorbs (cart.js): nach load und nach jeder Änderung, sonst lüden sie
+                                      im geschlossenen Dialog erst beim Öffnen.
+                             reveal   Bilder unter [data-reveal] und [data-stagger] (motion.js): 1,5 Fensterhöhen unter dem
+                                      Fenster, danach decode(). Nur mit Bewegung (PS.motion.enabled).
+  .fade-on-load              Nur Bilder, die Liquid lazy ausgibt (product-card, bike-card), tragen die Klasse. Unter
+                             html.has-motion haben sie bis .is-loaded (inline onload) Deckkraft 0 und blenden dann ein. Die
+                             Regel hängt an der Klasse, nicht an loading, damit ein vorgeladenes, noch ladendes Bild weiter
+                             einblendet. Ist es beim Erscheinen schon fertig, steht es ohne sichtbares Einblenden da (so gewollt).
+  Ausnahmen (NO_PRELOAD)     Der Reveal-Vorlader lässt aus: .rail, .product-grid--rail (eigener Vorlader), [data-hero],
+                             [data-story], [data-about-team], [data-build-book], [data-header], [data-pdp] (laden ihre Bilder in
+                             eigener Reihenfolge) und alles in [data-no-preload]. Dieselbe Liste steht im Prüfgerüst.
+  data-no-preload            Am Bild oder an einem Container: Der Reveal-Vorlader lässt diese Bilder lazy. Für Bereiche, die
+                             ihre Bilder selbst steuern.
+  ps:rail-near               An der Schiene (blubbert), einmal, wenn sie nach load zum ersten Mal auf eine Fensterhöhe nah kommt
+                             (nie bei PS.slowNet()). Danach läuft ihr Vorlader. Der Showroom wartet darauf mit dem Vorladen
+                             des anderen Zustands.
+  data-count, data-sig       Am Drawer (sections/cart-drawer.liquid): Stückzahl und Fingerabdruck (md5 aus Stückzahl, Summe und
+                             je Position Schlüssel und Menge). cart.js liest beides aus jeder Section-Antwort und holt /cart.js
+                             nur noch, wenn keine Stückzahl bekannt ist (Antwort ohne Drawer). Der Zähler [data-cart-count]
+                             trägt data-count, daraus kommt previous von ps:cart.
+  ps:cart-sig                sessionStorage: Fingerabdruck des zuletzt gesehenen Warenkorbs in diesem Tab, jede Drawer-Antwort
+                             schreibt ihn neu. Beim Laden und bei pageshow aus dem bfcache vergleicht cart.js ihn mit data-sig des
+                             Drawers. Weicht er ab (vorab geholte oder alte Seite), holt die Seite ihren Drawer neu
+                             (?sections=cart-drawer auf dem eigenen Pfad, pagePath: führende // gekürzt) und meldet ps:cart.
+  Vorschaubild               data-add-thumb am Quick-Add, "thumb" je Variante im Produkt-JSON (pdp-options): 176-px-Bild, das
+                             cart.js beim Klick vorab holt. cart-line gibt genau diese URL aus (widths: '176'), der Drawer nimmt
+                             es aus dem Speicher.
+  #ps-speculation            <script type="speculationrules"> im head (layout/theme.liquid), nur Chrome und Edge: prefetch, kein
+                             prerender; nur eigene Seiten; eagerness moderate mit Maus (hover und pointer fine), sonst
+                             conservative. Nie vorab: Warenkorb, Kasse, Konto und Anmelden, Bestellstatus, Rabatt-Links,
+                             Passwort- und Challenge-Seite, App-Proxys und Shopify-Dienste (alles auch mit Sprachpräfix),
+                             Filterlinks ([data-filter-link]), neue Tabs, Downloads, nofollow. Fehlt im Theme-Editor, bei
+                             Datensparen, 2G und 3G.
+                             Nach jedem ps:cart kommt die Regel als neues Element (kein Klon): Chrome verwirft dann die vorab
+                             geholten Seiten mit dem alten Warenkorb.
+  data-no-prefetch           Am Link oder an einem Container: Diese Links holt die Regel nie vorab.
 ```
 
 ## Skripte
