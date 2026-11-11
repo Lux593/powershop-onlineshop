@@ -569,6 +569,22 @@
     await frames(1);
     return want(chip).every((c) => imgs(c).every((i) => i.loading === 'eager')) ? [] : ['Fingerauflegen auf einen Chip lädt nicht vor'];
   }, () => room() ? '' : 'kein Showroom');
+  // Erst eine Baureihe, dann Neu/Gebraucht (Gesamt-Review): Nach dem Chip-Klick lädt die erste Reihe des anderen Zustands in
+  // dieser Baureihe vor. Wartet erst den Vorlader nach ps:rail-near ab, der sonst schon mit der neuen Baureihe liefe.
+  PK.add('toggle.after-chip', async () => {
+    const { s, rail, cards } = room(), has = (c, id) => (' ' + (c.dataset.categories || '') + ' ').includes(' ' + id + ' ');
+    const other = cards.filter((c) => !inState(c)), want = (ch) => other.filter((c) => has(c, ch.dataset.showroomCat)).slice(0, 3);
+    await near(rail);
+    await until(() => other.slice(0, 3).every((c) => imgs(c).every((i) => i.loading === 'eager')), 8000);
+    const chip = [...s.querySelectorAll('[data-showroom-cat]')].find((ch) => ch.dataset.showroomCat && !ch.hidden &&
+      want(ch).some((c) => imgs(c).some((i) => i.loading === 'lazy')));
+    if (!chip) return ['keine Baureihe mit lazy Karten im anderen Zustand'];
+    const back = s.querySelector('[data-showroom-cat][aria-pressed="true"]');
+    chip.click();
+    const ok = await until(() => want(chip).every((c) => imgs(c).every((i) => i.loading === 'eager')), 7000);
+    if (back) back.click();
+    return ok ? [] : [`nach dem Chip „${chip.textContent.trim()}“ erste Reihe des anderen Zustands nicht vorgeladen`];
+  }, () => !room() || !room().cards.some((c) => !inState(c)) ? 'kein Showroom mit zwei Zuständen' : fresh());
   PK.add('toggle.tabs-mouse', async () => {
     const { tabs, panel } = neu(), tab = tabs.find((t) => t.getAttribute('aria-selected') === 'false');
     tab.dispatchEvent(new PointerEvent('pointerenter', { pointerType: 'mouse' }));

@@ -58,12 +58,13 @@
        der Schienen-Vorlader (theme.js) sieht sie nicht. Safari kennt kein Zeigen und fokussiert Knöpfe beim Tippen nicht
        (assets/header.js:65), ein Vorladen erst beim Tippen käme zu spät. Darum:
        - Ist die Schiene nah (ps:rail-near) und sind ihre ersten 3 sichtbaren Karten fertig (höchstens 4 s), lädt im Leerlauf
-         die erste Reihe des anderen Zustands vor: 3 Karten in der gewählten Baureihe.
+         die erste Reihe des anderen Zustands vor: 3 Karten in der gewählten Baureihe. Dasselbe nach jedem Chip-Klick, sonst
+         blendeten nach „erst Baureihe, dann Umschalten“ die ersten Karten ein.
        - Ein Chip lädt beim Zeigen (nur Maus), beim Auflegen des Fingers und beim Fokus die ersten 3 Karten seiner Baureihe im
          aktuellen Zustand vor. */
     function firstThree(test) { return cards.filter(test).slice(0, 3); }
     if (rail && PS.eagerCards) {
-      rail.addEventListener('ps:rail-near', function () {
+      var preOther = function () {
         var imgs = [];
         cards.filter(function (card) { return card.getClientRects().length; }).slice(0, 3).forEach(function (card) {
           imgs.push.apply(imgs, card.querySelectorAll('img'));
@@ -73,7 +74,8 @@
             PS.eagerCards(firstThree(function (card) { return !inState(card) && inCategory(card, category); }), 'state');
           });
         });
-      }, { once: true });
+      };
+      rail.addEventListener('ps:rail-near', preOther, { once: true });
       chips.forEach(function (chip) {
         function pre() {
           var id = chip.dataset.showroomCat;
@@ -82,6 +84,7 @@
         chip.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') pre(); });
         chip.addEventListener('pointerdown', pre);
         chip.addEventListener('focus', pre);
+        chip.addEventListener('click', preOther);
       });
     }
     if (chips.length) update();

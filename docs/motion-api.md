@@ -270,8 +270,9 @@ Vorladen (assets/theme.js, motion.js, sections.js, cart.js, layout/theme.liquid;
                              tab      Reiter mit Karten (theme.js): Zeigen mit der Maus oder Fokus lädt das Panel des Reiters. Ohne
                                       Maus zusätzlich, sobald die Liste eine Fensterhöhe nah ist: die ersten 2 Karten jedes
                                       versteckten Panels.
-                             state    Showroom (sections.js): nach ps:rail-near, sobald die ersten 3 sichtbaren Karten fertig sind
-                                      (höchstens 4 s), 3 Karten des anderen Zustands in der gewählten Baureihe.
+                             state    Showroom (sections.js): nach ps:rail-near und nach jedem Chip-Klick, sobald die ersten 3
+                                      sichtbaren Karten fertig sind (höchstens 4 s), 3 Karten des anderen Zustands in der
+                                      gewählten Baureihe.
                              chip     Showroom-Chip (sections.js): Zeigen (Maus), Fingerauflegen oder Fokus lädt die ersten
                                       3 Karten seiner Baureihe im aktuellen Zustand.
                              drawer   Zeilenbilder des Warenkorbs (cart.js): nach load und nach jeder Änderung, sonst lüden sie
