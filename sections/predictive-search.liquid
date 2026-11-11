@@ -41,14 +41,18 @@
             <span>
               <span class="search__name">{{ product.title | escape }}</span><br>
               <span class="search__meta">
-                {%- if product.type != blank %}{{ product.type | escape }} · {% endif -%}
+                {%- if product.type != blank %}{{ product.type | escape }}{% endif -%}
                 {%- assign sku = product.selected_or_first_available_variant.sku -%}
-                {%- if sku != blank %}Art.-Nr. {{ sku | escape }} · {% endif -%}
-                {%- if product.type == 'Motorrad' -%}
-                  ab {{ product.price | money_without_trailing_zeros }}
-                {%- else -%}
-                  {{ product.price | money }}
-                {%- endif -%}
+                {%- if product.type != blank and sku != blank %} · {% endif -%}
+                {%- if sku != blank %}Art.-Nr. {{ sku | escape }}{% endif -%}
+                {%- if product.type != blank or sku != blank %}<span class="search__sep"> · </span>{% endif -%}
+                <span class="search__price">
+                  {%- if product.type == 'Motorrad' -%}
+                    ab {{ product.price | money_without_trailing_zeros }}
+                  {%- else -%}
+                    {{ product.price | money }}
+                  {%- endif -%}
+                </span>
               </span>
             </span>
           </a>

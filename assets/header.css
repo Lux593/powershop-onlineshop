@@ -374,6 +374,11 @@ html:not(:has(.announce)) { --announce-h: 0px; }
 .search__list a:hover .search__name { text-decoration: underline; }
 .search__list img { width: 48px; height: 60px; object-fit: cover; background: var(--c-stone); flex: none; }
 .search__meta { font-size: var(--fs-caption); color: var(--c-muted); }
+/* Handy: Preis immer in eigener Zeile unter Typ und Art.-Nr., damit „€“ nie allein in der zweiten Zeile landet */
+@media (max-width: 767px) {
+  .search__sep { display: none; }
+  .search__price { display: block; }
+}
 .search__hint { color: var(--c-muted); font-size: var(--fs-small); }
 .search mark { background: var(--c-mark); color: inherit; }
 
