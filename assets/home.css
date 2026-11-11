@@ -202,6 +202,10 @@ a.service-tile:hover > .icon, .service-tile:focus-visible > .icon { transform: t
   .doors .bento-tile { aspect-ratio: auto; height: clamp(300px, 28vw, 420px); }
   .bento-tile--door .bento-tile__label strong { font-size: 40px; }
 }
+/* Startseite („Mehr als ein Shop“) seit 11.11. niedriger als auf Service (Wunsch des Nutzers): Handy 10 % (16:9 → 16:8,1),
+   ab 1024 px 25 % (clamp(300px, 28vw, 420px) × 0,75). */
+.story .doors .bento-tile { aspect-ratio: 160 / 81; }
+@media (min-width: 1024px) { .story .doors .bento-tile { aspect-ratio: auto; height: clamp(225px, 21vw, 315px); } }
 
 /* Einblenden (Clip-Reveal an der Kachel selbst, nicht an .bento__col/-pair: mobil display:contents). Das Bild zoomt
    von 1,15 auf 1; --rd versetzt die Kacheln und gilt für Kachel und Bild. Der Clip endet in none (motion.css). */
