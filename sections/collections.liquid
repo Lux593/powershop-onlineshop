@@ -20,7 +20,7 @@
           <div class="pcard__media">
             <a href="{{ item.url }}" tabindex="-1" aria-hidden="true">
               {%- if item.featured_image -%}
-                {{ item.featured_image | image_url: width: 900 | image_tag: class: 'pcard__img', alt: '', loading: 'lazy', sizes: '(min-width: 1024px) 25vw, 50vw', widths: '300, 450, 600, 900' }}
+                {{ item.featured_image | image_url: width: 900 | image_tag: class: 'pcard__img fade-on-load', alt: '', loading: 'lazy', sizes: '(min-width: 1024px) 25vw, 50vw', widths: '300, 450, 600, 900', onload: "this.classList.add('is-loaded')" }}
               {%- endif -%}
             </a>
           </div>
