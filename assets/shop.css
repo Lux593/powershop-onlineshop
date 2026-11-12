@@ -100,6 +100,15 @@
 .filterbar__label { font-size: var(--fs-small); color: var(--c-muted); margin-right: 4px; }
 .filterbar__right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
 .filterbar__mobile { display: none; }
+/* Desktop: Sortierung immer in einer eigenen Zeile unter den Filtern, links unter „Filtern nach“, die Spaltenwahl rechts in derselben
+   Zeile (Nutzerwunsch 12.11.). Vorher rutschten beide nur bei vielen Filtern (Motorräder) rechtsbündig in die zweite Zeile, sonst
+   standen sie rechts neben den Filtern. -12 px gleichen das Innenpolster des Knopfs aus, damit „Sortieren:“ bündig unter dem Label steht. */
+@media (min-width: 1024px) {
+  .filterbar__right { flex-basis: 100%; margin-left: 0; }
+  .filterbar__right .fdrop--sort { margin-left: -12px; }
+  .filterbar__right .grid-toggle { margin-left: auto; }
+  .filterbar__right .fdrop--sort .fdrop__panel { left: 0; right: auto; } /* öffnet nach rechts; stärker als die Regel weiter unten */
+}
 @media (max-width: 1023px) {
   .filterbar__label, .filterbar .fdrop, .grid-toggle { display: none; }
   .filterbar__mobile { display: inline-flex; }
