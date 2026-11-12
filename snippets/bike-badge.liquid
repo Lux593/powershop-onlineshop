@@ -1,7 +1,7 @@
 {% doc %}
   Zustands-Badge eines Motorrads.
 
-  @param {string} zustand - "neu", "gebraucht" oder "vorfuehrer"
+  @param {string} zustand - "neu", "gebraucht" oder "vorfuehrer" (Anzeige: Demo-Bike)
   @param {string} [status] - "reserviert" überschreibt das Badge
   @param {boolean} [plain] - nur der Text für Screenreader („Zustand: Neu“) statt des Abzeichens. Die Karte versteckt ihr Bild samt Abzeichen
     (aria-hidden), der Zustand steht dort sonst nirgends als Text.
@@ -10,7 +10,7 @@
 {%- if plain -%}
   {%- if status == 'reserviert' -%}Status: Reserviert
   {%- elsif zustand == 'neu' -%}Zustand: Neu
-  {%- elsif zustand == 'vorfuehrer' -%}Zustand: Vorführer
+  {%- elsif zustand == 'vorfuehrer' -%}Zustand: Demo-Bike
   {%- else -%}Zustand: Gebraucht
   {%- endif -%}
 {%- elsif status == 'reserviert' -%}
@@ -18,7 +18,7 @@
 {%- elsif zustand == 'neu' -%}
   <span class="badge">Neu</span>
 {%- elsif zustand == 'vorfuehrer' -%}
-  <span class="badge badge--demo">Vorführer</span>
+  <span class="badge badge--demo">Demo-Bike</span>
 {%- else -%}
   <span class="badge badge--used">Gebraucht</span>
 {%- endif -%}
