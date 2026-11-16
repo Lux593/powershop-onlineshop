@@ -138,6 +138,13 @@ stehen im Shop alphabetisch; Spalten, die ihre Reihenfolge aus dem Admin behalte
 im Theme-Editor unter **Header → Spalten in eigener Reihenfolge**. Die Unterpunkte von Service verlinken die Anker der Service-Seite
 (`/pages/service#finanzierung` usw.). Die Kategorie-Chips im Showroom der Startseite sind Blöcke mit je einer Kollektion (Cruiser, CVO …).
 
+Motorräder stehen nach **Modellfamilie** (seit 16.11.): erst die Familie, darin der Preis aufsteigend, bei gleichem Preis A–Z. Das gilt für
+die Motorrad-Kollektionen (Standard-Sortierung „Modellfamilie“, im Menü „Sortieren“ weiter Preis, A–Z usw. wählbar) und den Showroom der
+Startseite. Die Reihenfolge der Familien steht in den Theme-Einstellungen unter **Motorräder** (heute Cruiser, Sport, Grand American Touring,
+Adventure Touring, Trike). Dafür stehen die Motorrad-Kollektionen im Admin auf Sortierung **„Manuell“**: Das Theme zeigt diese Sortierung als
+„Modellfamilie“ und sortiert selbst (`snippets/bike-order.liquid`); eine neue Motorrad-Kollektion braucht ebenfalls „Manuell“ und die Vorlage
+`collection.motorrad`. Grenze: bis 50 Motorräder je Kollektion bzw. Filterergebnis, darüber gilt die manuelle Reihenfolge aus dem Admin.
+
 Die Rechtslinks im Footer kommen aus den Shopify-Menüs `footer`, `customer-service` und `legal`: **vor dem Livegang im Admin anlegen**.
 Fehlt ein Rechtstext dort, verlinkt der Footer ersatzweise die Richtlinien aus Einstellungen > Richtlinien (Schalter im Footer-Abschnitt).
 Der Link „Cookie-Einstellungen“ (ein Knopf im Footer) öffnet die Einstellungen des Shopify-Cookie-Banners (`window.privacyBanner`, danach die Customer Privacy API) und wirkt nur mit aktivem Banner.
