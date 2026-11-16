@@ -1,6 +1,14 @@
 {%- liquid
   assign rail_id = 'showroom-rail-' | append: section.id
-  assign bikes = section.settings.collection.products
+  comment
+    Reihenfolge wie die Sortierung „Modellfamilie“ der Motorrad-Kollektionen (seit 16.11.): Familie, darin Preis aufsteigend, dann
+    A–Z (snippets/bike-order.liquid). Die Kollektion steht im Admin auf „Manuell“, ihre eigene Reihenfolge spielt hier keine Rolle.
+  endcomment
+  assign bikes = section.settings.collection.products | sort_natural: 'title'
+  capture bike_order
+    render 'bike-order', products: bikes
+  endcapture
+  assign bike_order = bike_order | strip | split: ','
 
   comment
     Karten und Kategorien in einem Durchgang: Jede Karte nennt in data-categories die Kategorie-Blöcke (Kollektionen wie
@@ -14,7 +22,9 @@
   assign used_count = 0
   assign used_categories = ' '
   capture cards
-    for bike in bikes
+    for pos in bike_order
+      assign i = pos | plus: 0
+      assign bike = bikes[i]
       assign bike_zustand = bike.metafields.bike.zustand.value | default: 'neu'
       if bike_zustand == 'neu'
         assign new_count = new_count | plus: 1

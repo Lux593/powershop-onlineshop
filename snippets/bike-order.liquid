@@ -1,0 +1,50 @@
+{% doc %}
+  Reihenfolge „Modellfamilie“ für Motorräder: Familien in der Reihenfolge aus den Theme-Einstellungen (Motorräder), darin Preis
+  aufsteigend, bei gleichem Preis A–Z. Familien, die dort nicht stehen, kommen danach (alphabetisch), Bikes ohne Familie ganz ans Ende.
+  Shopify kann nicht nach Metafeldern sortieren, darum geschieht es hier. Gibt die Positionen in products als kommagetrennte Liste
+  aus (z. B. „4,0,2,1,3“); der Aufrufer fängt sie mit capture ab und läuft damit über dieselbe Liste.
+  Genutzt von sections/collection.liquid (Sortierung „Modellfamilie“) und sections/showroom.liquid (Startseite).
+
+  @param {object} products - Motorräder (Liste), vorher A–Z sortiert (sort_natural: 'title'); daraus ergibt sich der Gleichstand nach Name
+
+  @example
+  {%- assign bikes = collection.products | sort_natural: 'title' -%}
+  {%- capture bike_order -%}{% render 'bike-order', products: bikes %}{%- endcapture -%}
+  {%- assign bike_order = bike_order | strip | split: ',' -%}
+{% enddoc %}
+
+{%- liquid
+  comment
+    Schlüssel je Bike: Rang der Familie (zweistellig) ~ Name einer unbekannten Familie ~ Preis in Cent (auf feste Länge
+    gebracht) ~ Position in products. Als Text sortiert ergibt das Familie → Preis → Name (die Position stammt aus der A–Z-Liste).
+  endcomment
+  assign order_list = settings.bike_family_order | default: 'Cruiser, Sport, Grand American Touring, Adventure Touring, Trike' | downcase | split: ','
+  assign keys = ''
+  for p in products
+    assign fam = p.metafields.bike.modellfamilie.value | strip | downcase
+    assign rank = 98
+    assign other = fam
+    if fam == blank
+      assign rank = 99
+    else
+      for f in order_list
+        assign f_clean = f | strip
+        if f_clean == fam
+          assign rank = forloop.index0 | plus: 10
+          assign other = ''
+          break
+        endif
+      endfor
+    endif
+    assign price_key = p.price | plus: 10000000000
+    assign pos_key = forloop.index0 | plus: 10000
+    assign keys = keys | append: '|' | append: rank | append: '~' | append: other | append: '~' | append: price_key | append: '~' | append: pos_key
+  endfor
+  assign keys = keys | remove_first: '|' | split: '|' | sort
+  assign out = ''
+  for key in keys
+    assign pos = key | split: '~' | last | minus: 10000
+    assign out = out | append: ',' | append: pos
+  endfor
+  echo out | remove_first: ','
+-%}

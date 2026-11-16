@@ -5,6 +5,7 @@
   @param {string} value - Wert der Sortierung, z. B. price-ascending
   @param {string} [fallback] - Name, falls der Wert unbekannt ist
   @param {boolean} [short] - Kurzform, z. B. „Preis ↑“ statt „Preis aufsteigend“
+  @param {boolean} [bikes] - Motorrad-Kollektion: die manuelle Sortierung heißt dort „Modellfamilie“ (Reihenfolge aus sections/collection.liquid)
 
   @example
   {% render 'sort-name', value: option.value, fallback: option.name %}
@@ -20,6 +21,7 @@
     {%- when 'price-descending' -%}Preis ↓
     {%- when 'created-descending' -%}Neueste
     {%- when 'created-ascending' -%}Älteste
+    {%- when 'manual' -%}{% if bikes %}Familie{% else %}Sortiert{% endif %}
     {%- else -%}Sortiert
   {%- endcase -%}
 {%- else -%}
@@ -32,7 +34,7 @@
     {%- when 'price-descending' -%}Preis absteigend
     {%- when 'created-descending' -%}Neueste zuerst
     {%- when 'created-ascending' -%}Älteste zuerst
-    {%- when 'manual' -%}Ausgewählt
+    {%- when 'manual' -%}{% if bikes %}Modellfamilie{% else %}Ausgewählt{% endif %}
     {%- else -%}{{ fallback | escape }}
   {%- endcase -%}
 {%- endif -%}

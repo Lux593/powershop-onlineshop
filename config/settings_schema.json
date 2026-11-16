@@ -64,6 +64,12 @@
     ]
   },
   {
+    "name": "Motorräder",
+    "settings": [
+      { "type": "text", "id": "bike_family_order", "label": "Reihenfolge der Modellfamilien", "default": "Cruiser, Sport, Grand American Touring, Adventure Touring, Trike", "info": "Kommagetrennt, Schreibweise wie im Feld „Modellfamilie“ am Motorrad. Gilt für die Sortierung „Modellfamilie“ der Motorrad-Kollektionen und den Showroom auf der Startseite: erst nach Familie in dieser Reihenfolge, darin nach Preis aufsteigend. Familien, die hier fehlen, kommen danach." }
+    ]
+  },
+  {
     "name": "Footer und Soziale Netze",
     "settings": [
       { "type": "textarea", "id": "payment_methods", "label": "Zahlarten (eine pro Zeile)", "default": "PayPal\nKlarna\nVisa\nMastercard\nApple Pay\nGoogle Pay", "info": "Der Shop zeigt automatisch die im Checkout aktiven Zahlarten als offizielle Icons. Diese Liste gilt nur, solange dort noch keine aktiv sind." },

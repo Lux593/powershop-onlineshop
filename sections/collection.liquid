@@ -53,6 +53,25 @@
   if collection.all_products_count == 0
     assign collection_empty = true
   endif
+
+  comment
+    Motorräder, Sortierung „Modellfamilie“ (seit 16.11.): Im Admin stehen die Motorrad-Kollektionen auf „Manuell“, das Theme zeigt
+    diese Sortierung als „Modellfamilie“ (results-toolbar.liquid) und ordnet selbst: Familie, darin Preis aufsteigend, dann A–Z
+    (snippets/bike-order.liquid). Dafür braucht Liquid alle Treffer auf einmal; ohne paginate liefert Shopify höchstens 50. Mit mehr
+    Treffern gilt die manuelle Reihenfolge aus dem Admin. Die Seiten (12 pro Seite) schneidet die Schleife unten selbst zu.
+  endcomment
+  assign family_sort = false
+  if is_bikes and collection_empty == false
+    assign current_sort = collection.sort_by | default: collection.default_sort_by
+    if current_sort == 'manual' and collection.products_count <= 50
+      assign family_sort = true
+      assign bikes_all = collection.products | sort_natural: 'title'
+      capture bike_order
+        render 'bike-order', products: bikes_all
+      endcapture
+      assign bike_order = bike_order | strip | split: ','
+    endif
+  endif
 -%}
 
 {%- if film_file != blank -%}<script src="{{ 'film-banner.js' | asset_url }}" defer></script>{%- endif -%}
@@ -137,14 +156,27 @@
 
         {%- if collection.products.size > 0 -%}
           <div class="product-grid{% if is_bikes %} product-grid--bikes{% endif %}" data-grid data-cols="{{ default_cols }}">
-            {%- for product in collection.products -%}
-              {%- if forloop.index0 < 4 -%}
-                {%- comment -%} Erstblick: eager und ohne Einblenden, damit das LCP-Bild nicht versteckt startet {%- endcomment -%}
-                {% render 'result-card', product: product, loading: 'eager' %}
-              {%- else -%}
-                {% render 'result-card', product: product, reveal: true %}
-              {%- endif -%}
-            {%- endfor -%}
+            {%- if family_sort -%}
+              {%- comment -%} Sortierung „Modellfamilie“: aktuelle Seite aus der ganzen, im Theme sortierten Liste (siehe oben) {%- endcomment -%}
+              {%- for pos in bike_order limit: paginate.page_size offset: paginate.current_offset -%}
+                {%- assign i = pos | plus: 0 -%}
+                {%- assign bike = bikes_all[i] -%}
+                {%- if forloop.index0 < 4 -%}
+                  {% render 'result-card', product: bike, loading: 'eager' %}
+                {%- else -%}
+                  {% render 'result-card', product: bike, reveal: true %}
+                {%- endif -%}
+              {%- endfor -%}
+            {%- else -%}
+              {%- for product in collection.products -%}
+                {%- if forloop.index0 < 4 -%}
+                  {%- comment -%} Erstblick: eager und ohne Einblenden, damit das LCP-Bild nicht versteckt startet {%- endcomment -%}
+                  {% render 'result-card', product: product, loading: 'eager' %}
+                {%- else -%}
+                  {% render 'result-card', product: product, reveal: true %}
+                {%- endif -%}
+              {%- endfor -%}
+            {%- endif -%}
           </div>
         {%- elsif collection_empty -%}
           <div class="empty empty--strip">

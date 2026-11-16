@@ -209,7 +209,11 @@
       assign bike_topics = bike_topics | append: ',reservierung'
     endif
     assign bike_topics = bike_topics | append: ',frage'
-    assign similar = category.products
+    comment
+      A–Z wie bisher: Die Motorrad-Kollektionen stehen seit 16.11. im Admin auf „Manuell“ (Sortierung „Modellfamilie“ im Theme),
+      deren eigene Reihenfolge ist zufällig.
+    endcomment
+    assign similar = category.products | sort_natural: 'title'
   -%}
 
   <div data-pdp="bike" data-section-id="{{ section.id }}">
