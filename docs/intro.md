@@ -14,7 +14,7 @@ jedem Seitenverhältnis (Handy hoch, Desktop, Ultrawide); es gibt keinen Film, d
 | `assets/intro.js` | Ablauf: `build` → `ready` → `zoom` → `done`, Fehler- und Notfälle. Enthält das Logo als Vektor (Pfad `LOGO.d`) und die Kamerafahrt |
 | `layout/theme.liquid` | Head-Skript (setzt `html.intro-on` vor dem ersten Bild), `intro.css`, Snippet am Anfang des Body, `intro.js` nach `motion.js` |
 | `assets/hero.js` | Film und Rotation des Hero warten, bis `html.intro-on` weg ist (Event `ps:introdone`) |
-| `assets/intro-build-16x9` / `-9x16` (.mp4, .webm) | Aufbau-Film, 4,4 s. Letztes Bild = Logo auf dunklem Grund; die Vektor-SVG stimmt auf dieses Bild |
+| `assets/intro-build-16x9` / `-9x16` (.mp4, .webm) | Aufbau-Film, 4,4 s, läuft mit 1,25-fachem Tempo (`BUILD_RATE` in `intro.js`), also ca. 3,5 s. Letztes Bild = Logo auf dunklem Grund; die Vektor-SVG stimmt auf dieses Bild |
 
 ## Einstellungen (Theme-Einstellungen > Intro (Startseite))
 
@@ -68,6 +68,6 @@ Der Aufbau-Film ist deterministisch aus dem Logo gerechnet (Linien-Aufbau). Das 
 die Bühne: Querformat 1920 × 1080, Hochformat 1080 × 1920; der Text sitzt bei 74 % (quer) / 64 % (hoch) der Bühnenhöhe
 (`--ty` in `intro.css`), das Logo endet bei 65,8 % / 56,9 %. Wird der Hochformat-Film ersetzt (er ist vorerst ein Zuschnitt
 des Querformats), das Logo dort so setzen, dass es über `--ty` endet, sonst `--ty` anpassen. Der Zeitpunkt, ab dem die Texte
-einsteigen, ist `T_TEXT` in `intro.js` (3,3 s, wenn sich die Linien treffen). Ein neuer Aufbau-Film muss auf dem letzten Bild das Logo
+einsteigen, ist `T_TEXT` in `intro.js` (3,3 s Filmzeit, wenn sich die Linien treffen; bei `BUILD_RATE` 1,25 also nach ca. 2,6 s). Ein neuer Aufbau-Film muss auf dem letzten Bild das Logo
 an derselben Stelle zeigen wie die SVG (`LAYOUT` in `intro.js`: Breite `lw`, Position `lx` / `ly` in Bühnen-Einheiten) und denselben
 dunklen Grund haben; sonst springt das Bild beim Klick. Ein neues Logo braucht eine neue Spur (Pfad `LOGO.d`, Fenster `LOGO.win`).

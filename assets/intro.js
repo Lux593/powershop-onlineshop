@@ -19,6 +19,7 @@
   if (!root) return;
 
   var T_TEXT = 3.3;      // s im Aufbau-Film: die Linien treffen sich, ab hier steigen die Texte ein
+  var BUILD_RATE = 1.25; // Abspieltempo des Aufbau-Films (4,4 s Film → ca. 3,5 s, Texte bei ca. 2,6 s). T_TEXT bleibt in Filmzeit
   var ZOOM_MS = 3000;    // Dauer der Kamerafahrt
   var RELEASE_AT = 0.6;  // Anteil der Fahrt, ab dem die Seite frei ist: Das Fenster füllt dann fast den Bildschirm, die Hero-Überschrift steigt ein
   var state = 'build';
@@ -148,6 +149,8 @@
     return s.webm && v.canPlayType('video/webm; codecs="vp9"') === 'probably' ? s.webm : s.mp4;
   }
   build.muted = true;
+  // defaultPlaybackRate überlebt load() (MP4-Rückfall), playbackRate allein würde dabei auf 1 zurückfallen
+  build.defaultPlaybackRate = build.playbackRate = BUILD_RATE;
   // Fehler beim Laden oder Dekodieren (etwa ein WebM-Profil, das Safari nicht kann, obwohl canPlayType „probably“ sagt):
   // einmal mit dem MP4 (H.264 geht überall) neu versuchen, erst danach gilt der Film als defekt.
   function retryMp4(v, s) {
