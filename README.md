@@ -140,7 +140,7 @@ im Theme-Editor unter **Header → Spalten in eigener Reihenfolge**. Die Unterpu
 
 Motorräder stehen nach **Modellfamilie** (seit 16.11.): erst die Familie, darin der Preis aufsteigend, bei gleichem Preis A–Z. Das gilt für
 die Motorrad-Kollektionen (Standard-Sortierung „Modellfamilie“, im Menü „Sortieren“ weiter Preis, A–Z usw. wählbar) und den Showroom der
-Startseite. Die Reihenfolge der Familien steht in den Theme-Einstellungen unter **Motorräder** (heute Cruiser, Sport, Grand American Touring,
+Startseite. Die Reihenfolge der Familien steht in den Theme-Einstellungen unter **Motorräder** (heute Sport, Cruiser, Grand American Touring,
 Adventure Touring, Trike). Dafür stehen die Motorrad-Kollektionen im Admin auf Sortierung **„Manuell“**: Das Theme zeigt diese Sortierung als
 „Modellfamilie“ und sortiert selbst (`snippets/bike-order.liquid`); eine neue Motorrad-Kollektion braucht ebenfalls „Manuell“ und die Vorlage
 `collection.motorrad`. Grenze: bis 50 Motorräder je Kollektion bzw. Filterergebnis, darüber gilt die manuelle Reihenfolge aus dem Admin.

@@ -66,7 +66,7 @@
   {
     "name": "Motorräder",
     "settings": [
-      { "type": "text", "id": "bike_family_order", "label": "Reihenfolge der Modellfamilien", "default": "Cruiser, Sport, Grand American Touring, Adventure Touring, Trike", "info": "Kommagetrennt, Schreibweise wie im Feld „Modellfamilie“ am Motorrad. Gilt für die Sortierung „Modellfamilie“ der Motorrad-Kollektionen und den Showroom auf der Startseite: erst nach Familie in dieser Reihenfolge, darin nach Preis aufsteigend. Familien, die hier fehlen, kommen danach." }
+      { "type": "text", "id": "bike_family_order", "label": "Reihenfolge der Modellfamilien", "default": "Sport, Cruiser, Grand American Touring, Adventure Touring, Trike", "info": "Kommagetrennt, Schreibweise wie im Feld „Modellfamilie“ am Motorrad. Gilt für die Sortierung „Modellfamilie“ der Motorrad-Kollektionen und den Showroom auf der Startseite: erst nach Familie in dieser Reihenfolge, darin nach Preis aufsteigend. Familien, die hier fehlen, kommen danach." }
     ]
   },
   {

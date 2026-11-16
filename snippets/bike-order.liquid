@@ -18,7 +18,7 @@
     Schlüssel je Bike: Rang der Familie (zweistellig) ~ Name einer unbekannten Familie ~ Preis in Cent (auf feste Länge
     gebracht) ~ Position in products. Als Text sortiert ergibt das Familie → Preis → Name (die Position stammt aus der A–Z-Liste).
   endcomment
-  assign order_list = settings.bike_family_order | default: 'Cruiser, Sport, Grand American Touring, Adventure Touring, Trike' | downcase | split: ','
+  assign order_list = settings.bike_family_order | default: 'Sport, Cruiser, Grand American Touring, Adventure Touring, Trike' | downcase | split: ','
   assign keys = ''
   for p in products
     assign fam = p.metafields.bike.modellfamilie.value | strip | downcase
